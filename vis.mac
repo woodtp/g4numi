@@ -2,8 +2,8 @@
 #
 # create empty scene
 #
-/vis/open DAWNFILE
-#/vis/open HepRepFile 600
+#/vis/open DAWNFILE
+/vis/open HepRepFile 600
 
 /vis/scene/create
 /vis/scene/add/trajectories

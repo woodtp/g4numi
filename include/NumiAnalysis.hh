@@ -29,9 +29,6 @@
 #include "NumiTrajectory.hh"
 #include "G4TrajectoryContainer.hh"
 
-#ifdef G4ANALYSIS_USE
-
-#endif
 
 class G4Track;
 
@@ -60,9 +57,7 @@ private:
   NumiAnalysis();
 
   static NumiAnalysis* instance;
-#ifdef G4ANALYSIS_USE
 
-#endif
 
   G4double x;
   G4double y;

@@ -68,7 +68,7 @@ NumiAnalysis* NumiAnalysis::getInstance()
 
 void NumiAnalysis::book()
 {
-#ifdef G4ANALYSIS_USE
+
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
   char filename[14];
   sprintf(filename,"%s%d%s","Numi_nt",pRunManager->GetCurrentRun()->GetRunID(),".root");
@@ -78,20 +78,20 @@ void NumiAnalysis::book()
   tree->Branch("data",&g4data,"run/I:evtno:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
 
   //book histograms
-#endif
+
 
 }
 
 void NumiAnalysis::finish()
 {
-#ifdef G4ANALYSIS_USE
+
   ntuple->cd();
   tree->Write();
   ntuple->Close();
   // close files
 
   delete ntuple;
-#endif
+
 
 }
 
@@ -119,7 +119,6 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
  
   G4double enuzr=gamma*(track.GetTotalEnergy())-partial; //neutrino energy in parent rest frame
  
-#ifdef G4ANALYSIS_USE
   //fill histograms, ntuples,...
 
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
@@ -419,7 +418,7 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
   
   
   tree->Fill();  // since I already defined where does tree get the data
-#endif
+
 
   // Write to file
   G4bool writeascii=true;

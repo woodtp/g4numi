@@ -37,7 +37,7 @@ int main(int argc,char** argv)
   runManager->SetUserAction(new NumiPrimaryGeneratorAction);
 
   // set user action classes
-  runManager->SetUserAction(new NumiStackingAction);
+  runManager->SetUserAction(new NumiSteppingAction);
   runManager->SetUserAction(new NumiStackingAction);
   runManager->SetUserAction(new NumiTrackingAction);
   runManager->SetUserAction(new NumiRunAction);
