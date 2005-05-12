@@ -20,6 +20,7 @@
 #include "G4AssemblyVolume.hh"
 #include "NumiMagneticField.hh"
 #include "G4Transform3D.hh"
+#include "G4PhysicalVolumeStore.hh"
 
 NumiDetectorConstruction::NumiDetectorConstruction()
 {
@@ -36,7 +37,7 @@ NumiDetectorConstruction::~NumiDetectorConstruction()
 {
   delete numiMagField; 
   delete numiMagFieldIC;
-  delete numiMagFieldOC;
+  delete numiMagFieldOC; 
   delete NumiData;
   DestroyMaterials();
 }
@@ -53,9 +54,20 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
  
   ConstructTargetHall();
   ConstructDecayPipe();
+  ConstructBaffle();
   ConstructTarget();
   ConstructHorns();
   ConstructHadronAbsorber();
 
   return ROCK;
+}
+ 
+G4VPhysicalVolume* NumiDetectorConstruction::GetPhysicalVolume(G4String PVname)
+{
+  G4PhysicalVolumeStore* PVStore=G4PhysicalVolumeStore::GetInstance();
+  for (size_t ii=0;ii<(*PVStore).size();ii++){
+    if ((*PVStore)[ii]->GetName()==PVname) return (*PVStore)[ii];
+  }
+  G4cout << "NumiDetectorConstruction: Volume "<<PVname<< " is not in Physical Volume Store"<<G4endl;
+  return 0;
 }

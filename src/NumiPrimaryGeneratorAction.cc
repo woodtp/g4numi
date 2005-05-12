@@ -6,6 +6,7 @@
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
 #include "globals.hh"
+#include "Randomize.hh"
 
 NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
 {
@@ -26,6 +27,16 @@ NumiPrimaryGeneratorAction::~NumiPrimaryGeneratorAction()
 
 void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+  G4double x0;
+  G4double y0;
+  G4double z0;
+  G4double meanx=0.; G4double sigmax=0.9*mm;
+  G4double meany=0.; G4double sigmay=1.*mm;
+  x0 = G4RandGauss::shoot(meanx,sigmax);
+  y0 = G4RandGauss::shoot(meany,sigmay);
+  z0 = -3.0*m;
+
+  particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);
 }
 

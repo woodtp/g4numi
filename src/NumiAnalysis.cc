@@ -223,8 +223,12 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
     }
 
   g4data.Necm=enuzr/GeV; // Neutrino energy in parent rest frame
-  g4data.Nimpwt=1.;  // Hadron production weight
-  
+
+  NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
+ 
+  g4data.Nimpwt=info->GetNImpWt();  // Importance weight
+
+
   g4data.xpoint=0.;  // x, y, z of parent at user selected vol
   g4data.xpoint=0.;
   g4data.xpoint=0.;
@@ -243,6 +247,7 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
   G4ThreeVector ParticleMomentum=G4ThreeVector(-999999,-999999,-999999);
   G4ThreeVector ParticlePosition=G4ThreeVector(-999999,-999999,-999999);
   NumiTrajectory* PParentTrack=GetParentTrajectory(track.GetParentID());
+
   while (!findtarget){
     G4int noofpoint=PParentTrack->GetPointEntries();
     G4String lastvolname=PParentTrack->GetPreStepVolumeName(noofpoint-2);
@@ -426,7 +431,7 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
     std::ofstream asciiFile(asciiFileName, std::ios::app);
     if(asciiFile.is_open()) {
       asciiFile << g4data.Ntype<< " " << g4data.Nenergy << " " << g4data.NenergyN[0] << " " << g4data.NWtNear[0];
-      asciiFile << " " << g4data.NenergyF[0] << " " << g4data.NWtFar[0] << G4endl;
+      asciiFile << " " << g4data.NenergyF[0] << " " << g4data.NWtFar[0] <<" "<<g4data.Nimpwt<< G4endl; 
       asciiFile.close();
     }
   }

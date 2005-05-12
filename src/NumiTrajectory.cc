@@ -59,10 +59,12 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
    NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
    if (info!=0) {
      decaycode=info->GetDecayCode();
-     tgen = info->Gettgen();}
+     tgen = info->Gettgen();
+     nimpwt = info->GetNImpWt();}
    else { 
      decaycode=0;
      tgen=0; 
+     nimpwt=1.;
    }
 }
 
@@ -96,6 +98,7 @@ NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
   ParticleMass = right.ParticleMass;
   decaycode = right.decaycode;
   tgen = right.tgen;
+  nimpwt = right.nimpwt;
 }
 
 NumiTrajectory::~NumiTrajectory()

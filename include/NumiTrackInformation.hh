@@ -32,12 +32,18 @@ class NumiTrackInformation : public G4VUserTrackInformation
     {return tgen;}
     inline void Settgen(G4int tgeneration)
     {tgen=tgeneration;}
+
+    inline G4double GetNImpWt() const 
+    {return Nimpwt;}
+    inline void SetNImpWt(G4double nimpweight)
+    {Nimpwt=nimpweight;}
     
     void Print() const;
 
   private:
     G4int              decay_code;
     G4int              tgen;
+    G4double           Nimpwt;
 
 };
 

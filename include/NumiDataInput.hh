@@ -1,8 +1,14 @@
 #include "globals.hh"
 #include "G4ThreeVector.hh"
+#include <vector>
 
 #ifndef NumiDataInput_h
 #define NumiDataInput_h 1
+
+typedef std::vector<G4double> vdouble_t;
+typedef std::vector<G4int> vint_t;
+typedef std::vector<G4String> vstring_t;
+typedef std::vector<G4bool> vbool_t;
 
 class NumiDataInput
 {
@@ -15,6 +21,8 @@ private:
   static NumiDataInput* fNumiDataInput;
 
 public:
+
+  G4bool NImpWeightOn;
 
   // World Volume
   G4double RockRadius, RockHalfLen, RockDensity, RockRadLen;
@@ -34,22 +42,22 @@ public:
   //HPBaffle 
   G4int HPBaffle, HPBaffleGEANTMat;
   G4double HPBaffleX0,HPBaffleY0,HPBaffleZ0,HPBaffleDXDZ,HPBaffleDYDZ;
-  G4double HPBaffleHeight,HPBaffleWidth,HPBaffleLength;
-  G4double HPBaffleHoleHeight,HPBaffleHoleWidth;
+  G4double HPBaffleLength,HPBaffleRin,HPBaffleRout;
 
   //Cooling pipes
   G4int NCPipeN;
-  G4bool CPipeFilledWater[20];
-  G4double CPipeX0[20],CPipeY0[20],CPipeZ0[20],CPipeLength[20],CPipeRadiusIn[20],CPipeRadiusOut[20],CPipeWallThick[20];
-  G4double CPipeDXDZ[20],CPipeDYDZ[20];
-  G4int CPGeantMat[20];
-  G4double CPipeCurvRad[20],CPipeOpenAng[20],CPipeCloseAng[20];
+  vbool_t CPipeFilledWater;
+  vdouble_t CPipeX0,CPipeY0,CPipeZ0,CPipeLength,CPipeRadiusIn,CPipeRadiusOut,CPipeWallThick;
+  vdouble_t CPipeDXDZ,CPipeDYDZ;
+  vint_t CPGeantMat;
+  vdouble_t CPipeCurvRad,CPipeOpenAng,CPipeCloseAng;
+  vstring_t CPipeVolName;
   
   //Container
   G4int NContainerN;
-  G4double CTubeZ0[20],CTubeLength[20],CTubeRin[20],CTubeRout[20];
-  G4int CTubeGeantMat[20],CTubeHoleIndex[20];
-  G4String CTubeVolName[20];
+  vdouble_t CTubeZ0,CTubeLength,CTubeRin,CTubeRout;
+  vint_t CTubeGeantMat,CTubeHoleIndex;
+  vstring_t CTubeVolName;
 
   // Tunnel
   G4double TunnelZ0, TunnelRadius, TunnelLength, TunnelA, TunnelZ;
@@ -63,28 +71,30 @@ public:
   // Decay Pipe Shield
   G4double ShieldX0,ShieldY0,ShieldZ0,ShieldDxdz, ShieldDydz,ShieldLength,ShieldRout,ShieldRin;
   G4int ShieldGEANTmat;
-
-  // Blocks
+  
+  //Blocks
   G4double BlockNblock;
-  G4double BlockX0[20],BlockY0[20],BlockZ0[20], BlockDxdz[20],BlockDydz[20];
-  G4double BlockLength[20],BlockHdx[20],BlockHdy[20];
-  G4int BlockGeantmat[20];
+  vdouble_t BlockX0,BlockY0,BlockZ0, BlockDxdz,BlockDydz;
+  vdouble_t BlockLength,BlockHdx,BlockHdy;
+  vint_t BlockGeantMaterial;
+  vstring_t BlockName;
+  vstring_t BlockMotherVolume;
 
   // Horn 1 & 2
   G4int PhornNphorn;
 
-  G4double PhornZ1[8], PhornZ2[8];  
-  G4int  PhornNpoint[8];  
-  G4double PhornAin[8], PhornBin[8], PhornCin[8], PhornAout[8], PhornBout[8], PhornCout[8];
-  G4double  PhornROCin[8], PhornROCout[8];
-  G4double PhornThickFront[8], PhornThickEnd[8];
-  
-  G4double PhornX0[8], PhornY0[8], PhornZ0[8], PhornDXDZ[8], PhornDYDZ[8], PhornCurrent[8];
-  G4int PhornGEANTmat[8]; 
+  vdouble_t PhornZ1, PhornZ2;  
+  vint_t  PhornNpoint;  
+  vdouble_t PhornAin, PhornBin, PhornCin, PhornAout, PhornBout, PhornCout;
+  vdouble_t  PhornROCin, PhornROCout;
+  vdouble_t PhornThickFront, PhornThickEnd;  
+  vdouble_t PhornX0, PhornY0, PhornZ0, PhornDXDZ, PhornDYDZ, PhornCurrent;
+  vint_t PhornGEANTmat; 
+  vstring_t PhornName;
   
   // Flux Area
-  G4double xdet_near[10],ydet_near[10],zdet_near[10];
-  G4double xdet_far[10],ydet_far[10],zdet_far[10];
+  vdouble_t xdet_near,ydet_near,zdet_near;
+  vdouble_t xdet_far,ydet_far,zdet_far;
 
   G4double HornCurrent; //old
   

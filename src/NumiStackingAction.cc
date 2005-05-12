@@ -12,9 +12,13 @@
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
 #include "G4ios.hh"
+#include "NumiImpWeight.hh"
+#include "NumiTrackInformation.hh"
+#include "NumiDataInput.hh"
 
 NumiStackingAction::NumiStackingAction()
 { 
+  NumiData=NumiDataInput::GetNumiDataInput();
 }
 
 NumiStackingAction::~NumiStackingAction()
@@ -30,28 +34,48 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
   // Discard Gammas, Electrons, ...
   if ((particleType==G4Gamma::GammaDefinition())||
       (particleType==G4Electron::ElectronDefinition())||
-      (particleType==G4Positron::PositronDefinition()))
+      (particleType==G4Positron::PositronDefinition())&&
+      (classification != fKill))
     {classification = fKill;}
 
   //Discard particles with pz<0
   G4ThreeVector momentum=aTrack->GetMomentumDirection();
-  if (momentum[2]<0) 
+  if (momentum[2]<0&&(classification != fKill)) 
     {classification = fKill;}
   
   //Discard particles with kinetic energy < 0.5GeV
   G4double energy = aTrack->GetKineticEnergy();
-  if (energy < 0.5*GeV) 
-    {classification = fKill;}
+  if (energy < 0.5*GeV&&(classification != fKill)) 
+    {classification = fKill;} 
   
-  return classification;
-}
+  //If importance weighting is on:
+  if (NumiData->NImpWeightOn&&(classification != fKill)){
+    NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
+    if (oldinfo!=0) {
+      if (oldinfo->GetNImpWt()==1.){                                     //Check if it already has weight (because one of the parents was weighted)
+	G4double Nimpweight=NumiImpWeight::CalculateImpWeight(aTrack);
 
-void NumiStackingAction::NewStage()
+	if(Nimpweight==0)
+	  {classification = fKill;} 
+	else {	  
+	  NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
+	  if (oldinfo!=0) oldinfo->SetNImpWt(Nimpweight);
+	  // only primary protons don't have TrackInformation already     
+	  // all others have some info set by NumiTrackingAction
+	}
+      }
+    }
+  }
+
+  return classification;
+} 
+
+void NumiStackingAction::NewStage() 
 {
   // stackManager->ReClassify();
   //  return;
 }
-    
+  
 void NumiStackingAction::PrepareNewEvent()
 { 
 }

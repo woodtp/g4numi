@@ -12,6 +12,9 @@ NumiDataInput::NumiDataInput()
     { G4Exception("NumiDataInput constructed twice.");}
   fNumiDataInput = this;
 
+
+  NImpWeightOn=false;
+
   //Rock        1
   //=======================================================================
   RockRadius  = 10.0*m;
@@ -56,12 +59,10 @@ NumiDataInput::NumiDataInput()
   HPBaffleZ0         = -3.04*m;
   HPBaffleDXDZ       =  0.0;
   HPBaffleDYDZ       =  0.0;
-  HPBaffleHeight     =  0.10*m;
-  HPBaffleWidth      =  0.10*m;
   HPBaffleLength     =  1.20*m;
-  HPBaffleHoleHeight = 12.0E-3*m;
-  HPBaffleHoleWidth  =  5.4E-3*m;
-
+  HPBaffleRin        =  5.5*mm;
+  HPBaffleRout       =  3.*cm;
+ 
   //Cooling pipes
   NCPipeN = 9;
   //=======================================================================
@@ -69,7 +70,7 @@ NumiDataInput::NumiDataInput()
   //=======================================================================
   G4int CPGeantMat_[]        = {31     ,   31   ,10     , 10     , 10    , 10    ,  10   , 10    , 10 };
   G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , true  ,true   ,false  ,true   , false};
-  G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0      , 0.    , 0.    ,  0.};
+  G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.};
   G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.};
   G4double CPipeZ0_[]        = {-0.625 , -0.625 ,-0.65  ,-0.65   , -.6501,-.6501 ,.619   , .6195 , .6235};
   G4double CPipeDXDZ_[]      = {    0  ,  0     , 0     ,  0     ,-99999 ,-99999 , 0     ,  0    , 0}; 
@@ -81,22 +82,24 @@ NumiDataInput::NumiDataInput()
   G4double CPipeCurvRad_[]   = {0      , 0      , 0     , 0      ,2.45e-2,2.45e-2, 0     ,   0   , 0}; // straight tube if this is 0;
   G4double CPipeOpenAng_[]   = {0      , 0      , 0     , 0      ,90.    ,90.    , 0     ,   0   , 0};
   G4double CPipeCloseAng_[]  = {0      , 0      , 0     , 0      ,270.   ,270.   , 0     ,   0   , 0};
+  G4String CPipeVolName_[]   = {"Pipe1","Pipe2" ,"Pipe3","Pipe4" ,"Pipe5","Pipe6","Pipe7","Pipe8","Pipe9"};
 
   for (G4int ii=0;ii<NCPipeN;ii++){
-    CPGeantMat[ii]= CPGeantMat_[ii];
-    CPipeFilledWater[ii]=CPipeFilledWater_[ii];
-    CPipeX0[ii] = CPipeX0_[ii]*m;
-    CPipeY0[ii] = CPipeY0_[ii]*m;   
-    CPipeZ0[ii] = CPipeZ0_[ii]*m;
-    CPipeDXDZ[ii] = CPipeDXDZ_[ii];
-    CPipeDYDZ[ii] = CPipeDYDZ_[ii];
-    CPipeLength[ii] = CPipeLength_[ii]*m;
-    CPipeRadiusOut[ii] = CPipeRadiusOut_[ii]*m;
-    CPipeRadiusIn[ii] = CPipeRadiusIn_[ii]*m;
-    CPipeWallThick[ii] = CPipeWallThick_[ii]*m;
-    CPipeCurvRad[ii] = CPipeCurvRad_[ii]*m;
-    CPipeOpenAng[ii] = CPipeOpenAng_[ii]*deg;
-    CPipeCloseAng[ii] = CPipeCloseAng_[ii]*deg;
+    CPGeantMat.push_back(CPGeantMat_[ii]);
+    CPipeFilledWater.push_back(CPipeFilledWater_[ii]);
+    CPipeX0.push_back(CPipeX0_[ii]*m);
+    CPipeY0.push_back(CPipeY0_[ii]*m);   
+    CPipeZ0.push_back(CPipeZ0_[ii]*m);
+    CPipeDXDZ.push_back(CPipeDXDZ_[ii]);
+    CPipeDYDZ.push_back(CPipeDYDZ_[ii]);
+    CPipeLength.push_back(CPipeLength_[ii]*m);
+    CPipeRadiusOut.push_back(CPipeRadiusOut_[ii]*m);
+    CPipeRadiusIn.push_back(CPipeRadiusIn_[ii]*m);
+    CPipeWallThick.push_back(CPipeWallThick_[ii]*m);
+    CPipeCurvRad.push_back(CPipeCurvRad_[ii]*m);
+    CPipeOpenAng.push_back(CPipeOpenAng_[ii]*deg);
+    CPipeCloseAng.push_back(CPipeCloseAng_[ii]*deg);
+    CPipeVolName.push_back(CPipeVolName_[ii]);
   }
   
   //Container
@@ -112,19 +115,19 @@ NumiDataInput::NumiDataInput()
   G4String CTubeVolName_[]={"BeDW"  ,"AlTube1","AlTube2", "Ring1" ,"Ring2"   ,"Ring3"   ,"Ring4"  , "Ring5" ,"CLid2" ,"CLid1","BeUp1", "BeUp2","BeUp3" ,"BFront","Body","BEnd" };
 
  for (G4int ii=0;ii<NContainerN;ii++){
-    CTubeZ0[ii]=CTubeZ0_[ii]*m;
-    CTubeLength[ii]=CTubeLength_[ii]*m;
-    CTubeRin[ii]=CTubeRin_[ii]*m;
-    CTubeRout[ii]=CTubeRout_[ii]*m;
-    CTubeHoleIndex[ii]=CTubeHoleIndex_[ii];
-    CTubeGeantMat[ii]= CTubeGeantMat_[ii];
-    CTubeVolName[ii]= CTubeVolName_[ii];
+    CTubeZ0.push_back(CTubeZ0_[ii]*m);
+    CTubeLength.push_back(CTubeLength_[ii]*m);
+    CTubeRin.push_back(CTubeRin_[ii]*m);
+    CTubeRout.push_back(CTubeRout_[ii]*m);
+    CTubeHoleIndex.push_back(CTubeHoleIndex_[ii]);
+    CTubeGeantMat.push_back(CTubeGeantMat_[ii]);
+    CTubeVolName.push_back(CTubeVolName_[ii]);
  }
 
   //Tunnel         1
   //=======================================================================
   TunnelZ0       = 45.28*m;
-  TunnelRadius   = 3.3*m;
+  TunnelRadius   = 3.3*m+.5*m; //added .5m because hadron absorber does not fit entirely inside 3.3
   TunnelLength   = 693.86*m;
   TunnelA        = 0.0;
   TunnelZ        = 0.0;
@@ -168,19 +171,24 @@ NumiDataInput::NumiDataInput()
   G4double BlockLength_[]= { 49.28 ,  49.28 ,  49.28 ,  13.0  , 6.0   , 30.279, 5.2832,  5.2832, 2.2860  , 0.9144  , 2.4384,  2.9972, 2.9972,  20.0E-3 };
   G4double BlockHdx_[]   = { 0.8128,  0.8128,  2.2098,  0.5842, 0.5842, 0.5842, 0.9906,  0.6604, 0.6604  , 2.3114  , 0.6477,  0.6604, 0.6604,  17.5E-3 };
   G4double BlockHdy_[]   = { 1.8232,  1.8232,  0.4628,  1.0109, 0.9982, 1.0109, 2.6416,  2.6416, 2.6416  , 2.6416  , 0.6477,  0.9906, 0.9906,  3.2E-3 };
-  G4int BlockGeantmat_[] = { 10    ,  10    ,  10    ,  10    , 10    , 10    , 10    ,  10    , 10      , 17      , 9     ,  10    , 10    ,  18 };
+  G4int BlockGeantMaterial_[] = { 10,  10   ,  10    ,  10    , 10    , 10    , 10    ,  10    , 10      , 17      , 9     ,  10    , 10    ,  18 };
+  G4String BlockName_[]  = {"BLK1" , "BLK2" ,"BLK3"  ,"BLK4"  ,"BLK5" ,"BLK6" ,"BLK7" , "BLK8" , "BLK9"  , "BLK10" ,"BLK11","BLK12" ,"BLK13","BLK14" };
+  G4String BlockMotherVolume_[]={"TGAR","TGAR","TGAR","TGAR"  ,"TGAR" ,"TGAR" ,"TUNE" , "TUNE" , "TUNE"  , "TUNE"  ,"TUNE" ,"TUNE"  ,"TUNE" ,"TGAR" };
 
   for (G4int ii=0;ii<BlockNblock;ii++){
-    BlockX0[ii]=BlockX0_[ii]*m;
-    BlockY0[ii]=BlockY0_[ii]*m;
-    BlockZ0[ii]=BlockZ0_[ii]*m;
-    BlockDxdz[ii]=BlockDxdz_[ii];
-    BlockDydz[ii]=BlockDydz_[ii];
-    BlockLength[ii]= BlockLength_[ii]*m;
-    BlockHdx[ii]= BlockHdx_[ii]*m;
-    BlockHdy[ii]=BlockHdy_[ii]*m;
-    BlockGeantmat[ii]=BlockGeantmat_[ii];
+    BlockX0.push_back(BlockX0_[ii]*m);
+    BlockY0.push_back(BlockY0_[ii]*m);
+    BlockZ0.push_back(BlockZ0_[ii]*m);
+    BlockDxdz.push_back(BlockDxdz_[ii]);
+    BlockDydz.push_back(BlockDydz_[ii]);
+    BlockLength.push_back(BlockLength_[ii]*m);
+    BlockHdx.push_back(BlockHdx_[ii]*m);
+    BlockHdy.push_back(BlockHdy_[ii]*m);
+    BlockGeantMaterial.push_back(BlockGeantMaterial_[ii]);
+    BlockName.push_back(BlockName_[ii]);
+    BlockMotherVolume.push_back(BlockMotherVolume_[ii]);
   }
+
 
   HornCurrent=205; //kA
   PhornNphorn=8;
@@ -213,47 +221,47 @@ NumiDataInput::NumiDataInput()
   G4int PhornGEANTmat_[]      = {       20  ,       20  ,      20  ,      20   ,     20   ,  20      , 20      ,  20      };
   
   for (G4int ii=0;ii<PhornNphorn;ii++){
-    PhornZ1[ii]         = PhornZ1_[ii]*m;
-    PhornZ2[ii]         = PhornZ2_[ii]*m;  
+    PhornZ1.push_back(PhornZ1_[ii]*m);
+    PhornZ2.push_back(PhornZ2_[ii]*m);  
     
-    PhornNpoint[ii]     = PhornNpoint_[ii];
-    PhornAin[ii]        = PhornAin_[ii]*cm; 
-    PhornBin[ii]        = PhornBin_[ii]/cm;
-    PhornCin[ii]        = PhornCin_[ii]*cm;   
-    PhornAout[ii]       = PhornAout_[ii]*cm;   
-    PhornBout[ii]       = PhornBout_[ii]/cm;
-    PhornCout[ii]       = PhornCout_[ii]*cm;
+    PhornNpoint.push_back(PhornNpoint_[ii]);
+    PhornAin.push_back(PhornAin_[ii]*cm); 
+    PhornBin.push_back(PhornBin_[ii]/cm);
+    PhornCin.push_back(PhornCin_[ii]*cm);   
+    PhornAout.push_back(PhornAout_[ii]*cm);   
+    PhornBout.push_back(PhornBout_[ii]/cm);
+    PhornCout.push_back(PhornCout_[ii]*cm);
     
-    PhornROCin[ii]      = PhornROCin_[ii]*m;  
-    PhornROCout[ii]     = PhornROCout_[ii]*m;
+    PhornROCin.push_back(PhornROCin_[ii]*m);  
+    PhornROCout.push_back(PhornROCout_[ii]*m);
     
-    PhornThickFront[ii] = PhornThickFront_[ii]*m;
-    PhornThickEnd[ii]   = PhornThickEnd_[ii]*m;
+    PhornThickFront.push_back(PhornThickFront_[ii]*m);
+    PhornThickEnd.push_back(PhornThickEnd_[ii]*m);
     
-    PhornX0[ii]         = PhornX0_[ii]*m;    
-    PhornY0[ii]         = PhornY0_[ii]*m;  
-    PhornZ0[ii]         = PhornZ0_[ii]*m;  
-    PhornDXDZ[ii]       = PhornDXDZ_[ii];   
-    PhornDYDZ[ii]       = PhornDYDZ_[ii]; 
-    PhornCurrent[ii]    = PhornCurrent_[ii];
-    PhornGEANTmat[ii]   = PhornGEANTmat_[ii];
+    PhornX0.push_back(PhornX0_[ii]*m);    
+    PhornY0.push_back(PhornY0_[ii]*m);  
+    PhornZ0.push_back(PhornZ0_[ii]*m);  
+    PhornDXDZ.push_back(PhornDXDZ_[ii]);   
+    PhornDYDZ.push_back(PhornDYDZ_[ii]); 
+    PhornCurrent.push_back(PhornCurrent_[ii]);
+    PhornGEANTmat.push_back(PhornGEANTmat_[ii]);
   }
 
  //Near & Far Detector location
-  xdet_near[0]=0;
-  ydet_near[0]=0;
-  zdet_near[0]=1040.*m;
-  xdet_far[0]=0;
-  ydet_far[0]=0;
-  zdet_far[0]=735000.*m;
+  xdet_near.push_back(0);
+  ydet_near.push_back(0);
+  zdet_near.push_back(1040.*m);
+  xdet_far.push_back(0);
+  ydet_far.push_back(0);
+  zdet_far.push_back(735000.*m);
 
   for(G4int ii=1;ii<10;ii++){
-  xdet_near[ii]=0;
-  ydet_near[ii]=0;
-  zdet_near[ii]=0;
-  xdet_far[ii]=0;
-  ydet_far[ii]=0;
-  zdet_far[ii]=0;
+  xdet_near.push_back(0);
+  ydet_near.push_back(0);
+  zdet_near.push_back(0);
+  xdet_far.push_back(0);
+  ydet_far.push_back(0);
+  zdet_far.push_back(0);
   }
   
 }

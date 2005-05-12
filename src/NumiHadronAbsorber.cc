@@ -33,7 +33,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
       BLK_solid[ii] = new G4Box(vol_name,NumiData->BlockHdx[ii],NumiData->BlockHdy[ii],NumiData->BlockLength[ii]/2.);
       vol_name="BLK_log";
       vol_name.append(no);
-      G4Material* material=GetMaterial(NumiData->BlockGeantmat[ii]);
+      G4Material* material=GetMaterial(NumiData->BlockGeantMaterial[ii]);
       BLK_log[ii] = new G4LogicalVolume(BLK_solid[ii],material,vol_name,0,0,0);
       vol_name="BLK";
       vol_name.append(no);

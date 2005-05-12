@@ -7,9 +7,10 @@
 
 #include "globals.hh"
 #include "G4UserStackingAction.hh"
-#include "G4ThreeVector.hh"
+//#include "G4ThreeVector.hh"
 
 class G4Track;
+class NumiDataInput;
 
 class NumiStackingAction : public G4UserStackingAction
 {
@@ -21,6 +22,8 @@ class NumiStackingAction : public G4UserStackingAction
     virtual void NewStage();
     virtual void PrepareNewEvent();
 
+  private:
+  NumiDataInput * NumiData;
 };
 
 #endif

@@ -1,16 +1,33 @@
-# $Id: GNUmakefile,v 1.2 2005/04/05 20:29:13 zarko Exp $
 # --------------------------------------------------------------
-# GNUmakefile for examples module.  Gabriele Cosmo, 06/04/98.
+# GNUmakefile for physics list user.  
+# JPW. Fri Jul 25 10:39:58 CEST 2003
 # --------------------------------------------------------------
 
 name := g4numi
+
 G4TARGET := $(name)
 G4EXLIB := true
 
 ifndef G4INSTALL
-  G4INSTALL = ../../..
+  G4INSTALL = ../..
 endif
 
+
+include $(G4INSTALL)/config/architecture.gmk
+
+#
+# define G4LISTS_BASE, if you have your own physics lists area installed
+# point G4LISTS_BASE to the directory, that contains the subdirectory 'lists'.
+#
+ifndef G4LISTS_BASE
+  EXTRALIBS += -L$(G4LIB)/.lists_build/$(G4SYSTEM)
+  G4LISTS_BASE = $(G4INSTALL)/hadronic_lists
+else
+  EXTRALIBS += -L$(G4LISTS_BASE)/lists/.lists_build/lib/$(G4SYSTEM)
+endif
+
+#for root
+#CPPFLAGS   +=  -I$(ROOTSYS)/include
   CPPFLAGS += $(shell $(ROOTSYS)/bin/root-config --cflags)
 
   ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit -lHtml
@@ -19,36 +36,184 @@ endif
   ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
   INTYLIBS      += $(ROOTLIBS)
 
-# Root (exlude libNew and libpthread from library list)
+#for debuging
+   CPPFLAGS += -g	
+#
+# Select your physics lists to link against.
+#
+# EXTRALIBS += -lFTFC
+# EXTRALIBS += -lFTFP
+# EXTRALIBS += -lLBE
+# EXTRALIBS += -lLHEP
+# EXTRALIBS += -lLHEP_GN
+# EXTRALIBS += -lLHEP_HP
+# EXTRALIBS += -lLHEP_LEAD
+# EXTRALIBS += -lLHEP_BERT_HP
+# EXTRALIBS += -lLHEP_BIC_HP
+# EXTRALIBS += -lLHEP_LEAD_HP
+# EXTRALIBS += -lLHEP_PRECO
+# EXTRALIBS += -lQGSP_BERT
+# EXTRALIBS += -lLHEP_PRECO_HP
+# EXTRALIBS += -lQGSC
+# EXTRALIBS += -lQGSC_LEAD
+# EXTRALIBS += -lQGSC_LEAD_HP
+EXTRALIBS += -lQGSP
+# EXTRALIBS += -lQGSP_GN
+# EXTRALIBS += -lQGSP_HP
+# EXTRALIBS += -lLHEP_BERT
+# EXTRALIBS += -lLHEP_BIC
+# EXTRALIBS += -lQGSP_BIC
+EXTRALIBS += -lPackaging
 
-#ROOTINC       = -I$(ROOTSYS)/include
+EXTRALIBS += -lG4hadronic_proc
+EXTRALIBS += -lG4hadronic_HE
+EXTRALIBS += -lG4hadronic_LE
+EXTRALIBS += -lG4hadronic_iso
+EXTRALIBS += -lG4had_neu_hp
+EXTRALIBS += -lG4hadronic_coherent_elastic
+EXTRALIBS += -lG4hadronic_hetcpp_evaporation
+EXTRALIBS += -lG4hadronic_hetcpp_utils
+EXTRALIBS += -lG4hadronic_bert_cascade
+EXTRALIBS += -lG4hadronic_interface_ci
+EXTRALIBS += -lG4hadronic_body_ci
+EXTRALIBS += -lG4hadronic_leading_particle
+EXTRALIBS += -lG4hadronic_stop
+EXTRALIBS += -lG4hadronic_radioactivedecay
 
-#ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit -lHtml
-#ROOTLIBS      := $(filter-out -lNew,$(ROOTLIBS))
-#ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
+EXTRALIBS += -lG4had_theo_max 
+EXTRALIBS += -lG4hadronic_qgstring
+EXTRALIBS += -lG4had_string_diff
+EXTRALIBS += -lG4had_string_frag
+EXTRALIBS += -lG4had_string_man
 
-# Extra flags for G4
-#CPPFLAGS += $(ROOTINC)
-#LDLIBS   += $(ROOTLIBS)
+EXTRALIBS += -lG4hadronic_binary 
+EXTRALIBS += -lG4had_im_r_matrix 
+EXTRALIBS += -lG4had_preequ_exciton 
+EXTRALIBS += -lG4hadronic_deex_evaporation 
+EXTRALIBS += -lG4hadronic_deex_fermi_breakup
+EXTRALIBS += -lG4hadronic_deex_fission
+EXTRALIBS += -lG4hadronic_deex_gem_evaporation
+EXTRALIBS += -lG4hadronic_deex_handler
+EXTRALIBS += -lG4hadronic_deex_management
+EXTRALIBS += -lG4hadronic_deex_multifragmentation
+EXTRALIBS += -lG4hadronic_deex_photon_evaporation
+EXTRALIBS += -lG4hadronic_deex_util
 
-include $(G4INSTALL)/config/architecture.gmk
+EXTRALIBS += -lG4had_mod_man 
+EXTRALIBS += -lG4had_mod_util
 
-include hadronic_lists.gmk
+EXTRALIBS += -lG4hadronic_mgt
+EXTRALIBS += -lG4hadronic_xsect
+EXTRALIBS += -lG4hadronic_util
 
-#G4ANALYSIS_USE:= true
+EXTRALIBS += -lG4shortlived
 
-ifdef G4ANALYSIS_USE
-  CPPFLAGS += `aida-config --include`
-  LDFLAGS += `aida-config --lib`
-endif
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/FTFC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/FTFP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LBE/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_BERT/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_BIC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_GN/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_BERT_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_BIC_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_LEAD/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_LEAD_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_PRECO/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/LHEP_PRECO_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/Packaging/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSC_LEAD/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSC_LEAD_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP_BERT/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP_BIC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP_GN/include
+CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP_HP/include
+
+
+LISTS_INCLUDE = $(G4LISTS_BASE)
+G4BASE = $(G4INSTALL)/source
+CPPFLAGS += -I$(G4BASE)/global/management/include \
+            -I$(G4BASE)/global/HEPRandom/include \
+            -I$(G4BASE)/global/HEPGeometry/include \
+            -I$(G4BASE)/geometry/volumes/include \
+            -I$(G4BASE)/geometry/management/include \
+            -I$(G4BASE)/geometry/magneticfield/include \
+            -I$(G4BASE)/geometry/navigation/include \
+            -I$(G4BASE)/intercoms/include \
+            -I$(G4BASE)/interface/include \
+            -I$(G4BASE)/track/include \
+            -I$(G4BASE)/event/include \
+            -I$(G4BASE)/particles/shortlived/include \
+            -I$(G4BASE)/particles/management/include \
+            -I$(G4BASE)/particles/leptons/include \
+            -I$(G4BASE)/particles/bosons/include \
+            -I$(G4BASE)/particles/hadrons/mesons/include \
+            -I$(G4BASE)/particles/hadrons/barions/include \
+            -I$(G4BASE)/particles/hadrons/ions/include \
+            -I$(G4BASE)/run/include \
+            -I$(G4BASE)/tracking/include \
+            -I$(G4BASE)/digits_hits/hits/include \
+            -I$(G4BASE)/digits_hits/digits/include \
+            -I$(G4BASE)/processes/management/include \
+            -I$(G4BASE)/processes/decay/include \
+            -I$(G4BASE)/processes/cuts/include \
+            -I$(G4BASE)/processes/optical/include \
+            -I$(G4BASE)/processes/transportation/include \
+            -I$(G4BASE)/processes/electromagnetic/lowenergy/include \
+            -I$(G4BASE)/processes/electromagnetic/standard/include \
+            -I$(G4BASE)/processes/electromagnetic/muons/include \
+            -I$(G4BASE)/processes/electromagnetic/utils/include \
+            -I$(G4BASE)/processes/electromagnetic/xrays/include \
+            -I$(G4BASE)/processes/hadronic/cross_sections/include \
+            -I$(G4BASE)/processes/hadronic/stopping/include \
+            -I$(G4BASE)/processes/hadronic/management/include \
+            -I$(G4BASE)/processes/hadronic/processes/include \
+            -I$(G4BASE)/processes/hadronic/util/include \
+            -I$(LISTS_INCLUDE)/lists/Packaging/include \
+            -I$(G4BASE)/processes/hadronic/models/management/include \
+            -I$(G4BASE)/processes/hadronic/models/util/include \
+            -I$(G4BASE)/processes/hadronic/models/binary_cascade/include \
+            -I$(G4BASE)/processes/hadronic/models/cascade/cascade/include \
+            -I$(G4BASE)/processes/hadronic/models/cascade/evaporation/include \
+            -I$(G4BASE)/processes/hadronic/models/cascade/utils/include \
+            -I$(G4BASE)/processes/hadronic/models/chiral_inv_phase_space/body/include \
+            -I$(G4BASE)/processes/hadronic/models/chiral_inv_phase_space/interface/include \
+            -I$(G4BASE)/processes/hadronic/models/coherent_elastic/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/evaporation/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/fermi_breakup/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/fission/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/gem_evaporation/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/handler/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/management/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/multifragmentation/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/photon_evaporation/include \
+            -I$(G4BASE)/processes/hadronic/models/de_excitation/util/include \
+            -I$(G4BASE)/processes/hadronic/models/high_energy/include \
+            -I$(G4BASE)/processes/hadronic/models/im_r_matrix/include \
+            -I$(G4BASE)/processes/hadronic/models/isotope_production/include \
+            -I$(G4BASE)/processes/hadronic/models/leading_particle/include \
+            -I$(G4BASE)/processes/hadronic/models/low_energy/include \
+            -I$(G4BASE)/processes/hadronic/models/neutron_hp/include \
+            -I$(G4BASE)/processes/hadronic/models/parton_string/diffraction/include \
+            -I$(G4BASE)/processes/hadronic/models/parton_string/hadronization/include \
+            -I$(G4BASE)/processes/hadronic/models/parton_string/management/include \
+            -I$(G4BASE)/processes/hadronic/models/parton_string/qgsm/include \
+            -I$(G4BASE)/processes/hadronic/models/pre_equilibrium/exciton_model/include \
+            -I$(G4BASE)/processes/hadronic/models/radioactive_decay/include \
+            -I$(G4BASE)/processes/hadronic/models/theo_high_energy/include \
+            -I$(G4BASE)/processes/hadronic/util/include \
+            -I$(G4BASE)/materials/include
 
 
 .PHONY: all
+ 
 all: lib bin
 
 include $(G4INSTALL)/config/binmake.gmk
 
-visclean:
-	rm -f g4*.prim g4*.eps g4*.wrl
-	rm -f .DAWN_*
+CXXFLAGS_WITHOUT_O := $(filter-out -O% , $(CXXFLAGS))
+CXXFLAGS_WITHOUT_O := $(filter-out +O% , $(CXXFLAGS_WITHOUT_O))
 

@@ -67,7 +67,8 @@ class NumiTrajectory : public G4VTrajectory
    { return tgen;}
    inline G4int GetDecayCode() const
    {return decaycode;}
-
+   virtual G4double GetNImpWt() const
+   {return nimpwt;}
   
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
@@ -83,6 +84,7 @@ class NumiTrajectory : public G4VTrajectory
    G4int                            decaycode;
    G4int                            eventno;
    G4int                            tgen;
+   G4double                         nimpwt;
    G4int                            fTrackID;
    G4int                            fParentID;
    G4ParticleDefinition*            fpParticleDefinition;

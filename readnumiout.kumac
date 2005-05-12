@@ -1,2 +1,2 @@
-n/cre 10 nt 6 ! ! ntype nenergy nenergyn nwtnear nenergyf nwtfar
+n/cre 10 nt 7 ! ! ntype nenergy nenergyn nwtnear nenergyf nwtfar nimpwt
 n/read 10 numi.out

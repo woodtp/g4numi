@@ -20,7 +20,8 @@
 
 void NumiDetectorConstruction::ConstructDecayPipe()
 {
-  // Tunnel
+
+// Tunnel
   G4double l=NumiData->TunnelLength/2;
   G4double r=NumiData->TunnelRadius;
   G4ThreeVector tunnel_position=G4ThreeVector(0,0,l+NumiData->TunnelZ0);

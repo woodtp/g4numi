@@ -33,11 +33,14 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   
   void ConstructTargetHall();
   void ConstructTarget();
+  void ConstructBaffle();
   void ConstructDecayPipe();
   void ConstructHadronAbsorber();  
   void ConstructHorns();  
   void DefineMaterials();
   void DestroyMaterials();
+
+  G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
   G4Material* GetMaterial(G4int matcode);
   G4double phornRgivenZ(G4double a, G4double b, G4double c, G4double z);
  
@@ -62,6 +65,8 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
     G4LogicalVolume* BLK_log[20]; 
     G4LogicalVolume* TGAR_log;
     G4LogicalVolume* Horn_PM_lv[8];
+    G4LogicalVolume* LVCPipe[20];
+  G4LogicalVolume* LVCPipeW[20];
 
     // Physical volumes
     //
@@ -70,7 +75,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
     G4VPhysicalVolume* TGAR;
     G4VPhysicalVolume* TRGT;
     G4VPhysicalVolume* PHORN[8];
-    G4VPhysicalVolume* CPIP[20];
+    G4VPhysicalVolume* PVCPipe[20];
     G4VPhysicalVolume* CNT[20];
 
     //Solids
