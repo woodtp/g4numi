@@ -44,7 +44,7 @@ NumiAnalysis* NumiAnalysis::instance = 0;
 
 NumiAnalysis::NumiAnalysis()
 {
-  NumiData=NumiDataInput::GetNumiDataInput();
+NumiData=NumiDataInput::GetNumiDataInput();
 #ifdef G4ANALYSIS_USE
 #endif
 
@@ -70,33 +70,78 @@ void NumiAnalysis::book()
 {
 
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
-  char filename[14];
-  sprintf(filename,"%s%d%s","Numi_nt",pRunManager->GetCurrentRun()->GetRunID(),".root");
-  ntuple = new TFile(filename, "recreate","root ntuple");  
+  //sprintf(filename,"%s%d%s","Numi_nt",pRunManager->GetCurrentRun()->GetRunID(),".root");
+  char filename[]="Numi_nt.root";
   
-  tree = new TTree("tree","g4numi data");
-  tree->Branch("data",&g4data,"run/I:evtno:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
-
+  if (NumiData->CreateNuNtuple){
+    //Check if file already existed
+    if (pRunManager->GetCurrentRun()->GetRunID()>0){
+      ntuple = new TFile(filename,"update","root ntuple");
+      tree=(TTree*)(ntuple->Get("nudata"));
+      tree->SetBranchAddress("data",&g4data);
+    }
+    else{
+      ntuple = new TFile(filename,"recreate","root ntuple");
+      tree = new TTree("nudata","g4numi Neutrino ntuple");
+      tree->Branch("data",&g4data,"run/I:evtno:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
+    }
+  }
+  
+  if (NumiData->CreateHadmmNtuple){
+    char hmmfilename[]="hadmm.root";
+    //if (hadmmntuple->GetSize()>1000){
+    if(pRunManager->GetCurrentRun()->GetRunID()>0){
+      hadmmntuple = new TFile(hmmfilename, "update","hadmm ntuple");
+      hadmmtree=(TTree*)(hadmmntuple->Get("hadmm"));
+      hadmmtree->SetBranchAddress("data",&g4hmmdata);
+    }
+    else{
+      hadmmntuple = new TFile(hmmfilename, "recreate","hadmm ntuple");
+      hadmmtree = new TTree("hadmm","g4numi Hadmmmon  ntuple");
+      hadmmtree->Branch("data",&g4hmmdata,"run/I:evtno:mtgthpos/D:mtgtvpos:mtgthsig:mtgtvsig:ptype/I:hmenergy/D:hmxpos:hmypos:hmzpos:hmmpx:hmmpy:hmmpz");
+    }
+  }
   //book histograms
-
-
 }
 
 void NumiAnalysis::finish()
 {
+  if (NumiData->CreateNuNtuple){
+    ntuple->cd();
+    tree->Write();
+    ntuple->Close();
+    delete ntuple;
+  }
 
-  ntuple->cd();
-  tree->Write();
-  ntuple->Close();
-  // close files
-
-  delete ntuple;
-
-
+  if (NumiData->CreateHadmmNtuple){
+    hadmmntuple->cd();
+    hadmmtree->Write();
+    hadmmntuple->Close();
+    delete hadmmntuple;
+  }
 }
-
-void NumiAnalysis::analyseStepping(const G4Track& track)
+void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 {
+  if (!NumiData->CreateHadmmNtuple) return;
+  G4RunManager* pRunManager=G4RunManager::GetRunManager();
+  g4hmmdata.run=pRunManager->GetCurrentRun()->GetRunID();
+  g4hmmdata.evtno=pRunManager->GetCurrentEvent()->GetEventID();
+  G4ParticleDefinition* particleDefinition=track.GetDefinition();
+  g4hmmdata.ptype=GetParticleCode(particleDefinition->GetParticleName());
+  g4hmmdata.hmmenergy=track.GetTotalEnergy();
+  g4hmmdata.hmmxpos=track.GetPosition()[0];
+  g4hmmdata.hmmypos=track.GetPosition()[1];
+  g4hmmdata.hmmzpos=track.GetPosition()[2];
+  g4hmmdata.hmmpx=track.GetMomentum()[0];
+  g4hmmdata.hmmpy=track.GetMomentum()[1];
+  g4hmmdata.hmmpz=track.GetMomentum()[2]; 
+ 
+  hadmmtree->Fill(); 
+ 
+}
+void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
+{
+  if (!NumiData->CreateNuNtuple) return;
 
   //Neutrino vertex position and momentum
   G4ThreeVector pos = track.GetPosition()/mm; 
@@ -435,7 +480,6 @@ void NumiAnalysis::analyseStepping(const G4Track& track)
       asciiFile.close();
     }
   }
-
 
 }
 

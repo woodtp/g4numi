@@ -42,7 +42,8 @@ public:
   
   void finish();
   
-  void analyseStepping(const G4Track& track);
+  void FillNeutrinoNtuple(const G4Track& track);
+  void FillHadmmNtuple(const G4Track& track);
   G4double GetWeight(const G4Track& nutrack, G4double enuzr, G4ThreeVector vertex_r,G4double gamma,G4ThreeVector beta_vec,G4double theta_pardet, G4double x_det, G4double y_det, G4double z_det);
   G4double GetNuEnergy(G4double Parent_mass, G4double gamma, G4double beta, G4double theta);
   G4double GetTheta(G4ThreeVector vertex_r,G4ThreeVector momentum,G4double x_det,G4double y_det,G4double z_det);
@@ -58,18 +59,19 @@ private:
 
   static NumiAnalysis* instance;
 
-
   G4double x;
   G4double y;
   G4double z;
 
+  G4double noProtons;
   G4String asciiFileName;
   NumiDataInput* NumiData;
 
-  TFile* hfile;
+  TFile* hadmmntuple;
   TFile* ntuple;
  
   TTree* tree;
+  TTree* hadmmtree;
   typedef struct {
     Int_t run;        //
     Int_t evtno; 
@@ -130,6 +132,24 @@ private:
   data_t g4data;
   //  std::ofstream asciiFile;
 
+  typedef struct{
+    Int_t run;        //
+    Int_t evtno; 
+    Double_t mtgthpos;
+    Double_t mtgtvpos;
+    Double_t mtgthsig;
+    Double_t mtgtvsig;
+    Int_t ptype;
+    Double_t hmmenergy;
+    Double_t hmmxpos;
+    Double_t hmmypos;
+    Double_t hmmzpos;
+    Double_t hmmpx;
+    Double_t hmmpy;
+    Double_t hmmpz;
+  } hadmmtuple_t;
+  hadmmtuple_t g4hmmdata;
+  
 };
 
 #endif 

@@ -37,8 +37,10 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   void ConstructDecayPipe();
   void ConstructHadronAbsorber();  
   void ConstructHorns();  
+  void ConstructSecMonitors();
   void DefineMaterials();
   void DestroyMaterials();
+
 
   G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
   G4Material* GetMaterial(G4int matcode);

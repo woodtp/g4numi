@@ -13,7 +13,14 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
 
-  NImpWeightOn=false;
+  NImpWeightOn = false; CreateNuNtuple=true;CreateHadmmNtuple=false;
+  protonMomentum = 120.*GeV;
+  beamSigmaY = 1.*mm;
+  beamSigmaX = 0.9*mm;
+  beamDirection = G4ThreeVector(0.,0.,1.);
+  beamPosition = G4ThreeVector(0.,0.,-4.*m);
+
+  protonKineticEnergy = sqrt(pow((.938*GeV),2)+pow(protonMomentum,2))-0.938*GeV;
 
   //Rock        1
   //=======================================================================
@@ -51,6 +58,13 @@ NumiDataInput::NumiDataInput()
   TargetRL           = 25.692;
   TargetGEANTmat     = 18;
 
+  //Budal Monitor
+  BudalX0 = 0.0;
+  BudalY0 = 0.0;
+  BudalZ0 = -16.72*cm;
+  BudalDxdz = 0.0;
+  BudalDydz = 0.0;
+  
   //HPBaffle           1 // Only the length and position can be changed currently
   //=======================================================================
   HPBaffleGEANTMat   =  18;
@@ -63,16 +77,18 @@ NumiDataInput::NumiDataInput()
   HPBaffleRin        =  5.5*mm;
   HPBaffleRout       =  3.*cm;
  
+  /*
   //Cooling pipes
   NCPipeN = 9;
   //=======================================================================
   // CPipeDXDZ=-99999 and CPipeDYDZ=0 puts curved part in z-y plane
+  // Z0 is with respect to the first target fin 
   //=======================================================================
   G4int CPGeantMat_[]        = {31     ,   31   ,10     , 10     , 10    , 10    ,  10   , 10    , 10 };
   G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , true  ,true   ,false  ,true   , false};
   G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.};
   G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.};
-  G4double CPipeZ0_[]        = {-0.625 , -0.625 ,-0.65  ,-0.65   , -.6501,-.6501 ,.619   , .6195 , .6235};
+  G4double CPipeZ0_[]        = {-0.275 , -0.275 ,-0.3  ,-0.3     , -.301 ,-.301  ,.969   , .9695 , .9735};
   G4double CPipeDXDZ_[]      = {    0  ,  0     , 0     ,  0     ,-99999 ,-99999 , 0     ,  0    , 0}; 
   G4double CPipeDYDZ_[]      = {    0  ,  0     , 0     ,  0     , 0     ,0      , 0     ,  0    , 0};
   G4double CPipeLength_[]    = {1.230  , 1.230  , .025  , .025   , 0     ,0      , 5e-4  ,  4e-3 , 3e-3};
@@ -83,7 +99,29 @@ NumiDataInput::NumiDataInput()
   G4double CPipeOpenAng_[]   = {0      , 0      , 0     , 0      ,90.    ,90.    , 0     ,   0   , 0};
   G4double CPipeCloseAng_[]  = {0      , 0      , 0     , 0      ,270.   ,270.   , 0     ,   0   , 0};
   G4String CPipeVolName_[]   = {"Pipe1","Pipe2" ,"Pipe3","Pipe4" ,"Pipe5","Pipe6","Pipe7","Pipe8","Pipe9"};
-
+  */
+  //Cooling pipes
+  NCPipeN = 17;
+  //=======================================================================
+  // CPipeDXDZ=-99999 and CPipeDYDZ=0 puts curved part in z-y plane
+  //=======================================================================
+  G4int CPGeantMat_[]        = {10     ,   10   ,10     , 10     , 10    , 10    ,  10   , 10    , 10     , 10           ,10            , 31     , 31      ,  10     ,  10     , 10      ,10  };
+  G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , true  ,true   ,false  ,true   , false  , true         ,true          , true   ,true     , true    , true    , true    , true};
+  G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.    , 0.           ,0.            , 0      , 0       , 0       , 0       , 0       , 0};
+  G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.    , 1.05e-2      ,-1.05e-2      , 5.95e-2, -5.95e-2, 5.95e-2 , -5.95e-2,5.95e-2  ,-5.95e-2};
+  G4double CPipeZ0_[]        = {-0.275 , -0.275 ,-0.30  ,-0.30   , -.3001,-.3001 ,.969   , .9695 , .9735  , 0.955        ,0.955         , -0.151 , -0.151  ,-0.287   ,-0.287   , -.30    , -.30};
+  G4double CPipeDXDZ_[]      = {    0  ,  0     , 0     ,  0     ,-99999 ,-99999 , 0     ,  0    , 0      , 0            ,0             , 0.     , 0.      , 0.      , 0.      , 0.      , 0.}; 
+  G4double CPipeDYDZ_[]      = {    0  ,  0     , 0     ,  0     , 0     ,0      , 0     ,  0    , 0      , 0            ,0             , 0.     , 0.      , 0.      , 0.      , 0.      , 0.};
+  G4double CPipeLength_[]    = {1.230  , 1.230  , .025  , .025   , 0     ,0      , 5e-4  ,  4e-3 , 3e-3   , 14.e-3      ,14.e-3         , 3e-2   , 3e-2    , 13.6e-2 ,13.6e-2  , 13e-3   ,13e-3};//PipeAdapter off by 4.5mm???
+  G4double CPipeRadiusOut_[] = {3e-3   , 3e-3   ,3e-3   ,3e-3    , 3e-3  ,3e-3   ,13.52e-3,14.1e-3,14.1e-3, 3.4e-3       , 3.4e-3       , 5e-3   , 5e-3    , 5.2e-3   , 5.2e-3 , 3e-3    ,3e-3};
+  G4double CPipeRadiusIn_[]  = {   0.  ,    0.  ,   0.  ,   0.   , 0.    ,   0.  ,7.52e-3,7.3e-3,7.3e-3   , 0.           , 0.           , 0      , 0       , 0      , 0        , 0.      ,0.}; 
+  //CPipeRadiusIn is not the inner pipe radius - use radiusOut and wallthickness for that
+  G4double CPipeWallThick_[] = {4e-4   ,4e-4    ,4e-4   ,4e-4    ,4e-4   ,4e-4   , 0     ,1.6e-3 , 0      , 0.8e-3       , 0.8e-3       , 1.e-3  , 1.e-3   , 1.1e-3  , 1.1e-3  , 4e-4    , 4e-4}; 
+  G4double CPipeCurvRad_[]   = {0      , 0      , 0     , 0      ,2.45e-2,2.45e-2, 0     ,   0   , 0      , 0            , 0            , 0      , 0       , 0      , 0        , 0       , 0}; // straight tube if this is 0;
+  G4double CPipeOpenAng_[]   = {0      , 0      , 0     , 0      ,90.    ,90.    , 0     ,   0   , 0      , 0            , 0            , 0      , 0       , 0      , 0        , 0       , 0   };
+  G4double CPipeCloseAng_[]  = {0      , 0      , 0     , 0      ,270.   ,270.   , 0     ,   0   , 0      , 0            , 0            , 0      , 0       , 0      , 0        , 0       , 0  };
+  G4String CPipeVolName_[]   = {"Pipe1","Pipe2" ,"Pipe3","Pipe4" ,"Pipe5","Pipe6","Pipe7","Pipe8","Pipe9" ,"PipeAdapter1","PipeAdapter2","PipeC1","PipeC2" ,"PipeB1","PipeB2"  ,"Pipe1tp","Pipe2btm" };
+  //For bellows (PipeB1 & 2) I don't have real dimensions
   for (G4int ii=0;ii<NCPipeN;ii++){
     CPGeantMat.push_back(CPGeantMat_[ii]);
     CPipeFilledWater.push_back(CPipeFilledWater_[ii]);
@@ -104,25 +142,42 @@ NumiDataInput::NumiDataInput()
   
   //Container
   //=======================================================================
-  NContainerN=16;
+  // Z0 with respect to the first target fin
+  NContainerN=11;
   
-  G4double CTubeZ0_[]     ={0.6285  , -0.3525 , -0.338 , -0.38   , -0.138   , 0.105    , 0.347   , 0.589  ,-0.3992   ,-0.4072, -.71481,-.714556,-.70855,-0.7022,-.6832  ,-0.4302  };
-  G4double CTubeLength_[] ={5e-4    , 14.5e-3 , 0.9785 , 8e-3    ,  8e-3    , 8e-3     , 8e-3    , 8e-3   , 17e-3    ,8e-3   , .254e-3,6.006e-3,6.35e-3 , 19e-3, 253e-3 , 23e-3 };
-  G4double CTubeRin_[]    ={0.0     , 16e-3   ,14.6e-3 , 9.5e-3  , 9.5e-3   , 9.5e-3   , 9.5e-3  , 9.5e-3 ,24e-3     , 74e-3 , 0.     ,1.27e-2,22.22e-3 ,17.5e-3,77e-3  , 77e-3};
-  G4double CTubeRout_[]   ={14.15e-3,16.4e-3  , 15e-3  , 14.55e-3, 14.55e-3 , 14.55e-3 , 14.55e-3, 14.55e-3,106e-3   ,106e-3 , 22e-3  ,34.67e-3,34.67e-3,107e-3 , 83e-3 , 120e-3  };
-  G4int CTubeHoleIndex_[] ={0       ,  0      , 0       , 1       , 1        , 1        , 1       , 1       , 0      , 0     ,  0    ,   0    ,  0     ,  0    ,  0    , 0};
-  G4int CTubeGeantMat_[]  ={5       ,  9      , 9       , 9       , 9        , 9        , 9       , 9       , 10     , 10    ,  5    ,  10    , 10     , 10    , 10    , 10};
-  G4String CTubeVolName_[]={"BeDW"  ,"AlTube1","AlTube2", "Ring1" ,"Ring2"   ,"Ring3"   ,"Ring4"  , "Ring5" ,"CLid2" ,"CLid1","BeUp1", "BeUp2","BeUp3" ,"BFront","Body","BEnd" };
+  G4double CTubeZ0_[]     ={0.9785  , -0.0025 ,  0.012  , -0.0492 ,-0.0572, -.36481,-.364556,-.35855,-0.3522,-.3332  ,-0.0802  };
+  G4double CTubeLength_[] ={5e-4    , 14.5e-3 , 0.9785  , 17e-3   ,8e-3   , .254e-3,6.006e-3,6.35e-3 , 19e-3, 253e-3 , 23e-3 };
+  G4double CTubeRin_[]    ={0.0     , 16e-3   ,14.6e-3  , 24e-3   , 74e-3 , 0.     ,1.27e-2,22.22e-3 ,17.5e-3,77e-3  , 77e-3};
+  G4double CTubeRout_[]   ={14.15e-3,16.4e-3  , 15e-3   , 106e-3  ,106e-3 , 22e-3  ,34.67e-3,34.67e-3,107e-3 , 83e-3 , 120e-3  };
+  G4int CTubeGeantMat_[]  ={5       ,  9      , 9       , 10      , 10    ,  5    ,  10    , 10     , 10    , 10    , 10};
+  G4String CTubeVolName_[]={"BeDW"  ,"AlTube1","AlTube2", "CLid2" ,"CLid1","BeUp1", "BeUp2","BeUp3" ,"BFront","Body","BEnd" };
 
  for (G4int ii=0;ii<NContainerN;ii++){
     CTubeZ0.push_back(CTubeZ0_[ii]*m);
     CTubeLength.push_back(CTubeLength_[ii]*m);
     CTubeRin.push_back(CTubeRin_[ii]*m);
     CTubeRout.push_back(CTubeRout_[ii]*m);
-    CTubeHoleIndex.push_back(CTubeHoleIndex_[ii]);
     CTubeGeantMat.push_back(CTubeGeantMat_[ii]);
     CTubeVolName.push_back(CTubeVolName_[ii]);
  }
+ //Rings holding target and cooling pipes
+ NTgtRingN = 5;
+ G4double TgtRingZ0_[]         = {-0.03   ,  0.212   , 0.455    , 0.697   , 0.939 };
+ G4double TgtRingLength_[]     = {8e-3    ,  8e-3    , 8e-3     , 8e-3    , 8e-3 };
+ G4double TgtRingRin_[]        = {9.5e-3  , 9.5e-3   , 9.5e-3   , 9.5e-3  , 9.5e-3};
+ G4double TgtRingRout_[]          = {14.55e-3, 14.55e-3 , 14.55e-3 , 14.55e-3, 14.55e-3};
+ G4int TgtRingGeantMaterial_[] = {9       , 9        , 9        , 9       , 9 };
+ G4String TgtRingVolName_[]    = {"Ring1" , "Ring2"  , "Ring3"  , "Ring4" , "Ring5" };
+
+for (G4int ii=0;ii<NTgtRingN;ii++){
+    TgtRingZ0.push_back(TgtRingZ0_[ii]*m);
+    TgtRingLength.push_back(TgtRingLength_[ii]*m);
+    TgtRingRin.push_back(TgtRingRin_[ii]*m);
+    TgtRingRout.push_back(TgtRingRout_[ii]*m);
+    TgtRingGeantMaterial.push_back(TgtRingGeantMaterial_[ii]);
+    TgtRingVolName.push_back(TgtRingVolName_[ii]);
+ }
+
 
   //Tunnel         1
   //=======================================================================
@@ -159,7 +214,7 @@ NumiDataInput::NumiDataInput()
   DecayPipeFWinmat   = 9;
   DecayPipeEWinmat   = 10;
 
-  BlockNblock = 14;
+  BlockNblock = 13;
   //======================================================================= 
   // Target area shielding (1-6) ; Absorber (7-13) ; Budal monitor (14) 
  

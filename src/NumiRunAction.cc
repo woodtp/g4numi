@@ -23,7 +23,7 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
   HepRandom::restoreEngineStatus("random.rndm");
   HepRandom::showEngineStatus();
   //Book histograms and ntuples
-  NumiAnalysis* analysis = NumiAnalysis::getInstance();
+   NumiAnalysis* analysis = NumiAnalysis::getInstance();
   analysis->book();
  
 }

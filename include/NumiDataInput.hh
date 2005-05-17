@@ -21,8 +21,11 @@ private:
   static NumiDataInput* fNumiDataInput;
 
 public:
+ 
+  G4bool NImpWeightOn, CreateNuNtuple,CreateHadmmNtuple;
 
-  G4bool NImpWeightOn;
+  G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
+  G4ThreeVector beamPosition, beamDirection;
 
   // World Volume
   G4double RockRadius, RockHalfLen, RockDensity, RockRadLen;
@@ -38,6 +41,15 @@ public:
   G4int TargetGEANTmat,TargetSegmentNo;
   G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
   G4bool TargetEndRounded;
+
+  //Rings holding target and cooling pipes
+  G4int NTgtRingN;
+  vdouble_t TgtRingZ0, TgtRingLength, TgtRingRin,TgtRingRout;
+  vint_t TgtRingGeantMaterial;
+  vstring_t TgtRingVolName;
+
+  //Budal
+  G4double BudalX0,BudalY0,BudalZ0,BudalDxdz,BudalDydz;
 
   //HPBaffle 
   G4int HPBaffle, HPBaffleGEANTMat;
@@ -56,7 +68,7 @@ public:
   //Container
   G4int NContainerN;
   vdouble_t CTubeZ0,CTubeLength,CTubeRin,CTubeRout;
-  vint_t CTubeGeantMat,CTubeHoleIndex;
+  vint_t CTubeGeantMat;
   vstring_t CTubeVolName;
 
   // Tunnel

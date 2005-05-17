@@ -58,6 +58,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ConstructTarget();
   ConstructHorns();
   ConstructHadronAbsorber();
+  ConstructSecMonitors();
 
   return ROCK;
 }

@@ -11,6 +11,7 @@
 #include "G4TrajectoryContainer.hh"
 #include "G4RunManager.hh"
 #include "NumiTrackInformation.hh"
+#include "NumiAnalysis.hh"
 
 NumiSteppingAction::NumiSteppingAction()
 {  
@@ -37,9 +38,18 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   // 12 mu- -> nu_mu anti_nu_e e-
   // 13 pi+ -> nu_mu mu+
   // 14 pi- -> anti_nu_mu mu-
-
   G4Track * theTrack = theStep->GetTrack();
   G4ParticleDefinition * particleType = theTrack->GetDefinition();
+  
+  //check if the particle is at hadmon or mumon
+  if (theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
+    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVHadMon")||
+	(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVMuMonA1")){
+      
+      NumiAnalysis* analysis=NumiAnalysis::getInstance();
+      analysis->FillHadmmNtuple(*theTrack);
+    }
+  }
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
     G4int decay_code=0;
     if (theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
@@ -111,12 +121,23 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	  }
       }
 
+      NumiTrackInformation* oldinfo=(NumiTrackInformation*)(theTrack->GetUserInformation()); 
+      if (oldinfo!=0) {
+	oldinfo->SetDecayCode(decay_code);                                                      
+	theTrack->SetUserInformation(oldinfo); 
+      }
+      else {
+	NumiTrackInformation* newinfo=new NumiTrackInformation(); 
+	newinfo->SetDecayCode(decay_code);                                                       
+	theTrack->SetUserInformation(newinfo); 
+      }
+      /*
       NumiTrackInformation* oldinfo=(NumiTrackInformation*)(theTrack->GetUserInformation());
       NumiTrackInformation* newinfo=new NumiTrackInformation();
       if (oldinfo!=0) newinfo=oldinfo;
       newinfo->SetDecayCode(decay_code);
       theTrack->SetUserInformation(newinfo);
-
+      */
     }
   }
 }

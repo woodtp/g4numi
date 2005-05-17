@@ -47,7 +47,7 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
        (particleDefinition==G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->analyseStepping(*aTrack);
+      analysis->FillNeutrinoNtuple(*aTrack);
     }
   
 }
