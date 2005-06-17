@@ -21,6 +21,7 @@
 #include "NumiMagneticField.hh"
 #include "G4Transform3D.hh"
 #include "G4PhysicalVolumeStore.hh"
+#include "G4LogicalVolumeStore.hh"
 
 NumiDetectorConstruction::NumiDetectorConstruction()
 {
@@ -56,9 +57,21 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ConstructDecayPipe();
   ConstructBaffle();
   ConstructTarget();
-  ConstructHorns();
+  ConstructHorn1();
+  ConstructHorn2();
   ConstructHadronAbsorber();
   ConstructSecMonitors();
+
+//Set Vis Attributes according to solid material (only for volumes not explicitly set)
+  G4LogicalVolumeStore* lvStore=G4LogicalVolumeStore::GetInstance();
+  lvStore=G4LogicalVolumeStore::GetInstance();
+
+  for (size_t ii=0;ii<(*lvStore).size();ii++){   
+    if ((*lvStore)[ii]->GetVisAttributes()==0) {
+      G4String matName=(*lvStore)[ii]->GetMaterial()->GetName();
+      (*lvStore)[ii]->SetVisAttributes(GetMaterialVisAttrib(matName));
+    }
+  }
 
   return ROCK;
 }

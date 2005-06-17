@@ -1,14 +1,16 @@
+#ifndef NumiDataInput_h
+#define NumiDataInput_h 1
+
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include <vector>
-
-#ifndef NumiDataInput_h
-#define NumiDataInput_h 1
+#include "NumiHornSpiderSupport.hh"
 
 typedef std::vector<G4double> vdouble_t;
 typedef std::vector<G4int> vint_t;
 typedef std::vector<G4String> vstring_t;
 typedef std::vector<G4bool> vbool_t;
+typedef std::vector<NumiHornSpiderSupport> vNumiHornSpiderSupport_t;
 
 class NumiDataInput
 {
@@ -84,13 +86,19 @@ public:
   G4double ShieldX0,ShieldY0,ShieldZ0,ShieldDxdz, ShieldDydz,ShieldLength,ShieldRout,ShieldRin;
   G4int ShieldGEANTmat;
   
-  //Blocks
-  G4double BlockNblock;
-  vdouble_t BlockX0,BlockY0,BlockZ0, BlockDxdz,BlockDydz;
-  vdouble_t BlockLength,BlockHdx,BlockHdy;
-  vint_t BlockGeantMaterial;
-  vstring_t BlockName;
-  vstring_t BlockMotherVolume;
+  //Target Hall Blocks
+  G4double THBlockNblock;
+  vdouble_t THBlockX0,THBlockY0,THBlockZ0, THBlockDxdz,THBlockDydz;
+  vdouble_t THBlockLength,THBlockHdx,THBlockHdy;
+  vint_t THBlockGeantMaterial;
+  vstring_t THBlockName;
+
+  //Hadron Absorber Blocks
+  G4double HABlockNblock;
+  vdouble_t HABlockX0,HABlockY0,HABlockZ0, HABlockDxdz,HABlockDydz;
+  vdouble_t HABlockLength,HABlockHdx,HABlockHdy;
+  vint_t HABlockGeantMaterial;
+  vstring_t HABlockName;
 
   // Horn 1 & 2
   G4int PhornNphorn;
@@ -110,6 +118,34 @@ public:
 
   G4double HornCurrent; //old
   
+ // Horn 1
+  G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
+  
+  vdouble_t PHorn1OCRout,PHorn1OCRin,PHorn1OCZ0;
+  vdouble_t PHorn1ICZ0;
+  vint_t PHorn1ICNpoint;
 
+  vdouble_t PHorn1EndZ0,PHorn1EndLength,PHorn1EndRout,PHorn1EndRin;
+  vint_t PHorn1EndGeantMat;
+  vstring_t PHorn1EndVolName;
+
+  G4int NHorn1SpiderSupportPlanesN,NHorn1SpidersPerPlaneN;
+  vdouble_t Horn1SpiderSupportZ0;
+  vNumiHornSpiderSupport_t Horn1SS;
+  
+  // Horn 2
+  G4int NPHorn2OCN,NPHorn2ICN,NPHorn2EndN;
+  
+  vdouble_t PHorn2OCRout,PHorn2OCRin,PHorn2OCZ0;
+  vdouble_t PHorn2ICZ0;
+  vint_t PHorn2ICNpoint;
+
+  vdouble_t PHorn2EndZ0,PHorn2EndLength,PHorn2EndRout,PHorn2EndRin;
+  vint_t PHorn2EndGeantMat;
+  vstring_t PHorn2EndVolName;
+
+  G4int NHorn2SpiderSupportPlanesN,NHorn2SpidersPerPlaneN;
+  vdouble_t Horn2SpiderSupportZ0;
+  vNumiHornSpiderSupport_t Horn2SS;
 };
 #endif

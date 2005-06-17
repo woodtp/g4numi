@@ -1,6 +1,5 @@
 // --------------------------------------------------------------
-//NumiMagneticField by Yuki 7/12/04
-//modified by Yuki 8/2/04
+//NumiMagneticField 
 
 #include "NumiMagneticField.hh"
 #include "G4ios.hh"
@@ -13,8 +12,7 @@
 NumiMagneticField::NumiMagneticField()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  if(NumiData) current = NumiData->HornCurrent;
-  else current=205.; //kA
+  current = NumiData->HornCurrent;
 }
 
 NumiMagneticField::~NumiMagneticField(){;}
@@ -33,8 +31,7 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
 NumiMagneticFieldIC::NumiMagneticFieldIC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  if(NumiData) current = NumiData->HornCurrent;
-  else current=205.; //kA 
+  current = NumiData->HornCurrent;
 }
 
 NumiMagneticFieldIC::~NumiMagneticFieldIC(){;}
@@ -54,22 +51,22 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
   G4VSolid * solid=myVolume->GetLogicalVolume()->GetSolid();
 
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);
-  G4double d_out=0.;
-  G4double d_in=0.;
-  G4double Bfield_mag = 0.;  
+  G4double dOut=0.;
+  G4double dIn=0.;
+  G4double magBField = 0.;  
 
-  if (myVolume->GetName().contains("PI")){
-  d_out=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
-  d_in=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
-  if (d_out<1.*cm&&d_in<1.*cm) 
+  if (myVolume->GetName().contains("IC")){
+  dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
+  dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
+  if (dOut<1.*m&&dIn<1.*m) 
     {
-    Bfield_mag = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
-    Bfield_mag=Bfield_mag*(1-(radius*radius-(radius-d_in)*(radius-d_in))/((radius+d_out)*(radius+d_out)-(radius-d_in)*(radius-d_in)));// linear distribution of current
+    magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+    magBField=magBField*(1-(radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
     }
   }
  
-  Bfield[0] = -Bfield_mag*Point[1]/radius;
-  Bfield[1] = Bfield_mag*Point[0]/radius;
+  Bfield[0] = -magBField*Point[1]/radius;
+  Bfield[1] = magBField*Point[0]/radius;
   Bfield[2] = 0.;
 }
 
@@ -78,10 +75,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
 NumiMagneticFieldOC::NumiMagneticFieldOC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  if(NumiData) current = NumiData->HornCurrent;
-  else current=205.; //kA
-
- 
+  current = NumiData->HornCurrent;
 }
 
 NumiMagneticFieldOC::~NumiMagneticFieldOC(){;}
@@ -98,20 +92,27 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
 
   delete numinavigator;
 
-  G4double rin=15.33*cm;
-  G4double rout=16.2*cm;
-  G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]); //cm
-  if ((myVolume->GetName().contains("PI06"))||
-      (myVolume->GetName().contains("PI07"))||
-      (myVolume->GetName().contains("PI08")))
-    {
-      rin=37.*cm;
-      rout=37.86*cm; 
-    }
-  G4double B = current / (5.*radius/cm)/10*tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
-  B=B*(1-(radius*radius-rin*rin)/(rout*rout-rin*rin)); // linear distribution of current
+  G4VSolid *solid=myVolume->GetLogicalVolume()->GetSolid();
 
-  Bfield[0] = -B*Point[1]/radius;
-  Bfield[1] = B*Point[0]/radius;
+  G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);
+  G4double dOut=0.;
+  G4double dIn=0.;
+  G4double magBField = 0.;
+
+  if (myVolume->GetName().contains("OC")){
+  dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
+  dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
+  if (dOut<1.*m&&dIn<1.*m) 
+    {
+      magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+      G4double rIn=radius-dIn;
+      G4double rOut=radius+dOut;
+      magBField=magBField*(1-(radius*radius-rIn*rIn)/(rOut*rOut-rIn*rIn)); // linear distribution of current
+    }
+  }
+
+  Bfield[0] = -magBField*Point[1]/radius;
+  Bfield[1] = magBField*Point[0]/radius;
   Bfield[2] = 0.;
+  
 }

@@ -358,37 +358,33 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   G4ThreeVector ParentMomentum;
   G4ThreeVector ParentPosition;
   
-    for (G4int ii=0;ii<point_no-1;ii++){ 
-      ParentMomentum=NuParentTrack->GetMomentum(ii);
-      ParentPosition=(NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
-      // check if the particle passes through the neck of the horn
-      // if yes then set the trk_ to +999999
-      if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
-	  (ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1]<5.*cm)&&
-	  (g4data.trkx[2]==-999999. || g4data.trkx[2]==999999.))
-	{
-	  g4data.trkx[2]=999999.;
-	  g4data.trky[2]=999999.;
-	  g4data.trkz[2]=999999.;  
-      	}
-      if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
-	  (ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1]<5.*cm)&&
-	  (g4data.trkx[4]==-999999. || g4data.trkx[4]==999999.))
-	{
-	  g4data.trkx[4]=999999.;
-	  g4data.trky[4]=999999.;
-	  g4data.trkz[4]=999999.;  
-      	}
+  for (G4int ii=0;ii<point_no-1;ii++){ 
+    ParentMomentum=NuParentTrack->GetMomentum(ii);
+    ParentPosition=(NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
+    // check if the particle passes through the neck of the horn
+    // if yes then set the trk_ to +999999
+    if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
+	(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1]<5.*cm)&&
+	(g4data.trkx[2]==-999999. || g4data.trkx[2]==999999.))
+      {
+	g4data.trkx[2]=999999.;
+	g4data.trky[2]=999999.;
+	g4data.trkz[2]=999999.;  
+      }
+    if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
+	(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1]<5.*cm)&&
+	(g4data.trkx[4]==-999999. || g4data.trkx[4]==999999.))
+      {
+	g4data.trkx[4]=999999.;
+	g4data.trky[4]=999999.;
+	g4data.trkz[4]=999999.;  
+      }
       
-      G4String p_prevolname="";
-      G4String p_postvolname="";
-      G4String postvolname="";
-      if (ii>1) p_prevolname=NuParentTrack->GetPreStepVolumeName(ii-1);//prevolume of first point is not defined
-      G4String prevolname=NuParentTrack->GetPreStepVolumeName(ii);
-      if (ii<point_no-2) postvolname=NuParentTrack->GetPreStepVolumeName(ii+1);
-      if (ii<point_no-3) p_postvolname=NuParentTrack->GetPreStepVolumeName(ii+2);//prevolume of final point is sometimes not defined
-
-    // inside target
+    G4String postvolname="";
+    G4String prevolname=NuParentTrack->GetPreStepVolumeName(ii);
+    if (ii<point_no-2) postvolname=NuParentTrack->GetPreStepVolumeName(ii+1);
+    
+    // parent created inside target
     if ((prevolname.contains("TGT")) && ii==0){
       	g4data.trkx[0]=ParentPosition[0]/cm;
 	g4data.trky[0]=ParentPosition[1]/cm;
@@ -396,8 +392,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	g4data.trkpx[0]=ParentMomentum[0]/GeV;
 	g4data.trkpy[0]=ParentMomentum[1]/GeV;
 	g4data.trkpz[0]=ParentMomentum[2]/GeV;}
-    //target boundary
-    if ((prevolname.contains("TGT")) && postvolname.contains("TGAR")){
+    //parent at target fin boundary
+    if ((prevolname.contains("TGT")) && postvolname.contains("Target")){
       	g4data.trkx[1]=ParentPosition[0]/cm;
 	g4data.trky[1]=ParentPosition[1]/cm;
 	g4data.trkz[1]=ParentPosition[2]/cm;
@@ -405,57 +401,46 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	g4data.trkpy[1]=ParentMomentum[1]/GeV;
 	g4data.trkpz[1]=ParentMomentum[2]/GeV;}
     //enter horn1
-     if ((!(p_prevolname.contains("P")) && prevolname.contains("TGAR")) && postvolname.contains("P") &&
-	 prevolname.contains("TGAR") &&
-	 (postvolname.contains("1")||postvolname.contains("2")||postvolname.contains("3")||
-	  postvolname.contains("4")||postvolname.contains("5"))&&
-	 (!postvolname.contains("PC06") && !postvolname.contains("PC08"))){
-      	g4data.trkx[2]=ParentPosition[0]/cm;
-	g4data.trky[2]=ParentPosition[1]/cm;
-	g4data.trkz[2]=ParentPosition[2]/cm;
-	g4data.trkpx[2]=ParentMomentum[0]/GeV;
-	g4data.trkpy[2]=ParentMomentum[1]/GeV;
-	g4data.trkpz[2]=ParentMomentum[2]/GeV;}
-     //exit horn1
-     if ((prevolname.contains("P") && postvolname.contains("TGAR") && !p_postvolname.contains("P"))&&
-	 (prevolname.contains("1")||prevolname.contains("2")||prevolname.contains("3")||
-	  prevolname.contains("4")||prevolname.contains("5")) &&
-	 (!prevolname.contains("PC06") && !prevolname.contains("PC08"))){
-      	g4data.trkx[3]=ParentPosition[0]/cm;
-	g4data.trky[3]=ParentPosition[1]/cm;
-	g4data.trkz[3]=ParentPosition[2]/cm;
-	g4data.trkpx[3]=ParentMomentum[0]/GeV;
-	g4data.trkpy[3]=ParentMomentum[1]/GeV;
-	g4data.trkpz[3]=ParentMomentum[2]/GeV;}
-     //enter horn2
-     if ((!(p_prevolname.contains("P")) && prevolname.contains("TGAR")) && postvolname.contains("P") &&
-	 (postvolname.contains("6")||postvolname.contains("7")||postvolname.contains("8") ||
-	  postvolname.contains("PC06")||postvolname.contains("PC08"))){
-      	g4data.trkx[4]=ParentPosition[0]/cm;
-	g4data.trky[4]=ParentPosition[1]/cm;
-	g4data.trkz[4]=ParentPosition[2]/cm;
-	g4data.trkpx[4]=ParentMomentum[0]/GeV;
-	g4data.trkpy[4]=ParentMomentum[1]/GeV;
-	g4data.trkpz[4]=ParentMomentum[2]/GeV;}
-     //exit horn2
-     if ((prevolname.contains("P") && postvolname.contains("TGAR") && !p_postvolname.contains("P"))&&
-	 (prevolname.contains("6")||prevolname.contains("7")||prevolname.contains("8") ||
-	  prevolname.contains("PC06")||prevolname.contains("PC08"))){
-      	g4data.trkx[5]=ParentPosition[0]/cm;
-	g4data.trky[5]=ParentPosition[1]/cm;
-	g4data.trkz[5]=ParentPosition[2]/cm;
-	g4data.trkpx[5]=ParentMomentum[0]/GeV;
-	g4data.trkpy[5]=ParentMomentum[1]/GeV;
-	g4data.trkpz[5]=ParentMomentum[2]/GeV;}
-     //enter decay pipe
-     if (p_prevolname.contains("TGAR")&&(prevolname.contains("UPWN")||prevolname.contains("DVOL")||prevolname.contains("DPIP"))){
-      	g4data.trkx[6]=ParentPosition[0]/cm;
-	g4data.trky[6]=ParentPosition[1]/cm;
-	g4data.trkz[6]=ParentPosition[2]/cm;
-	g4data.trkpx[6]=ParentMomentum[0]/GeV;
-	g4data.trkpy[6]=ParentMomentum[1]/GeV;
-	g4data.trkpz[6]=ParentMomentum[2]/GeV;}
-  }
+    if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
+      g4data.trkx[2]=ParentPosition[0]/cm;
+      g4data.trky[2]=ParentPosition[1]/cm;
+      g4data.trkz[2]=ParentPosition[2]/cm;
+      g4data.trkpx[2]=ParentMomentum[0]/GeV;
+      g4data.trkpy[2]=ParentMomentum[1]/GeV;
+      g4data.trkpz[2]=ParentMomentum[2]/GeV;}
+    //exit horn1
+    if (prevolname.contains("Horn1") && postvolname.contains("TGAR")){
+      g4data.trkx[3]=ParentPosition[0]/cm;
+      g4data.trky[3]=ParentPosition[1]/cm;
+      g4data.trkz[3]=ParentPosition[2]/cm;
+      g4data.trkpx[3]=ParentMomentum[0]/GeV;
+      g4data.trkpy[3]=ParentMomentum[1]/GeV;
+      g4data.trkpz[3]=ParentMomentum[2]/GeV;}
+    //enter horn2
+    if (prevolname.contains("TGAR") && postvolname.contains("Horn2")){
+      g4data.trkx[4]=ParentPosition[0]/cm;
+      g4data.trky[4]=ParentPosition[1]/cm;
+      g4data.trkz[4]=ParentPosition[2]/cm;
+      g4data.trkpx[4]=ParentMomentum[0]/GeV;
+      g4data.trkpy[4]=ParentMomentum[1]/GeV;
+      g4data.trkpz[4]=ParentMomentum[2]/GeV;}
+    //exit horn2
+    if (prevolname.contains("Horn2") && postvolname.contains("TGAR")){
+      g4data.trkx[5]=ParentPosition[0]/cm;
+      g4data.trky[5]=ParentPosition[1]/cm;
+      g4data.trkz[5]=ParentPosition[2]/cm;
+      g4data.trkpx[5]=ParentMomentum[0]/GeV;
+      g4data.trkpy[5]=ParentMomentum[1]/GeV;
+      g4data.trkpz[5]=ParentMomentum[2]/GeV;}
+    //enter decay pipe
+    if (prevolname.contains("DVOL")&&(postvolname.contains("UpWn"))){
+      g4data.trkx[6]=ParentPosition[0]/cm;
+      g4data.trky[6]=ParentPosition[1]/cm;
+      g4data.trkz[6]=ParentPosition[2]/cm;
+      g4data.trkpx[6]=ParentMomentum[0]/GeV;
+      g4data.trkpy[6]=ParentMomentum[1]/GeV;
+      g4data.trkpz[6]=ParentMomentum[2]/GeV;}
+    }
 
     ParentMomentum=NuParentTrack->GetMomentum(point_no-1);
     ParentPosition=(NuParentTrack->GetPoint(point_no-1)->GetPosition()/m)*m;
@@ -490,6 +475,15 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
   if(container==0) return 0;
 
   TrajectoryVector* vect = container->GetVector();
+  G4VTrajectory* tr;
+  G4int ii=0; 
+  while (ii<vect->size()){  
+    tr=(*vect)[ii]; 
+    NumiTrajectory* tr1=(NumiTrajectory*)(tr);  
+    if(tr1->GetTrackID()==parentID) return tr1; 
+    ii++; 
+  }
+  /*
   G4VTrajectory** tr = vect->begin();
 
   while(tr!=vect->end())
@@ -498,6 +492,7 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
     if(tr1->GetTrackID()==parentID) return tr1;
     tr++;
   }
+  */
   return 0;
 }
 

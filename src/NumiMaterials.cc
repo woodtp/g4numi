@@ -1,5 +1,6 @@
 #include "NumiDetectorConstruction.hh"
 #include "G4Material.hh"
+#include "G4VisAttributes.hh"
 #include "globals.hh"
 #include "NumiDataInput.hh"
 
@@ -39,6 +40,9 @@ void NumiDetectorConstruction::DefineMaterials()
 
   A = 32.065*g/mole; 
   G4Element* elS  = new G4Element(name="Sulfur"  ,symbol="S" , Z=16 , A);
+
+  A = 39.948*g/mole;
+  G4Element* elAr = new G4Element(name="Argon" , symbol="Ar", Z=18, A);
 
   A = 39.1*g/mole; 
   G4Element* elK  = new G4Element(name="Potassium"  ,symbol="K" , Z=19 , A);
@@ -92,15 +96,22 @@ void NumiDetectorConstruction::DefineMaterials()
   Water->AddElement(elO, natoms=1); 
 
   density=2.376e-15*g/cm3;
-  G4double temperature=300*kelvin;
+  G4double temperature=300.*kelvin;
   G4double pressure=2.0e-7*bar;
   Vacuum = new G4Material("Vacuum", density, 1, kStateGas,temperature,pressure);
   Vacuum-> AddMaterial(Air, 1.);
+
+  density=1.29/760.*mg/cm3;
+  temperature=300.*kelvin;
+  pressure=atmosphere/760.;
+  DecayPipeVacuum = new G4Material("DecayPipeVacuum", density, 1, kStateGas,temperature,pressure);
+  DecayPipeVacuum-> AddMaterial(Air, 1.);
 
   //other materials  
   Be = new G4Material("Berillium", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
   C =  new G4Material("Carbon", Z=6., A=12.01*g/mole, density= 1.83*g/cm3);
   Al = new G4Material("Aluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3);
+  Ar = new G4Material("Argon", Z= 18, A=39.948*g/mole,1.784*kg/m3,kStateGas,300*kelvin,atmosphere);
   Pb = new G4Material("Lead", Z= 82., A= 207.19*g/mole, density= 11.35*g/cm3);
   Fe = new G4Material("Iron", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3);
   Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
@@ -132,8 +143,41 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==17) return Concrete;
   if (matcode==18) return Target;
   if (matcode==16) return Vacuum;
+  if (matcode==25) return Water;
   G4cout << "Wrong material code " << matcode << G4endl;
   return Vacuum;
+}
+G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4int matCode)
+{ 
+  G4VisAttributes* visAttrib=new G4VisAttributes(G4Color(1.,0.,0.));
+  if (matCode==15) visAttrib=new G4VisAttributes(false); //Air
+  if (matCode==6) visAttrib=new G4VisAttributes(G4Color(0.7,0.7,0.7)); //C
+  if (matCode==9 || matCode==20) visAttrib=new G4VisAttributes(G4Color(0.2,0.8,1.));//Al
+  if (matCode==5) visAttrib=new G4VisAttributes(G4Color(0.1,0.2,0.95));//Be 
+  if (matCode==10) visAttrib=new G4VisAttributes(G4Color(0.5,0.5,0.5));//Fe
+  if (matCode==31) visAttrib=new G4VisAttributes(G4Color(1.,1.,1.));//CT852
+  if (matCode==17) visAttrib=new G4VisAttributes(G4Color(0.85,0.85,0.85));//Concrete
+  if (matCode==18) visAttrib=new G4VisAttributes(G4Color(0.6,0.6,0.7));//Target
+  if (matCode==16) visAttrib=new G4VisAttributes(false);//Vacuum
+  if (matCode==25) visAttrib=new G4VisAttributes(G4Color(0.,0.,1.));//Water
+  
+  return visAttrib;
+}
+G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4String matName){
+  G4VisAttributes* visAttrib=new G4VisAttributes(G4Color(1.,0.,0.));
+  if (matName=="Air") return GetMaterialVisAttrib(15);
+  if (matName=="Carbon") return GetMaterialVisAttrib(6);
+  if (matName=="Aluminum") return GetMaterialVisAttrib(9);
+  if (matName=="Berillium") return GetMaterialVisAttrib(5);
+  if (matName=="Iron") return GetMaterialVisAttrib(10);
+  if (matName=="CT852") return GetMaterialVisAttrib(31);
+  if (matName=="Concrete") return GetMaterialVisAttrib(17);
+  if (matName=="Target") return GetMaterialVisAttrib(18);
+  if (matName=="Vacuum") return GetMaterialVisAttrib(16);
+  if (matName=="DecayPipeVacuum") return GetMaterialVisAttrib(16);
+  if (matName=="Argon") return GetMaterialVisAttrib(16);
+  if (matName=="Water") return GetMaterialVisAttrib(25);
+  return visAttrib;
 }
 
 void NumiDetectorConstruction::DestroyMaterials()

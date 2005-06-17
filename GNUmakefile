@@ -12,7 +12,6 @@ ifndef G4INSTALL
   G4INSTALL = ../..
 endif
 
-
 include $(G4INSTALL)/config/architecture.gmk
 
 #
@@ -209,11 +208,9 @@ CPPFLAGS += -I$(G4BASE)/global/management/include \
 
 
 .PHONY: all
- 
 all: lib bin
 
 include $(G4INSTALL)/config/binmake.gmk
 
 CXXFLAGS_WITHOUT_O := $(filter-out -O% , $(CXXFLAGS))
 CXXFLAGS_WITHOUT_O := $(filter-out +O% , $(CXXFLAGS_WITHOUT_O))
-

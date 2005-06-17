@@ -181,9 +181,31 @@ void NumiTrajectory::DrawTrajectory(G4int i_mode) const
          colour = G4Colour(0.,0.5,0.5);
    }
 
-   G4VisAttributes attribs(colour);
-   pPolyline.SetVisAttributes(attribs);
-   if(pVVisManager) pVVisManager->Draw(pPolyline);
+   //G4VisAttributes attribs(colour);
+
+   //draw only protons,pi+ and pi-
+   G4VisAttributes attribs;
+   if (fpParticleDefinition==G4Proton::ProtonDefinition()) {
+     colour=G4Colour(0.,0.,1.);
+     attribs=G4VisAttributes(colour);
+     pPolyline.SetVisAttributes(attribs);
+     if(pVVisManager) pVVisManager->Draw(pPolyline);
+   }
+   if (fpParticleDefinition==G4PionMinus::PionMinusDefinition()) {
+     colour=G4Colour(1.,0.,0.);
+     attribs=G4VisAttributes(colour);
+     pPolyline.SetVisAttributes(attribs);
+     if(pVVisManager) pVVisManager->Draw(pPolyline);
+   }
+   if (fpParticleDefinition==G4PionPlus::PionPlusDefinition()) {
+     colour=G4Colour(0.,1.,0.);
+     attribs=G4VisAttributes(colour);
+     pPolyline.SetVisAttributes(attribs);
+     if(pVVisManager) pVVisManager->Draw(pPolyline);
+   }
+
+   //pPolyline.SetVisAttributes(attribs);
+   //if(pVVisManager) pVVisManager->Draw(pPolyline);
 }
 
 void NumiTrajectory::AppendStep(const G4Step* aStep)

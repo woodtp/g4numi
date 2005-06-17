@@ -3,7 +3,8 @@
 # create empty scene
 #
 #/vis/open DAWNFILE
-/vis/open HepRepFile 600
+#/vis/open HepRepFile 600
+/vis/open VRML2FILE
 
 /vis/scene/create
 /vis/scene/add/trajectories
@@ -25,9 +26,10 @@
 #
 # for drawing the tracks
 # (if too many tracks cause core dump => storeTrajectory 0)
-#/tracking/storeTrajectory 1
+/tracking/storeTrajectory 1
 #/vis/scene/endOfEventAction accumulate
-/control/verbose 2
-/run/verbose 2
-/gun/particle geantino
-/run/beamOn 1
+#/control/verbose 2
+#/run/verbose 2
+#/gun/particle geantino
+/vis/scene/endOfEventAction accumulate
+/run/beamOn 4
