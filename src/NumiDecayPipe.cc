@@ -105,7 +105,7 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   G4Sphere *sUpWnSteelSphere2=new G4Sphere("upwnSph2",
 					   69.3*in,69.675*in,
 					   0.*deg,360.*deg,
-					   17.64*deg+.4*deg,8.748*deg);
+					   17.64*deg+.4*deg,8.748*deg-.2*deg);
   G4LogicalVolume *upwnSteelSphere2=new G4LogicalVolume(sUpWnSteelSphere2,
 						       Fe,
 						       "lvFeUpWn",

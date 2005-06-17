@@ -18,6 +18,7 @@
 #include "G4FieldManager.hh"
 
 static const G4double in=2.54*cm;
+
 void NumiDetectorConstruction::ConstructHorn2()
 {
   G4ThreeVector translation;
@@ -36,15 +37,15 @@ void NumiDetectorConstruction::ConstructHorn2()
   G4double frontRmin=1.859*in;
   G4double frontRmax=2.184*in;
   G4double frontRtor=12.756*in;
-  G4double MVgap=0.2*mm;
+  G4double MVgap=0.1*mm;
   G4double Fgap=0.5*mm;
   G4ThreeVector MHorn2Origin=G4ThreeVector(0,0,0);
   G4double FZ0=0.*in;
   G4double FZ1=137.96*in-Fgap;
   G4double epsilon=.0000001*mm;
-  G4double maxDev=0.25*mm;
+  G4double maxDev=0.5*mm;
   
-  G4int nPoints=G4int((ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+ND->PHorn2EndLength[ND->NPHorn2EndN-1]+frontRmax)/(.01*mm));
+  G4int nPoints=G4int((ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+ND->PHorn2EndLength[ND->NPHorn2EndN-1]+frontRmax)/(.05*mm));
   G4double deltaZ=(ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+frontRmax)/nPoints;
   
   G4int nOut(0),nIn(0),nMV(0),nF(0);
@@ -143,7 +144,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,THallHorn2Z0)-TargetHallPosition;
   G4VPhysicalVolume* pvMHorn2 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn2",lvMHorn2,TGAR,false,0);
-  
+      
   //Front part
   G4VSolid* sHorn2Front;
   G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
@@ -156,7 +157,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn2Origin+G4ThreeVector(0.,0.,OCZ0);
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2Front",lvHorn2Front,pvMHorn2,false,0);
-  
+    
   //Outer Conductor
   G4Polycone* sPHorn2OC=new G4Polycone("sPHorn2OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
   G4LogicalVolume* lvPHorn2OC=new G4LogicalVolume(sPHorn2OC,Al,"lvPHorn2OC",0,0,0);
@@ -167,7 +168,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0.)-MHorn2Origin;
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2OC",lvPHorn2OC,pvMHorn2,false,0);
-  
+
   //Inner Conductor
   G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,Al,"lvPHorn2IC",0,0,0);
@@ -178,7 +179,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2IC",lvPHorn2IC,pvMHorn2,false,0);
-    
+      
   //Field Part
   G4Polycone* sPConeF=new G4Polycone("sPCone2F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
@@ -203,6 +204,7 @@ void NumiDetectorConstruction::ConstructHorn2()
       ConstructSpiderSupport(&(ND->Horn2SS[ii]),angle,ND->Horn2SpiderSupportZ0[ii],rIn,rOut,pvPHorn2F,ii+jj);
     }
   }
+  
   //Horn end
   G4VSolid* sPHorn2End;
   for (G4int ii=0;ii<ND->NPHorn2EndN;ii++)
@@ -214,7 +216,7 @@ void NumiDetectorConstruction::ConstructHorn2()
       translation=G4ThreeVector(0.,0.,ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii]/2.)-MHorn2Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn2End,pvMHorn2,false,0);
     }
-       
+     
 }
 G4double NumiDetectorConstruction::PHorn2OCRout(G4double z)
 {

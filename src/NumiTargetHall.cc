@@ -13,6 +13,7 @@
 
 void NumiDetectorConstruction::ConstructTargetHall()
 {
+
 //TGAR
   G4double TGAR_width=NumiData->TargetAreaWidth/2.;
   G4double TGAR_height=NumiData->TargetAreaHeight/2.;
@@ -22,7 +23,7 @@ void NumiDetectorConstruction::ConstructTargetHall()
   G4Box* sTGAR=new G4Box("sTGAR",TGAR_width,TGAR_height,TGAR_length);
   G4LogicalVolume *lvTGAR=new G4LogicalVolume(sTGAR,Air,"lvTGAR",0,0,0);
   TGAR = new G4PVPlacement(0,targetHallPosition,"TGAR",lvTGAR,ROCK,false,0);
-  
+  /*  
   // G4VisAttributes invisible=G4VisAttributes(false);
   //Blocks
   for (G4int ii=0;ii<NumiData->THBlockNblock;ii++){
@@ -39,7 +40,7 @@ void NumiDetectorConstruction::ConstructTargetHall()
     G4ThreeVector blockPosition=G4ThreeVector(NumiData->THBlockX0[ii],NumiData->THBlockY0[ii],NumiData->THBlockZ0[ii]+NumiData->THBlockLength[ii]/2.)-targetHallPosition;
     new G4PVPlacement(0,blockPosition,volName,lvTHBLK,TGAR,false,0);
   }
-
+  */
   G4cout << "Target Hall Constructed" << G4endl;
 }
  

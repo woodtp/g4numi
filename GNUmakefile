@@ -22,7 +22,7 @@ ifndef G4LISTS_BASE
   EXTRALIBS += -L$(G4LIB)/.lists_build/$(G4SYSTEM)
   G4LISTS_BASE = $(G4INSTALL)/hadronic_lists
 else
-  EXTRALIBS += -L$(G4LISTS_BASE)/lists/.lists_build/lib/$(G4SYSTEM)
+  EXTRALIBS += -L$(G4LISTS_BASE)/hadronic/plists/lib/$(G4SYSTEM)
 endif
 
 #for root
@@ -133,6 +133,30 @@ CPPFLAGS += -I$(G4LISTS_BASE)/lists/QGSP_HP/include
 
 
 LISTS_INCLUDE = $(G4LISTS_BASE)
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/FTFC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/FTFP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LBE/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_BERT/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_BIC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_GN/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_BERT_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_BIC_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_LEAD/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_LEAD_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_PRECO/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/LHEP_PRECO_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/Packaging/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSC_LEAD/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSC_LEAD_HP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP_BERT/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP_BIC/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP_GN/include
+CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP_HP/include
+
 G4BASE = $(G4INSTALL)/source
 CPPFLAGS += -I$(G4BASE)/global/management/include \
             -I$(G4BASE)/global/HEPRandom/include \
@@ -171,7 +195,7 @@ CPPFLAGS += -I$(G4BASE)/global/management/include \
             -I$(G4BASE)/processes/hadronic/management/include \
             -I$(G4BASE)/processes/hadronic/processes/include \
             -I$(G4BASE)/processes/hadronic/util/include \
-            -I$(LISTS_INCLUDE)/lists/Packaging/include \
+            -I$(LISTS_INCLUDE)/hadronic/Packaging/include \
             -I$(G4BASE)/processes/hadronic/models/management/include \
             -I$(G4BASE)/processes/hadronic/models/util/include \
             -I$(G4BASE)/processes/hadronic/models/binary_cascade/include \

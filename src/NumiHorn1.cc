@@ -17,7 +17,6 @@
 #include "NumiMagneticField.hh"
 #include "G4FieldManager.hh"
 #include "NumiHornSpiderSupport.hh"
-#include "G4ChordFinder.hh"
 
 static const G4double in=2.54*cm;
 
@@ -44,11 +43,11 @@ void NumiDetectorConstruction::ConstructHorn1()
   G4double frontRtor=3.763*in;
   G4double epsilon=.0000001*mm;
   G4ThreeVector MHorn1Origin=G4ThreeVector(0,0,0);
-  G4double maxDev=0.25*mm;
+  G4double maxDev=.5*mm;
   
   //inner and outer radius of inner and outer conductor evaluated at Npoints points
   // if deviation in between the two points is greater then maxDev then create a polycone plane 
-  G4int nPoints=G4int((ND->PHorn1EndZ0[ND->NPHorn1EndN-1]+ND->PHorn1EndLength[ND->NPHorn1EndN-1]+frontRmax)/(.01*mm));
+  G4int nPoints=G4int((ND->PHorn1EndZ0[ND->NPHorn1EndN-1]+ND->PHorn1EndLength[ND->NPHorn1EndN-1]+frontRmax)/(.02*mm));
   G4double deltaZ=(ND->PHorn1EndZ0[ND->NPHorn1EndN-1]+frontRmax)/nPoints;
   
   G4int nOut(0),nIn(0),nMV(0),nF(0);
