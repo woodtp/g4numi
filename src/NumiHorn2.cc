@@ -69,12 +69,12 @@ void NumiDetectorConstruction::ConstructHorn2()
 
   for (G4int ii=1;ii<nPoints;ii++){
     zPos=Horn2Z0+deltaZ*ii;
-    if ((abs(PHorn2OCRout(zPos)-(PHorn2OCRout(zPos-deltaZ)+PHorn2OCRout(zPos+deltaZ))/2.)>maxDev)||
-	(abs(PHorn2OCRin(zPos)-(PHorn2OCRin(zPos-deltaZ)+PHorn2OCRin(zPos+deltaZ))/2.)>maxDev)||
-	((abs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos-deltaZ))<epsilon)&&(abs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos+deltaZ))>epsilon))||
-	((abs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos-deltaZ))>epsilon)&&(abs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos+deltaZ))<epsilon)&&(zPos>OCZ0&&zPos<OCZ1))||
-	((abs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos-deltaZ))<epsilon)&&(abs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos+deltaZ))>epsilon))||
-	((abs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos-deltaZ))>epsilon)&&(abs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos+deltaZ))<epsilon)&&(zPos>ICZ0)))  
+    if ((fabs(PHorn2OCRout(zPos)-(PHorn2OCRout(zPos-deltaZ)+PHorn2OCRout(zPos+deltaZ))/2.)>maxDev)||
+	(fabs(PHorn2OCRin(zPos)-(PHorn2OCRin(zPos-deltaZ)+PHorn2OCRin(zPos+deltaZ))/2.)>maxDev)||
+	((fabs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos-deltaZ))<epsilon)&&(fabs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos+deltaZ))>epsilon))||
+	((fabs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos-deltaZ))>epsilon)&&(fabs(PHorn2OCRout(zPos)-PHorn2OCRout(zPos+deltaZ))<epsilon)&&(zPos>OCZ0&&zPos<OCZ1))||
+	((fabs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos-deltaZ))<epsilon)&&(fabs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos+deltaZ))>epsilon))||
+	((fabs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos-deltaZ))>epsilon)&&(fabs(PHorn2OCRin(zPos)-PHorn2OCRin(zPos+deltaZ))<epsilon)&&(zPos>ICZ0)))  
       { 
 	if (zPos>OCZ0&&zPos<OCZ1){
 	  nOut++;
@@ -99,10 +99,10 @@ void NumiDetectorConstruction::ConstructHorn2()
 	  else 	MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
 	}
       }
-    if ((abs(PHorn2ICRout((lastICzPos+zPos)/2.)-(PHorn2ICRout(lastICzPos)+PHorn2ICRout(zPos))/2.)>maxDev)||
-	((abs(PHorn2ICRin((lastICzPos+zPos)/2.)-(PHorn2ICRin(lastICzPos)+PHorn2ICRin(zPos))/2.)>maxDev))||
-	((abs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))<epsilon)&&(abs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))>epsilon))||
-	((abs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))>epsilon)&&(abs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))<epsilon)))
+    if ((fabs(PHorn2ICRout((lastICzPos+zPos)/2.)-(PHorn2ICRout(lastICzPos)+PHorn2ICRout(zPos))/2.)>maxDev)||
+	((fabs(PHorn2ICRin((lastICzPos+zPos)/2.)-(PHorn2ICRin(lastICzPos)+PHorn2ICRin(zPos))/2.)>maxDev))||
+	((fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))<epsilon)&&(fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))>epsilon))||
+	((fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))>epsilon)&&(fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))<epsilon)))
       {
 	lastICzPos=zPos;
 	if (zPos>ICZ0&&zPos<=ICZ1){
