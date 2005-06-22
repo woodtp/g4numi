@@ -55,7 +55,7 @@ NumiDataInput::NumiDataInput()
   TargetSegmentPitch = 0.3*mm;
   TargetA            = 12.01*g/mole;
   TargetZ            = 6.;
-  TargetDensity      = 1.754*g/cm3;
+  TargetDensity      = 1.815*g/cm3;//1.754*g/cm3;
   TargetRL           = 25.692;
   TargetGEANTmat     = 18;
 
