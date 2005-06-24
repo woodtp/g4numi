@@ -113,7 +113,7 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   new G4PVPlacement(0,sphereFePos,"UpWn2",upwnSteelSphere2,pvDVOL,false,0);
   
   G4ThreeVector upwnPos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.);
-  G4double polyConeZ0=45.28*m;
+  //G4double polyConeZ0=45.28*m;
   G4double polyConeLength=12.08*in;
   G4double polyConeR0in=13.321*in-3./8.*in;
   G4double polyConeThick=3./8.*in;

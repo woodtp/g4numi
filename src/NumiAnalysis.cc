@@ -83,7 +83,7 @@ void NumiAnalysis::book()
     else{
       ntuple = new TFile(filename,"recreate","root ntuple");
       tree = new TTree("nudata","g4numi Neutrino ntuple");
-      tree->Branch("data",&g4data,"run/I:evtno:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
+      tree->Branch("data",&g4data,"run/I:evtno:beamHWidth/D:beamVWidth:beamX:beamY:protonX:protonY:nuTarZ:hornCurrent:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
     }
   }
   
@@ -142,7 +142,8 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 {
   if (!NumiData->CreateNuNtuple) return;
-
+  
+  
   //Neutrino vertex position and momentum
   G4ThreeVector pos = track.GetPosition()/mm; 
   x = pos.x();
@@ -169,6 +170,23 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
   g4data.run=pRunManager->GetCurrentRun()->GetRunID();
   g4data.evtno=pRunManager->GetCurrentEvent()->GetEventID();
+  g4data.beamHWidth=NumiData->beamSigmaX/cm;
+  g4data.beamVWidth=NumiData->beamSigmaY/cm;
+  g4data.beamX=NumiData->beamPosition[0]/cm;
+  g4data.beamY=NumiData->beamPosition[1]/cm;
+  
+  G4int particleID=track.GetParentID();
+  NumiTrajectory* dummyTrack=GetParentTrajectory(particleID);
+  while (particleID!=1){ 
+    particleID=dummyTrack->GetParentID();
+    dummyTrack=GetParentTrajectory(particleID);
+  }
+  g4data.protonX=dummyTrack->GetVertexPosition()[0];
+  g4data.protonY=dummyTrack->GetVertexPosition()[1];
+
+  g4data.nuTarZ=NumiData->TargetZ0;
+  g4data.hornCurrent=NumiData->HornCurrent;
+
   // Random decay - these neutrinos rarely hit any of the detectors
   g4data.Ndxdz=NuMomentum[0]/NuMomentum[2];
   g4data.Ndydz=NuMomentum[1]/NuMomentum[2];
@@ -189,7 +207,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data.NenergyN[ii]=GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
   g4data.NWtNear[ii]=GetWeight(track,enuzr,vertex_r,gamma,beta,theta,xdet,ydet,zdet);
   }
- 
+  
+  
   for (G4int ii=0;ii<10;ii++){         // far detector
   G4double xdet=NumiData->xdet_far[ii]; 
   G4double ydet=NumiData->ydet_far[ii];
@@ -288,53 +307,30 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   
   G4int tgen=0;    
   G4int tptype=0;
-  G4bool findtarget=false;
+  G4bool findTarget=false;
   G4ThreeVector ParticleMomentum=G4ThreeVector(-999999,-999999,-999999);
   G4ThreeVector ParticlePosition=G4ThreeVector(-999999,-999999,-999999);
   NumiTrajectory* PParentTrack=GetParentTrajectory(track.GetParentID());
-
-  while (!findtarget){
-    G4int noofpoint=PParentTrack->GetPointEntries();
-    G4String lastvolname=PParentTrack->GetPreStepVolumeName(noofpoint-2);
-     if (lastvolname.contains("TGT")||lastvolname.contains("HPB")) 
-      {
-	// if the neutrino is created in the target then it is the one that makes it out
-	findtarget=true;
-	NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
-	tgen=info->Gettgen();
-	ParticleMomentum=PParentTrack->GetMomentum(0);              // in this case tv_ and tvp_ are nu parent
-	ParticlePosition=PParentTrack->GetPoint(0)->GetPosition();  // production vertex and momentum
-	tptype=ntype;                                               //
-      }
-    else 
-      {
-	G4String volname=PParentTrack->GetPreStepVolumeName(0);
-	if (volname.contains("TGT")||volname.contains("HPB"))
-	  {
-	    findtarget=true;     
-	    tgen=PParentTrack->Gettgen();
-	    for(G4int ii=0;ii<noofpoint-2;ii++){
-	      G4String exitvolname=PParentTrack->GetPreStepVolumeName(ii);
-	      G4String entervolname=PParentTrack->GetPreStepVolumeName(ii+1);
-	      if (entervolname.contains("TGAR")&&(exitvolname.contains("HP") || exitvolname.contains("TGT"))) {
-		ParticleMomentum=PParentTrack->GetMomentum(ii);              // tv_ and tvp_ are equal to position and  
-		ParticlePosition=PParentTrack->GetPoint(ii)->GetPosition();  // momentum of the particle exiting the target
-	      }
-	    }
-	  }
-	else if ((PParentTrack->GetParentID()==1)&&(!volname.contains("TGT")&&!volname.contains("HPB")))
-	  {
-	    // particle parent is primary proton, but it's not created in target
-	    findtarget=true;  
-	    tgen=-1;
-	  }
-	else 
-	  {
-		    PParentTrack=GetParentTrajectory(PParentTrack->GetParentID());
-	  }
-      }
+  particleID=PParentTrack->GetTrackID();
+  
+  while (!findTarget&&particleID!=1){
+    G4int numberOfPoints=PParentTrack->GetPointEntries();
+    for (G4int ii=0;ii<numberOfPoints-1;ii++){
+      G4String lastVolName=PParentTrack->GetPreStepVolumeName(ii);
+      G4String nextVolName=PParentTrack->GetPreStepVolumeName(ii+1);      
+      if (lastVolName.contains("TGTExit")&&nextVolName.contains("TargetMother"))
+	{
+	  ParticleMomentum=PParentTrack->GetMomentum(ii);              // tv_ and tp_ are equal to position and  
+	  ParticlePosition=PParentTrack->GetPoint(ii)->GetPosition();  // momentum of the particle exiting the target (actually shell around target)
+	  NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
+	  tgen=info->Gettgen();
+	  tptype=GetParticleCode(PParentTrack->GetParticleName());
+	  findTarget=true;
+	}
+    }
+    PParentTrack=GetParentTrajectory(PParentTrack->GetParentID());
+    particleID=PParentTrack->GetTrackID();
   }
-  if (tptype==0) tptype=GetParticleCode(PParentTrack->GetParticleName());
 
   g4data.tvx=ParticlePosition[0]/cm;
   g4data.tvy=ParticlePosition[1]/cm;
@@ -392,8 +388,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	g4data.trkpx[0]=ParentMomentum[0]/GeV;
 	g4data.trkpy[0]=ParentMomentum[1]/GeV;
 	g4data.trkpz[0]=ParentMomentum[2]/GeV;}
-    //parent at target fin boundary
-    if ((prevolname.contains("TGT")) && postvolname.contains("Target")){
+    //parent at exits target
+    if ((prevolname.contains("TGTExit")) && postvolname.contains("TargetMother")){
       	g4data.trkx[1]=ParentPosition[0]/cm;
 	g4data.trky[1]=ParentPosition[1]/cm;
 	g4data.trkz[1]=ParentPosition[2]/cm;
@@ -477,7 +473,7 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
   TrajectoryVector* vect = container->GetVector();
   G4VTrajectory* tr;
   G4int ii=0; 
-  while (ii<vect->size()){  
+  while (ii<G4int(vect->size())){  
     tr=(*vect)[ii]; 
     NumiTrajectory* tr1=(NumiTrajectory*)(tr);  
     if(tr1->GetTrackID()==parentID) return tr1; 

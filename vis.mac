@@ -3,8 +3,8 @@
 # create empty scene
 #
 #/vis/open DAWNFILE
-#/vis/open HepRepFile 600
-/vis/open VRML2FILE
+/vis/open HepRepFile 600
+#/vis/open VRML2FILE
 
 /vis/scene/create
 /vis/scene/add/trajectories
@@ -32,4 +32,4 @@
 #/run/verbose 2
 #/gun/particle geantino
 /vis/scene/endOfEventAction accumulate
-/run/beamOn 4
+/run/beamOn 1

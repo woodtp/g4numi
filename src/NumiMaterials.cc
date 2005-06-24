@@ -41,8 +41,8 @@ void NumiDetectorConstruction::DefineMaterials()
   A = 32.065*g/mole; 
   G4Element* elS  = new G4Element(name="Sulfur"  ,symbol="S" , Z=16 , A);
 
-  A = 39.948*g/mole;
-  G4Element* elAr = new G4Element(name="Argon" , symbol="Ar", Z=18, A);
+  //A = 39.948*g/mole;
+  //G4Element* elAr = new G4Element(name="Argon" , symbol="Ar", Z=18, A);
 
   A = 39.1*g/mole; 
   G4Element* elK  = new G4Element(name="Potassium"  ,symbol="K" , Z=19 , A);

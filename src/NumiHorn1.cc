@@ -200,7 +200,7 @@ void NumiDetectorConstruction::ConstructHorn1()
   G4VPhysicalVolume *pvPHorn1F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1F",lvPHorn1F,pvMHorn1,false,0);
   
   //Spider Support
-  for (G4int ii=0;ii<ND->Horn1SS.size();ii++){
+  for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
     for (G4int jj=0;jj<ND->NHorn1SpidersPerPlaneN;jj++){
       G4double angle=G4double(360.*deg*jj/ND->NHorn1SpidersPerPlaneN);
       G4double halfThick=(&ND->Horn1SS[ii])->bottomL/2.;

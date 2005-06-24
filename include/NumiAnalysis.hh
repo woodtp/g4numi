@@ -74,7 +74,15 @@ private:
   TTree* hadmmtree;
   typedef struct {
     Int_t run;        //
-    Int_t evtno; 
+    Int_t evtno;
+    Double_t beamHWidth;
+    Double_t beamVWidth;
+    Double_t beamX;
+    Double_t beamY;
+    Double_t protonX;
+    Double_t protonY;
+    Double_t nuTarZ;
+    Double_t hornCurrent;
     Double_t Ndxdz;
     Double_t Ndydz;
     Double_t Npz;

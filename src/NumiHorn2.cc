@@ -26,7 +26,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   NumiDataInput* ND=NumiDataInput::GetNumiDataInput();
   // subtract TargetHallPosition to get origin at the face of Horn2
   G4ThreeVector TargetHallPosition=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0);
-  G4double MHorn2Length=133.966*2.54*cm+3.938*in+1.75*in+2.5*in;
+  //G4double MHorn2Length=133.966*2.54*cm+3.938*in+1.75*in+2.5*in;
   G4double THallHorn2Z0=10.*m; // Target Hall location of the origin of Horn 
   G4double Horn2Z0=-1.889*in;// HornZ0 in Horn coordinate system
   //G4double Horn2Z1=
@@ -196,7 +196,7 @@ void NumiDetectorConstruction::ConstructHorn2()
   G4VPhysicalVolume *pvPHorn2F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2F",lvPHorn2F,pvMHorn2,false,0);
 
   //Spider support
-  for (G4int ii=0;ii<ND->Horn2SS.size();ii++){
+  for (G4int ii=0;ii<G4int(ND->Horn2SS.size());ii++){
     for (G4int jj=0;jj<ND->NHorn2SpidersPerPlaneN;jj++){
       G4double angle=G4double(360.*deg*jj/ND->NHorn2SpidersPerPlaneN);
       G4double rIn=PHorn2ICRout(ND->Horn2SpiderSupportZ0[ii])+Fgap;//

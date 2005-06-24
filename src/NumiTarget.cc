@@ -44,9 +44,9 @@ void NumiDetectorConstruction::ConstructTarget()
     sTargetMotherVol=new G4UnionSolid("sTargetMotherVol",sTargetMotherVol,dummySolid,G4Transform3D(rotation,translation));
   }    
   G4ThreeVector TargetMotherVolPosition=TargetMVOrigin-target_hall_position+targetPosition;
-  G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,Vacuum,"lvTarget",0,0,0);
+  G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,Vacuum,"lvTargetMother",0,0,0);
   TargetRegion->AddRootLogicalVolume(lvTargetMotherVol);
-  G4VPhysicalVolume* pvTargetMotherVol=new G4PVPlacement(0,TargetMotherVolPosition,"pvTarget",lvTargetMotherVol,TGAR,false,0);
+  G4VPhysicalVolume* pvTargetMotherVol=new G4PVPlacement(0,TargetMotherVolPosition,"pvTargetMother",lvTargetMotherVol,TGAR,false,0);
   
   //------------------------------------------------------------------------------------------------
   //Target
