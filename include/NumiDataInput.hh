@@ -35,7 +35,8 @@ public:
   // Target Area
   G4double TargetAreaZ0, TargetAreaLength, TargetAreaHeight,TargetAreaWidth;
   G4int TargetAreaGEANTmat;
- 
+
+  
   // Target
   G4double TargetX0, TargetY0, TargetZ0, TargetDxdz, TargetDydz;
   G4double TargetSLength, TargetSWidth, TargetSHeight, TargetA, TargetDensity;
@@ -43,7 +44,11 @@ public:
   G4int TargetGEANTmat,TargetSegmentNo;
   G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
   G4bool TargetEndRounded;
-
+	void SetTargetZ0(G4double val) {
+		TargetZ0 = val;
+		HPBaffleZ0 += (val + 0.45*m);
+	}
+	
   //Rings holding target and cooling pipes
   G4int NTgtRingN;
   vdouble_t TgtRingZ0, TgtRingLength, TgtRingRin,TgtRingRout;
@@ -117,7 +122,10 @@ public:
   vdouble_t xdet_far,ydet_far,zdet_far;
 
   G4double HornCurrent; //old
-  
+	void SetHornCurrent(G4double val) {
+		HornCurrent = val;
+	}
+	
  // Horn 1
   G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
   

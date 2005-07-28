@@ -25,11 +25,11 @@ void NumiDetectorConstruction::ConstructTarget()
   char no[3];
 
   // Mother volume (TGAR) position
-  G4ThreeVector target_hall_position=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0);
+  G4ThreeVector target_hall_position=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0); 
   G4ThreeVector targetPosition=G4ThreeVector(NumiData->TargetX0,NumiData->TargetY0,NumiData->TargetZ0);
-  
+    
   //Create Target Region
-  G4Region* TargetRegion = new G4Region("Numi Target");
+  //G4Region* TargetRegion = new G4Region("Numi Target");
 
   //Create Mother Volume
   G4VSolid* sTargetMotherVol;
@@ -45,7 +45,7 @@ void NumiDetectorConstruction::ConstructTarget()
   }    
   G4ThreeVector TargetMotherVolPosition=TargetMVOrigin-target_hall_position+targetPosition;
   G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,Vacuum,"lvTargetMother",0,0,0);
-  TargetRegion->AddRootLogicalVolume(lvTargetMotherVol);
+  //TargetRegion->AddRootLogicalVolume(lvTargetMotherVol);
   G4VPhysicalVolume* pvTargetMotherVol=new G4PVPlacement(0,TargetMotherVolPosition,"pvTargetMother",lvTargetMotherVol,TGAR,false,0);
   
   //------------------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ NumiDataInput::NumiDataInput()
   //=======================================================================
   TargetX0           = 0.0;
   TargetY0           = 0.0;
-  TargetZ0           = -0.35*m-10.*cm;
+  TargetZ0           = -0.45*m; //-0.35*m-10.*cm;
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
   TargetSLength      = 20.*mm;
