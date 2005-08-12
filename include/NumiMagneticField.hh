@@ -1,5 +1,5 @@
 
-// $Id: NumiMagneticField.hh,v 1.1 2005/01/20 20:30:45 zarko Exp $
+// $Id: NumiMagneticField.hh,v 1.2 2005/08/12 19:52:01 zarko Exp $
 // --------------------------------------------------------------
 // NumiMagneticField.hh modified by Yuki 2004/7/16
 // modified by Yuki 8/2/04
@@ -22,7 +22,7 @@ class NumiMagneticField : public G4MagneticField
   
   private:
     NumiDataInput* NumiData;
-    G4double current;
+  //G4double current;
 };
 
 class NumiMagneticFieldIC : public G4MagneticField
@@ -35,7 +35,7 @@ class NumiMagneticFieldIC : public G4MagneticField
 
   private:
     NumiDataInput* NumiData;
-    G4double current;
+  //G4double current;
 };
 
 class NumiMagneticFieldOC : public G4MagneticField
@@ -48,7 +48,7 @@ class NumiMagneticFieldOC : public G4MagneticField
 
   private:
     NumiDataInput* NumiData;
-    G4double current;
+  //G4double current;
 };
 
 #endif

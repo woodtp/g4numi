@@ -32,8 +32,8 @@ NumiDataInput::NumiDataInput()
 
   //TargetArea          1
   //=======================================================================
-  TargetAreaZ0       = -4.0*m;
-  TargetAreaLength   = 49.28*m;
+  TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
+  TargetAreaLength   = 52.398*m;//was 49.28*m (08/09/05);
   TargetAreaHeight   = 6.0*m;
   TargetAreaWidth    = 6.0*m;
   TargetAreaGEANTmat = 15;
@@ -61,7 +61,7 @@ NumiDataInput::NumiDataInput()
 
   //Budal Monitor
   BudalX0 = 0.0;
-  BudalY0 = 0.0;
+  BudalY0 = 2.26*mm;
   BudalZ0 = -16.72*cm;
   BudalDxdz = 0.0;
   BudalDydz = 0.0;
@@ -84,7 +84,7 @@ NumiDataInput::NumiDataInput()
   // CPipeDXDZ=-99999 and CPipeDYDZ=0 puts curved part in z-y plane
   //=======================================================================
   G4int CPGeantMat_[]        = {10     ,   10   ,10     , 10     , 10    , 10    ,  10   , 10    , 10     , 10           ,10            , 31     , 31      ,10        ,10        ,  10     ,  10     , 10      ,10  };
-  G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , true  ,true   ,false  ,true   , false  , true         ,true          , true   ,true     ,true      ,true      , true    , true    , true    , true};
+  G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , false  ,false   ,false  ,true   , false  , true         ,true          , true   ,true     ,true      ,true      , true    , true    , true    , true};
   G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.    , 0.           ,0.            , 0      , 0       ,0         ,0         , 0       , 0       , 0       , 0};
   G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.    , 1.05e-2      ,-1.05e-2      , 5.95e-2, -5.95e-2,5.95e-2   ,-5.95e-2  , 5.95e-2 , -5.95e-2,5.95e-2  ,-5.95e-2};
   G4double CPipeZ0_[]        = {-0.275 , -0.275 ,-0.30  ,-0.30   , -.3001,-.3001 ,.969   , .9695 , .9735  , 0.955        ,0.955         , -0.215 , -0.215  ,-.071     ,-.071     ,-0.287   ,-0.287   , -.30    , -.30};
@@ -158,9 +158,9 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   //Tunnel         1
   //=======================================================================
-  TunnelZ0       = 45.28*m;
+  TunnelZ0       = 45.6985*m; //was 45.28*m (08/09/05);
   TunnelRadius   = 3.3*m+.5*m; //added .5m because hadron absorber does not fit entirely inside 3.3
-  TunnelLength   = 693.86*m;
+  TunnelLength   = 693.4415*m; //was 693.86*m (08/09/05);
   TunnelA        = 0.0;
   TunnelZ        = 0.0;
   TunnelGEANTmat = 15;
@@ -169,19 +169,19 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //======================================================================= 
   ShieldX0       = 0.0; 
   ShieldY0       = 0.0; 
-  ShieldZ0       = 45.28*m;   
+  ShieldZ0       = 45.699*m; //was 45.28*m (08/09/05);   
   ShieldDxdz     = 0.0; // not 
   ShieldDydz     = 0.0; // used
-  ShieldLength   = 677.1*m;  
+  ShieldLength   = 676.681*m; //was 677.1*m (08/09/05);  
   ShieldRout     = 2.23*m; 
   ShieldRin      = 1.0097*m; 
   ShieldGEANTmat = 17;
   
   //DecayPipe          1    
   //=======================================================================
-  DecayPipeZ0        = 45.28*m;
+  DecayPipeZ0        = 45.699*m; //was 45.28*m (08/09/05);
   DecayPipeRadius    = 0.9906*m;
-  DecayPipeLength    = 677.1*m;
+  DecayPipeLength    = 676.681*m; //was 677.1*m (08/09/05);
   DecayPipeFWinThick = 1.60E-3*m;
   DecayPipeEWinThick = 4.76E-3*m;
   DecayPipeWallThick = 1.905E-2*m;
@@ -247,7 +247,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   }
   
   
-  HornCurrent=200.; //kA
+  HornCurrent=200000.*ampere; 
   static const G4double in=2.54*cm;
   
   NPHorn2EndN=3;

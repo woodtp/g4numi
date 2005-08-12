@@ -98,7 +98,7 @@ void NumiDetectorConstruction::ConstructTarget()
   rotation.rotateZ(90.*deg);
   // with this translation rotation axis is at the begining of the volume (x0,y0,z0) and not at its center
   translation=G4ThreeVector(-(sin(atan(NumiData->BudalDxdz)))*cos(atan(NumiData->BudalDydz))*NumiData->TargetSLength/2.,(sin(atan(NumiData->BudalDydz)))*NumiData->TargetSLength/2.,(1-cos(atan(NumiData->BudalDxdz))*cos(atan(NumiData->BudalDydz)))*NumiData->TargetSLength/2.);
-  G4ThreeVector budalMonitorPosition=G4ThreeVector(0.,0.,NumiData->BudalZ0+NumiData->TargetSLength/2.)-TargetMVOrigin;
+  G4ThreeVector budalMonitorPosition=G4ThreeVector(NumiData->BudalX0,NumiData->BudalY0,NumiData->BudalZ0+NumiData->TargetSLength/2.)-TargetMVOrigin;
   G4LogicalVolume* LVBudalMonitor=new G4LogicalVolume(TGT1_solid,Target,"LVBudalMonitor",0,0,0);
   new G4PVPlacement(G4Transform3D(rotation,budalMonitorPosition),"BudalMonitor",LVBudalMonitor,pvTargetMotherVol,false,0);
   

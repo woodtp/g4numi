@@ -69,7 +69,6 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
 	// Messenger
 	NumiDetectorMessenger *detectorMessenger;
 	
-	
   G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
   G4Material* GetMaterial(G4int matcode);
   G4double phornRgivenZ(G4double a, G4double b, G4double c, G4double z);

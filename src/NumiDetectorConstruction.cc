@@ -23,7 +23,7 @@
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
 
-//#include "G4RegionStore.hh"
+#include "G4RegionStore.hh"
 #include "G4SolidStore.hh"
 #include "G4GeometryManager.hh"
 #include "G4RunManager.hh"
@@ -31,17 +31,17 @@
 
 NumiDetectorConstruction::NumiDetectorConstruction()
 {
-    //Scan the input file     
-    NumiData=new NumiDataInput();
+  //Scan the input file     
+  NumiData=new NumiDataInput();
 
-// Pointers for magnetic fields ***    
-    numiMagField = new NumiMagneticField(); 
-    numiMagFieldIC = new NumiMagneticFieldIC();
-    numiMagFieldOC = new NumiMagneticFieldOC();
-
-	// create commands for interactive definition of the geometry
-	detectorMessenger = new NumiDetectorMessenger(this);
-	
+  // Pointers for magnetic fields ***    
+  numiMagField = new NumiMagneticField(); 
+  numiMagFieldIC = new NumiMagneticFieldIC();
+  numiMagFieldOC = new NumiMagneticFieldOC();
+  
+  // create commands for interactive definition of the geometry
+  detectorMessenger = new NumiDetectorMessenger(this);
+  DefineMaterials();
 }
 
 NumiDetectorConstruction::~NumiDetectorConstruction()
@@ -52,23 +52,12 @@ NumiDetectorConstruction::~NumiDetectorConstruction()
   delete NumiData;
   DestroyMaterials();
   delete detectorMessenger;
-  
 }
 
 G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 {
 
-	// Clean old geometry, if any
-	//
-	G4GeometryManager::GetInstance()->OpenGeometry();
-	//G4RegionStore::GetInstance()->Clean();
-	G4PhysicalVolumeStore::GetInstance()->Clean();
-	G4LogicalVolumeStore::GetInstance()->Clean();
-	G4SolidStore::GetInstance()->Clean();
-
-	DefineMaterials();
-
-  //Define world volume
+   //Define world volume 
   G4Tubs* ROCK_solid = new G4Tubs("ROCK_solid",0.,NumiData->RockRadius,NumiData->RockHalfLen,0,360.*deg);
   ROCK_log = new G4LogicalVolume(ROCK_solid,Concrete,"ROCK_log",0,0,0); 
   ROCK_log->SetVisAttributes(G4VisAttributes::Invisible);
@@ -80,10 +69,10 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ConstructTarget();
   ConstructHorn1();
   ConstructHorn2();
-  ConstructHadronAbsorber();
+  ConstructHadronAbsorber(); 
   ConstructSecMonitors();
 
-//Set Vis Attributes according to solid material (only for volumes not explicitly set)
+  //Set Vis Attributes according to solid material (only for volumes not explicitly set)
   G4LogicalVolumeStore* lvStore=G4LogicalVolumeStore::GetInstance();
   lvStore=G4LogicalVolumeStore::GetInstance();
 
@@ -116,20 +105,28 @@ void NumiDetectorConstruction::SetTargetGas(G4String gasChoice) {
 void NumiDetectorConstruction::SetTargetZ0(G4double val) {
 
 	NumiData->SetTargetZ0(val);
-	G4cout << " Geometry changed: target position Z0 = " << NumiData->TargetZ0 << G4endl;
-	G4cout << " Geometry changed: baffle position Z0 = " << NumiData->HPBaffleZ0 << G4endl;
+	G4cout << " Geometry changed: target position Z0 = " << NumiData->TargetZ0/cm << " cm"<<G4endl;
+	G4cout << " Geometry changed: baffle position Z0 = " << NumiData->HPBaffleZ0/cm << " cm"<<G4endl;
 	
 }
 
 void NumiDetectorConstruction::SetHornCurrent(G4double val) {
 
 	NumiData->SetHornCurrent(val);
-	G4cout << " Geometry changed: Horn current = " << NumiData->HornCurrent << G4endl;
+	G4cout << " Geometry changed: Horn current = " << NumiData->HornCurrent/ampere<<" A"<< G4endl;
 
 }
 
 void NumiDetectorConstruction::UpdateGeometry() {
 
-	G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
-	
+
+  // Clean old geometry
+  //
+  G4GeometryManager::GetInstance()->OpenGeometry();
+  //G4RegionStore::GetInstance()->Clean();
+  G4PhysicalVolumeStore::GetInstance()->Clean();
+  G4LogicalVolumeStore::GetInstance()->Clean();
+  G4SolidStore::GetInstance()->Clean();
+  G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
+  
 }

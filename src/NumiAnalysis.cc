@@ -47,10 +47,13 @@ NumiAnalysis::NumiAnalysis()
 NumiData=NumiDataInput::GetNumiDataInput();
 #ifdef G4ANALYSIS_USE
 #endif
-
-  asciiFileName="numi.out";
-  std::ofstream asciiFile(asciiFileName, std::ios::app);
  
+ writeASCII=false;
+ if (writeASCII) {
+   asciiFileName="numi.out";
+   std::ofstream asciiFile(asciiFileName);
+ }
+
 }
 
 NumiAnalysis::~NumiAnalysis()
@@ -185,7 +188,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data.protonY=dummyTrack->GetVertexPosition()[1];
 
   g4data.nuTarZ=NumiData->TargetZ0;
-  g4data.hornCurrent=NumiData->HornCurrent;
+  g4data.hornCurrent=NumiData->HornCurrent/ampere/1000.;
 
   // Random decay - these neutrinos rarely hit any of the detectors
   g4data.Ndxdz=NuMomentum[0]/NuMomentum[2];
@@ -452,8 +455,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 
 
   // Write to file
-  G4bool writeascii=true;
-  if (writeascii) {
+  if (writeASCII) {
     std::ofstream asciiFile(asciiFileName, std::ios::app);
     if(asciiFile.is_open()) {
       asciiFile << g4data.Ntype<< " " << g4data.Nenergy << " " << g4data.NenergyN[0] << " " << g4data.NWtNear[0];

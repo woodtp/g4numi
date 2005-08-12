@@ -69,43 +69,51 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   //couple of tubes and spheres and a polycone
   //for tubes we need Rin, Rout, material,volName,Z0,length
   G4int NUpWnTubesN=5;
-  G4double UpWnTubeZ0[]      ={45.28*m  ,45.3054*m , 45.4578*m , 45.4769*m, 45.496*m};
+  //G4double UpWnTubeZ0[]      ={45.28*m  ,45.3054*m , 45.4578*m , 45.4769*m, 45.496*m};
+  G4double UpWnTubeZ0[]      ={2.295*in   , 3.295*in  ,  9.295*in  ,  10.045*in ,  10.795*in}; //Distance from beginning of decay pipe
   G4double UpWnTubeLength[]  ={1.*in    ,6.*in     , .75*in    , .75*in   , 6.*in    };
   G4double UpWnTubeRin[]     ={19.5*in  ,20.8125*in,19.5*in    , 19.5*in  , 20.8125*in };
   G4double UpWnTubeRout[]    ={22.*in   ,21.*in    ,22.*in     , 22.*in   , 21.*in};
   G4int UpWnTubeVolMaterial[]={20       , 20       ,  20       ,  10      , 10};
   G4String UpWnTubeVolName[] ={"UpWnAl1","UpWnAl2" ,"UpWnAl3"  ,"UpWnFe1" ,"UpWnFe2" };
-  for (G4int ii=0;ii<NUpWnTubesN;ii++){
-    UpWnTubeZ0[ii]+=65.*mm;
-  }
+  // for (G4int ii=0;ii<NUpWnTubesN;ii++){
+  //  UpWnTubeZ0[ii]+=NumiData->DecayPipeZ0;
+  // }
   G4VSolid *sUpWnTube;
   G4LogicalVolume *lvUpWnTube;
   for(G4int ii=0;ii<NUpWnTubesN;ii++){
     sUpWnTube=new G4Tubs(UpWnTubeVolName[ii].append("S"),UpWnTubeRin[ii],UpWnTubeRout[ii],UpWnTubeLength[ii]/2.,0.,360.*deg);
     lvUpWnTube=new G4LogicalVolume(sUpWnTube,GetMaterial(UpWnTubeVolMaterial[ii]),UpWnTubeVolName[ii].append("LV"),0,0,0);
     
-    G4ThreeVector translation=G4ThreeVector(0.,0.,UpWnTubeZ0[ii]+UpWnTubeLength[ii]/2.)-G4ThreeVector(0,0,NumiData->DecayPipeZ0+NumiData->DecayPipeLength/2.);
+    G4ThreeVector translation=G4ThreeVector(0.,0.,UpWnTubeZ0[ii]+UpWnTubeLength[ii]/2.)-G4ThreeVector(0,0,(-NumiData->DecayPipeEWinThick+NumiData->DecayPipeLength)/2.);
     G4RotationMatrix rotation=G4RotationMatrix(0.,0.,0.);
     new G4PVPlacement(G4Transform3D(rotation,translation),UpWnTubeVolName[ii],lvUpWnTube,pvDVOL,false,0);
   }
+
+  //Spherical Al part
   l=NumiData->DecayPipeFWinThick/2.;
   r=NumiData->DecayPipeRadius;
-  G4ThreeVector sphereAlPos=G4ThreeVector(0,0,-NumiData->DecayPipeLength/2.-71.*in+108.*mm+65.*mm);
+  G4double rAlWinCurv=70.*in;  //curvature of Al window
+  G4double thickAlWin=0.063*in; //thickness of Al window
+  G4double angleAlWin=16.175*deg; 
+
+  G4ThreeVector sphereAlPos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.-rAlWinCurv*cos(angleAlWin)+UpWnTubeZ0[0]+UpWnTubeLength[0]);
   G4Sphere *sUpWnSteelSphere1=new G4Sphere("UpWnSph1",
-					 70.*in,(70.063)*in,
+					 rAlWinCurv,rAlWinCurv+thickAlWin,
 					 0.*deg,360.*deg,
-					 0.*deg,16.7*deg-.6*deg);
+					 0.*deg,angleAlWin);
   G4LogicalVolume *upwnSteelSphere1=new G4LogicalVolume(sUpWnSteelSphere1,
 						       Al,
 						       "lvAlUpWn",
 						       0,0,0);
   new G4PVPlacement(0,sphereAlPos,"UpWn1",upwnSteelSphere1,pvDVOL,false,0);
-  
-  G4ThreeVector sphereFePos=G4ThreeVector(0,0,-NumiData->DecayPipeLength/2.-69.3*in+19.303*in);
+
+  //Spherical Fe part
+  G4ThreeVector sphereFePos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.-69.3*in+19.303*in-3./8.*in);
   G4Sphere *sUpWnSteelSphere2=new G4Sphere("upwnSph2",
 					   69.3*in,69.675*in,
 					   0.*deg,360.*deg,
-					   17.64*deg+.4*deg,8.748*deg-.2*deg);
+					   17.64*deg,8.748*deg);
   G4LogicalVolume *upwnSteelSphere2=new G4LogicalVolume(sUpWnSteelSphere2,
 						       Fe,
 						       "lvFeUpWn",
@@ -114,7 +122,7 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   
   G4ThreeVector upwnPos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.);
   //G4double polyConeZ0=45.28*m;
-  G4double polyConeLength=12.08*in;
+  G4double polyConeLength=11.707*in;
   G4double polyConeR0in=13.321*in-3./8.*in;
   G4double polyConeThick=3./8.*in;
   G4int NpolyConeDivN=10;

@@ -59,6 +59,7 @@ private:
 
   static NumiAnalysis* instance;
 
+  G4bool writeASCII;
   G4double x;
   G4double y;
   G4double z;

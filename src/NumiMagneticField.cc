@@ -12,16 +12,16 @@
 NumiMagneticField::NumiMagneticField()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  current = NumiData->HornCurrent;
+
 }
 
 NumiMagneticField::~NumiMagneticField(){;}
 
 void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) const
 {
+  G4double current = NumiData->HornCurrent/ampere/1000.;
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);    
   G4double B = current / (5.*radius/cm)/10*tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
-
   Bfield[0] = -B*Point[1]/radius;
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
@@ -31,13 +31,13 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
 NumiMagneticFieldIC::NumiMagneticFieldIC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  current = NumiData->HornCurrent;
 }
 
 NumiMagneticFieldIC::~NumiMagneticFieldIC(){;}
 
 void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) const
 {
+  G4double current = NumiData->HornCurrent/ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
@@ -64,6 +64,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
 	magBField=magBField*(1-(radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
       }
   }
+
   if (radius!=0){
     Bfield[0] = -magBField*Point[1]/radius;
     Bfield[1] = magBField*Point[0]/radius;
@@ -80,13 +81,13 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
 NumiMagneticFieldOC::NumiMagneticFieldOC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-  current = NumiData->HornCurrent;
 }
 
 NumiMagneticFieldOC::~NumiMagneticFieldOC(){;}
 
 void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) const
 {
+  G4double current = NumiData->HornCurrent/ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
@@ -115,6 +116,7 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
       magBField=magBField*(1-(radius*radius-rIn*rIn)/(rOut*rOut-rIn*rIn)); // linear distribution of current
     }
   }
+
   if (radius!=0){
   Bfield[0] = -magBField*Point[1]/radius;
   Bfield[1] = magBField*Point[0]/radius;
