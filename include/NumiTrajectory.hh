@@ -98,7 +98,6 @@ class NumiTrajectory : public G4VTrajectory
    G4double                         ParticleMass;
    NumiTrajectoryVolumeName*        PreStepVolume;
 };
-
 extern G4Allocator<NumiTrajectory> myTrajectoryAllocator;
 
 inline void* NumiTrajectory::operator new(size_t)

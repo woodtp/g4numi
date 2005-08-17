@@ -23,8 +23,37 @@ private:
   static NumiDataInput* fNumiDataInput;
 
 public:
- 
-  G4bool NImpWeightOn, CreateNuNtuple,CreateHadmmNtuple;
+	void SetTargetZ0(G4double val) {
+		TargetZ0 = val;
+		HPBaffleZ0 += (val + 0.45*m);
+	}
+	void SetHornCurrent(G4double val) {
+		HornCurrent = val;
+	}
+  void SetNImpWeight(G4bool val) {
+    NImpWeightOn = val;
+  }
+  void SetNuNtupleName(G4String fileName){
+    nuNtupleName=fileName;
+  }
+  void SetHadmmNtupleName(G4String fileName){
+    hadmmNtupleName=fileName;
+  }
+  void SetASCIIName(G4String fileName){
+    asciiName=fileName;
+  }
+  void OutputNuNtuple(G4bool output){
+    createNuNtuple=output;
+  }
+  void OutputHadmmNtuple(G4bool output){
+    createHadmmNtuple=output;
+  }
+  void OutputASCII(G4bool output){
+    createASCII=output;
+  }
+
+  G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
+  G4String nuNtupleName, hadmmNtupleName, asciiName;
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
   G4ThreeVector beamPosition, beamDirection;
@@ -44,10 +73,6 @@ public:
   G4int TargetGEANTmat,TargetSegmentNo;
   G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
   G4bool TargetEndRounded;
-	void SetTargetZ0(G4double val) {
-		TargetZ0 = val;
-		HPBaffleZ0 += (val + 0.45*m);
-	}
 	
   //Rings holding target and cooling pipes
   G4int NTgtRingN;
@@ -122,9 +147,6 @@ public:
   vdouble_t xdet_far,ydet_far,zdet_far;
 
   G4double HornCurrent; //old
-	void SetHornCurrent(G4double val) {
-		HornCurrent = val;
-	}
 	
  // Horn 1
   G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;

@@ -48,12 +48,6 @@ NumiData=NumiDataInput::GetNumiDataInput();
 #ifdef G4ANALYSIS_USE
 #endif
  
- writeASCII=false;
- if (writeASCII) {
-   asciiFileName="numi.out";
-   std::ofstream asciiFile(asciiFileName);
- }
-
 }
 
 NumiAnalysis::~NumiAnalysis()
@@ -73,61 +67,58 @@ void NumiAnalysis::book()
 {
 
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
-  //sprintf(filename,"%s%d%s","Numi_nt",pRunManager->GetCurrentRun()->GetRunID(),".root");
-  char filename[]="Numi_nt.root";
-  
-  if (NumiData->CreateNuNtuple){
-    //Check if file already existed
-    if (pRunManager->GetCurrentRun()->GetRunID()>0){
-      ntuple = new TFile(filename,"update","root ntuple");
-      tree=(TTree*)(ntuple->Get("nudata"));
-      tree->SetBranchAddress("data",&g4data);
-    }
-    else{
-      ntuple = new TFile(filename,"recreate","root ntuple");
-      tree = new TTree("nudata","g4numi Neutrino ntuple");
-      tree->Branch("data",&g4data,"run/I:evtno:beamHWidth/D:beamVWidth:beamX:beamY:protonX:protonY:nuTarZ:hornCurrent:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
-    }
+
+  if (NumiData->createNuNtuple){
+    sprintf(nuNtupleFileName,"%s%s%04d%s",(NumiData->nuNtupleName).c_str(),"_",pRunManager->GetCurrentRun()->GetRunID(),".root");
+    nuNtuple = new TFile(nuNtupleFileName,"recreate","root ntuple");
+    G4cout << "Creating neutrino ntuple: "<<nuNtupleFileName<<G4endl;
+    tree = new TTree("nudata","g4numi Neutrino ntuple");
+    tree->Branch("data",&g4data,"run/I:evtno:beamHWidth/D:beamVWidth:beamX:beamY:protonX:protonY:nuTarZ:hornCurrent:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
   }
-  
-  if (NumiData->CreateHadmmNtuple){
-    char hmmfilename[]="hadmm.root";
-    //if (hadmmntuple->GetSize()>1000){
-    if(pRunManager->GetCurrentRun()->GetRunID()>0){
-      hadmmntuple = new TFile(hmmfilename, "update","hadmm ntuple");
-      hadmmtree=(TTree*)(hadmmntuple->Get("hadmm"));
-      hadmmtree->SetBranchAddress("data",&g4hmmdata);
-    }
-    else{
-      hadmmntuple = new TFile(hmmfilename, "recreate","hadmm ntuple");
-      hadmmtree = new TTree("hadmm","g4numi Hadmmmon  ntuple");
-      hadmmtree->Branch("data",&g4hmmdata,"run/I:evtno:mtgthpos/D:mtgtvpos:mtgthsig:mtgtvsig:ptype/I:hmenergy/D:hmxpos:hmypos:hmzpos:hmmpx:hmmpy:hmmpz");
-    }
+ 
+  if (NumiData->createHadmmNtuple){
+    sprintf(hadmmNtupleFileName,"%s%s%04d%s",(NumiData->hadmmNtupleName).c_str(),"_",pRunManager->GetCurrentRun()->GetRunID(),".root");
+    G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileName<<G4endl;
+    hadmmNtuple = new TFile(hadmmNtupleFileName, "recreate","hadmm ntuple");
+    hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
+    hadmmtree->Branch("data",&g4hmmdata,"run/I:evtno:mtgthpos/D:mtgtvpos:mtgthsig:mtgtvsig:ptype/I:hmmenergy/D:hmmxpos:hmmypos:hmmzpos:hmmpx:hmmpy:hmmpz");
   }
+
+  if (NumiData->createASCII) {
+    G4RunManager* pRunManager=G4RunManager::GetRunManager();
+    sprintf(asciiFileName,"%s%s%04d%s",(NumiData->asciiName).c_str(),"_",pRunManager->GetCurrentRun()->GetRunID(),".txt");
+    G4cout << "Creating ASCII output file : "<<asciiFileName<<G4endl;
+    std::ofstream asciiFile(asciiFileName);
+  }
+
   //book histograms
 }
 
 void NumiAnalysis::finish()
 {
-  if (NumiData->CreateNuNtuple){
-    ntuple->cd();
+  if (NumiData->createNuNtuple){
+    nuNtuple->cd();
     tree->Write();
-    ntuple->Close();
-    delete ntuple;
+    nuNtuple->Close();
+    delete nuNtuple;
   }
 
-  if (NumiData->CreateHadmmNtuple){
-    hadmmntuple->cd();
+  if (NumiData->createHadmmNtuple){
+    hadmmNtuple->cd();
     hadmmtree->Write();
-    hadmmntuple->Close();
-    delete hadmmntuple;
+    hadmmNtuple->Close();
+    delete hadmmNtuple;
   }
 }
 void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 {
-  if (!NumiData->CreateHadmmNtuple) return;
+  if (!NumiData->createHadmmNtuple) return;
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
   g4hmmdata.run=pRunManager->GetCurrentRun()->GetRunID();
+  g4hmmdata.mtgthsig=NumiData->beamSigmaX/cm;
+  g4hmmdata.mtgtvsig=NumiData->beamSigmaY/cm;
+  g4hmmdata.mtgthpos=NumiData->beamPosition[0]/cm;
+  g4hmmdata.mtgtvpos=NumiData->beamPosition[1]/cm;
   g4hmmdata.evtno=pRunManager->GetCurrentEvent()->GetEventID();
   G4ParticleDefinition* particleDefinition=track.GetDefinition();
   g4hmmdata.ptype=GetParticleCode(particleDefinition->GetParticleName());
@@ -144,9 +135,8 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 }
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 {
-  if (!NumiData->CreateNuNtuple) return;
-  
-  
+  if (!NumiData->createNuNtuple) return;
+    
   //Neutrino vertex position and momentum
   G4ThreeVector pos = track.GetPosition()/mm; 
   x = pos.x();
@@ -455,7 +445,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 
 
   // Write to file
-  if (writeASCII) {
+  if (NumiData->createASCII) {
     std::ofstream asciiFile(asciiFileName, std::ios::app);
     if(asciiFile.is_open()) {
       asciiFile << g4data.Ntype<< " " << g4data.Nenergy << " " << g4data.NenergyN[0] << " " << g4data.NWtNear[0];

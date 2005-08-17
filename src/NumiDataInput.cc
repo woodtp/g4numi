@@ -14,7 +14,11 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
 
-  NImpWeightOn = true; CreateNuNtuple=true;CreateHadmmNtuple=false;
+  NImpWeightOn = true; createNuNtuple=true;createHadmmNtuple=false;createASCII=false;
+  nuNtupleName="nuNtuple"; 
+  hadmmNtupleName="hadmmNtuple";
+  asciiName="asciiOut";
+
   protonMomentum = 120.*GeV;  
   beamSigmaY = 1.*mm;
   beamSigmaX = 0.9*mm;

@@ -27,14 +27,14 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
 {
   G4cout << "Starting run " << aRun->GetRunID()<<G4endl;
   G4cout<<"Random seed used for this run "<<HepRandom::getTheSeed();
-  G4String randomFile="rndm/beginOfRun";
-  char runN[3];
-  sprintf(runN,"%d",aRun->GetRunID());
+  G4String randomFile="rndm/beginOfRun_";
+  char runN[4];
+  sprintf(runN,"%04d",aRun->GetRunID());
   randomFile.append(runN);
   randomFile.append(".rndm");
   HepRandom::saveEngineStatus(randomFile);
   G4cout << "; Random engine status saved in "<<randomFile<<G4endl;
-
+  
   //Book histograms and ntuples
   NumiAnalysis* analysis = NumiAnalysis::getInstance();
   analysis->book();
@@ -45,9 +45,9 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
 void NumiRunAction::EndOfRunAction(const G4Run* aRun)
 {
 
-  G4String randomFile="rndm/endOfRun";
-  char runN[3];
-  sprintf(runN,"%d",aRun->GetRunID());
+  G4String randomFile="rndm/endOfRun_";
+  char runN[4];
+  sprintf(runN,"%04d",aRun->GetRunID());
   randomFile.append(runN);
   randomFile.append(".rndm");
   HepRandom::saveEngineStatus(randomFile);
