@@ -9,7 +9,9 @@
 #include "NumiRunActionMessenger.hh"
 #include "NumiAnalysis.hh"
 #include "NumiTrajectory.hh"
+#include "NumiDataInput.hh"
 #include "Randomize.hh"
+#include "NumiRunManager.hh"
 
 NumiRunAction::NumiRunAction()
 { 
@@ -25,6 +27,9 @@ NumiRunAction::~NumiRunAction()
 
 void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
 {
+  NumiDataInput *ND=NumiDataInput::GetNumiDataInput();
+  NumiRunManager *pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
+
   G4cout << "Starting run " << aRun->GetRunID()<<G4endl;
   G4cout<<"Random seed used for this run "<<HepRandom::getTheSeed();
   G4String randomFile="rndm/beginOfRun_";
@@ -34,7 +39,22 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
   randomFile.append(".rndm");
   HepRandom::saveEngineStatus(randomFile);
   G4cout << "; Random engine status saved in "<<randomFile<<G4endl;
-  
+
+  if (ND->useFlukaInput){
+    G4cout<<"Using Fluka input ntuple "<<ND->GetExtNtupleFileName()<<G4endl;
+  }
+  else if (ND->useMarsInput){
+    G4cout<<"Using Mars input ntuple "<<ND->GetExtNtupleFileName()<<G4endl;
+  }
+  else{
+    G4cout<<"Proton beam:"<<G4endl;
+      G4cout << " Momentum: "<<ND->protonMomentum/GeV << "GeV" <<G4endl;
+      G4cout << " Kinetic Energy: "<<ND->protonKineticEnergy/GeV<<"GeV" <<G4endl;
+      G4cout << " Position "<<ND->beamPosition/m<<" m"<<G4endl;
+      G4cout << " SigmaX = "<<ND->beamSigmaX/mm<<" mm"<<G4endl;
+      G4cout << " SigmaY = "<<ND->beamSigmaY/mm<<" mm"<<G4endl;
+  }
+  G4cout << "Processing "<<pRunManager->GetNumberOfEvents()<<" particles"<<G4endl;
   //Book histograms and ntuples
   NumiAnalysis* analysis = NumiAnalysis::getInstance();
   analysis->book();

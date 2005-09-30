@@ -41,6 +41,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   NumiRunDir = new G4UIdirectory("/NuMI/run/");
   NumiRunDir->SetGuidance("NuMI run management");
 
+  debugOn = new G4UIcmdWithABool("/NuMI/run/debugOn",this);
+  debugOn->SetGuidance("Output some debugging info");
+  debugOn->SetParameterName("debugOn",true);
+  debugOn->SetDefaultValue (NumiData->IsDebugOn());
+  debugOn->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
   setRunID = new G4UIcmdWithAnInteger("/NuMI/run/setRunID",this);
   setRunID->SetGuidance("set run ID.");
   setRunID->SetParameterName("run ID number",true);
@@ -53,7 +59,24 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useNImpWeight->SetDefaultValue (NumiData->NImpWeightOn);
   useNImpWeight->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  useFlukaInput = new G4UIcmdWithABool("/NuMI/run/useFlukaInput",this);
+  useFlukaInput->SetGuidance("use fluka input ntuple");
+  useFlukaInput->SetParameterName("useFlukaInput",true);
+  useFlukaInput->SetDefaultValue (NumiData->useFlukaInput);
+  useFlukaInput->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  useMarsInput = new G4UIcmdWithABool("/NuMI/run/useMarsInput",this);
+  useMarsInput->SetGuidance("use mars input ntuple");
+  useMarsInput->SetParameterName("useMarsInput",true);
+  useMarsInput->SetDefaultValue (NumiData->useMarsInput);
+  useMarsInput->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  extNtupleFileName = new G4UIcmdWithAString("/NuMI/run/extNtupleFileName",this);
+  extNtupleFileName->SetGuidance("set external (fluka/mars) ntuple file name");
+  extNtupleFileName->SetParameterName("extNtupleFileName",true);
+  extNtupleFileName->SetDefaultValue (NumiData->GetExtNtupleFileName());
+  extNtupleFileName->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
   NumiOutputDir = new G4UIdirectory("/NuMI/output/");
   NumiOutputDir->SetGuidance("NuMI output management");
 
@@ -104,6 +127,8 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setRunID;
   delete useNImpWeight;
   delete NumiRunDir;
+  delete useFlukaInput;
+  delete useMarsInput;
 
   delete setNuNtupleFile;
   delete outputNuNtuple;
@@ -140,10 +165,24 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
     runManager->SetRunIDCounter(setRunID->GetNewIntValue(newValues));
   }
 
+  if (command == debugOn){
+    NumiData->SetDebugOn(debugOn->GetNewBoolValue(newValues));
+  }
+
   if (command == useNImpWeight){
     NumiData->SetNImpWeight(useNImpWeight->GetNewBoolValue(newValues));
   }
 
+  if (command == useFlukaInput){
+    NumiData->SetFlukaInput(useFlukaInput->GetNewBoolValue(newValues));
+  }
+
+  if (command == useMarsInput){
+    NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
+  }
+  if (command == extNtupleFileName){
+    NumiData->SetExtNtupleFileName(newValues);
+  }
   if (command == setNuNtupleFile){
       NumiData->SetNuNtupleName(newValues);
   }

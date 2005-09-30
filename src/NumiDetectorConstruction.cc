@@ -59,14 +59,16 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 
    //Define world volume 
   G4Tubs* ROCK_solid = new G4Tubs("ROCK_solid",0.,NumiData->RockRadius,NumiData->RockHalfLen,0,360.*deg);
-  ROCK_log = new G4LogicalVolume(ROCK_solid,Concrete,"ROCK_log",0,0,0); 
+  ROCK_log = new G4LogicalVolume(ROCK_solid,DolomiteRock,"ROCK_log",0,0,0); 
   ROCK_log->SetVisAttributes(G4VisAttributes::Invisible);
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
  
   ConstructTargetHall();
   ConstructDecayPipe();
   ConstructBaffle();
-  ConstructTarget();
+  if (NumiData->constructTarget){
+    ConstructTarget();
+  }
   ConstructHorn1();
   ConstructHorn2();
   ConstructHadronAbsorber(); 

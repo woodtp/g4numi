@@ -30,8 +30,26 @@ public:
 	void SetHornCurrent(G4double val) {
 		HornCurrent = val;
 	}
+  void SetDebugOn(G4bool val) {
+    debugOn = val;
+  }
+  G4bool IsDebugOn(){
+    return debugOn;
+  }
   void SetNImpWeight(G4bool val) {
     NImpWeightOn = val;
+  }
+  void SetFlukaInput(G4bool val) {
+    useFlukaInput = val;
+  }
+  void SetMarsInput(G4bool val) {
+    useMarsInput = val;
+  }
+  void SetExtNtupleFileName(G4String fileName){
+    extNtupleFileName=fileName;
+  }
+  G4String GetExtNtupleFileName(){
+    return extNtupleFileName;
   }
   void SetNuNtupleName(G4String fileName){
     nuNtupleName=fileName;
@@ -51,9 +69,15 @@ public:
   void OutputASCII(G4bool output){
     createASCII=output;
   }
+ private:
+  G4bool debugOn;
+  G4String extNtupleFileName;
 
+ public:
   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
+  G4bool useFlukaInput, useMarsInput;
   G4String nuNtupleName, hadmmNtupleName, asciiName;
+ 
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
   G4ThreeVector beamPosition, beamDirection;
@@ -67,6 +91,7 @@ public:
 
   
   // Target
+  G4bool constructTarget;
   G4double TargetX0, TargetY0, TargetZ0, TargetDxdz, TargetDydz;
   G4double TargetSLength, TargetSWidth, TargetSHeight, TargetA, TargetDensity;
   G4double  TargetZ, TargetRL;

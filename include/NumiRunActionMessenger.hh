@@ -31,8 +31,12 @@ private:
   G4UIcmdWithoutParameter*  showRndmCmd;
   G4UIcmdWithAnInteger*     setRndmSeedCmd;
   G4UIdirectory*            NumiRunDir;
+  G4UIcmdWithABool*         debugOn;
   G4UIcmdWithAnInteger*     setRunID;
   G4UIcmdWithABool*         useNImpWeight;
+  G4UIcmdWithABool*         useFlukaInput;
+  G4UIcmdWithABool*         useMarsInput;
+  G4UIcmdWithAString*       extNtupleFileName;
   G4UIdirectory*            NumiOutputDir;
   G4UIcmdWithAString*       setNuNtupleFile; 
   G4UIcmdWithAString*       setHadmmNtupleFile; 

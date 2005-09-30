@@ -11,6 +11,7 @@
 #include "NumiSteppingAction.hh"
 #include "NumiTrackingAction.hh"
 #include "NumiRunAction.hh"
+#include "NumiRunManager.hh"
 
 #ifdef G4VIS_USE
 #include "NumiVisManager.hh"
@@ -20,7 +21,7 @@
 int main(int argc,char** argv)
 {
   // Construct the default run manager
-  G4RunManager* runManager = new G4RunManager;
+  G4RunManager* runManager = new NumiRunManager;
 
   // set mandatory initialization classes
   runManager->SetUserInitialization(new NumiDetectorConstruction);

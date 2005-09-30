@@ -57,6 +57,7 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
       if (energy < 1.*GeV&&(classification != fKill)) 
 	{classification = fKill;} 
     }
+  /*
   else {
     NumiAnalysis *NA=NumiAnalysis::getInstance();
     NumiTrajectory* NuParentTrack=NA->GetParentTrajectory(aTrack->GetParentID());
@@ -68,8 +69,25 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
       // probably it would be better to kill all particles below some energy during tracking
       // that would speed up things 
     }
-}
-      
+   // 09/29/05 added killing of particles below some cut in NumiSteppingAction 
+  */
+
+  //check if track is inside world (some neutral particles make huge jumps from horns (field part) and
+  // end up decaying in ~infinity which occasionaly causes g4numi to crash
+  G4ThreeVector position=aTrack->GetPosition();
+  if ((classification != fKill)&&
+      ((sqrt(position[0]*position[0]+position[1]*position[1])>NumiData->RockRadius)||
+       position[2]>NumiData->RockHalfLen)){
+    if (NumiData->IsDebugOn()){
+      G4cout <<"NumiStackingAction: Killing Out of World Particle" <<G4endl;
+      G4cout << "   Particle type: "<<aTrack->GetDefinition()->GetParticleName()
+	     << " ; Parent ID: "<<aTrack->GetParentID()
+	     << " ;  Kinetic Energy = "<<aTrack->GetKineticEnergy()/GeV<<" GeV"<<G4endl;
+      G4cout << "   Position (m) = "<<position/m<<G4endl;
+    }
+    classification =fKill;
+  }
+
   //If importance weighting is on:
   if (NumiData->NImpWeightOn&&(classification != fKill)){
     NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
@@ -79,8 +97,9 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
 	if(Nimpweight==0)
 	  {classification = fKill;} 
 	else {	  
-	  NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
-	  if (oldinfo!=0) oldinfo->SetNImpWt(Nimpweight);
+	  oldinfo->SetNImpWt(Nimpweight);
+	  //?? NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
+	  //?? if (oldinfo!=0) oldinfo->SetNImpWt(Nimpweight);
 	  // only primary protons don't have TrackInformation already     
 	  // all others have some info set by NumiTrackingAction
 	}

@@ -17,6 +17,9 @@ void NumiDetectorConstruction::DefineMaterials()
   A = 1.01*g/mole;
   G4Element* elH  = new G4Element(name="Hydrogen",symbol="H" , Z= 1, A);
 
+  //A = 4.003*g/mole; 
+  //G4Element* elHe  = new G4Element(name="Helium",symbol="He" , Z= 2, A);
+
   A = 12.01*g/mole;
   G4Element* elC  = new G4Element(name="Carbon"  ,symbol="C" , Z = 6, A);
 
@@ -28,6 +31,9 @@ void NumiDetectorConstruction::DefineMaterials()
 
   A = 22.99*g/mole; 
   G4Element* elNa  = new G4Element(name="Natrium"  ,symbol="Na" , Z=11 , A);
+
+  A = 24.305*g/mole;  
+  G4Element* elMg  = new G4Element(name="Magnesium"  ,symbol="Mg" , Z=12 , A); 
 
   A = 26.98*g/mole; 
   G4Element* elAl  = new G4Element(name="Aluminum"  ,symbol="Al" , Z=13, A);
@@ -101,13 +107,14 @@ void NumiDetectorConstruction::DefineMaterials()
   Vacuum = new G4Material("Vacuum", density, 1, kStateGas,temperature,pressure);
   Vacuum-> AddMaterial(Air, 1.);
 
-  density=1.29/760.*mg/cm3;
+  density=1.29/760.*mg/cm3*0.4;
   temperature=300.*kelvin;
-  pressure=atmosphere/760.;
+  pressure=atmosphere/760.*0.4; //Decay Pipe Vacuum is ~0.4Torr
   DecayPipeVacuum = new G4Material("DecayPipeVacuum", density, 1, kStateGas,temperature,pressure);
   DecayPipeVacuum-> AddMaterial(Air, 1.);
 
   //other materials  
+  He = new G4Material("Helium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
   Be = new G4Material("Berillium", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
   C =  new G4Material("Carbon", Z=6., A=12.01*g/mole, density= 1.83*g/cm3);
   Al = new G4Material("Aluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3);
@@ -129,6 +136,21 @@ void NumiDetectorConstruction::DefineMaterials()
   Concrete->AddElement(elCa , fractionmass= 0.044);
   Concrete->AddElement(elFe , fractionmass= 0.014);
   Concrete->AddElement(elC , fractionmass= 0.001);
+
+  //first let's define rock
+  density = 2.41*g/cm3;
+  G4Material *rockMat=new G4Material("rockMat",density,4); //CaMg(CO3)2
+  rockMat->AddElement(elCa, natoms = 1);
+  rockMat->AddElement(elMg, natoms = 1); 
+  rockMat->AddElement(elC, natoms = 2); 
+  rockMat->AddElement(elO, natoms = 6); 
+  
+  //now let's add 8% of water
+  density = 2.41*g/cm3;
+  DolomiteRock = new G4Material("Dolomite",density,2);
+  DolomiteRock->AddMaterial(rockMat, fractionmass = 0.92);
+  DolomiteRock->AddMaterial(Water, fractionmass = 0.08);
+
 }
 
 G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
@@ -144,6 +166,8 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==18) return Target;
   if (matcode==16) return Vacuum;
   if (matcode==25) return Water;
+  if (matcode==28) return DecayPipeVacuum;
+
   G4cout << "Wrong material code " << matcode << G4endl;
   return Vacuum;
 }
@@ -160,7 +184,8 @@ G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4int matCode)
   if (matCode==18) visAttrib=new G4VisAttributes(G4Color(0.6,0.6,0.7));//Target
   if (matCode==16) visAttrib=new G4VisAttributes(false);//Vacuum
   if (matCode==25) visAttrib=new G4VisAttributes(G4Color(0.,0.,1.));//Water
-  
+  if (matCode==28) visAttrib=new G4VisAttributes(false);//Vacuum
+
   return visAttrib;
 }
 G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4String matName){

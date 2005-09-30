@@ -39,17 +39,28 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   // 13 pi+ -> nu_mu mu+
   // 14 pi- -> anti_nu_mu mu-
   G4Track * theTrack = theStep->GetTrack();
-  G4ParticleDefinition * particleType = theTrack->GetDefinition();
+  G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
   
-  //check if the particle is at hadmon or mumon
+  if ((theTrack->GetKineticEnergy()<1.*GeV )&&
+      (particleDefinition!=G4NeutrinoE::NeutrinoEDefinition())&&
+      (particleDefinition!=G4NeutrinoMu::NeutrinoMuDefinition()) &&
+      (particleDefinition!=G4NeutrinoTau::NeutrinoTauDefinition()) &&
+      (particleDefinition!=G4AntiNeutrinoE::AntiNeutrinoEDefinition()) &&
+      (particleDefinition!=G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) &&
+      (particleDefinition!=G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
+    {
+      theTrack->SetTrackStatus(fStopAndKill);
+    }
+
   if (theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
+    //check if the particle is at hadmon or mumon
     if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVHadMon")||
 	(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVMuMonA1")){
-      
       NumiAnalysis* analysis=NumiAnalysis::getInstance();
       analysis->FillHadmmNtuple(*theTrack);
     }
   }
+  
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
     G4int decay_code=0;
     if (theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
@@ -59,21 +70,21 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
       G4int nSecTotal  = nSecAtRest+nSecAlong+nSecPost;
       G4TrackVector* secVec = fpSteppingManager->GetfSecondary();
       
-      if (particleType==G4PionPlus::PionPlusDefinition()) {
+      if (particleDefinition==G4PionPlus::PionPlusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
 	      decay_code=13;
 	  }
       }
-      if (particleType==G4PionMinus::PionMinusDefinition()) {
+      if (particleDefinition==G4PionMinus::PionMinusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
 	      decay_code=14;
 	  }
       }
-      if (particleType==G4KaonPlus::KaonPlusDefinition()) {
+      if (particleDefinition==G4KaonPlus::KaonPlusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
@@ -83,7 +94,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	      decay_code=6;
 	  }
       }
-      if (particleType==G4KaonMinus::KaonMinusDefinition()) {
+      if (particleDefinition==G4KaonMinus::KaonMinusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
@@ -93,7 +104,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	      decay_code=9;
 	  }
       }
-      if (particleType==G4KaonZeroLong::KaonZeroLongDefinition()) {
+      if (particleDefinition==G4KaonZeroLong::KaonZeroLongDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_e")
@@ -106,14 +117,14 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	      decay_code=4;	    
 	  }
       }
-      if (particleType==G4MuonPlus::MuonPlusDefinition()) {
+      if (particleDefinition==G4MuonPlus::MuonPlusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
 	      decay_code=11;	
 	  }
       }
-      if (particleType==G4MuonMinus::MuonMinusDefinition()) {
+      if (particleDefinition==G4MuonMinus::MuonMinusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")

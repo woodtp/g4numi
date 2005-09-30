@@ -1,4 +1,3 @@
-
 #ifndef NumiDetectorMessenger_H
 #define NumiDetectorMessenger_H 1
 
@@ -12,6 +11,7 @@ class G4UIcmdWithAnInteger;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithADouble;
 class G4UIcmdWithoutParameter;
+class G4UIcmdWithABool;
 
 class NumiDetectorMessenger: public G4UImessenger {
 
@@ -27,10 +27,11 @@ private:
 	G4UIdirectory*              NumiDir;
 	G4UIdirectory*              detDir;
 	G4UIcmdWithAString*         TargetGasCmd;
-    G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
-    G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
-    //G4UIcmdWithAnInteger*      NbLayersCmd;    
-    G4UIcmdWithoutParameter*   UpdateCmd;
+        G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
+        G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
+        G4UIcmdWithABool*           ConstructTarget;
+        //G4UIcmdWithAnInteger*     NbLayersCmd;    
+        G4UIcmdWithoutParameter*    UpdateCmd;
 };
 
 #endif

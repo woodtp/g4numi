@@ -48,8 +48,8 @@ public:
   G4double GetNuEnergy(G4double Parent_mass, G4double gamma, G4double beta, G4double theta);
   G4double GetTheta(G4ThreeVector vertex_r,G4ThreeVector momentum,G4double x_det,G4double y_det,G4double z_det);
 
-  G4int GetParticleCode(G4String particle_name);
-
+  G4int GetParticleCode(G4String);
+  G4String GetParticleName(G4int);
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   
   static NumiAnalysis* getInstance();

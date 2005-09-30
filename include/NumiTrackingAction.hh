@@ -7,6 +7,10 @@
 #include "G4UserTrackingAction.hh"
 #include "NumiTrajectory.hh"
 
+class NumiDataInput;
+class NumiRunManager;
+class NumiPrimaryGeneratorAction;
+
 class NumiTrackingAction : public G4UserTrackingAction
 {
   public:
@@ -15,6 +19,11 @@ class NumiTrackingAction : public G4UserTrackingAction
 
     virtual void PreUserTrackingAction(const G4Track*);
     virtual void PostUserTrackingAction(const G4Track*);
+
+  private:
+  NumiDataInput *ND;
+  NumiRunManager *pRunManager;
+  NumiPrimaryGeneratorAction *NPGA;
 };
 
 #endif

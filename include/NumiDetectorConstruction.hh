@@ -86,6 +86,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4Material* DecayPipeVacuum;
   G4Material* Air;
   G4Material* Water;
+  G4Material* He;
   G4Material* Be;
   G4Material* C;
   G4Material* Al;
@@ -95,6 +96,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4Material* CT852;
   G4Material* Concrete;
   G4Material* Target;
+  G4Material* DolomiteRock;
 
     // Logical volumes
     //

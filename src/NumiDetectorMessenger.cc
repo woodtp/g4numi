@@ -1,15 +1,19 @@
 
 #include "NumiDetectorMessenger.hh"
 #include "NumiDetectorConstruction.hh"
+#include "NumiDataInput.hh"
 
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UnitsTable.hh"
 
 NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet):NumiDetector(NumiDet) {
+
+        NumiDataInput *ND=NumiDataInput::GetNumiDataInput();
 
 	NumiDir = new G4UIdirectory("/NuMI/");
 	NumiDir->SetGuidance("UI commands for detector geometry");
@@ -21,6 +25,12 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	TargetGasCmd->SetGuidance("Select gas inside the target.");
 	TargetGasCmd->SetParameterName("choice",false);
 	TargetGasCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+	ConstructTarget = new G4UIcmdWithABool("/NuMI/det/constructTarget",this); 
+	ConstructTarget->SetGuidance("Target construction on/off"); 
+	ConstructTarget->SetParameterName("constructTarget",true); 
+	ConstructTarget->SetDefaultValue (ND->constructTarget); 
+	ConstructTarget->AvailableForStates(G4State_PreInit,G4State_Idle); 
   
 	TargetZ0Cmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/setTargetZ0",this);
 	TargetZ0Cmd->SetGuidance("Set Z0 position of target");
@@ -33,6 +43,7 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	HornCurrentCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/setHornCurrent",this);
 	HornCurrentCmd->SetGuidance("Set horn current");
 	HornCurrentCmd->SetParameterName("current",false);
+	HornCurrentCmd->SetDefaultValue(ND->HornCurrent);
 	HornCurrentCmd->SetRange("current>=0.");
 	HornCurrentCmd->SetUnitCategory("Electric current");
 	HornCurrentCmd->AvailableForStates(G4State_PreInit,G4State_Idle);

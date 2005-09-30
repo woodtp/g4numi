@@ -81,7 +81,7 @@ void NumiDetectorConstruction::ConstructHorn2()
 	  OCzPos.push_back(zPos); OCRout.push_back(PHorn2OCRout(zPos)); OCRin.push_back(PHorn2OCRin(zPos));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF]));}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nIn++;
 	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos)); ICRin.push_back(PHorn2ICRin(zPos));
 	  nMV++;
@@ -90,7 +90,7 @@ void NumiDetectorConstruction::ConstructHorn2()
 	else if (zPos>=OCZ1){
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF]));}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nMV++;	  
 	  MVzPos.push_back(zPos); 
 	  if (maxR>=PHorn2OCRout(zPos)) MVRout.push_back(maxR+MVgap);
@@ -110,7 +110,7 @@ void NumiDetectorConstruction::ConstructHorn2()
 	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos)); ICRin.push_back(PHorn2ICRin(zPos));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF]));}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nMV++;
 	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
 	}

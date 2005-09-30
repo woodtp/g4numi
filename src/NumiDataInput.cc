@@ -13,15 +13,20 @@ NumiDataInput::NumiDataInput()
     { G4Exception("NumiDataInput constructed twice.");}
   fNumiDataInput = this;
 
-
+  debugOn = false;
   NImpWeightOn = true; createNuNtuple=true;createHadmmNtuple=false;createASCII=false;
+  useFlukaInput = false; useMarsInput=false;
+
+  extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
+
+  //base name for output files:
   nuNtupleName="nuNtuple"; 
   hadmmNtupleName="hadmmNtuple";
   asciiName="asciiOut";
 
   protonMomentum = 120.*GeV;  
   beamSigmaY = 1.*mm;
-  beamSigmaX = 0.9*mm;
+  beamSigmaX = 1.*mm;
   beamDirection = G4ThreeVector(0.,0.,1.);
   beamPosition = G4ThreeVector(0.,0.,-4.*m);
 
@@ -34,6 +39,7 @@ NumiDataInput::NumiDataInput()
   RockDensity = 0.0; // not
   RockRadLen  = 0.0; // used
 
+  constructTarget = true;
   //TargetArea          1
   //=======================================================================
   TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
@@ -45,7 +51,7 @@ NumiDataInput::NumiDataInput()
   // Target   1
   //=======================================================================
   TargetX0           = 0.0;
-  TargetY0           = 0.0;
+  TargetY0           = -1.1*mm;
   TargetZ0           = -0.45*m; //-0.35*m-10.*cm;
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
@@ -59,7 +65,7 @@ NumiDataInput::NumiDataInput()
   TargetSegmentPitch = 0.3*mm;
   TargetA            = 12.01*g/mole;
   TargetZ            = 6.;
-  TargetDensity      = 1.815*g/cm3;//1.754*g/cm3;
+  TargetDensity      = 1.78*g/cm3; //1.815*g/cm3;//1.754*g/cm3;
   TargetRL           = 25.692;
   TargetGEANTmat     = 18;
 
@@ -127,7 +133,7 @@ NumiDataInput::NumiDataInput()
   // Z0 with respect to the first target fin
   NContainerN=21;
   
-  G4double CTubeZ0_[]     ={-.42181, -.421556, -.41555, -.35855 , -0.3522 ,-.3332 ,-0.0802, -0.123  ,-0.109  ,-0.0572 ,-0.0492 , -0.04  ,-0.042 ,-.022 , -0.013   , -0.0025  ,0.011     , 0.011       ,  0.011      , 0.9785 , 0.9896  };
+  G4double CTubeZ0_[]     ={-.42181, -.421556, -.41555, -.35855 , -0.3522 ,-.3332 ,-0.0802, -0.123  ,-0.109  ,-0.0572 ,-0.0492 , -0.04  ,-0.042 ,-.022 , -0.013   , -0.0035  ,0.011     , 0.011       ,  0.011      , 0.9785 , 0.9896  };
   G4double CTubeLength_[] ={.254e-3, 6.006e-3, 5.7e-2 , 6.35e-3 , 19e-3   , 253e-3, 23e-3 , 11e-2   , 66e-3  ,8e-3   , 17e-3  , 6e-3   ,0.02   ,15e-3  , 24e-3    , 14.5e-3  , 0.9785   ,1e-6         , 0.9786      ,5e-4    , 1e-6};
   G4double CTubeRin_[]    ={  0.   , 1.27e-2 , 1.7e-2 , 22.22e-3, 17.5e-3 , 77e-3 , 77e-3 , 14.6e-3 , 16.e-3 , 74e-3 , 24e-3  , 18.5e-3,16e-3  ,16e-3  , 14.6e-3  , 16e-3    , 14.6e-3  ,15.101e-3    , 15.1e-3     , 0.0    , 0.};
   G4double CTubeRout_[]   ={22e-3  , 34.67e-3, 1.9e-2 , 34.67e-3, 107e-3  , 83e-3 , 120e-3, 16.0e-3 , 21.4e-3,106e-3 , 106e-3 , 24e-3  ,18.5e-3,18.5e-3, 16e-3    , 16.4e-3  , 15e-3    , .35         , 15.101e-3   ,14.15e-3, 15.1e-3  };
@@ -251,7 +257,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   }
   
   
-  HornCurrent=200000.*ampere; 
+  HornCurrent=182100.*ampere; 
   static const G4double in=2.54*cm;
   
   NPHorn2EndN=3;
