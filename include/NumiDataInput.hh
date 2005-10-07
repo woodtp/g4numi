@@ -168,6 +168,7 @@ public:
   vstring_t PhornName;
   
   // Flux Area
+  G4int nNear,nFar;
   vdouble_t xdet_near,ydet_near,zdet_near;
   vdouble_t xdet_far,ydet_far,zdet_far;
 

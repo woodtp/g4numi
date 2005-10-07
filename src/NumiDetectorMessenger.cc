@@ -78,7 +78,10 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue){
 	if ( command == HornCurrentCmd ) {
 		NumiDetector->SetHornCurrent(HornCurrentCmd->GetNewDoubleValue(newValue));
 	}
-
+	if ( command == ConstructTarget ) {
+	        NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+		NumiData->constructTarget=ConstructTarget->GetNewBoolValue(newValue);
+	}
 	if ( command == UpdateCmd ) {
 		NumiDetector->UpdateGeometry();
 	}

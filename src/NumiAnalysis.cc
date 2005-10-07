@@ -20,6 +20,8 @@
 #include <TPostScript.h>
 #include <TGraph.h>
 
+#include "data_t.hh"
+#include "hadmmtuple_t.hh"
 #include "NumiAnalysis.hh"
 #include "globals.hh"
 #include "G4Track.hh"
@@ -48,6 +50,9 @@ NumiAnalysis::NumiAnalysis()
 NumiData=NumiDataInput::GetNumiDataInput();
 #ifdef G4ANALYSIS_USE
 #endif
+
+  g4data = new data_t();
+  g4hmmdata = new hadmmtuple_t();
  
 }
 
@@ -74,7 +79,7 @@ void NumiAnalysis::book()
     nuNtuple = new TFile(nuNtupleFileName,"recreate","root ntuple");
     G4cout << "Creating neutrino ntuple: "<<nuNtupleFileName<<G4endl;
     tree = new TTree("nudata","g4numi Neutrino ntuple");
-    tree->Branch("data",&g4data,"run/I:evtno:beamHWidth/D:beamVWidth:beamX:beamY:protonX:protonY:nuTarZ:hornCurrent:Ndxdz/D:Ndydz:Npz:Nenergy:NdxdzNea:NdydzNea:NenergyN[10]:NWtNear[10]:NdxdzFar:NdydzFar:NenergyF[10]:NWtFar[10]:Norig/I:Ndecay:Ntype:Vx/D:Vy:Vz:pdPx:pdPy:pdPz:ppdxdz:ppdydz:pppz:ppenergy:ppmedium:ptype/I:ppvx/D:ppvy:ppvz:muparpx:muparpy:muparpz:mupare:Necm:Nimpwt:xpoint:ypoint:zpoint:tvx:tvy:tvz:tpx:tpy:tpz:tptype/I:tgen/I:trkx[10]/D:trky[10]:trkz[10]:trkpx[10]:trkpy[10]:trkpz[10]");
+    tree->Branch("data","data_t",&g4data,32000,1);
   }
  
   if (NumiData->createHadmmNtuple){
@@ -82,7 +87,7 @@ void NumiAnalysis::book()
     G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileName<<G4endl;
     hadmmNtuple = new TFile(hadmmNtupleFileName, "recreate","hadmm ntuple");
     hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
-    hadmmtree->Branch("data",&g4hmmdata,"run/I:evtno:mtgthpos/D:mtgtvpos:mtgthsig:mtgtvsig:ptype/I:hmmenergy/D:hmmxpos:hmmypos:hmmzpos:hmmpx:hmmpy:hmmpz");
+    hadmmtree->Branch("data","hadmmtuple_t",&g4hmmdata,32000,1);
   }
 
   if (NumiData->createASCII) {
@@ -115,21 +120,21 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 {
   if (!NumiData->createHadmmNtuple) return;
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
-  g4hmmdata.run=pRunManager->GetCurrentRun()->GetRunID();
-  g4hmmdata.mtgthsig=NumiData->beamSigmaX/cm;
-  g4hmmdata.mtgtvsig=NumiData->beamSigmaY/cm;
-  g4hmmdata.mtgthpos=NumiData->beamPosition[0]/cm;
-  g4hmmdata.mtgtvpos=NumiData->beamPosition[1]/cm;
-  g4hmmdata.evtno=pRunManager->GetCurrentEvent()->GetEventID();
+  g4hmmdata->run=pRunManager->GetCurrentRun()->GetRunID();
+  g4hmmdata->mtgthsig=NumiData->beamSigmaX/cm;
+  g4hmmdata->mtgtvsig=NumiData->beamSigmaY/cm;
+  g4hmmdata->mtgthpos=NumiData->beamPosition[0]/cm;
+  g4hmmdata->mtgtvpos=NumiData->beamPosition[1]/cm;
+  g4hmmdata->evtno=pRunManager->GetCurrentEvent()->GetEventID();
   G4ParticleDefinition* particleDefinition=track.GetDefinition();
-  g4hmmdata.ptype=GetParticleCode(particleDefinition->GetParticleName());
-  g4hmmdata.hmmenergy=track.GetTotalEnergy();
-  g4hmmdata.hmmxpos=track.GetPosition()[0];
-  g4hmmdata.hmmypos=track.GetPosition()[1];
-  g4hmmdata.hmmzpos=track.GetPosition()[2];
-  g4hmmdata.hmmpx=track.GetMomentum()[0];
-  g4hmmdata.hmmpy=track.GetMomentum()[1];
-  g4hmmdata.hmmpz=track.GetMomentum()[2]; 
+  g4hmmdata->ptype=GetParticleCode(particleDefinition->GetParticleName());
+  g4hmmdata->hmmenergy=track.GetTotalEnergy();
+  g4hmmdata->hmmxpos=track.GetPosition()[0];
+  g4hmmdata->hmmypos=track.GetPosition()[1];
+  g4hmmdata->hmmzpos=track.GetPosition()[2];
+  g4hmmdata->hmmpx=track.GetMomentum()[0];
+  g4hmmdata->hmmpy=track.GetMomentum()[1];
+  g4hmmdata->hmmpz=track.GetMomentum()[2]; 
  
   hadmmtree->Fill(); 
  
@@ -137,6 +142,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 {
 
+ 
   if (!NumiData->createNuNtuple) return;
     
   
@@ -167,58 +173,71 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   //fill histograms, ntuples,...
   G4RunManager* pRunManager=G4RunManager::GetRunManager();
   NumiPrimaryGeneratorAction *NPGA=(NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
-  
-  g4data.run=pRunManager->GetCurrentRun()->GetRunID();
-  g4data.evtno=pRunManager->GetCurrentEvent()->GetEventID();
-  g4data.beamHWidth=NumiData->beamSigmaX/cm;
-  g4data.beamVWidth=NumiData->beamSigmaY/cm;
-  g4data.beamX=NumiData->beamPosition[0]/cm;
-  g4data.beamY=NumiData->beamPosition[1]/cm;
-   
+ 
+  g4data->run=pRunManager->GetCurrentRun()->GetRunID();
+  g4data->evtno=pRunManager->GetCurrentEvent()->GetEventID();
+  g4data->beamHWidth=NumiData->beamSigmaX/cm;
+  g4data->beamVWidth=NumiData->beamSigmaY/cm;
+  g4data->beamX=NumiData->beamPosition[0]/cm;
+  g4data->beamY=NumiData->beamPosition[1]/cm;
+ 
   G4int particleID=track.GetParentID();
   // NumiTrajectory* dummyTrack=GetParentTrajectory(particleID);
   //  while (particleID!=1){ 
   //  particleID=dummyTrack->GetParentID();
   //  dummyTrack=GetParentTrajectory(particleID);
   // }
-  g4data.protonX=NPGA->GetProtonX();
-  g4data.protonY=NPGA->GetProtonY();
-  
-  g4data.nuTarZ=NumiData->TargetZ0;
-  g4data.hornCurrent=NumiData->HornCurrent/ampere/1000.;
+  G4ThreeVector protonOrigin=NPGA->GetProtonOrigin();
+  g4data->protonX=protonOrigin[0];
+  g4data->protonY=protonOrigin[1];
+  g4data->protonZ=protonOrigin[2];
+
+  G4ThreeVector protonMomentum=NPGA->GetProtonMomentum();
+  g4data->protonPx=protonMomentum[0];
+  g4data->protonPy=protonMomentum[1];
+  g4data->protonPz=protonMomentum[2];
+
+  g4data->nuTarZ=NumiData->TargetZ0;
+  g4data->hornCurrent=NumiData->HornCurrent/ampere/1000.;
 
   // Random decay - these neutrinos rarely hit any of the detectors
-  g4data.Ndxdz=NuMomentum[0]/NuMomentum[2];
-  g4data.Ndydz=NuMomentum[1]/NuMomentum[2];
-  g4data.Npz=NuMomentum[2]/GeV;
-  g4data.Nenergy=track.GetTotalEnergy()/GeV;
+  g4data->Ndxdz=NuMomentum[0]/NuMomentum[2];
+  g4data->Ndydz=NuMomentum[1]/NuMomentum[2];
+  g4data->Npz=NuMomentum[2]/GeV;
+  g4data->Nenergy=track.GetTotalEnergy()/GeV;
 
   // Neutrino data at different points
-  for (G4int ii=0;ii<10;ii++){          // near detector 
-  G4double xdet=NumiData->xdet_near[ii]; 
-  G4double ydet=NumiData->ydet_near[ii];
-  G4double zdet=NumiData->zdet_near[ii];
- 
-  g4data.NdxdzNea=(x-NumiData->xdet_near[0])/(z-NumiData->zdet_near[0]);
-  g4data.NdydzNea=(y-NumiData->ydet_near[0])/(z-NumiData->zdet_near[0]);
-  G4double theta=GetTheta(vertex_r,ParentMomentumFinal,xdet,ydet,zdet); 
 
-  g4data.NenergyN[ii]=GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
-  g4data.NWtNear[ii]=GetWeight(track,enuzr,vertex_r,gamma,beta,theta,xdet,ydet,zdet);
+  for (G4int ii=0;ii<NumiData->nNear;ii++){          // near detector 
+    g4data->NdxdzNear[ii]=(x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
+    g4data->NdydzNear[ii]=(y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
+    
+    G4double theta=GetTheta(vertex_r,ParentMomentumFinal,
+			  NumiData->xdet_near[ii],
+			  NumiData->ydet_near[ii],
+			  NumiData->zdet_near[ii]); 
+
+    g4data->NenergyN[ii]=GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
+    g4data->NWtNear[ii]=GetWeight(track,enuzr,vertex_r,gamma,beta,theta,
+				  NumiData->xdet_near[ii],
+				  NumiData->ydet_near[ii],
+				  NumiData->zdet_near[ii]);
   }
-   
-  for (G4int ii=0;ii<10;ii++){         // far detector
-  G4double xdet=NumiData->xdet_far[ii]; 
-  G4double ydet=NumiData->ydet_far[ii];
-  G4double zdet=NumiData->zdet_far[ii];
 
-  g4data.NdxdzFar=(x-NumiData->xdet_far[0])/(z-NumiData->zdet_far[0]);
-  g4data.NdydzFar=(y-NumiData->ydet_far[0])/(z-NumiData->zdet_far[0]);
-
-  G4double theta=GetTheta(vertex_r,ParentMomentumFinal,xdet,ydet,zdet);
- 
-  g4data.NenergyF[ii]=GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
-  g4data.NWtFar[ii]=GetWeight(track,enuzr,vertex_r,gamma,beta,theta,xdet,ydet,zdet);
+  for (G4int ii=0;ii<NumiData->nFar;ii++){         // far detector
+    g4data->NdxdzFar[ii]=(x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
+    g4data->NdydzFar[ii]=(y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
+    
+    G4double theta=GetTheta(vertex_r,ParentMomentumFinal,
+			    NumiData->xdet_far[ii],
+			    NumiData->ydet_far[ii],
+			    NumiData->zdet_far[ii]);
+    
+    g4data->NenergyF[ii]=GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
+    g4data->NWtFar[ii]=GetWeight(track,enuzr,vertex_r,gamma,beta,theta,
+				 NumiData->xdet_far[ii],
+				 NumiData->ydet_far[ii],
+				 NumiData->zdet_far[ii]);
   }
   
   //other info
@@ -232,36 +251,36 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   G4String firstvolname=NuParentTrack->GetPreStepVolumeName(0);
   if (firstvolname.contains("Baffle") || firstvolname.contains("TGT")) Norig=1;
 
-  g4data.Norig=Norig;
-  g4data.Ndecay=NuParentTrack->GetDecayCode();
+  g4data->Norig=Norig;
+  g4data->Ndecay=NuParentTrack->GetDecayCode();
 
   G4ParticleDefinition * particleType = track.GetDefinition();
   G4int ntype=GetParticleCode(particleType->GetParticleName());
-  g4data.Ntype=ntype;
-  g4data.Vx=x/cm;
-  g4data.Vy=y/cm;
-  g4data.Vz=z/cm;
-  g4data.pdPx=ParentMomentumFinal[0]/GeV;
-  g4data.pdPy=ParentMomentumFinal[1]/GeV;
-  g4data.pdPz=ParentMomentumFinal[2]/GeV;
+  g4data->Ntype=ntype;
+  g4data->Vx=x/cm;
+  g4data->Vy=y/cm;
+  g4data->Vz=z/cm;
+  g4data->pdPx=ParentMomentumFinal[0]/GeV;
+  g4data->pdPy=ParentMomentumFinal[1]/GeV;
+  g4data->pdPz=ParentMomentumFinal[2]/GeV;
 
   G4ThreeVector ParentMomentumProduction=NuParentTrack->GetMomentum(0);
-  g4data.ppdxdz=ParentMomentumProduction[0]/ParentMomentumProduction[2];
-  g4data.ppdydz=ParentMomentumProduction[1]/ParentMomentumProduction[2];
-  g4data.pppz=ParentMomentumProduction[2]/GeV; 
+  g4data->ppdxdz=ParentMomentumProduction[0]/ParentMomentumProduction[2];
+  g4data->ppdydz=ParentMomentumProduction[1]/ParentMomentumProduction[2];
+  g4data->pppz=ParentMomentumProduction[2]/GeV; 
 
   G4double parentp=sqrt(ParentMomentumProduction*ParentMomentumProduction);
 
-  g4data.ppenergy=sqrt((parentp*parentp-Parent_mass*Parent_mass))/GeV;
+  g4data->ppenergy=sqrt((parentp*parentp-Parent_mass*Parent_mass))/GeV;
 
-  g4data.ppmedium=0.; //this is still empty
+  g4data->ppmedium=0.; //this is still empty
 
-  g4data.ptype=GetParticleCode(parent_name);
+  g4data->ptype=GetParticleCode(parent_name);
 
   G4ThreeVector production_vertex=(NuParentTrack->GetPoint(0)->GetPosition()/m)*m; 
-  g4data.ppvx=production_vertex[0]/cm;
-  g4data.ppvy=production_vertex[1]/cm;
-  g4data.ppvz=production_vertex[2]/cm;
+  g4data->ppvx=production_vertex[0]/cm;
+  g4data->ppvy=production_vertex[1]/cm;
+  g4data->ppvz=production_vertex[2]/cm;
   
   //if nu parent is a muon then find muon parent info
   if ((parent_name=="mu+" || parent_name=="mu-")&&NuParentTrack->GetParentID()!=0)
@@ -271,28 +290,28 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       G4int nopoint_mupar=MuParentTrack->GetPointEntries();
       G4ThreeVector muparp=MuParentTrack->GetMomentum(nopoint_mupar-1);
       G4double muparm=MuParentTrack->GetMass();
-      g4data.muparpx=muparp[0]/GeV; // vector of hadron parent of muon
-      g4data.muparpy=muparp[1]/GeV; // 
-      g4data.muparpz=muparp[2]/GeV;
-      g4data.mupare=(sqrt(muparp*muparp-muparm*muparm))/GeV;
+      g4data->muparpx=muparp[0]/GeV; // vector of hadron parent of muon
+      g4data->muparpy=muparp[1]/GeV; // 
+      g4data->muparpz=muparp[2]/GeV;
+      g4data->mupare=(sqrt(muparp*muparp-muparm*muparm))/GeV;
     }
   else
     {
-      g4data.muparpx=-999999.;  
-      g4data.muparpy=-999999.;
-      g4data.muparpz=-999999.;
-      g4data.mupare=-999999.;
+      g4data->muparpx=-999999.;  
+      g4data->muparpy=-999999.;
+      g4data->muparpz=-999999.;
+      g4data->mupare=-999999.;
     }
 
-  g4data.Necm=enuzr/GeV; // Neutrino energy in parent rest frame
+  g4data->Necm=enuzr/GeV; // Neutrino energy in parent rest frame
   NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
  
-  g4data.Nimpwt=info->GetNImpWt();  // Importance weight
+  g4data->Nimpwt=info->GetNImpWt();  // Importance weight
 
 
-  g4data.xpoint=0.;  // x, y, z of parent at user selected vol
-  g4data.xpoint=0.;
-  g4data.xpoint=0.;
+  g4data->xpoint=0.;  // x, y, z of parent at user selected vol
+  g4data->xpoint=0.;
+  g4data->xpoint=0.;
 
   /*    
 	tgen is is the "generation" number
@@ -331,35 +350,35 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       particleID=PParentTrack->GetTrackID();
       }
       
-      g4data.tvx=ParticlePosition[0]/cm;
-      g4data.tvy=ParticlePosition[1]/cm;
-      g4data.tvz=ParticlePosition[2]/cm;
-      g4data.tpx=ParticleMomentum[0]/GeV;
-      g4data.tpy=ParticleMomentum[1]/GeV;
-      g4data.tpz=ParticleMomentum[2]/GeV;
-      g4data.tgen=tgen;
-      g4data.tptype=tptype;
+      g4data->tvx=ParticlePosition[0]/cm;
+      g4data->tvy=ParticlePosition[1]/cm;
+      g4data->tvz=ParticlePosition[2]/cm;
+      g4data->tpx=ParticleMomentum[0]/GeV;
+      g4data->tpy=ParticleMomentum[1]/GeV;
+      g4data->tpz=ParticleMomentum[2]/GeV;
+      g4data->tgen=tgen;
+      g4data->tptype=tptype;
     }
   else
     {
-      g4data.tvx=NPGA->ParticlePosition[0]/cm;
-      g4data.tvy=NPGA->ParticlePosition[1]/cm;
-      g4data.tvz=NPGA->ParticlePosition[2]/cm;
-      g4data.tpx=NPGA->ParticleMomentum[0]/GeV;
-      g4data.tpy=NPGA->ParticleMomentum[1]/GeV;
-      g4data.tpz=NPGA->ParticleMomentum[2]/GeV;
-      g4data.tgen=NPGA->tgen;
-      g4data.tptype=NPGA->type;
+      g4data->tvx=NPGA->ParticlePosition[0]/cm;
+      g4data->tvy=NPGA->ParticlePosition[1]/cm;
+      g4data->tvz=NPGA->ParticlePosition[2]/cm;
+      g4data->tpx=NPGA->ParticleMomentum[0]/GeV;
+      g4data->tpy=NPGA->ParticleMomentum[1]/GeV;
+      g4data->tpz=NPGA->ParticleMomentum[2]/GeV;
+      g4data->tgen=NPGA->tgen;
+      g4data->tptype=NPGA->type;
     }   
  
   //set all trk_ & trkp_ to -999999  
   for (G4int ii=0;ii<10;ii++){
-	g4data.trkx[ii]=-999999.;
-	g4data.trky[ii]=-999999.;
-	g4data.trkz[ii]=-999999.;
-	g4data.trkpx[ii]=-999999.;
-	g4data.trkpy[ii]=-999999.;
-	g4data.trkpz[ii]=-999999.;
+	g4data->trkx[ii]=-999999.;
+	g4data->trky[ii]=-999999.;
+	g4data->trkz[ii]=-999999.;
+	g4data->trkpx[ii]=-999999.;
+	g4data->trkpy[ii]=-999999.;
+	g4data->trkpz[ii]=-999999.;
   }
  
   //if(parentID!=0){
@@ -372,104 +391,104 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       ParentMomentum=NuParentTrack->GetMomentum(ii);
       ParentPosition=(NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
     
-      /*
-      // check if the particle passes through the neck of the horn
-      // if yes then set the trk_ to +999999
-      if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
-      (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
-      (g4data.trkx[2]==-999999. || g4data.trkx[2]==999999.))
-      {
-      g4data.trkx[2]=999999.;
-      g4data.trky[2]=999999.;
-      g4data.trkz[2]=999999.;  
-      }
-      if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
-      (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
-      (g4data.trkx[4]==-999999. || g4data.trkx[4]==999999.))
-      {
-      g4data.trkx[4]=999999.;
-      g4data.trky[4]=999999.;
-      g4data.trkz[4]=999999.;  
-      }
-      */
       G4String postvolname="";
       G4String prevolname=NuParentTrack->GetPreStepVolumeName(ii);
       if (ii<point_no-2) postvolname=NuParentTrack->GetPreStepVolumeName(ii+1);
       
       // parent created inside target
-      if ((prevolname.contains("TGT")) && ii==0){
-	g4data.trkx[0]=ParentPosition[0]/cm;
-	g4data.trky[0]=ParentPosition[1]/cm;
-	g4data.trkz[0]=ParentPosition[2]/cm;
-	g4data.trkpx[0]=ParentMomentum[0]/GeV;
-	g4data.trkpy[0]=ParentMomentum[1]/GeV;
-	g4data.trkpz[0]=ParentMomentum[2]/GeV;}
+      if ((prevolname.contains("TGT")||prevolname.contains("Budal")) && ii==0){
+	g4data->trkx[0]=ParentPosition[0]/cm;
+	g4data->trky[0]=ParentPosition[1]/cm;
+	g4data->trkz[0]=ParentPosition[2]/cm;
+	g4data->trkpx[0]=ParentMomentum[0]/GeV;
+	g4data->trkpy[0]=ParentMomentum[1]/GeV;
+	g4data->trkpz[0]=ParentMomentum[2]/GeV;}
       //parent at exits target
       if ((prevolname.contains("TGTExit")) && postvolname.contains("TargetMother")){
-	g4data.trkx[1]=ParentPosition[0]/cm;
-	g4data.trky[1]=ParentPosition[1]/cm;
-	g4data.trkz[1]=ParentPosition[2]/cm;
-	g4data.trkpx[1]=ParentMomentum[0]/GeV;
-	g4data.trkpy[1]=ParentMomentum[1]/GeV;
-	g4data.trkpz[1]=ParentMomentum[2]/GeV;}
+	g4data->trkx[1]=ParentPosition[0]/cm;
+	g4data->trky[1]=ParentPosition[1]/cm;
+	g4data->trkz[1]=ParentPosition[2]/cm;
+	g4data->trkpx[1]=ParentMomentum[0]/GeV;
+	g4data->trkpy[1]=ParentMomentum[1]/GeV;
+	g4data->trkpz[1]=ParentMomentum[2]/GeV;}
       //enter horn1
       if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
-	g4data.trkx[2]=ParentPosition[0]/cm;
-	g4data.trky[2]=ParentPosition[1]/cm;
-	g4data.trkz[2]=ParentPosition[2]/cm;
-	g4data.trkpx[2]=ParentMomentum[0]/GeV;
-	g4data.trkpy[2]=ParentMomentum[1]/GeV;
-	g4data.trkpz[2]=ParentMomentum[2]/GeV;
+	g4data->trkx[2]=ParentPosition[0]/cm;
+	g4data->trky[2]=ParentPosition[1]/cm;
+	g4data->trkz[2]=ParentPosition[2]/cm;
+	g4data->trkpx[2]=ParentMomentum[0]/GeV;
+	g4data->trkpy[2]=ParentMomentum[1]/GeV;
+	g4data->trkpz[2]=ParentMomentum[2]/GeV;
 	wasInHorn1=true;
       }
       //exit horn1
       if (prevolname.contains("Horn1") && postvolname.contains("TGAR")){
-	g4data.trkx[3]=ParentPosition[0]/cm;
-	g4data.trky[3]=ParentPosition[1]/cm;
-	g4data.trkz[3]=ParentPosition[2]/cm;
-	g4data.trkpx[3]=ParentMomentum[0]/GeV;
-	g4data.trkpy[3]=ParentMomentum[1]/GeV;
-	g4data.trkpz[3]=ParentMomentum[2]/GeV;
-	if (wasInHorn1=false) G4cout<<"nije usao, a sad izlazi iz Horn1"<<G4endl;
+	g4data->trkx[3]=ParentPosition[0]/cm;
+	g4data->trky[3]=ParentPosition[1]/cm;
+	g4data->trkz[3]=ParentPosition[2]/cm;
+	g4data->trkpx[3]=ParentMomentum[0]/GeV;
+	g4data->trkpy[3]=ParentMomentum[1]/GeV;
+	g4data->trkpz[3]=ParentMomentum[2]/GeV;
       }
       //enter horn2
       if (prevolname.contains("TGAR") && postvolname.contains("Horn2")){
-	g4data.trkx[4]=ParentPosition[0]/cm;
-	g4data.trky[4]=ParentPosition[1]/cm;
-	g4data.trkz[4]=ParentPosition[2]/cm;
-	g4data.trkpx[4]=ParentMomentum[0]/GeV;
-	g4data.trkpy[4]=ParentMomentum[1]/GeV;
-	g4data.trkpz[4]=ParentMomentum[2]/GeV;
+	g4data->trkx[4]=ParentPosition[0]/cm;
+	g4data->trky[4]=ParentPosition[1]/cm;
+	g4data->trkz[4]=ParentPosition[2]/cm;
+	g4data->trkpx[4]=ParentMomentum[0]/GeV;
+	g4data->trkpy[4]=ParentMomentum[1]/GeV;
+	g4data->trkpz[4]=ParentMomentum[2]/GeV;
 	wasInHorn2=true;
       }
       //exit horn2
       if (prevolname.contains("Horn2") && postvolname.contains("TGAR")){
-	g4data.trkx[5]=ParentPosition[0]/cm;
-	g4data.trky[5]=ParentPosition[1]/cm;
-	g4data.trkz[5]=ParentPosition[2]/cm;
-	g4data.trkpx[5]=ParentMomentum[0]/GeV;
-	g4data.trkpy[5]=ParentMomentum[1]/GeV;
-	g4data.trkpz[5]=ParentMomentum[2]/GeV;
-	if (wasInHorn2=false) G4cout<<"nije usao, a sad izlazi iz Horn2"<<G4endl;
+	g4data->trkx[5]=ParentPosition[0]/cm;
+	g4data->trky[5]=ParentPosition[1]/cm;
+	g4data->trkz[5]=ParentPosition[2]/cm;
+	g4data->trkpx[5]=ParentMomentum[0]/GeV;
+	g4data->trkpy[5]=ParentMomentum[1]/GeV;
+	g4data->trkpz[5]=ParentMomentum[2]/GeV;
       }
       //enter decay pipe
       if (prevolname.contains("DVOL")&&(postvolname.contains("UpWn"))){
-	g4data.trkx[6]=ParentPosition[0]/cm;
-	g4data.trky[6]=ParentPosition[1]/cm;
-	g4data.trkz[6]=ParentPosition[2]/cm;
-	g4data.trkpx[6]=ParentMomentum[0]/GeV;
-	g4data.trkpy[6]=ParentMomentum[1]/GeV;
-	g4data.trkpz[6]=ParentMomentum[2]/GeV;}
+	g4data->trkx[6]=ParentPosition[0]/cm;
+	g4data->trky[6]=ParentPosition[1]/cm;
+	g4data->trkz[6]=ParentPosition[2]/cm;
+	g4data->trkpx[6]=ParentMomentum[0]/GeV;
+	g4data->trkpy[6]=ParentMomentum[1]/GeV;
+	g4data->trkpz[6]=ParentMomentum[2]/GeV;}
+
+
+      
+      // check if the particle passes through the neck of the horn
+      // if yes then set the trk_ to +999999
+      // need to make this work for arbitrary horn position!!
+      if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
+	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
+	  (g4data->trkx[2]==-999999. || g4data->trkx[2]==999999.))
+	{
+	  g4data->trkx[2]=999999.;
+	  g4data->trky[2]=999999.;
+	  g4data->trkz[2]=999999.;  
+	}
+      if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
+	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
+	  (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
+	{
+	  g4data->trkx[4]=999999.;
+	  g4data->trky[4]=999999.;
+	  g4data->trkz[4]=999999.;  
+	}
     }
     
     ParentMomentum=NuParentTrack->GetMomentum(point_no-1);
     ParentPosition=(NuParentTrack->GetPoint(point_no-1)->GetPosition()/m)*m;
-    g4data.trkx[7]=ParentPosition[0]/cm;
-    g4data.trky[7]=ParentPosition[1]/cm;
-    g4data.trkz[7]=ParentPosition[2]/cm;
-    g4data.trkpx[7]=ParentMomentum[0]/GeV;
-    g4data.trkpy[7]=ParentMomentum[1]/GeV;
-    g4data.trkpz[7]=ParentMomentum[2]/GeV;
+    g4data->trkx[7]=ParentPosition[0]/cm;
+    g4data->trky[7]=ParentPosition[1]/cm;
+    g4data->trkz[7]=ParentPosition[2]/cm;
+    g4data->trkpx[7]=ParentMomentum[0]/GeV;
+    g4data->trkpy[7]=ParentMomentum[1]/GeV;
+    g4data->trkpz[7]=ParentMomentum[2]/GeV;
     // }
   
   tree->Fill();  // since I already defined where does tree get the data
@@ -479,8 +498,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   if (NumiData->createASCII) {
     std::ofstream asciiFile(asciiFileName, std::ios::app);
     if(asciiFile.is_open()) {
-      asciiFile << g4data.Ntype<< " " << g4data.Nenergy << " " << g4data.NenergyN[0] << " " << g4data.NWtNear[0];
-      asciiFile << " " << g4data.NenergyF[0] << " " << g4data.NWtFar[0] <<" "<<g4data.Nimpwt<< G4endl; 
+      asciiFile << g4data->Ntype<< " " << g4data->Nenergy << " " << g4data->NenergyN[0] << " " << g4data->NWtNear[0];
+      asciiFile << " " << g4data->NenergyF[0] << " " << g4data->NWtFar[0] <<" "<<g4data->Nimpwt<< G4endl; 
       asciiFile.close();
     }
   }

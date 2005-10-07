@@ -26,14 +26,14 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     G4bool OpenNtuple(G4String ntupleName);
     void CloseNtuple();
   
-  G4double GetProtonX(){
-    return protonX;
+  G4ThreeVector GetProtonOrigin(){
+    return protonOrigin;
   }
-  G4double GetProtonY(){
-    return protonY;
+  G4ThreeVector GetProtonMomentum(){
+    return protonMomentum;
   }
-  G4ThreeVector GetProtonDirection(){
-    return protonDirection;
+  G4ThreeVector GetProtonIntVertex(){
+    return protonIntVertex;
   }
   
     G4int noOfPrimaries,tgen,type;
@@ -42,8 +42,10 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
   private:
     G4bool isFirst;
-    G4double protonX,protonY;
-    G4ThreeVector protonDirection;   
+    G4ThreeVector protonOrigin;
+    G4ThreeVector protonMomentum;
+    G4ThreeVector protonIntVertex;
+
     TFile *rootFile;
     TTree *primaryNtuple;
     G4int currentPrimaryNo;
@@ -51,9 +53,7 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     NumiAnalysis* numiAnalysis;
     NumiRunManager* pRunManager;
     G4ParticleGun* particleGun;
-    G4double meanx;
-    G4double meany;
-    G4double meanz;
+
 };
 
 #endif

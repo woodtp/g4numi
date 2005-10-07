@@ -25,8 +25,8 @@ NumiDataInput::NumiDataInput()
   asciiName="asciiOut";
 
   protonMomentum = 120.*GeV;  
-  beamSigmaY = 1.*mm;
-  beamSigmaX = 1.*mm;
+  beamSigmaY = 1.25*mm;
+  beamSigmaX = 1.1*mm;
   beamDirection = G4ThreeVector(0.,0.,1.);
   beamPosition = G4ThreeVector(0.,0.,-4.*m);
 
@@ -36,8 +36,8 @@ NumiDataInput::NumiDataInput()
   //=======================================================================
   RockRadius  = 10.0*m;
   RockHalfLen = 1200.0*m;
-  RockDensity = 0.0; // not
-  RockRadLen  = 0.0; // used
+  RockDensity = 2.41*g/cm3; // not
+  RockRadLen  = 0.0;        // used
 
   constructTarget = true;
   //TargetArea          1
@@ -369,23 +369,29 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //---------------------------------------------------------
   
   //Near & Far Detector location
-  xdet_near.push_back(0);
-  ydet_near.push_back(0);
-  zdet_near.push_back(1040.*m);
-  xdet_far.push_back(0);
-  ydet_far.push_back(0);
-  zdet_far.push_back(735000.*m);
+  nNear=9;
+  nFar=2;
+  G4double xdetNear[]    = {0     , 0.     , 7.     , 11.    , 14.    , 14.    , 14.   , 0.  , 25.84     };
+  G4double ydetNear[]    = {0     , -3.    , -5.    , -5.    , -6.    , -3.    , 0.    , 71. , 78.42     };
+  G4double zdetNear[]    = {1040  , 1010.  , 975.   , 958.   , 940.   , 840.   , 740.  , 940., 745.25    };
+  G4String detNameNear[] = {"Near","Nova1a","Nova1b","Nova1c","Nova2a","Nova2b","Nova3","MSB","MiniBooNE"};
+  G4double xdetFar[]     = {0     , 28.81258   };
+  G4double ydetFar[]     = {0     , 81.39258   };
+  G4double zdetFar[]     = {735000, 811400     };
+  G4String detNameFar[]  = {"Far" , "Ash River"};
 
-  for(G4int ii=1;ii<10;ii++){
-    xdet_near.push_back(0);
-    ydet_near.push_back(0);
-    zdet_near.push_back(0);
-    xdet_far.push_back(0);
-    ydet_far.push_back(0);
-    zdet_far.push_back(0);
+  for(G4int ii=0;ii<nNear;ii++){
+    xdet_near.push_back(xdetNear[ii]*m);
+    ydet_near.push_back(ydetNear[ii]*m);
+    zdet_near.push_back(zdetNear[ii]*m);
   }
-  
+  for(G4int ii=0;ii<nFar;ii++){
+    xdet_far.push_back(xdetFar[ii]*m);
+    ydet_far.push_back(ydetFar[ii]*m);
+    zdet_far.push_back(zdetFar[ii]*m);
+  }
 }
+
 NumiDataInput::~NumiDataInput()
 {
 }

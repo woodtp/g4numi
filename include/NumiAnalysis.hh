@@ -1,6 +1,7 @@
 //
 // NumiAnalysis.hh
 //
+// Modified Jul 2005 by A. MArino to make data_t and hadmmtuple_t classes
 
 #ifndef NUMIANALYSIS_HH
 #define NUMIANALYSIS_HH
@@ -29,8 +30,9 @@
 #include "NumiTrajectory.hh"
 #include "G4TrajectoryContainer.hh"
 
-
 class G4Track;
+class data_t;
+class hadmmtuple_t;
 
 class NumiAnalysis
 {
@@ -44,10 +46,18 @@ public:
   
   void FillNeutrinoNtuple(const G4Track& track);
   void FillHadmmNtuple(const G4Track& track);
-  G4double GetWeight(const G4Track& nutrack, G4double enuzr, G4ThreeVector vertex_r,G4double gamma,G4ThreeVector beta_vec,G4double theta_pardet, G4double x_det, G4double y_det, G4double z_det);
+  G4double GetWeight(const G4Track& nutrack, 
+		     G4double enuzr, 
+		     G4ThreeVector vertex_r,
+		     G4double gamma,
+		     G4ThreeVector beta_vec,
+		     G4double theta_pardet, 
+		     G4double x_det, 
+		     G4double y_det, 
+		     G4double z_det);
   G4double GetNuEnergy(G4double Parent_mass, G4double gamma, G4double beta, G4double theta);
   G4double GetTheta(G4ThreeVector vertex_r,G4ThreeVector momentum,G4double x_det,G4double y_det,G4double z_det);
-
+  
   G4int GetParticleCode(G4String);
   G4String GetParticleName(G4int);
   NumiTrajectory* GetParentTrajectory(G4int parentID);
@@ -73,6 +83,10 @@ private:
  
   TTree* tree;
   TTree* hadmmtree;
+
+  data_t *g4data;
+  hadmmtuple_t *g4hmmdata;
+  /*
   typedef struct {
     Int_t run;        //
     Int_t evtno;
@@ -158,7 +172,7 @@ private:
     Double_t hmmpz;
   } hadmmtuple_t;
   hadmmtuple_t g4hmmdata;
-  
+*/  
 };
 
 #endif 
