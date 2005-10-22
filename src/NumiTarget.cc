@@ -22,6 +22,7 @@ void NumiDetectorConstruction::ConstructTarget()
   G4RotationMatrix rotation;
   G4ThreeVector translation; 
   G4String Sname,PVname,LVname,vol_name;
+  G4double tgtGap=0.025*mm;
   char no[3];
 
   // Mother volume (TGAR) position
@@ -151,7 +152,7 @@ void NumiDetectorConstruction::ConstructTarget()
     PVname=""; PVname=PVname.append(NumiData->CPipeVolName[ii]);
  
     if (NumiData->CPipeCurvRad[ii]==0){
-      CP_solid=new G4Tubs(Sname,NumiData->CPipeRadiusIn[ii],NumiData->CPipeRadiusOut[ii],NumiData->CPipeLength[ii]/2.,0.,360.*deg);
+      CP_solid=new G4Tubs(Sname,NumiData->CPipeRadiusIn[ii],NumiData->CPipeRadiusOut[ii]-tgtGap,NumiData->CPipeLength[ii]/2.-tgtGap,0.,360.*deg);
       LVCPipe[ii]=new G4LogicalVolume(CP_solid,GetMaterial(NumiData->CPGeantMat[ii]),LVname,0,0,0);
       // Position the pipe
       rotation=G4RotationMatrix(0,0,0);
@@ -166,11 +167,11 @@ void NumiDetectorConstruction::ConstructTarget()
 	PVname=PVname.append("_water");
 	if (NumiData->CPipeRadiusIn[ii]==0) {
 	  CP_water_solid=new 
-	    G4Tubs(Sname,0.,NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii],NumiData->CPipeLength[ii]/2.,0.,360.*deg);
+	    G4Tubs(Sname,0.,NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii],NumiData->CPipeLength[ii]/2.-tgtGap,0.,360.*deg);
 	}
 	else {
 	  CP_water_solid=new 
-	    G4Tubs(Sname,NumiData->CPipeRadiusIn[ii]+NumiData->CPipeWallThick[ii],NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii],NumiData->CPipeLength[ii]/2.,0.,360.*deg);
+	    G4Tubs(Sname,NumiData->CPipeRadiusIn[ii]+NumiData->CPipeWallThick[ii],NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii],NumiData->CPipeLength[ii]/2.-tgtGap,0.,360.*deg);
 	}
 	LVCPipeW[ii]=new G4LogicalVolume(CP_water_solid,Water,LVname,0,0,0);
 	G4VisAttributes * WaterPipeAtt=new G4VisAttributes(G4Colour(0.,0.,1.));
@@ -189,7 +190,7 @@ void NumiDetectorConstruction::ConstructTarget()
 	dPhi=360.*deg-2*NumiData->CPipeOpenAng[ii]+NumiData->CPipeCloseAng[ii]; //there is a bug in G4Torus (geant4.6) visualization, so use this to visualize it; should be fixed in 4.7.x
       }
       */
-      CPipe_tor=new G4Torus(Sname,0.,NumiData->CPipeRadiusOut[ii],NumiData->CPipeCurvRad[ii],NumiData->CPipeOpenAng[ii],dPhi);
+      CPipe_tor=new G4Torus(Sname,NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii],NumiData->CPipeRadiusOut[ii],NumiData->CPipeCurvRad[ii],NumiData->CPipeOpenAng[ii],dPhi);
       LVCPipe[ii]=new G4LogicalVolume(CPipe_tor,GetMaterial(NumiData->CPGeantMat[ii]),LVname,0,0,0);
 
       // Position the pipe  
@@ -204,11 +205,11 @@ void NumiDetectorConstruction::ConstructTarget()
 	Sname=Sname.append("_water");
 	LVname=LVname.append("_water");
 	PVname=PVname.append("_water"); 
-	CPipeW_tor=new G4Torus(Sname,0.,(NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii]),NumiData->CPipeCurvRad[ii],NumiData->CPipeOpenAng[ii],dPhi);
+	CPipeW_tor=new G4Torus(Sname,0.,(NumiData->CPipeRadiusOut[ii]-NumiData->CPipeWallThick[ii])-tgtGap,NumiData->CPipeCurvRad[ii],NumiData->CPipeOpenAng[ii],dPhi);
 	LVCPipeW[ii]=new G4LogicalVolume(CPipeW_tor,Water,LVname,0,0,0);
 	G4VisAttributes * WaterPipeAtt=new G4VisAttributes(G4Colour(0.,0.,1.)); 
 	LVCPipeW[ii]->SetVisAttributes(WaterPipeAtt);
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),PVname,LVCPipeW[ii],PVCPipe[ii],false,0);
+	new G4PVPlacement(G4Transform3D(rotation,CPipe_position),PVname,LVCPipeW[ii],pvTargetMotherVol,false,0);
       }
     }
   }

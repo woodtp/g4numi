@@ -23,13 +23,13 @@ private:
   static NumiDataInput* fNumiDataInput;
 
 public:
-	void SetTargetZ0(G4double val) {
-		TargetZ0 = val;
-		HPBaffleZ0 += (val + 0.45*m);
-	}
-	void SetHornCurrent(G4double val) {
-		HornCurrent = val;
-	}
+  void SetTargetZ0(G4double val) {
+    TargetZ0 = val;
+    HPBaffleZ0 += (val + 0.45*m);
+  }
+  void SetHornCurrent(G4double val) {
+    HornCurrent = val;
+  }
   void SetDebugOn(G4bool val) {
     debugOn = val;
   }
@@ -77,7 +77,6 @@ public:
   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
   G4bool useFlukaInput, useMarsInput;
   G4String nuNtupleName, hadmmNtupleName, asciiName;
- 
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
   G4ThreeVector beamPosition, beamDirection;
@@ -89,6 +88,14 @@ public:
   G4double TargetAreaZ0, TargetAreaLength, TargetAreaHeight,TargetAreaWidth;
   G4int TargetAreaGEANTmat;
 
+ // added by Zachary Barnett - Target Area ConcretePit
+  G4int NTHConcreteSectionsN;
+  vdouble_t THConcreteX0, THConcreteY0, THConcreteZ0;
+  vdouble_t THConcreteLength, THConcreteHdx, THConcreteHdy;
+  vdouble_t THConcreteDxdz, THConcreteDydz;
+  vint_t THConcreteGeantMaterial;
+  vstring_t THConcreteName;
+  //-------------------------------------
   
   // Target
   G4bool constructTarget;

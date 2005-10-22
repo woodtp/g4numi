@@ -79,8 +79,6 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //G4UImanager* UI=G4UImanager::GetUIpointer();
   
     G4int totNoPrim=pRunManager->GetNumberOfEvents();
-    //  G4cout <<currentPrimaryNo<<G4endl;
-    if (pRunManager==NULL) G4cout<<"RunManager==NULL??"<<G4endl;
     if (totNoPrim>20){
       if (currentPrimaryNo%(totNoPrim/20)==0) 
 	G4cout<<"Processing particles #: "
@@ -127,8 +125,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4String particleName;
     primaryNtuple->GetEntry(currentPrimaryNo);
   
-    x0 = primaryNtuple->GetLeaf("x")->GetValue()*cm+ND->TargetX0;
-    y0 = primaryNtuple->GetLeaf("y")->GetValue()*cm+ND->TargetY0;
+    x0 = primaryNtuple->GetLeaf("x")->GetValue()*cm;
+    y0 = primaryNtuple->GetLeaf("y")->GetValue()*cm;
     z0 = primaryNtuple->GetLeaf("z")->GetValue()*cm+ND->TargetZ0+35*cm;
     px = primaryNtuple->GetLeaf("px")->GetValue()*GeV;
     py = primaryNtuple->GetLeaf("py")->GetValue()*GeV;

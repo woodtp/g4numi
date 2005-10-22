@@ -44,8 +44,13 @@ NumiDataInput::NumiDataInput()
   //=======================================================================
   TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
   TargetAreaLength   = 52.398*m;//was 49.28*m (08/09/05);
-  TargetAreaHeight   = 6.0*m;
-  TargetAreaWidth    = 6.0*m;
+
+  // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version, 
+  // but I had to extend them by 1 m to fit the concrete chase in TGAR 
+  // (working from dimensions and placement given in the Numi Technical Design Handbook)
+  // I (Zarko) had to add 1.5m more to fit all blocks
+  TargetAreaHeight   = 8.5*m;
+  TargetAreaWidth    = 8.5*m;
   TargetAreaGEANTmat = 15;
 
   // Target   1
@@ -94,7 +99,7 @@ NumiDataInput::NumiDataInput()
   // CPipeDXDZ=-99999 and CPipeDYDZ=0 puts curved part in z-y plane
   //=======================================================================
   G4int CPGeantMat_[]        = {10     ,   10   ,10     , 10     , 10    , 10    ,  10   , 10    , 10     , 10           ,10            , 31     , 31      ,10        ,10        ,  10     ,  10     , 10      ,10  };
-  G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   , false  ,false   ,false  ,true   , false  , true         ,true          , true   ,true     ,true      ,true      , true    , true    , true    , true};
+  G4bool CPipeFilledWater_[] = { true  , true   ,true   , true   ,  true , true  ,false  ,true   , false  , true         ,true          , true   ,true     ,true      ,true      , true    , true    , true    , true};
   G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.    , 0.           ,0.            , 0      , 0       ,0         ,0         , 0       , 0       , 0       , 0};
   G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.    , 1.05e-2      ,-1.05e-2      , 5.95e-2, -5.95e-2,5.95e-2   ,-5.95e-2  , 5.95e-2 , -5.95e-2,5.95e-2  ,-5.95e-2};
   G4double CPipeZ0_[]        = {-0.275 , -0.275 ,-0.30  ,-0.30   , -.3001,-.3001 ,.969   , .9695 , .9735  , 0.955        ,0.955         , -0.215 , -0.215  ,-.071     ,-.071     ,-0.287   ,-0.287   , -.30    , -.30};
@@ -201,32 +206,239 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   DecayPipeFWinmat   = 9;
   DecayPipeEWinmat   = 10;
 
-  THBlockNblock = 6;
+  // New Target Hall by Zach Barnett 
+  
+  //==========================================================================
+  // TargetHallChase       1
+  
+  NTHConcreteSectionsN = 6;
+  
+  // units in meters, dimensions based on Numi note.
+  G4double THConcreteX0_[]= {3.36073, 2.60670, 0.0, -2.60670, -3.36073, 0.0};
+  G4double THConcreteY0_[]= {2.801, 0.0, -2.801, 0, 2.801, 3.45665};
+  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume 
+  G4double THConcreteZ0_[]= {19.499, 19.499, 19.499, 19.499, 19.499, 19.499};
+  G4double THConcreteLength_[]= {52.397, 52.397, 52.397, 52.397, 52.397, 52.397};
+  G4double THConcreteHdx_[]={.754025,.46675,3.07345,.46675,.754025, 2.921};
+  G4double THConcreteHdy_[]={.42705,2.37395,.42705,2.37395,.42705, .2286};
+  G4double THConcreteDxdz_[]={0,0,0,0,0, 0.0};
+  G4double THConcreteDydz_[]={0,0,0,0,0, 0.0};
+  G4int THConcreteGeantMaterial_[] = {17,17,17,17,17, 17};
+  G4String THConcreteName_[]={"Section1","Section2","Section3","Section4","Section5","Section6(lid)"};
+
+  for (G4int ii=0;ii<NTHConcreteSectionsN;ii++){
+	  THConcreteX0.push_back(THConcreteX0_[ii]*m);
+	  THConcreteY0.push_back(THConcreteY0_[ii]*m);
+	  THConcreteZ0.push_back(THConcreteZ0_[ii]*m);
+	  THConcreteDxdz.push_back(THConcreteDxdz_[ii]*m);
+	  THConcreteDydz.push_back(THConcreteDydz_[ii]*m);
+	  THConcreteLength.push_back(THConcreteLength_[ii]*m);
+	  THConcreteHdx.push_back(THConcreteHdx_[ii]*m);
+	  THConcreteHdy.push_back(THConcreteHdy_[ii]*m);
+	  THConcreteGeantMaterial.push_back(THConcreteGeantMaterial_[ii]);
+	  THConcreteName.push_back(THConcreteName_[ii]);
+  }
+  
+  //==========================================================================
+
   //======================================================================= 
-  // Target Hall shielding (1-6) ;
-  G4double THBlockX0_[]    = { 1.3970, -1.3970,  0.    ,  0.    , 0     , 0     };
-  G4double THBlockY0_[]    = { 0.8707,  0.8707, -1.4153,  1.3665, 1.3792+0.0325, 1.3665};
-  G4double THBlockZ0_[]    = {-4.0   , -4.0   , -4.0   , -4.0   , 9.0   , 15.0  };
-  G4double THBlockDxdz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
-  G4double THBlockDydz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
-  G4double THBlockLength_[]= { 49.28 ,  49.28 ,  49.28 ,  13.0  , 6.0   , 30.279};
-  G4double THBlockHdx_[]   = { 0.8128,  0.8128,  2.2098,  0.5842, 0.5842, 0.5842};
-  G4double THBlockHdy_[]   = { 1.8232,  1.8232,  0.4628,  1.0109, 0.9982-0.065, 1.0109};
-  G4int THBlockGeantMaterial_[] = { 10,  10   ,  10    ,  10    , 10    , 10   };
-  G4String THBlockName_[]  = {"BLK1" , "BLK2" ,"BLK3"  ,"BLK4"  ,"BLK5" ,"BLK6"};
+  // Target Hall shielding (18 blocks, numbered 0-17)
+ 
+  THBlockNblock = 18;
+  
+  // reminder: all length dimensions for the target shielding blocks are in meters.
+  //These are the Duratek blocks mentioned in the Numi Technical Design Handbook.
+
+  //Blocks 15-17 are not actually in the Numi Technical Design Handbook--they are used
+  //to provide a covering over the top
+
+  G4double THBlockX0_[]    = { 0.0,      //Block 0
+							   1.3554,   //Block 1
+							   -1.3554,  //Block 2
+							   1.7158,    //Block 3
+							   .6904,     //Block 4
+							   -.6904,    //Block 5
+							   -1.7158,   //Block 6
+							   1.0254,      //Block 7 
+							   -1.0254,     //Block 8
+							   1.7158,    //Block 9
+							   -1.7158,   //Block 10
+							   1.0254,      //Block 11
+							   -1.0254,     //Block 12
+							   1.7158,    //Block 13
+							   -1.7158,    //Block 14
+							   0.6904,        //Block15 (top block1--one of the slightly enlarged blocks)
+							   -0.6904,        //Block16 (top block2--one of the slightly enlarged blocks)
+							   0.0        //Block17 (top block3)
+  };
+
+  G4double THBlockY0_[]    = { -2.03895,      //Block 0
+							   -2.03895,      //Block 1
+							   -2.03895,      //Block 2
+							   -1.03895,      //Block 3
+							   -1.36895,      //Block 4
+							   -1.36895,      //Block 5
+							   -1.03895,      //Block 6
+							   -0.36895,     //Block 7
+							   -0.36895,     //Block 8
+							   0.29105,     //Block 9
+							   0.29105,     //Block 10
+							   0.96105,      //Block 11
+							   0.96105,      //Block 12
+							   1.62105,     //Block 13
+							   1.62105,      //Block 14
+							   1.98395,        //Block15 (top block1--one of the slightly enlarged blocks)
+							   1.98395,        //Block16 (top block2--one of the slightly enlarged blocks)
+							   1.29355        //Block17 (top block3)
+  };
+
+  
+  
+  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume
+
+  G4double THBlockZ0_[]= {19.499};
+  G4double THBlockDxdz_[] = {0.0};
+  G4double THBlockDydz_[] = {0.0};
+	  
+  /*	  
+  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume 
+  G4double THBlockZ0_[]    = { 20.64,        //Block 0
+  20.64,        //Block 1
+							   20.64,        //Block 2
+							   20.64,        //Block 3
+							   20.64,        //Block 4
+							   20.64,        //Block 5
+							   20.64,        //Block 6
+							   20.64,        //Block 7
+							   20.64,        //Block 8
+							   20.64,        //Block 9
+							   20.64,        //Block 10
+							   20.64,        //Block 11
+							   20.64,        //Block 12
+							   20.64,        //Block 13
+							   20.64,         //Block 14
+							   20.64,        //Block15 (top block1--one of the slightly enlarged blocks)
+							   20.64,        //Block16 (top block2--one of the slightly enlarged blocks)
+							   20.64        //Block17 (top block3)
+  };
+
+	  
+  G4double THBlockDxdz_[]  = { 0.0,        //Block 0
+							   0.0,        //Block 1
+							   0.0,        //Block 2
+							   0.0,        //Block 3
+							   0.0,        //Block 4
+							   0.0,        //Block 5
+							   0.0,        //Block 6
+							   0.0,        //Block 7
+							   0.0,        //Block 8
+							   0.0,        //Block 9
+							   0.0,        //Block 10
+							   0.0,        //Block 11
+							   0.0,        //Block 12
+							   0.0,        //Block 13
+							   0.0,         //Block 14
+							   0.0,        //Block15 (top block1--one of the slightly enlarged blocks)
+							   0.0,        //Block16 (top block2--one of the slightly enlarged blocks)
+							   0.0,        //Block17 (top block3)
+                             };
+
+  G4double THBlockDydz_[]  = { 0.0,        //Block 0
+			       0.0,        //Block 1
+			       0.0,        //Block 2
+			       0.0,        //Block 3
+			       0.0,        //Block 4
+			       0.0,        //Block 5
+			       0.0,        //Block 6
+			       0.0,        //Block 7
+			       0.0,        //Block 8
+			       0.0,        //Block 9
+			       0.0,        //Block 10
+			       0.0,        //Block 11
+			       0.0,        //Block 12
+			       0.0,        //Block 13
+			       0.0,         //Block 14
+			       0.0,        //Block15 (top block1--one of the slightly enlarged blocks)
+			       0.0,        //Block16 (top block2--one of the slightly enlarged blocks)
+			       0.0,        //Block17 (top block3)
+                             };
+  */
+	  
+  // all normal blocks have the same Length, Hdx, and Hdy values.  These values for the slightly larger blocks are set
+  // in NumiTargetHall.cc, line 103
+  G4double THBlockLength_[]= {52.397};
+
+  G4double THBlockHdx_[]   = {1.33/2.0};
+
+  G4double THBlockHdy_[]   = {0.67/2.0};
+
+  G4int THBlockGeantMaterial_[] = {10};
+
+  G4String THBlockName_[]  = {"BLK0",
+			      "BLK1",
+			      "BLK2",
+			      "BLK3",
+			      "BLK4",
+			      "BLK5",
+			      "BLK6",
+			      "BLK7",
+			      "BLK8",
+			      "BLK9",
+			      "BLK10",
+			      "BLK11",
+			      "BLK12",
+			      "BLK13",
+			      "BLK14",
+			      "BLK15",
+			      "BLK16",
+			      "BLK17"
+                              };
+
+  //This next block puts all the block coordinates into vectors and assigns the unit "meters" to the values.
 
   for (G4int ii=0;ii<THBlockNblock;ii++){
     THBlockX0.push_back(THBlockX0_[ii]*m);
     THBlockY0.push_back(THBlockY0_[ii]*m);
-    THBlockZ0.push_back(THBlockZ0_[ii]*m);
-    THBlockDxdz.push_back(THBlockDxdz_[ii]);
-    THBlockDydz.push_back(THBlockDydz_[ii]);
-    THBlockLength.push_back(THBlockLength_[ii]*m);
-    THBlockHdx.push_back(THBlockHdx_[ii]*m);
-    THBlockHdy.push_back(THBlockHdy_[ii]*m);
-    THBlockGeantMaterial.push_back(THBlockGeantMaterial_[ii]);
+    THBlockZ0.push_back(THBlockZ0_[0]*m);
+    THBlockDxdz.push_back(THBlockDxdz_[0]*m);
+    THBlockDydz.push_back(THBlockDydz_[0]*m);
+    THBlockLength.push_back(THBlockLength_[0]*m);
+    THBlockHdx.push_back(THBlockHdx_[0]*m);
+    THBlockHdy.push_back(THBlockHdy_[0]*m);
+    THBlockGeantMaterial.push_back(THBlockGeantMaterial_[0]);
     THBlockName.push_back(THBlockName_[ii]);
   }
+
+  /* This part has the gnumi like blocks in TGAR 
+  // To use it comment the top part written by Zach and uncomment this
+     NTHConcreteSectionsN = 0;
+     THBlockNblock = 6;
+     //======================================================================= 
+     // Target Hall shielding (1-6) ;
+     G4double THBlockX0_[]    = { 1.3970, -1.3970,  0.    ,  0.    , 0     , 0     };
+     G4double THBlockY0_[]    = { 0.8707,  0.8707, -1.4153,  1.3665, 1.3792+0.0325, 1.3665};
+     G4double THBlockZ0_[]    = {-4.0   , -4.0   , -4.0   , -4.0   , 9.0   , 15.0  };
+     G4double THBlockDxdz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
+     G4double THBlockDydz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
+     G4double THBlockLength_[]= { 49.28 ,  49.28 ,  49.28 ,  13.0  , 6.0   , 30.279};
+     G4double THBlockHdx_[]   = { 0.8128,  0.8128,  2.2098,  0.5842, 0.5842, 0.5842};
+     G4double THBlockHdy_[]   = { 1.8232,  1.8232,  0.4628,  1.0109, 0.9982-0.065, 1.0109};
+     G4int THBlockGeantMaterial_[] = { 10,  10   ,  10    ,  10    , 10    , 10   };
+     G4String THBlockName_[]  = {"BLK1" , "BLK2" ,"BLK3"  ,"BLK4"  ,"BLK5" ,"BLK6"};
+     
+     for (G4int ii=0;ii<THBlockNblock;ii++){
+     THBlockX0.push_back(THBlockX0_[ii]*m);
+     THBlockY0.push_back(THBlockY0_[ii]*m);
+     THBlockZ0.push_back(THBlockZ0_[ii]*m);
+     THBlockDxdz.push_back(THBlockDxdz_[ii]);
+     THBlockDydz.push_back(THBlockDydz_[ii]);
+     THBlockLength.push_back(THBlockLength_[ii]*m);
+     THBlockHdx.push_back(THBlockHdx_[ii]*m);
+     THBlockHdy.push_back(THBlockHdy_[ii]*m);
+     THBlockGeantMaterial.push_back(THBlockGeantMaterial_[ii]);
+     THBlockName.push_back(THBlockName_[ii]);
+     }
+  */
 
   HABlockNblock = 7;
   //======================================================================= 
