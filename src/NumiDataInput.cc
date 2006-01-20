@@ -409,65 +409,11 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     THBlockName.push_back(THBlockName_[ii]);
   }
 
-  /* This part has the gnumi like blocks in TGAR 
-  // To use it comment the top part written by Zach and uncomment this
-     NTHConcreteSectionsN = 0;
-     THBlockNblock = 6;
-     //======================================================================= 
-     // Target Hall shielding (1-6) ;
-     G4double THBlockX0_[]    = { 1.3970, -1.3970,  0.    ,  0.    , 0     , 0     };
-     G4double THBlockY0_[]    = { 0.8707,  0.8707, -1.4153,  1.3665, 1.3792+0.0325, 1.3665};
-     G4double THBlockZ0_[]    = {-4.0   , -4.0   , -4.0   , -4.0   , 9.0   , 15.0  };
-     G4double THBlockDxdz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
-     G4double THBlockDydz_[]  = { 0.0   ,  0.0   ,  0.0   ,  0.0   , 0     , 0     };
-     G4double THBlockLength_[]= { 49.28 ,  49.28 ,  49.28 ,  13.0  , 6.0   , 30.279};
-     G4double THBlockHdx_[]   = { 0.8128,  0.8128,  2.2098,  0.5842, 0.5842, 0.5842};
-     G4double THBlockHdy_[]   = { 1.8232,  1.8232,  0.4628,  1.0109, 0.9982-0.065, 1.0109};
-     G4int THBlockGeantMaterial_[] = { 10,  10   ,  10    ,  10    , 10    , 10   };
-     G4String THBlockName_[]  = {"BLK1" , "BLK2" ,"BLK3"  ,"BLK4"  ,"BLK5" ,"BLK6"};
-     
-     for (G4int ii=0;ii<THBlockNblock;ii++){
-     THBlockX0.push_back(THBlockX0_[ii]*m);
-     THBlockY0.push_back(THBlockY0_[ii]*m);
-     THBlockZ0.push_back(THBlockZ0_[ii]*m);
-     THBlockDxdz.push_back(THBlockDxdz_[ii]);
-     THBlockDydz.push_back(THBlockDydz_[ii]);
-     THBlockLength.push_back(THBlockLength_[ii]*m);
-     THBlockHdx.push_back(THBlockHdx_[ii]*m);
-     THBlockHdy.push_back(THBlockHdy_[ii]*m);
-     THBlockGeantMaterial.push_back(THBlockGeantMaterial_[ii]);
-     THBlockName.push_back(THBlockName_[ii]);
-     }
-  */
-
-  HABlockNblock = 7;
   //======================================================================= 
-  // Hadron Absorber 
- 
-  G4double HABlockX0_[]    = { 1.651 , -1.3208, 0.0     , 0.3302  , 0.0   ,  0.0   , 0.0     };
-  G4double HABlockY0_[]    = { 0.0   ,  0.0   , 0.0     , 0.0     , 0.0   , -1.651 , 1.651  };
-  G4double HABlockZ0_[]    = { 723.48,  723.48, 726.4772, 728.7632, 723.48,  723.48, 723.48  };
-  G4double HABlockDxdz_[]  = { 0.0   ,  0.0   , 0.0     , 0.0     , 0.0   ,  0.0   , 0.0     };
-  G4double HABlockDydz_[]  = { 0.0   ,  0.0   , 0.0     , 0.0     , 0.0   ,  0.0   , 0.0     };
-  G4double HABlockLength_[]= { 5.2832,  5.2832, 2.2860  , 0.9144  , 2.4384,  2.9972, 2.9972  };
-  G4double HABlockHdx_[]   = { 0.9906,  0.6604, 0.6604  , 2.3114  , 0.6477,  0.6604, 0.6604  };
-  G4double HABlockHdy_[]   = { 2.6416,  2.6416, 2.6416  , 2.6416  , 0.6477,  0.9906, 0.9906};
-  G4int HABlockGeantMaterial_[] = {10,  10    , 10      , 17      , 9     ,  10    , 10    };
-  G4String HABlockName_[]  = {"HABLK1" , "HABLK2" ,"HABLK3"   ,"HABLK4"   ,"HABLK5" ,"HABLK6"  ,"HABLK7"};
- 
-  for (G4int ii=0;ii<HABlockNblock;ii++){
-    HABlockX0.push_back(HABlockX0_[ii]*m);
-    HABlockY0.push_back(HABlockY0_[ii]*m);
-    HABlockZ0.push_back(HABlockZ0_[ii]*m);
-    HABlockDxdz.push_back(HABlockDxdz_[ii]);
-    HABlockDydz.push_back(HABlockDydz_[ii]);
-    HABlockLength.push_back(HABlockLength_[ii]*m);
-    HABlockHdx.push_back(HABlockHdx_[ii]*m);
-    HABlockHdy.push_back(HABlockHdy_[ii]*m);
-    HABlockGeantMaterial.push_back(HABlockGeantMaterial_[ii]);
-    HABlockName.push_back(HABlockName_[ii]);
-  }
-  
+  // Hadron Box Dimensions
+  HadrBox_width = 324*.0254*m;
+  HadrBox_height = 6.6294*m;
+  HadrBox_length = 9*m;
   
   HornCurrent=182100.*ampere; 
   static const G4double in=2.54*cm;

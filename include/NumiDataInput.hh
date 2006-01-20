@@ -155,12 +155,8 @@ public:
   vint_t THBlockGeantMaterial;
   vstring_t THBlockName;
 
-  //Hadron Absorber Blocks
-  G4double HABlockNblock;
-  vdouble_t HABlockX0,HABlockY0,HABlockZ0, HABlockDxdz,HABlockDydz;
-  vdouble_t HABlockLength,HABlockHdx,HABlockHdy;
-  vint_t HABlockGeantMaterial;
-  vstring_t HABlockName;
+  //Hadron Absorber Box
+  G4double HadrBox_width, HadrBox_height, HadrBox_length;
 
   // Horn 1 & 2
   G4int PhornNphorn;

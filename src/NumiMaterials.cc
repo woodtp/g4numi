@@ -95,6 +95,15 @@ void NumiDetectorConstruction::DefineMaterials()
   CT852->AddElement(elNi, 0.6*perCent); 
   CT852->AddElement(elFe, 84.145*perCent); 
 
+  density = 7.75*g/cm3;// The actual density of the stuff is currenty unknown
+  Slab_Iron = new G4Material("Slab_Iron",density,6);
+  Slab_Iron->AddElement(elC,  0.1*perCent);
+  Slab_Iron->AddElement(elSi, 0.1*perCent);
+  Slab_Iron->AddElement(elMn, 0.4*perCent);
+  Slab_Iron->AddElement(elFe, 98.2*perCent);
+  Slab_Iron->AddElement(elNi, 1.0*perCent);
+  Slab_Iron->AddElement(elCu, 0.2*perCent);
+
   density = 1.*g/cm3; 
   G4int natoms;
   Water = new G4Material("Water", density, 2); //number of components =2
@@ -122,6 +131,8 @@ void NumiDetectorConstruction::DefineMaterials()
   Pb = new G4Material("Lead", Z= 82., A= 207.19*g/mole, density= 11.35*g/cm3);
   Fe = new G4Material("Iron", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3);
   Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
+  var_Al = new G4Material("VariableDensityAluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3*.9);
+  var_Stl = new G4Material("VariableDensitySteel", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3*.9);
   
   density = 2.03*g/cm3;
   G4double fractionmass;
@@ -167,6 +178,9 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==16) return Vacuum;
   if (matcode==25) return Water;
   if (matcode==28) return DecayPipeVacuum;
+  if (matcode==21) return var_Al;
+  if (matcode==22) return var_Stl;
+  if (matcode==11) return Slab_Iron;
 
   G4cout << "Wrong material code " << matcode << G4endl;
   return Vacuum;

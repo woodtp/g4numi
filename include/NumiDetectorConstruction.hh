@@ -97,32 +97,42 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4Material* Concrete;
   G4Material* Target;
   G4Material* DolomiteRock;
+  G4Material* var_Al;
+  G4Material* var_Stl;
+  G4Material* Slab_Iron;
 
-    // Logical volumes
-    //
-    G4LogicalVolume* ROCK_log;
-    G4LogicalVolume* TRGT_lv;
+
+  // Logical volumes
+  //
+  G4LogicalVolume* ROCK_log;
+  G4LogicalVolume* TRGT_lv;
   // G4LogicalVolume* lvTUNE;
-    G4LogicalVolume* BLK_log[20]; 
-    G4LogicalVolume* TGAR_log;
-    G4LogicalVolume* Horn_PM_lv[8];
-    G4LogicalVolume* LVCPipe[20];
-    G4LogicalVolume* LVCPipeW[20];
+  G4LogicalVolume* BLK_log[100]; 
+  G4LogicalVolume* CShld_log[15]; 
+  G4LogicalVolume* TGAR_log;
+  G4LogicalVolume* Horn_PM_lv[8];
+  G4LogicalVolume* LVCPipe[20];
+  G4LogicalVolume* LVCPipeW[20];
+  G4LogicalVolume* HadrBox_log;
+  G4LogicalVolume* ShldBox_log;
 
-    // Physical volumes
-    //
-    G4VPhysicalVolume* ROCK;
-    G4VPhysicalVolume* pvTUNE;
-    G4VPhysicalVolume* TGAR;
-    G4VPhysicalVolume* TRGT;
-    G4VPhysicalVolume* PHORN[8];
-    G4VPhysicalVolume* PVCPipe[20];
-    G4VPhysicalVolume* CNT[20];
-
-    //Solids
-    //
-    G4VSolid* BLK_solid[20];
-    G4VSolid* Horn_PM[8];
+  // Physical volumes
+  //
+  G4VPhysicalVolume* ROCK;
+  G4VPhysicalVolume* pvTUNE;
+  G4VPhysicalVolume* TGAR;
+  G4VPhysicalVolume* TRGT;
+  G4VPhysicalVolume* PHORN[8];
+  G4VPhysicalVolume* PVCPipe[20];
+  G4VPhysicalVolume* CNT[20];
+  G4VPhysicalVolume* HadrBox;
+  G4VPhysicalVolume* ShldBox;
+  
+  //Solids
+  //
+  G4VSolid* BLK_solid[100];
+  G4VSolid* CShld_solid[15];
+  G4VSolid* Horn_PM[8];
 };
 
 #endif
