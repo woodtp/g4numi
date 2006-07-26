@@ -44,31 +44,31 @@ class NumiTrajectory : public G4VTrajectory
    inline G4int GetParentID() const
    { return fParentID; }
    inline G4String GetParticleName() const
-   { return ParticleName; }
+   { return fParticleName; }
    inline G4double GetCharge() const
-   { return PDGCharge; }
+   { return fPDGCharge; }
    inline G4double GetMass() const
-   { return ParticleMass; }
+   { return fParticleMass; }
    inline G4int GetPDGEncoding() const
-   { return PDGEncoding; }
+   { return fPDGEncoding; }
    inline const G4ThreeVector& GetVertexPosition() const
-   { return vertexPosition; }
+   { return fVertexPosition; }
    virtual int GetPointEntries() const
-   { return positionRecord->size(); }
+   { return fPositionRecord->size(); }
    virtual G4VTrajectoryPoint* GetPoint(G4int i) const 
-   { return (*positionRecord)[i]; }
+   { return (*fPositionRecord)[i]; }
    virtual G4ThreeVector GetMomentum(G4int i) const
-   { return (*momentumRecord)[i]; }
+   { return (*fMomentumRecord)[i]; }
    virtual G4String GetPreStepVolumeName(G4int i) const
-   { return (*PreStepVolume)[i]; }
+   { return (*fPreStepVolume)[i]; }
    inline G4ThreeVector GetInitialMomentum() const 
-   { return momentum; }                            
-   virtual G4int Gettgen() const
-   { return tgen;}
+   { return fMomentum; }                            
+   virtual G4int GetTgen() const
+   { return fTgen;}
    inline G4int GetDecayCode() const
-   {return decaycode;}
+   { return fDecayCode;}
    virtual G4double GetNImpWt() const
-   {return nimpwt;}
+   { return fNImpWt;}
   
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
@@ -79,24 +79,22 @@ class NumiTrajectory : public G4VTrajectory
    G4ParticleDefinition* GetParticleDefinition();
 
  private:
-   NumiTrajectoryMomentumContainer* momentumRecord;
-   NumiTrajectoryPointContainer*    positionRecord;
-   G4int                            decaycode;
-   G4int                            eventno;
-   G4int                            tgen;
-   G4double                         nimpwt;
+   NumiTrajectoryMomentumContainer* fMomentumRecord;
+   NumiTrajectoryPointContainer*    fPositionRecord;
+   G4int                            fDecayCode;
+   G4int                            fEventNo;
+   G4int                            fTgen;
+   G4double                         fNImpWt;
    G4int                            fTrackID;
    G4int                            fParentID;
-   G4ParticleDefinition*            fpParticleDefinition;
-   G4String                         ParticleName;
-   G4double                         PDGCharge;
-   G4int                            PDGEncoding;
-   G4ThreeVector                    momentum;
-   G4ThreeVector                    vertexPosition;
-   G4ThreeVector                    InitialPolarization;
-   G4ThreeVector                    FinalPolarization;
-   G4double                         ParticleMass;
-   NumiTrajectoryVolumeName*        PreStepVolume;
+   G4ParticleDefinition*            fParticleDefinition;
+   G4String                         fParticleName;
+   G4double                         fPDGCharge;
+   G4int                            fPDGEncoding;
+   G4ThreeVector                    fMomentum;
+   G4ThreeVector                    fVertexPosition;
+   G4double                         fParticleMass;
+   NumiTrajectoryVolumeName*        fPreStepVolume;
 };
 extern G4Allocator<NumiTrajectory> myTrajectoryAllocator;
 

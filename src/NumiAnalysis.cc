@@ -2,7 +2,11 @@
 // NumiAnalysis.cc
 //
 
-//Root files
+#include <fstream>
+#include <iomanip>
+#include <stdlib.h>
+
+//Root 
 #include "TROOT.h"          // Top level (or root) structure for all classes
 #include "TApplication.h"   // ROOT head file for GUI application singleton
 #include <TH1.h>            // ROOT head file for 1 dimension histograms
@@ -20,14 +24,10 @@
 #include <TPostScript.h>
 #include <TGraph.h>
 
-#include "data_t.hh"
-#include "hadmmtuple_t.hh"
-#include "NumiAnalysis.hh"
+//GEANT4 
 #include "globals.hh"
-#include "G4Track.hh"
 #include "G4ios.hh"
-#include <fstream>
-#include <iomanip>
+#include "G4Track.hh"
 #include "G4SteppingManager.hh"
 #include "G4ThreeVector.hh"
 #include "G4TrajectoryContainer.hh"
@@ -37,10 +37,16 @@
 #include "G4Navigator.hh"
 #include "G4TransportationManager.hh"
 #include "G4Run.hh"
+
+//g4numi 
+#include "data_t.hh"
+#include "hadmmtuple_t.hh"
+#include "NumiParticleCode.hh"
+#include "NumiAnalysis.hh"
 #include "NumiTrackInformation.hh"
 #include "NumiPrimaryGeneratorAction.hh"
 #include "NumiDataInput.hh"
-#include <stdlib.h>
+
 using namespace std;
 
 NumiAnalysis* NumiAnalysis::instance = 0;
@@ -127,7 +133,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track)
   g4hmmdata->mtgtvpos=NumiData->beamPosition[1]/cm;
   g4hmmdata->evtno=pRunManager->GetCurrentEvent()->GetEventID();
   G4ParticleDefinition* particleDefinition=track.GetDefinition();
-  g4hmmdata->ptype=GetParticleCode(particleDefinition->GetParticleName());
+  g4hmmdata->ptype=NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
   g4hmmdata->hmmenergy=track.GetTotalEnergy();
   g4hmmdata->hmmxpos=track.GetPosition()[0];
   g4hmmdata->hmmypos=track.GetPosition()[1];
@@ -255,7 +261,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data->Ndecay=NuParentTrack->GetDecayCode();
 
   G4ParticleDefinition * particleType = track.GetDefinition();
-  G4int ntype=GetParticleCode(particleType->GetParticleName());
+  G4int ntype=NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleType->GetParticleName()));
   g4data->Ntype=ntype;
   g4data->Vx=x/cm;
   g4data->Vy=y/cm;
@@ -275,8 +281,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 
   g4data->ppmedium=0.; //this is still empty
 
-  g4data->ptype=GetParticleCode(parent_name);
-
+  g4data->ptype=NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(parent_name));
+ 
   G4ThreeVector production_vertex=(NuParentTrack->GetPoint(0)->GetPosition()/m)*m; 
   g4data->ppvx=production_vertex[0]/cm;
   g4data->ppvy=production_vertex[1]/cm;
@@ -307,7 +313,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
  
   g4data->Nimpwt=info->GetNImpWt();  // Importance weight
-
+  g4data->tgen=info->GetTgen()-1;
 
   g4data->xpoint=0.;  // x, y, z of parent at user selected vol
   g4data->xpoint=0.;
@@ -321,14 +327,13 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	etc. until the cascade exiting the target core.
   */ 
   
-  G4int tgen=0;    
-  G4int tptype=0;
-  if(!NumiData->useFlukaInput&&!NumiData->useMarsInput)
+  if(!NumiData->useFlukaInput&&!NumiData->useMarsInput) //if not using external ntuple then need to find the particle that exited the target
     {
       G4bool findTarget=false;
       G4ThreeVector ParticleMomentum=G4ThreeVector(-999999,-999999,-999999);
       G4ThreeVector ParticlePosition=G4ThreeVector(-999999,-999999,-999999);
       NumiTrajectory* PParentTrack=GetParentTrajectory(track.GetParentID());
+      G4int tptype=NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
       particleID=PParentTrack->GetTrackID();
       
       while (!findTarget&&particleID!=1){
@@ -340,37 +345,34 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	    {
 	      ParticleMomentum=PParentTrack->GetMomentum(ii);              // tv_ and tp_ are equal to position and  
 	      ParticlePosition=PParentTrack->GetPoint(ii)->GetPosition();  // momentum of the particle exiting the target (actually shell around target)
-	      NumiTrackInformation* info=(NumiTrackInformation*)(track.GetUserInformation());
-	      tgen=info->Gettgen();
-	      tptype=GetParticleCode(PParentTrack->GetParticleName());
+	      tptype=NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
 	      findTarget=true;
 	    }
 	}
-      PParentTrack=GetParentTrajectory(PParentTrack->GetParentID());
-      particleID=PParentTrack->GetTrackID();
+	PParentTrack=GetParentTrajectory(PParentTrack->GetParentID());
+	particleID=PParentTrack->GetTrackID();
       }
-      
       g4data->tvx=ParticlePosition[0]/cm;
       g4data->tvy=ParticlePosition[1]/cm;
       g4data->tvz=ParticlePosition[2]/cm;
       g4data->tpx=ParticleMomentum[0]/GeV;
       g4data->tpy=ParticleMomentum[1]/GeV;
       g4data->tpz=ParticleMomentum[2]/GeV;
-      g4data->tgen=tgen;
       g4data->tptype=tptype;
     }
-  else
+  else          // using external ntuple, so set these to whatever comes from that ntuple
     {
-      g4data->tvx=NPGA->ParticlePosition[0]/cm;
-      g4data->tvy=NPGA->ParticlePosition[1]/cm;
-      g4data->tvz=NPGA->ParticlePosition[2]/cm;
-      g4data->tpx=NPGA->ParticleMomentum[0]/GeV;
-      g4data->tpy=NPGA->ParticleMomentum[1]/GeV;
-      g4data->tpz=NPGA->ParticleMomentum[2]/GeV;
-      g4data->tgen=NPGA->tgen;
-      g4data->tptype=NPGA->type;
+      G4ThreeVector ParticlePosition=NPGA->GetParticlePosition();
+      g4data->tvx=ParticlePosition[0]/cm;
+      g4data->tvy=ParticlePosition[1]/cm;
+      g4data->tvz=ParticlePosition[2]/cm;
+      G4ThreeVector ParticleMomentum=NPGA->GetParticleMomentum();
+      g4data->tpx=ParticleMomentum[0]/GeV;
+      g4data->tpy=ParticleMomentum[1]/GeV;
+      g4data->tpz=ParticleMomentum[2]/GeV;
+      g4data->tptype=NPGA->GetParticleType();
     }   
- 
+  
   //set all trk_ & trkp_ to -999999  
   for (G4int ii=0;ii<10;ii++){
 	g4data->trkx[ii]=-999999.;
@@ -564,7 +566,7 @@ G4double NumiAnalysis::GetWeight(const G4Track& nutrack,G4double enuzr,G4ThreeVe
     //boost parent of mu to mu production cm
     G4double mu_mass=NuParentTrack->GetMass();
     G4ThreeVector ParentMomentumInitial=NuParentTrack->GetMomentum(0);  
-    G4double gamma_mu_init=sqrt(ParentMomentumInitial*ParentMomentumInitial-mu_mass*mu_mass)/mu_mass;
+    G4double gamma_mu_init=sqrt(ParentMomentumInitial*ParentMomentumInitial+mu_mass*mu_mass)/mu_mass;
     G4double mu_init_energy=gamma_mu_init*mu_mass;
     G4ThreeVector beta_mu_init_vec=ParentMomentumInitial/mu_init_energy;
     
@@ -609,88 +611,4 @@ G4double NumiAnalysis::GetNuEnergy(G4double enuzr,G4double gamma, G4double beta,
   
   G4double emrat= 1/(gamma*(1-beta*cos(theta_pardet)));
   return enuzr*emrat;  
-}
-
-G4int NumiAnalysis::GetParticleCode(G4String particle_name)
-{
-  //returns particle code
-  G4int ptype=0;
-  if (particle_name=="nu_tau") ptype=0; 
-  if (particle_name=="anti_nu_tau") ptype=0;
-
-  if (particle_name=="eta_prime") ptype=0; //?
-
-  if (particle_name=="mu+") ptype=5;
-  if (particle_name=="mu-") ptype=6;
-  if (particle_name=="pi0") ptype=7;
-  if (particle_name=="pi+") ptype=8;
-  if (particle_name=="pi-") ptype=9;
-  if (particle_name=="kaon0L") ptype=10;
-  if (particle_name=="kaon+") ptype=11;
-  if (particle_name=="kaon-") ptype=12;
-  if (particle_name=="neutron") ptype=13;
-  if (particle_name=="proton") ptype=14;
-  if (particle_name=="anti_proton") ptype=15; 
-  if (particle_name=="kaon0S") ptype=16;
-  if (particle_name=="eta") ptype=17; 
-  if (particle_name=="lambda") ptype=18;
-  if (particle_name=="sigma+") ptype=19; 
-  if (particle_name=="sigma0") ptype=20;
-  if (particle_name=="sigma-") ptype=21;
-  if (particle_name=="xi0") ptype=22; 
-  if (particle_name=="xi-") ptype=23;
-  if (particle_name=="omega-") ptype=24; 
-  if (particle_name=="anti_neutron") ptype=25; 
-  if (particle_name=="anti_lambda") ptype=26;
-  if (particle_name=="anti_sigma-") ptype=27; 
-  if (particle_name=="anti_sigma0") ptype=28;
-  if (particle_name=="anti_sigma+") ptype=29;
-  if (particle_name=="anti_xi0") ptype=30; 
-  if (particle_name=="anti_xi-") ptype=31;//?
-  if (particle_name=="anti_nu_e") ptype=52;
-  if (particle_name=="nu_e") ptype=53;
-  if (particle_name=="anti_nu_mu") ptype=55;
-  if (particle_name=="nu_mu") ptype=56;
-
-  if (ptype==0) G4cout<<"NumiAnalysis: "<<particle_name<<" code not found"<<G4endl;
-
-  return ptype;
-}
-G4String NumiAnalysis::GetParticleName(G4int particleCode)
-{
-  G4String particleName="";
-  if (particleCode ==  5) particleName="mu+";
-  if (particleCode ==  6) particleName="mu-";
-  if (particleCode ==  7) particleName="pi0";
-  if (particleCode ==  8) particleName="pi+";
-  if (particleCode ==  9) particleName="pi-";
-  if (particleCode == 10) particleName="kaon0L";
-  if (particleCode == 11) particleName="kaon+";
-  if (particleCode == 12) particleName="kaon-";
-  if (particleCode == 13) particleName="neutron";
-  if (particleCode == 14) particleName="proton";
-  if (particleCode == 15) particleName="anti_proton";
-  if (particleCode == 16) particleName="kaon0S";
-  if (particleCode == 17) particleName="eta";
-  if (particleCode == 18) particleName="lambda";
-  if (particleCode == 19) particleName="sigma+";
-  if (particleCode == 20) particleName="sigma0";
-  if (particleCode == 21) particleName="sigma-";
-  if (particleCode == 22) particleName="x0";
-  if (particleCode == 23) particleName="xi-";
-  if (particleCode == 24) particleName="omega-";
-  if (particleCode == 25) particleName="anti_neutron";
-  if (particleCode == 26) particleName="anti_lambda";
-  if (particleCode == 27) particleName="anti_sigma-";
-  if (particleCode == 28) particleName="anti_sigma0";
-  if (particleCode == 29) particleName="anti_sigma+";
-  if (particleCode == 30) particleName="anti_x0";
-  if (particleCode == 31) particleName="anti_xi-";
-  if (particleCode == 52) particleName="anti_nu_e";
-  if (particleCode == 53) particleName="nu_e";
-  if (particleCode == 55) particleName="anti_nu_mu";
-  if (particleCode == 56) particleName="nu_mu";
-  
-  if (particleName=="") G4cout<<"NumiAnalysis: "<<particleCode<< " particle name not found "<<G4endl; 
-  return particleName;
 }

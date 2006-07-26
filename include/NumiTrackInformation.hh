@@ -28,9 +28,9 @@ class NumiTrackInformation : public G4VUserTrackInformation
     inline void SetDecayCode(G4int decaycode)
     {decay_code=decaycode;} 
   
-    inline G4int Gettgen() const 
+    inline G4int GetTgen() const 
     {return tgen;}
-    inline void Settgen(G4int tgeneration)
+    inline void SetTgen(G4int tgeneration)
     {tgen=tgeneration;}
 
     inline G4double GetNImpWt() const 

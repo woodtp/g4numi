@@ -31,11 +31,11 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     {   
       NumiTrackInformation* info=new NumiTrackInformation();
       if (ND->useFlukaInput||ND->useMarsInput){
-	info->Settgen(NPGA->tgen);
-	info->SetNImpWt(NPGA->weight);
+	info->SetTgen(NPGA->GetTgen());
+	info->SetNImpWt(NPGA->GetWeight());
       }
       else{
-	info->Settgen(1);
+	info->SetTgen(1);
 	info->SetNImpWt(1.);
       }
       G4Track* theTrack = (G4Track*)aTrack;
@@ -66,13 +66,13 @@ void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // set tgen(secondary)=tgen(parent)+1
   NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
     if (info!=0) {
-       G4int tgen=info->Gettgen();
+       G4int tgen=info->GetTgen();
        G4double nimpwt=info->GetNImpWt();
        G4TrackVector* SecVector=fpTrackingManager->GimmeSecondaries();
        for (size_t ii=0;ii<(*SecVector).size();ii++){
 	 NumiTrackInformation* newinfo=new NumiTrackInformation();
-	 newinfo->Settgen(tgen+1); // set generation of daughter particles
-	 newinfo->SetNImpWt(nimpwt); // set weight of the track to parent weight
+	 newinfo->SetTgen(tgen+1); // set generation of daughter particles
+	 newinfo->SetNImpWt(nimpwt); // set weight of the new track equal to parent weight
 	 (*SecVector)[ii]->SetUserInformation(newinfo);
        }
     }

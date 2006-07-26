@@ -28,7 +28,7 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 
        if(ND->useFlukaInput||ND->useMarsInput){
 	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
-  	 n_event=primaryGeneratorAction->noOfPrimaries;
+  	 n_event=primaryGeneratorAction->GetNoOfPrimaries();
        }
        else{
      	 primaryGeneratorAction->SetProtonBeam();

@@ -9,7 +9,7 @@
 #include "NumiDataInput.hh"
 #include "G4UImanager.hh"
 #include "NumiRunManager.hh"
-#include "NumiAnalysis.hh"
+#include "NumiParticleCode.hh"
 
 #include "TROOT.h"
 #include <TFile.h>
@@ -20,57 +20,55 @@
 
 NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
 {
-  ND=NumiDataInput::GetNumiDataInput();
-  
+  fND=NumiDataInput::GetNumiDataInput();
   G4int n_particle = 1;
-  isFirst=true;
-  particleGun = new G4ParticleGun(n_particle);
-  numiAnalysis=NumiAnalysis::getInstance();
-  pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
+  fIsFirst=true;
+  fParticleGun = new G4ParticleGun(n_particle);
+  fRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
 }
 
 NumiPrimaryGeneratorAction::~NumiPrimaryGeneratorAction()
 {
-  delete particleGun;
+  delete fParticleGun;
 }
 
 void NumiPrimaryGeneratorAction::SetProtonBeam()
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
  
-  particleGun->SetParticleDefinition(particleTable->FindParticle("proton"));
-  particleGun->SetParticleEnergy(ND->protonKineticEnergy);
-  particleGun->SetParticlePosition(ND->beamPosition);
-  particleGun->SetParticleMomentumDirection(ND->beamDirection);
+  fParticleGun->SetParticleDefinition(particleTable->FindParticle("proton"));
+  fParticleGun->SetParticleEnergy(fND->protonKineticEnergy);
+  fParticleGun->SetParticlePosition(fND->beamPosition);
+  fParticleGun->SetParticleMomentumDirection(fND->beamDirection);
 
-  currentPrimaryNo=0;
+  fCurrentPrimaryNo=0;
 }
 
 G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 {
-  G4bool isOpen=false;
-  rootFile=new TFile(ntupleName,"READ");
-  if (!rootFile->IsZombie())
+  G4bool fIsOpen=false;
+  fRootFile=new TFile(ntupleName,"READ");
+  if (!fRootFile->IsZombie())
     {
-      primaryNtuple=(TTree*)(rootFile->Get("h1"));
-      currentPrimaryNo=0;
-      noOfPrimaries=primaryNtuple->GetEntries();
-      isOpen=true;
+      fPrimaryNtuple=(TTree*)(fRootFile->Get("h3"));
+      fCurrentPrimaryNo=0;
+      fNoOfPrimaries=fPrimaryNtuple->GetEntries();
+      fIsOpen=true;
     }
   else
     {
       G4cout<<"NumiPrimaryGeneratorAction: Input (fluka/mars) root file doesn't exist"
 	    <<"   Aborting run"<<G4endl;
-      isOpen=false;
+      fIsOpen=false;
     }
-  currentPrimaryNo=0;
-  return isOpen;
+  fCurrentPrimaryNo=0;
+  return fIsOpen;
 }
 
 void NumiPrimaryGeneratorAction::CloseNtuple()
 {
-    rootFile->Close();
-    currentPrimaryNo=0;
+    fRootFile->Close();
+    fCurrentPrimaryNo=0;
 }
 
 void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
@@ -78,33 +76,35 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   //G4UImanager* UI=G4UImanager::GetUIpointer();
   
-    G4int totNoPrim=pRunManager->GetNumberOfEvents();
-    if (totNoPrim>20){
-      if (currentPrimaryNo%(totNoPrim/20)==0) 
-	G4cout<<"Processing particles #: "
-	      <<currentPrimaryNo<<" to "<< currentPrimaryNo+(totNoPrim/20)<<G4endl;
-    }
-
-    if (!ND->useFlukaInput&&!ND->useMarsInput){
+  G4int totNoPrim=fRunManager->GetNumberOfEvents();
+  if (totNoPrim>20){
+    if (fCurrentPrimaryNo%(totNoPrim/20)==0) 
+      G4cout<<"Processing particles #: "
+	    <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20)<<G4endl;
+  }
+  
+  if (!fND->useFlukaInput&&!fND->useMarsInput){
     G4double x0;
     G4double y0; 
     G4double z0;
-    G4double sigmax=ND->beamSigmaX;
-    G4double sigmay=ND->beamSigmaY;
-  
-    x0 = G4RandGauss::shoot(ND->beamPosition[0],sigmax);
-    y0 = G4RandGauss::shoot(ND->beamPosition[1],sigmay);
-    z0 = ND->beamPosition[2];
+    G4double sigmax=fND->beamSigmaX;
+    G4double sigmay=fND->beamSigmaY;
     
-    protonOrigin   = G4ThreeVector(x0, y0, z0);
-    protonMomentum = G4ThreeVector(0, 0, ND->protonMomentum);
-    protonIntVertex = G4ThreeVector(-9999.,-9999.,-9999.);
+    x0 = G4RandGauss::shoot(fND->beamPosition[0],sigmax);
+    y0 = G4RandGauss::shoot(fND->beamPosition[1],sigmay);
+    z0 = fND->beamPosition[2];
     
-    particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-    particleGun->GeneratePrimaryVertex(anEvent);
+    fProtonOrigin   = G4ThreeVector(x0, y0, z0);
+    fProtonMomentum = G4ThreeVector(0, 0, fND->protonMomentum);
+    fProtonIntVertex = G4ThreeVector(-9999.,-9999.,-9999.);
+    fWeight=1.; //for primary protons set weight and tgen
+    fTgen=0;
+    
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+    fParticleGun->GeneratePrimaryVertex(anEvent);
   }
-
-  if (ND->useFlukaInput||ND->useMarsInput) {
+  
+  if (fND->useFlukaInput||fND->useMarsInput) {
     /*
       Fluka and Mars input variables:
       FLUKA                           MARS                   
@@ -120,54 +120,54 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       MOMPX,MOMPY,MOMPZ               PPX, PPY, PPZ                             - ???
       MOMTYPE                         PTYPE                                     - ???
     */
-
+    
     G4double x0,y0,z0,px,py,pz;
     G4String particleName;
-    primaryNtuple->GetEntry(currentPrimaryNo);
-  
-    x0 = primaryNtuple->GetLeaf("x")->GetValue()*cm;
-    y0 = primaryNtuple->GetLeaf("y")->GetValue()*cm;
-    z0 = primaryNtuple->GetLeaf("z")->GetValue()*cm+ND->TargetZ0+35*cm;
-    px = primaryNtuple->GetLeaf("px")->GetValue()*GeV;
-    py = primaryNtuple->GetLeaf("py")->GetValue()*GeV;
-    pz = primaryNtuple->GetLeaf("pz")->GetValue()*GeV;
-
-    ParticlePosition=G4ThreeVector(x0,y0,z0);
-    ParticleMomentum=G4ThreeVector(px,py,pz);
-
-    weight = primaryNtuple->GetLeaf("weight")->GetValue();
-    type = G4int(primaryNtuple->GetLeaf("type")->GetValue());
-    tgen = G4int(primaryNtuple->GetLeaf("gener")->GetValue());
-    particleName=numiAnalysis->GetParticleName(type);
-    protonOrigin   = G4ThreeVector(primaryNtuple->GetLeaf("protx")->GetValue()*cm,
-				   primaryNtuple->GetLeaf("proty")->GetValue()*cm,
-				   primaryNtuple->GetLeaf("protz")->GetValue()*cm);
-    protonMomentum = G4ThreeVector(primaryNtuple->GetLeaf("protpx")->GetValue()*cm,
-				   primaryNtuple->GetLeaf("protpy")->GetValue()*cm,
-				   primaryNtuple->GetLeaf("protpz")->GetValue()*cm);
-
-    if (ND->useMarsInput){
-      protonIntVertex = G4ThreeVector(primaryNtuple->GetLeaf("pvtxx")->GetValue()*cm,
-				      primaryNtuple->GetLeaf("pvtxy")->GetValue()*cm,
-				      primaryNtuple->GetLeaf("pvtxz")->GetValue()*cm);
+    fPrimaryNtuple->GetEntry(fCurrentPrimaryNo);
+    
+    x0 = fPrimaryNtuple->GetLeaf("x")->GetValue()*cm;
+    y0 = fPrimaryNtuple->GetLeaf("y")->GetValue()*cm;
+    z0 = fPrimaryNtuple->GetLeaf("z")->GetValue()*cm+fND->TargetZ0+35*cm;
+    px = fPrimaryNtuple->GetLeaf("px")->GetValue()*GeV;
+    py = fPrimaryNtuple->GetLeaf("py")->GetValue()*GeV;
+    pz = fPrimaryNtuple->GetLeaf("pz")->GetValue()*GeV;
+    
+    fParticlePosition=G4ThreeVector(x0,y0,z0);
+    fParticleMomentum=G4ThreeVector(px,py,pz);
+    
+    fWeight = fPrimaryNtuple->GetLeaf("weight")->GetValue();
+    fType = G4int(fPrimaryNtuple->GetLeaf("type")->GetValue());
+    fTgen = G4int(fPrimaryNtuple->GetLeaf("gener")->GetValue());
+    particleName=NumiParticleCode::AsString(NumiParticleCode::IntToEnum(fType));
+    fProtonOrigin   = G4ThreeVector(fPrimaryNtuple->GetLeaf("protx")->GetValue()*cm,
+				    fPrimaryNtuple->GetLeaf("proty")->GetValue()*cm,
+				    fPrimaryNtuple->GetLeaf("protz")->GetValue()*cm);
+    fProtonMomentum = G4ThreeVector(fPrimaryNtuple->GetLeaf("protpx")->GetValue()*cm,
+				    fPrimaryNtuple->GetLeaf("protpy")->GetValue()*cm,
+				    fPrimaryNtuple->GetLeaf("protpz")->GetValue()*cm);
+    
+    if (fND->useMarsInput){
+      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("pvtxx")->GetValue()*cm,
+				       fPrimaryNtuple->GetLeaf("pvtxy")->GetValue()*cm,
+				       fPrimaryNtuple->GetLeaf("pvtxz")->GetValue()*cm);
     }
-    else if (ND->useFlukaInput){
-      protonIntVertex = G4ThreeVector(primaryNtuple->GetLeaf("protvx")->GetValue()*cm,
-				      primaryNtuple->GetLeaf("protvy")->GetValue()*cm,
-				      primaryNtuple->GetLeaf("protvz")->GetValue()*cm);
+    else if (fND->useFlukaInput){
+      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("protvx")->GetValue()*cm,
+				       fPrimaryNtuple->GetLeaf("protvy")->GetValue()*cm,
+				       fPrimaryNtuple->GetLeaf("protvz")->GetValue()*cm);
     }
- 
+    
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    particleGun->SetParticleDefinition(particleTable->FindParticle(particleName));
+    fParticleGun->SetParticleDefinition(particleTable->FindParticle(particleName));
     G4double mass=particleTable->FindParticle(particleName)->GetPDGMass();
     
-    particleGun->SetParticleEnergy(sqrt(mass*mass+px*px+py*py+pz*pz)-mass);
-    particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-    particleGun->SetParticleMomentum(G4ThreeVector(px,py,pz));
-    particleGun->GeneratePrimaryVertex(anEvent);
+    fParticleGun->SetParticleEnergy(sqrt(mass*mass+px*px+py*py+pz*pz)-mass);
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+    fParticleGun->SetParticleMomentum(G4ThreeVector(px,py,pz));
+    fParticleGun->GeneratePrimaryVertex(anEvent);
     
   }
-  currentPrimaryNo++;
+  fCurrentPrimaryNo++;
 }
 
 

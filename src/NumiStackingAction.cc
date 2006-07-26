@@ -57,21 +57,7 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
       if (energy < 1.*GeV&&(classification != fKill)) 
 	{classification = fKill;} 
     }
-  /*
-  else {
-    NumiAnalysis *NA=NumiAnalysis::getInstance();
-    NumiTrajectory* NuParentTrack=NA->GetParentTrajectory(aTrack->GetParentID());
-    G4int noPoints=NuParentTrack->GetPointEntries();
-    G4ThreeVector ParentMomentumFinal=NuParentTrack->GetMomentum(noPoints-1);
-    if (ParentMomentumFinal*ParentMomentumFinal<1.*GeV){
-      classification = fKill;
-      // this kills all of the neutrinos that come from parents that are stopped
-      // probably it would be better to kill all particles below some energy during tracking
-      // that would speed up things 
-    }
-   // 09/29/05 added killing of particles below some cut in NumiSteppingAction 
-  */
-
+  
   //check if track is inside world (some neutral particles make huge jumps from horns (field part) and
   // end up decaying in ~infinity which occasionaly causes g4numi to crash
   G4ThreeVector position=aTrack->GetPosition();
@@ -90,25 +76,21 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
   //If importance weighting is on:
   if (NumiData->NImpWeightOn&&(classification != fKill)){
-    NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
-    if (oldinfo!=0) {
-      if (oldinfo->GetNImpWt()==1.){                                     //Check if it already has weight (because one of the parents was weighted)
+    NumiTrackInformation* trackInfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
+    if (trackInfo!=0) 
+      {
 	G4double Nimpweight=NumiImpWeight::CalculateImpWeight(aTrack);
-	if(Nimpweight==0)
-	  {classification = fKill;} 
-	else {	  
-	  oldinfo->SetNImpWt(Nimpweight);
-	  //?? NumiTrackInformation* oldinfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
-	  //?? if (oldinfo!=0) oldinfo->SetNImpWt(Nimpweight);
-	  // only primary protons don't have TrackInformation already     
-	  // all others have some info set by NumiTrackingAction
-	}
+	if(Nimpweight==0.)
+	  {
+	    classification = fKill;
+	  } 
+	
+	else 
+	  trackInfo->SetNImpWt(Nimpweight);
       }
-    }
   }
-
   return classification;
-} 
+}
 
 void NumiStackingAction::NewStage() 
 {
