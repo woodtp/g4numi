@@ -13,32 +13,38 @@
 
 class  hadmmtuple_t 
 {
-
-   public:
-   // a constructor and a destructor
-    hadmmtuple_t();
-    virtual ~hadmmtuple_t();
-
-
+  
+ public:
+  // a constructor and a destructor
+  hadmmtuple_t();
+  virtual ~hadmmtuple_t();
+  
+  
   // the following variables are placed in the root tree
-    Int_t run;       
-    Int_t evtno; 
-    Double_t mtgthpos;
-    Double_t mtgtvpos;
-    Double_t mtgthsig;
-    Double_t mtgtvsig;
-    Int_t ptype;
-    Double_t hmmenergy;
-    Double_t hmmxpos;
-    Double_t hmmypos;
-    Double_t hmmzpos;
-    Double_t hmmpx;
-    Double_t hmmpy;
-    Double_t hmmpz;
-
-      private:
+  Int_t run;       
+  Int_t evtno; 
+  Double_t mtgthpos;
+  Double_t mtgtvpos;
+  Double_t mtgthsig;
+  Double_t mtgtvsig;
+  Int_t ptype;
+  Double_t hmmenergy;
+  Double_t hmmxpos;
+  Double_t hmmypos;
+  Double_t hmmzpos;
+  Double_t hmmpx;
+  Double_t hmmpy;
+  Double_t hmmpz;
+  Double_t mmxpos[4];
+  Double_t mmypos[4];
+  Double_t mmzpos[4];
+  Double_t mmpx[4];
+  Double_t mmpy[4];
+  Double_t mmpz[4];
+  
+ private:
   ClassDef(hadmmtuple_t , 1)
-
-  };
+    
+    };
 #endif // admmtuple_t_h
 

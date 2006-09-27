@@ -44,7 +44,7 @@ public:
   void book();
   void finish();
   void FillNeutrinoNtuple(const G4Track& track);
-  void FillHadmmNtuple(const G4Track& track);
+  void FillHadmmNtuple(const G4Track& track,Int_t mm_num);
   G4double GetWeight(const G4Track& nutrack, 
 		     G4double enuzr, 
 		     G4ThreeVector vertex_r,

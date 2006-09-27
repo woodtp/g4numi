@@ -15,15 +15,16 @@ class NumiRunManager;
 
 class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  public:
-    NumiPrimaryGeneratorAction();
-    ~NumiPrimaryGeneratorAction();
+ public:
+  NumiPrimaryGeneratorAction();
+  ~NumiPrimaryGeneratorAction();
 
-  public:
-    void GeneratePrimaries(G4Event* anEvent);
-    void SetProtonBeam();
-    G4bool OpenNtuple(G4String ntupleName);
-    void CloseNtuple();
+ public:
+  void GeneratePrimaries(G4Event* anEvent);
+  void SetProtonBeam();
+  void SetMuonBeam();
+  G4bool OpenNtuple(G4String ntupleName);
+  void CloseNtuple();
   
   // Primary proton information
   G4ThreeVector GetProtonOrigin(){
@@ -54,27 +55,26 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   // *********************************************************************
   G4int GetNoOfPrimaries(){
     return fNoOfPrimaries;
-  }
-   
-    
+  }    
  
 
-  private:
-    G4ThreeVector fParticleMomentum,fParticlePosition;    
-    G4int fNoOfPrimaries,fTgen,fType; 
-    G4double fWeight;
-    G4bool fIsFirst;
+ private:
+  G4ThreeVector fParticleMomentum,fParticlePosition;    
+  G4int fNoOfPrimaries,fTgen,fType; 
+  G4double fWeight;
+  G4bool fIsFirst;
+  G4ThreeVector tunnelPos;
     
-    G4ThreeVector fProtonOrigin;
-    G4ThreeVector fProtonMomentum;
-    G4ThreeVector fProtonIntVertex;
+  G4ThreeVector fProtonOrigin;
+  G4ThreeVector fProtonMomentum;
+  G4ThreeVector fProtonIntVertex;
 
-    TFile *fRootFile;
-    TTree *fPrimaryNtuple;
-    G4int fCurrentPrimaryNo;
-    NumiDataInput* fND;
-    NumiRunManager* fRunManager;
-    G4ParticleGun* fParticleGun;
+  TFile *fRootFile;
+  TTree *fPrimaryNtuple;
+  G4int fCurrentPrimaryNo;
+  NumiDataInput* fND;
+  NumiRunManager* fRunManager;
+  G4ParticleGun* fParticleGun;
 
 };
 

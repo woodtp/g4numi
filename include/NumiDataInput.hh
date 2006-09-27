@@ -45,6 +45,12 @@ public:
   void SetMarsInput(G4bool val) {
     useMarsInput = val;
   }
+  void SetRunNumber(G4String runNum){
+    RunNumber=runNum;
+  }
+  G4String GetRunNumber(){
+    return RunNumber;
+  }
   void SetExtNtupleFileName(G4String fileName){
     extNtupleFileName=fileName;
   }
@@ -75,8 +81,8 @@ public:
 
  public:
   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
-  G4bool useFlukaInput, useMarsInput;
-  G4String nuNtupleName, hadmmNtupleName, asciiName;
+  G4bool useFlukaInput, useMarsInput, useMuonBeam;
+  G4String nuNtupleName, hadmmNtupleName, asciiName, RunNumber;
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
   G4ThreeVector beamPosition, beamDirection;
