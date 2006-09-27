@@ -66,7 +66,7 @@ data_t::data_t():
 {
   
   // data_t record constructor
-  for ( Int_t index=0; index<9; ++index){
+  for ( Int_t index=0; index<11; ++index){
     NdxdzNear[index]= -1.e4;
     NdydzNear[index]= -1.e4;
     NenergyN[index]= -1.e4;

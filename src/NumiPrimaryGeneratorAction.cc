@@ -4,6 +4,7 @@
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
+#include "G4ThreeVector.hh"
 #include "globals.hh"
 #include "Randomize.hh"
 #include "NumiDataInput.hh"
@@ -25,6 +26,8 @@ NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
   fIsFirst=true;
   fParticleGun = new G4ParticleGun(n_particle);
   fRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
+  tunnelPos = G4ThreeVector(0,0,fND->TunnelLength/2.+fND->TunnelZ0);
+
 }
 
 NumiPrimaryGeneratorAction::~NumiPrimaryGeneratorAction()
@@ -40,6 +43,31 @@ void NumiPrimaryGeneratorAction::SetProtonBeam()
   fParticleGun->SetParticleEnergy(fND->protonKineticEnergy);
   fParticleGun->SetParticlePosition(fND->beamPosition);
   fParticleGun->SetParticleMomentumDirection(fND->beamDirection);
+
+  fCurrentPrimaryNo=0;
+}
+
+// Used as a quicker check of muon response
+// past the end of the decay pipe. The values are hard-coded
+// for the muon 'beam' as to make it easier to change.
+
+void NumiPrimaryGeneratorAction::SetMuonBeam()
+{
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+
+  G4float xpos, ypos, zpos;
+
+  xpos = 0;
+  ypos = 0;
+  zpos = 700*m;
+ 
+  G4ThreeVector muonBeamPos = G4ThreeVector(xpos, ypos, zpos) - tunnelPos;
+  G4ThreeVector muonBeamDirection = G4ThreeVector(0, 0, 1); // straight down the pipe
+
+  fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
+  fParticleGun->SetParticleEnergy(80*GeV);// just a guess right now
+  fParticleGun->SetParticlePosition(muonBeamPos);
+  fParticleGun->SetParticleMomentumDirection(muonBeamDirection);
 
   fCurrentPrimaryNo=0;
 }
@@ -73,9 +101,9 @@ void NumiPrimaryGeneratorAction::CloseNtuple()
 
 void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  
+  //  std::cout<<"*************** anEvent: "<<anEvent->get_eventID()<<" *******************"<<std::endl;
   //G4UImanager* UI=G4UImanager::GetUIpointer();
-  
+
   G4int totNoPrim=fRunManager->GetNumberOfEvents();
   if (totNoPrim>20){
     if (fCurrentPrimaryNo%(totNoPrim/20)==0) 
@@ -83,7 +111,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	    <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20)<<G4endl;
   }
   
-  if (!fND->useFlukaInput&&!fND->useMarsInput){
+  if (!fND->useFlukaInput && !fND->useMarsInput && !fND->useMuonBeam){
     G4double x0;
     G4double y0; 
     G4double z0;
@@ -103,8 +131,24 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
+  else if(fND->useMuonBeam){
   
-  if (fND->useFlukaInput||fND->useMarsInput) {
+    G4double x0 = fND->DecayPipeRadius*2.0;
+    G4double y0 = fND->DecayPipeRadius*2.0; 
+    G4double z0;
+
+    while(sqrt(pow(x0,2)+pow(y0,2)) > fND->DecayPipeRadius){
+      x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
+      y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
+    }
+      z0 = 722*m;// just before the endcap
+
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+  }
+
+
+  if (fND->useFlukaInput || fND->useMarsInput) {
     /*
       Fluka and Mars input variables:
       FLUKA                           MARS                   

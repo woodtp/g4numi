@@ -1,5 +1,5 @@
 // The new and improved Hadron Absorber my D. Jason Koskinen
-// Oct. 10, 2005
+// Last Update: March 5, 2006
 #include "NumiDetectorConstruction.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
@@ -23,7 +23,7 @@
 
 void NumiDetectorConstruction::ConstructHadronAbsorber()
 {
-  G4ThreeVector tunnelPos=G4ThreeVector(0,0,NumiData->TunnelLength/2.+NumiData->TunnelZ0);
+  G4ThreeVector tunnelPos = G4ThreeVector(0,0,NumiData->TunnelLength/2.+NumiData->TunnelZ0);
   G4double in = .0254;
   G4float CShld_length = 72*in*m;
   
@@ -84,6 +84,8 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   G4String volName;
 
   // This constructs a Hadron Absorber volume to put everything in. 
+  //------------------------------------------------------------------------
+
   G4Box*  expHadrBox = new G4Box("expHadrBox",NumiData->HadrBox_width/2.,NumiData->HadrBox_height/2.0,NumiData->HadrBox_length/2.0);
   HadrBox_log = new G4LogicalVolume(expHadrBox,Air,"LVHadrBox",0,0,0);
   G4RotationMatrix *zrot=new G4RotationMatrix();
@@ -93,14 +95,17 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   //(rotation,G4ThreeVector,name,logical volume,mother,boolean operators,copy number)
   HadrBox=new G4PVPlacement(zrot,pos,nam,HadrBox_log,pvTUNE,false,0);
 
-  // The following code was introduced with the idea to include some variable density bits of the 
-  // stl and al core in order to simulate the cooling pipes. 
+  // The following code was introduced with the idea to include 
+  // some variable density bits of the stl and al core in order
+  // to simulate the cooling pipes. 
+  //------------------------------------------------------------------------
+
   G4Box* hole1_solid = new G4Box("hole1",4.5*in*m/2.0,42.75*in*m/2.0,12*in*m/2.0);
   G4Box* hole2_solid = new G4Box("hole2",4.5*in*m/2.0,42.75*in*m/2.0,9.1*in*m/2.0);
   G4LogicalVolume* hole1_log = new G4LogicalVolume(hole1_solid,var_Al,"hole1",0,0,0);
   G4LogicalVolume* hole2_log = new G4LogicalVolume(hole2_solid,var_Stl,"hole2",0,0,0);
-  G4ThreeVector holePosL = G4ThreeVector(-22*in*m/2.0,0,0);
-  G4ThreeVector holePosR = G4ThreeVector(22*in*m/2.0,0,0);
+  G4ThreeVector holePosL = G4ThreeVector(-22*in*m,-1.875*in*m,0);
+  G4ThreeVector holePosR = G4ThreeVector(22*in*m,-1.875*in*m,0);
   G4ThreeVector blockPos;
 
   G4float Alx_pos = 0;
@@ -108,7 +113,9 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   G4float Alz_pos = 0;
   G4float core_offset = 12.75*in*m; // This is the offset between the beginning edge of the blublocks and the the front edge of the core.
 
-  //Al core block positioning
+  // The Absorber core positioning and placement
+  //-----------------------------------------------------------------------
+
   for(G4int ii=0;ii<8;ii++){
     Alz_pos=ii*Al_length+Al_length/2.0-NumiData->HadrBox_length/2.0+core_offset; 
     sprintf(no,"%d",ii+1);
@@ -147,9 +154,13 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
     new G4PVPlacement(0,blockPos,volName,BLK_log[ii],HadrBox,false,0);
   }	
 
+  // Base, side and top levels surrounding the Absorber Core
+  //-------------------------------------------------------------------
+
   G4float bbx_pos = 0;
   G4float bby_pos = 0;
   G4float bbz_pos = 0;
+
   // Blu block positioning
   // Bottom two layers
   for (G4int ii=0;ii<24;ii++){
@@ -225,6 +236,31 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
       new G4PVPlacement(0,slabpos4,volName,stl_slab4_lv,HadrBox,false,0);
     }
   }
+
+  // Creates the steel slabs wedged between the core
+  // and the surrounding blu blocks to reduce the gap size.
+  // Dixon estimates that the steel slabs are ~1 the length
+  // of the blu blocks.
+  volName="stl_slabL_s";
+  volName.append(no);
+  G4Box *stl_slabL_s = new G4Box(volName,1/2.0*in/2.0*m,Al_width/2.0,1*bb_length/2.0);
+  volName="stl_slabL_lv";
+  volName.append(no);
+  G4LogicalVolume *stl_slabL_lv = new G4LogicalVolume(stl_slabL_s,blu_material,volName,0,0,0);
+  volName="stl_slabL";
+  G4ThreeVector slabpos5 = G4ThreeVector(-Al_width/2-1/2.0*in/2.0*m, 0, -NumiData->HadrBox_length/2.0+core_offset+8*Al_length+10*Stl_length-1*bb_length/2.0);
+  new G4PVPlacement(0,slabpos5,volName,stl_slabL_lv,HadrBox,false,0);
+
+  volName="stl_slabR_s";
+  volName.append(no);
+  G4Box *stl_slabR_s = new G4Box(volName,1/2.0*in/2.0*m,Al_width/2.0,1*bb_length/2.0);
+  volName="stl_slabR_lv";
+  volName.append(no);
+  G4LogicalVolume *stl_slabR_lv = new G4LogicalVolume(stl_slabR_s,blu_material,volName,0,0,0);
+  volName="stl_slabR";
+  G4ThreeVector slabpos6 = G4ThreeVector(Al_width/2+1/2.0*in/2.0*m, 0, -NumiData->HadrBox_length/2.0+core_offset+8*Al_length+10*Stl_length-1*bb_length/2.0);
+  new G4PVPlacement(0,slabpos6,volName,stl_slabR_lv,HadrBox,false,0);
+
   //Layer left(beam-view) and under of the core, and above the steel slab
   for (G4int ii=0;ii<8;ii++){
     bbx_pos=-bb_width;
@@ -242,6 +278,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
      blockPos=G4ThreeVector(bbx_pos,bby_pos,bbz_pos);
     new G4PVPlacement(0,blockPos,volName,BLK_log[ii],HadrBox,false,0);
   }
+
   for (G4int ii=0;ii<8;ii++){
     bbx_pos=bb_width;
     bby_pos=ii/4*bb_height-Al_height/2.0-bb_height*1.5;
@@ -258,6 +295,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
      blockPos=G4ThreeVector(bbx_pos,bby_pos,bbz_pos);
     new G4PVPlacement(0,blockPos,volName,BLK_log[ii],HadrBox,false,0);
   }
+
   // Blocks to the right of the core (Beam-view looking downstream)
   for (G4int ii=0;ii<8;ii++){
     bbx_pos=bb_width/2.0+bb_height/2.0+(ii%2)*bb_height;
@@ -275,6 +313,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
      blockPos=G4ThreeVector(bbx_pos,bby_pos,bbz_pos);
     new G4PVPlacement(0,blockPos,volName,BLK_log[ii],HadrBox,false,0);
   }
+
   // Blocks to the left of the core
   for (G4int ii=0;ii<8;ii++){
     bbx_pos=-bb_width/2.0-bb_height/2.0-(ii%2)*bb_height;
@@ -292,6 +331,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
      blockPos=G4ThreeVector(bbx_pos,bby_pos,bbz_pos);
     new G4PVPlacement(0,blockPos,volName,BLK_log[ii],HadrBox,false,0);
   }
+
   // Blocks above the Core
   for (G4int ii=0;ii<24;ii++){
     bbx_pos=ii%3*(-bb_width)+bb_width;
@@ -311,6 +351,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   }
 
   // Concrete blocks surrounding core
+  //------------------------------------------------------------------------
 
   G4float conc_width=.9144*m;
   G4float conc_length=7*.9144*m;
@@ -348,6 +389,8 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   G4cout << "Hadron Absorber Constructed" << G4endl;
 
   // Constructs a volume in which to put the pre-absorber concrete shielding.
+  //-------------------------------------------------------------------------
+
   G4Box*  expShldBox = new G4Box("expShldBox",NumiData->HadrBox_width/2.,NumiData->HadrBox_height/2.0,CShld_length/2.0);
   ShldBox_log =new G4LogicalVolume(expShldBox,Air,"LVShldBox",0,0,0);
   G4ThreeVector shldpos=G4ThreeVector(0,y_shld,z_shld)-tunnelPos;
@@ -424,6 +467,6 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   blockPos = G4ThreeVector((A_width+B_width)/2.0-1.5*12*in*m/2.0,A_height/2.0-1.5*12*in*m/2.0,-2*A_length/2.0+1.5*12*in*m/2.0);
   new G4PVPlacement(0,blockPos,CShld_log[15],"air_BLK15",CShld_log[2],false,0);
 
-  G4cout << "Target Shielding Constructed" << G4endl;
+  G4cout << "Decay Pipe end cap Shielding Constructed" << G4endl;
 
 }

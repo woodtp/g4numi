@@ -42,25 +42,46 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
   
   if ((theTrack->GetKineticEnergy()<1.*GeV )&&
-      (particleDefinition!=G4NeutrinoE::NeutrinoEDefinition())&&
-      (particleDefinition!=G4NeutrinoMu::NeutrinoMuDefinition()) &&
-      (particleDefinition!=G4NeutrinoTau::NeutrinoTauDefinition()) &&
-      (particleDefinition!=G4AntiNeutrinoE::AntiNeutrinoEDefinition()) &&
-      (particleDefinition!=G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) &&
-      (particleDefinition!=G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
+      (particleDefinition != G4NeutrinoE::NeutrinoEDefinition())&&
+      (particleDefinition != G4NeutrinoMu::NeutrinoMuDefinition()) &&
+      (particleDefinition != G4NeutrinoTau::NeutrinoTauDefinition()) &&
+      (particleDefinition != G4AntiNeutrinoE::AntiNeutrinoEDefinition()) &&
+      (particleDefinition != G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) &&
+      (particleDefinition != G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
       theTrack->SetTrackStatus(fStopAndKill);
     }
 
+  // Checks to see whether the particle has entered the Hadron
+  // or muon monitors, and if so calls the NumiAnalysis class
+  // to record the particle properties through the monitors.-DJK
+
   if (theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
-    //check if the particle is at hadmon or mumon
-    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVHadMon")||
-	(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="PVMuMonA1")){
-      NumiAnalysis* analysis=NumiAnalysis::getInstance();
-      analysis->FillHadmmNtuple(*theTrack);
+
+    //G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+
+    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
+	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield")){
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillHadmmNtuple(*theTrack,4);
+    }
+    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
+	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_0")){
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillHadmmNtuple(*theTrack,0);
+    }
+    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuMon_1"
+	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_1")){
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillHadmmNtuple(*theTrack,1);
+    }
+    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuMon_2"
+	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_2")){
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillHadmmNtuple(*theTrack,2);
     }
   }
-  
+
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
     G4int decay_code=0;
     if (theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){

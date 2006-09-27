@@ -1,12 +1,12 @@
 #include "NumiDataInput.hh"
 #include "G4ThreeVector.hh"
 #include "NumiHornSpiderSupport.hh"
+#include <math.h>
 
 NumiDataInput* NumiDataInput::fNumiDataInput = 0;
 
 NumiDataInput* NumiDataInput::GetNumiDataInput()
 {return fNumiDataInput;}
-
 NumiDataInput::NumiDataInput()
 {
   if (fNumiDataInput)
@@ -14,8 +14,8 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
   debugOn = false;
-  NImpWeightOn = true; createNuNtuple=true;createHadmmNtuple=false;createASCII=false;
-  useFlukaInput = false; useMarsInput=false;
+  NImpWeightOn = true; createNuNtuple=true; createHadmmNtuple=true;createASCII=false;
+  useFlukaInput = false; useMarsInput=false; useMuonBeam = true;
 
   extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
 
@@ -23,12 +23,24 @@ NumiDataInput::NumiDataInput()
   nuNtupleName="nuNtuple"; 
   hadmmNtupleName="hadmmNtuple";
   asciiName="asciiOut";
+  RunNumber="0000";
+
+  G4float beam_x_dir=0;
+  G4float beam_y_dir=0;
+  G4float beam_z_dir=1;//cos(.01*pi/180);
+  //actual dm is 5/13e-4 radians 
+  G4float beam_x_pos=0;
+  G4float beam_y_pos=0;
+  G4float beam_z_pos=-4.0*m;
+  // the reason for the beam_z_pos change was to move the beam to start
+  // immediately before the target so that the beam spot interaction point
+  // would remain constant, but the angle would change.
 
   protonMomentum = 120.*GeV;  
-  beamSigmaY = 1.25*mm;
-  beamSigmaX = 1.1*mm;
-  beamDirection = G4ThreeVector(0.,0.,1.);
-  beamPosition = G4ThreeVector(0.,0.,-4.*m);
+  beamSigmaY = 0;//1.25*mm;
+  beamSigmaX = 0;//1.1*mm;
+  beamDirection = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
+  beamPosition = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
 
   protonKineticEnergy = sqrt(pow((.938*GeV),2)+pow(protonMomentum,2))-0.938*GeV;
 
@@ -413,7 +425,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   // Hadron Box Dimensions
   HadrBox_width = 324*.0254*m;
   HadrBox_height = 6.6294*m;
-  HadrBox_length = 9*m;
+  HadrBox_length = 1524*cm;
   
   HornCurrent=182100.*ampere; 
   static const G4double in=2.54*cm;
@@ -527,12 +539,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //---------------------------------------------------------
   
   //Near & Far Detector location
-  nNear=9;
+  nNear=11;//was 9 without the different energy for the ND positions.
   nFar=2;
-  G4double xdetNear[]    = {0     , 0.     , 7.     , 11.    , 14.    , 14.    , 14.   , 0.  , 25.84     };
-  G4double ydetNear[]    = {0     , -3.    , -5.    , -5.    , -6.    , -3.    , 0.    , 71. , 78.42     };
-  G4double zdetNear[]    = {1040  , 1010.  , 975.   , 958.   , 940.   , 840.   , 740.  , 940., 745.25    };
-  G4String detNameNear[] = {"Near","Nova1a","Nova1b","Nova1c","Nova2a","Nova2b","Nova3","MSB","MiniBooNE"};
+  G4double xdetNear[]    = {0     , 0.     , 7.     , 11.    , 14.    , 14.    , 14.   , 0.  , 25.84  , 4.8/2.       , -4.8/2.       };
+  G4double ydetNear[]    = {0     , -3.    , -5.    , -5.    , -6.    , -3.    , 0.    , 71. , 78.42  , 3.8/2.       , -3.8/2.       };
+  G4double zdetNear[]    = {1040  , 1010.  , 975.   , 958.   , 940.   , 840.   , 740.  , 940., 745.25 , 1040+16.6/2. , 1040-16.6/2.  };
+  G4String detNameNear[] = {"Near","Nova1a","Nova1b","Nova1c","Nova2a","Nova2b","Nova3","MSB","MiniBooNE","Near +x +y +z","Near -x -y -z"};
   G4double xdetFar[]     = {0     , 28.81258   };
   G4double ydetFar[]     = {0     , 81.39258   };
   G4double zdetFar[]     = {735000, 811400     };

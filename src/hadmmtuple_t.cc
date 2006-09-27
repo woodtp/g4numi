@@ -26,10 +26,16 @@ hadmmtuple_t::hadmmtuple_t():
   hmmpy(-1.e4),
   hmmpz(-1.e4)
 {
-  //hadmmtuple_t constructor
+  for(Int_t index=0;index<3;index++){
+    mmxpos[index]=-1.e4;
+    mmypos[index]=-1.e4;
+    mmzpos[index]=-1.e4;
+    mmpx[index]=-1.e4;
+    mmpy[index]=-1.e4;
+    mmpz[index]=-1.e4;
+  }
 }
-
-//-----------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------
 hadmmtuple_t::~hadmmtuple_t()
 {
   // hadmmtuple_t destructor

@@ -131,8 +131,16 @@ void NumiDetectorConstruction::DefineMaterials()
   Pb = new G4Material("Lead", Z= 82., A= 207.19*g/mole, density= 11.35*g/cm3);
   Fe = new G4Material("Iron", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3);
   Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
-  var_Al = new G4Material("VariableDensityAluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3*.9);
-  var_Stl = new G4Material("VariableDensitySteel", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3*.9);
+  var_Al = new G4Material("VariableDensityAluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3*.895);
+  var_Stl = new G4Material("VariableDensitySteel", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3*.67);
+
+  // The variable density bits result from the water cooling pipes through
+  // the core. ~1/3 of the steel 'holes' has water travelling through it.
+  // So, the change in density is 
+  // DensitySteel*(2/3+1/3*(DensityWater/DensitySteel)) = DensitySteel*.67
+  // The aluminum blocks have ~1/6 water through the 'holes'. There is a 
+  // nuclear Z difference between water and stell that is being ignored 
+  // in these approximations. -DJK
   
   density = 2.03*g/cm3;
   G4double fractionmass;

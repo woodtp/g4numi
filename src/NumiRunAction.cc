@@ -46,6 +46,9 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
   else if (ND->useMarsInput){
     G4cout<<"Using Mars input ntuple "<<ND->GetExtNtupleFileName()<<G4endl;
   }
+  else if(ND->useMuonBeam){
+    G4cout<<" *** Using Muon beam:"<<G4endl;
+  }
   else{
     G4cout<<"Proton beam:"<<G4endl;
       G4cout << " Momentum: "<<ND->protonMomentum/GeV << "GeV" <<G4endl;
