@@ -75,6 +75,12 @@ public:
   void OutputASCII(G4bool output){
     createASCII=output;
   }
+  G4bool GetKillTracking(){
+    return KillTracking;
+  }
+  G4double GetKillTrackingThreshold(){
+    return KillTrackingThreshold;
+  }
  private:
   G4bool debugOn;
   G4String extNtupleFileName;
@@ -82,9 +88,11 @@ public:
  public:
   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
   G4bool useFlukaInput, useMarsInput, useMuonBeam;
-  G4String nuNtupleName, hadmmNtupleName, asciiName, RunNumber;
+  G4bool KillTracking;
+  G4String nuNtupleName, hadmmNtupleName, asciiName, RunNumber, geometry;
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
+  G4double KillTrackingThreshold;
   G4ThreeVector beamPosition, beamDirection;
 
   // World Volume
@@ -144,6 +152,7 @@ public:
   // Tunnel
   G4double TunnelZ0, TunnelRadius, TunnelLength, TunnelA, TunnelZ;
   G4int TunnelGEANTmat;
+  G4double BeamAngle;//nominally .058 radians
 
   // Decay Pipe
   G4double DecayPipeZ0,DecayPipeRadius,DecayPipeLength,DecayPipeFWinThick,DecayPipeEWinThick,DecayPipeWallThick;

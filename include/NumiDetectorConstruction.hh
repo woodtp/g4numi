@@ -95,11 +95,23 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4Material* Fe;
   G4Material* CT852;
   G4Material* Concrete;
+  G4Material* Shotcrete;
+  G4Material* Rebar_Concrete;
   G4Material* Target;
   G4Material* DolomiteRock;
+  G4Material* DoloStone;
+  G4Material* MaqShale;
+  G4Material* Chert;
+  G4Material* Pyrite;
+  G4Material* MaqSiltstone;
   G4Material* var_Al;
   G4Material* var_Stl;
-  G4Material* Slab_Iron;
+  G4Material* Slab_Stl;
+  G4Material* Blu_Stl;
+  G4Material* n1018_Stl;
+  G4Material* A500_Stl;
+  G4Material* M1018_Stl;
+
 
 
   // Logical volumes
@@ -108,7 +120,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4LogicalVolume* TRGT_lv;
   // G4LogicalVolume* lvTUNE;
   G4LogicalVolume* BLK_log[100]; 
-  G4LogicalVolume* CShld_log[15]; 
+  G4LogicalVolume* CShld_log[15];
   G4LogicalVolume* TGAR_log;
   G4LogicalVolume* Horn_PM_lv[8];
   G4LogicalVolume* LVCPipe[20];

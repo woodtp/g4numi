@@ -45,6 +45,7 @@ public:
   void finish();
   void FillNeutrinoNtuple(const G4Track& track);
   void FillHadmmNtuple(const G4Track& track,Int_t mm_num);
+  void WriteHadmmNtuple();
   G4double GetWeight(const G4Track& nutrack, 
 		     G4double enuzr, 
 		     G4ThreeVector vertex_r,
@@ -69,7 +70,7 @@ private:
   G4double z;
 
   G4double noProtons;
-  char asciiFileName[30], nuNtupleFileName[30], hadmmNtupleFileName[30];
+  char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50];
 
   NumiDataInput* NumiData;
 
