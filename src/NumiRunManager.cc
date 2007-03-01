@@ -17,17 +17,17 @@ NumiRunManager::~NumiRunManager()
 {;}
 void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 {
-  nEvents=n_event;
+  nEvents = n_event;
   G4bool runOn(true);
   G4bool cond = ConfirmBeamOnCondition();
    if(cond)
      {
-       NumiDataInput *ND=NumiDataInput::GetNumiDataInput();
+       NumiDataInput *ND = NumiDataInput::GetNumiDataInput();
        //       ND->SetRunNumber(macroFile);
-       primaryGeneratorAction=(NumiPrimaryGeneratorAction*)(this)->userPrimaryGeneratorAction;
+       primaryGeneratorAction = (NumiPrimaryGeneratorAction*)(this)->userPrimaryGeneratorAction;
        if(ND->useFlukaInput || ND->useMarsInput){
 	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
-  	 n_event=primaryGeneratorAction->GetNoOfPrimaries();
+  	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
        else if(ND->useMuonBeam){   
 	 G4cout << "Muon Beam is set" << G4endl;  	 

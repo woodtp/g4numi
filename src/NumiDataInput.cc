@@ -3,10 +3,12 @@
 #include "NumiHornSpiderSupport.hh"
 #include <math.h>
 
+static const G4double in=2.54*cm;
+
 NumiDataInput* NumiDataInput::fNumiDataInput = 0;
 
-NumiDataInput* NumiDataInput::GetNumiDataInput()
-{return fNumiDataInput;}
+NumiDataInput* NumiDataInput::GetNumiDataInput(){return fNumiDataInput;}
+
 NumiDataInput::NumiDataInput()
 {
   if (fNumiDataInput)
@@ -14,16 +16,21 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
   debugOn = false;
-  NImpWeightOn = true; createNuNtuple=true; createHadmmNtuple=true;createASCII=false;
-  useFlukaInput = false; useMarsInput=false; useMuonBeam = true;
+  NImpWeightOn = false; createNuNtuple=true; createHadmmNtuple=true;
+  createASCII=false; useFlukaInput = false; useMarsInput=false; 
+  useMuonBeam = true; KillTracking = false;
 
   extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
+  //Set the energy threshold for 'killing' particles
+  KillTrackingThreshold = 0.05*GeV;
 
   //base name for output files:
-  nuNtupleName="nuNtuple"; 
-  hadmmNtupleName="hadmmNtuple";
-  asciiName="asciiOut";
-  RunNumber="0000";
+  nuNtupleName = "nuNtuple"; 
+  hadmmNtupleName = "hadmmNtuple";
+  asciiName = "asciiOut";
+  RunNumber = "0000";
+  geometry = "";
+
 
   G4float beam_x_dir=0;
   G4float beam_y_dir=0;
@@ -191,6 +198,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   TunnelA        = 0.0;
   TunnelZ        = 0.0;
   TunnelGEANTmat = 15;
+  BeamAngle      = 0.05835; // .05835 in radians.
 
   //ShieldNshield  5 
   //======================================================================= 
@@ -423,12 +431,15 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   //======================================================================= 
   // Hadron Box Dimensions
+  // 55.75' is the surveyed distance between the
+  // downstream wall of Muon Alcove 1 and the
+  // nominal center of the Decay Pipe.
   HadrBox_width = 324*.0254*m;
   HadrBox_height = 6.6294*m;
-  HadrBox_length = 1524*cm;
+  HadrBox_length = 55.75*12*in-(4*12*in+2.24*in+9*12*in+9*in);
+
   
   HornCurrent=182100.*ampere; 
-  static const G4double in=2.54*cm;
   
   NPHorn2EndN=3;
   G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};

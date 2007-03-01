@@ -11,15 +11,19 @@
 #include "G4TrajectoryContainer.hh"
 #include "G4RunManager.hh"
 #include "NumiTrackInformation.hh"
+#include "NumiDataInput.hh"
 #include "NumiAnalysis.hh"
 
+
 NumiSteppingAction::NumiSteppingAction()
-{  
+{
+  NDI = NumiDataInput::GetNumiDataInput();
 }
 
 NumiSteppingAction::~NumiSteppingAction()
 {
 }
+
 
 void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 {
@@ -38,10 +42,10 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   // 12 mu- -> nu_mu anti_nu_e e-
   // 13 pi+ -> nu_mu mu+
   // 14 pi- -> anti_nu_mu mu-
+
   G4Track * theTrack = theStep->GetTrack();
   G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
-  
-  if ((theTrack->GetKineticEnergy()<1.*GeV )&&
+  if (((NDI->GetKillTracking() && (theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold())) || theTrack->GetKineticEnergy() < 0.05 * GeV) &&
       (particleDefinition != G4NeutrinoE::NeutrinoEDefinition())&&
       (particleDefinition != G4NeutrinoMu::NeutrinoMuDefinition()) &&
       (particleDefinition != G4NeutrinoTau::NeutrinoTauDefinition()) &&
@@ -58,7 +62,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 
   if (theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
 
-    //G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+    //    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 
     if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
 	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield")){

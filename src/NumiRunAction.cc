@@ -27,8 +27,8 @@ NumiRunAction::~NumiRunAction()
 
 void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-  NumiDataInput *ND=NumiDataInput::GetNumiDataInput();
-  NumiRunManager *pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
+  NumiDataInput *ND = NumiDataInput::GetNumiDataInput();
+  NumiRunManager *pRunManager = (NumiRunManager*)NumiRunManager::GetRunManager();
 
   G4cout << "Starting run " << aRun->GetRunID()<<G4endl;
   G4cout<<"Random seed used for this run "<<HepRandom::getTheSeed();

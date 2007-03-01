@@ -20,7 +20,7 @@
 
 NumiStackingAction::NumiStackingAction()
 { 
-  NumiData=NumiDataInput::GetNumiDataInput();
+  NumiData = NumiDataInput::GetNumiDataInput();
 }
 
 NumiStackingAction::~NumiStackingAction()
@@ -34,15 +34,15 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
   G4ParticleDefinition * particleType = aTrack->GetDefinition();
 
   // Discard Gammas, Electrons, ...
-  if ((particleType==G4Gamma::GammaDefinition())||
-      (particleType==G4Electron::ElectronDefinition())||
-      (particleType==G4Positron::PositronDefinition())&&
+  if ((particleType==G4Gamma::GammaDefinition()) ||
+      (particleType==G4Electron::ElectronDefinition()) ||
+      (particleType==G4Positron::PositronDefinition()) &&
       (classification != fKill))
     {classification = fKill;}
 
   //Discard particles with pz<0
   G4ThreeVector momentum=aTrack->GetMomentumDirection();
-  if (momentum[2]<0&&(classification != fKill)) 
+  if (momentum[2]<0 && (classification != fKill)) 
     {classification = fKill;}
   
   //Discard particles with kinetic energy < 1.GeV (that are not neutrinos)
@@ -54,7 +54,8 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
       (particleType!=G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
       G4double energy = aTrack->GetKineticEnergy();
-      if (energy < 1.*GeV&&(classification != fKill)) 
+      if (((NumiData->GetKillTracking() && energy < NumiData->GetKillTrackingThreshold()) || energy < 0.05*GeV) &&
+	  (classification != fKill))
 	{classification = fKill;} 
     }
   
@@ -75,7 +76,7 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
   }
 
   //If importance weighting is on:
-  if (NumiData->NImpWeightOn&&(classification != fKill)){
+  if (NumiData->NImpWeightOn && (classification != fKill)){
     NumiTrackInformation* trackInfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
     if (trackInfo!=0) 
       {

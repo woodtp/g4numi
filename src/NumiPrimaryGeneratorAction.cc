@@ -59,13 +59,13 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
 
   xpos = 0;
   ypos = 0;
-  zpos = 700*m;
+  zpos = fND->DecayPipeLength + fND->TunnelZ0;;
  
   G4ThreeVector muonBeamPos = G4ThreeVector(xpos, ypos, zpos) - tunnelPos;
   G4ThreeVector muonBeamDirection = G4ThreeVector(0, 0, 1); // straight down the pipe
 
   fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
-  fParticleGun->SetParticleEnergy(80*GeV);// just a guess right now
+  //  fParticleGun->SetParticleEnergy(80*GeV);// just a guess right now
   fParticleGun->SetParticlePosition(muonBeamPos);
   fParticleGun->SetParticleMomentumDirection(muonBeamDirection);
 
@@ -137,11 +137,21 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4double y0 = fND->DecayPipeRadius*2.0; 
     G4double z0;
 
+    // Uniformly distributed circular muon beam 
     while(sqrt(pow(x0,2)+pow(y0,2)) > fND->DecayPipeRadius){
       x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
       y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
     }
-      z0 = 722*m;// just before the endcap
+
+    //Square beam the fits just inside the decay pipe without
+    // producing particles that would immediatly hit rock outside the
+    // decay pipe.
+    /*
+    x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
+    y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
+    */
+
+    z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap
 
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->GeneratePrimaryVertex(anEvent);

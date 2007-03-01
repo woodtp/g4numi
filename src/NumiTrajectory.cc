@@ -55,13 +55,13 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
 
    NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
    if (info!=0) {
-     fDecayCode=info->GetDecayCode();
+     fDecayCode = info->GetDecayCode();
      fTgen = info->GetTgen();
      fNImpWt = info->GetNImpWt();}
    else { 
-     fDecayCode=0;
-     fTgen=0; 
-     fNImpWt=1.;
+     fDecayCode = 0;
+     fTgen = 0; 
+     fNImpWt = 1.;
    }
 }
 

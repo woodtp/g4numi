@@ -59,7 +59,8 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 
    //Define world volume 
   G4Tubs* ROCK_solid = new G4Tubs("ROCK_solid",0.,NumiData->RockRadius,NumiData->RockHalfLen,0,360.*deg);
-  ROCK_log = new G4LogicalVolume(ROCK_solid,DolomiteRock,"ROCK_log",0,0,0); 
+  //  ROCK_log = new G4LogicalVolume(ROCK_solid,DoloStone,"ROCK_log",0,0,0); 
+  ROCK_log = new G4LogicalVolume(ROCK_solid, DoloStone,"ROCK_log",0,0,0); 
   ROCK_log->SetVisAttributes(G4VisAttributes::Invisible);
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
  
@@ -77,7 +78,6 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   //Set Vis Attributes according to solid material (only for volumes not explicitly set)
   G4LogicalVolumeStore* lvStore=G4LogicalVolumeStore::GetInstance();
   lvStore=G4LogicalVolumeStore::GetInstance();
-
   for (size_t ii=0;ii<(*lvStore).size();ii++){   
     if ((*lvStore)[ii]->GetVisAttributes()==0) {
       G4String matName=(*lvStore)[ii]->GetMaterial()->GetName();

@@ -105,7 +105,7 @@ void NumiAnalysis::book()
 
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
   if (NumiData->createNuNtuple){
-    sprintf(nuNtupleFileName,"%s_%04d.root",(NumiData->nuNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID());
+    sprintf(nuNtupleFileName,"%s_%04d%s.root",(NumiData->nuNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
     nuNtuple = new TFile(nuNtupleFileName,"RECREATE","root ntuple");
     G4cout << "Creating neutrino ntuple: "<<nuNtupleFileName<<G4endl;
     tree = new TTree("nudata","g4numi Neutrino ntuple");
@@ -113,7 +113,7 @@ void NumiAnalysis::book()
   }
  
   if (NumiData->createHadmmNtuple){
-    sprintf(hadmmNtupleFileName,"%s_%04d.root",(NumiData->hadmmNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID());
+    sprintf(hadmmNtupleFileName,"%s_%04d%s.root",(NumiData->hadmmNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
     G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileName<<G4endl;
     hadmmNtuple = new TFile(hadmmNtupleFileName, "RECREATE","hadmm ntuple");
     hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
@@ -146,6 +146,7 @@ void NumiAnalysis::finish()
     delete hadmmNtuple;
   }
 }
+
 void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num)
 {
   if (!NumiData->createHadmmNtuple) return;
@@ -180,26 +181,27 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num)
     g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
     g4hmmdata->mmpz[hmm_num] = track.GetMomentum()[2]; 
   } 
+}
+
+
+void NumiAnalysis::WriteHadmmNtuple(){
 
   hadmmtree->Fill(); 
+  
+  g4hmmdata->hmmxpos = -81579;
+  g4hmmdata->hmmypos = -81579;
+  g4hmmdata->hmmzpos = -81579;
+  g4hmmdata->hmmpx = -81579;
+  g4hmmdata->hmmpy = -81579;
+  g4hmmdata->hmmpz = -81579;
 
-  // Complete and utter nasty hack until when I can establish where
-  // the tracking gets called and I can reset the values -J
-  if (hmm_num == 4){
-    g4hmmdata->hmmxpos = -81579;
-    g4hmmdata->hmmypos = -81579;
-    g4hmmdata->hmmzpos = -81579;
-    g4hmmdata->hmmpx = -81579;
-    g4hmmdata->hmmpy = -81579;
-    g4hmmdata->hmmpz = -81579;
-  }
-  else{
-    g4hmmdata->mmxpos[hmm_num] = -81579;
-    g4hmmdata->mmpx[hmm_num] = -81579;
-    g4hmmdata->mmypos[hmm_num] = -81579;
-    g4hmmdata->mmpy[hmm_num] = -81579;
-    g4hmmdata->mmzpos[hmm_num] = -81579;
-    g4hmmdata->mmpz[hmm_num] = -81579; 
+  for(G4int i=0; i<3; i++){
+    g4hmmdata->mmxpos[i] = -81579;
+    g4hmmdata->mmpx[i] = -81579;
+    g4hmmdata->mmypos[i] = -81579;
+    g4hmmdata->mmpy[i] = -81579;
+    g4hmmdata->mmzpos[i] = -81579;
+    g4hmmdata->mmpz[i ] = -81579; 
   }
 }
 
@@ -218,7 +220,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   G4ThreeVector NuMomentum = track.GetMomentum();
   G4int parentID = track.GetParentID();
   
-  if (parentID==0) return; //I have to make some changes so that neutrinos in fluka/mars ntuples don't crash
+  if (parentID == 0) return; //I have to make some changes so that neutrinos in fluka/mars ntuples don't crash
 
   NumiTrajectory* NuParentTrack = GetParentTrajectory(parentID);
   G4int point_no = NuParentTrack->GetPointEntries();
@@ -510,7 +512,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       g4data->trkpz[5] = ParentMomentum[2]/GeV;
     }
     //enter decay pipe
-    if (prevolname.contains("DVOL")&&(postvolname.contains("UpWn"))){
+    if (prevolname.contains("DVOL") && (postvolname.contains("UpWn"))){
       g4data->trkx[6] = ParentPosition[0]/cm;
       g4data->trky[6] = ParentPosition[1]/cm;
       g4data->trkz[6] = ParentPosition[2]/cm;
@@ -578,7 +580,7 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
   while (ii<G4int(vect->size())){  
     tr = (*vect)[ii]; 
     NumiTrajectory* tr1 = (NumiTrajectory*)(tr);  
-    if(tr1->GetTrackID()==parentID) return tr1; 
+    if(tr1->GetTrackID() == parentID) return tr1; 
     ii++; 
   }
   /*

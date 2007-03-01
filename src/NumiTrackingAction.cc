@@ -29,7 +29,7 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   //set tgen (and weight for fluka nad mars input) 
   if (aTrack->GetTrackID()==1) 
     {   
-      NumiTrackInformation* info=new NumiTrackInformation();
+      NumiTrackInformation* info = new NumiTrackInformation();
       if (ND->useFlukaInput||ND->useMarsInput){
 	info->SetTgen(NPGA->GetTgen());
 	info->SetNImpWt(NPGA->GetWeight());
@@ -49,12 +49,12 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
    
   //if a particle is a neutrino then analyse and store in ntuple
   G4ParticleDefinition * particleDefinition = aTrack->GetDefinition();
-  if ((particleDefinition==G4NeutrinoE::NeutrinoEDefinition())||
-      (particleDefinition==G4NeutrinoMu::NeutrinoMuDefinition()) ||
-      (particleDefinition==G4NeutrinoTau::NeutrinoTauDefinition()) ||
-      (particleDefinition==G4AntiNeutrinoE::AntiNeutrinoEDefinition()) ||
-      (particleDefinition==G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) ||
-      (particleDefinition==G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
+  if ((particleDefinition == G4NeutrinoE::NeutrinoEDefinition())||
+      (particleDefinition == G4NeutrinoMu::NeutrinoMuDefinition()) ||
+      (particleDefinition == G4NeutrinoTau::NeutrinoTauDefinition()) ||
+      (particleDefinition == G4AntiNeutrinoE::AntiNeutrinoEDefinition()) ||
+      (particleDefinition == G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) ||
+      (particleDefinition == G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
       analysis->FillNeutrinoNtuple(*aTrack);
@@ -63,14 +63,23 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-  // set tgen(secondary)=tgen(parent)+1
-  NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
+
+  // Jtest
+  //---
+  NumiAnalysis* analysis = NumiAnalysis::getInstance();
+  analysis->WriteHadmmNtuple();
+  
+  //---
+
+
+  // set tgen(secondary) = tgen(parent)+1
+  NumiTrackInformation* info = (NumiTrackInformation*)(aTrack->GetUserInformation());
     if (info!=0) {
-       G4int tgen=info->GetTgen();
-       G4double nimpwt=info->GetNImpWt();
+       G4int tgen = info->GetTgen();
+       G4double nimpwt = info->GetNImpWt();
        G4TrackVector* SecVector=fpTrackingManager->GimmeSecondaries();
        for (size_t ii=0;ii<(*SecVector).size();ii++){
-	 NumiTrackInformation* newinfo=new NumiTrackInformation();
+	 NumiTrackInformation* newinfo = new NumiTrackInformation();
 	 newinfo->SetTgen(tgen+1); // set generation of daughter particles
 	 newinfo->SetNImpWt(nimpwt); // set weight of the new track equal to parent weight
 	 (*SecVector)[ii]->SetUserInformation(newinfo);
