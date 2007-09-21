@@ -25,6 +25,27 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   Bfield[0] = -B*Point[1]/radius;
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
+  /*
+  G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
+  G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+  numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
+  G4ThreeVector Position=G4ThreeVector(Point[0],Point[1],Point[2]); 
+  G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
+  G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
+  G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
+
+  delete numinavigator;
+
+  G4VSolid * solid=myVolume->GetLogicalVolume()->GetSolid();
+  if (Point[2]>92*cm&&Point[2]<92.1*cm) {
+    G4cout<<"FMag: "<<myVolume->GetName()<<" "
+	<<Point[0]<<" "
+	<<Point[1]<<" "
+	<<Point[2]<<" "
+	<<sqrt(Point[0]*Point[0]+Point[1]*Point[1])<<" "
+	<<B<<G4endl;
+  }
+  */
 }
 
 //magnetic field in inner conductor ====================================================
@@ -61,10 +82,19 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
     if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 
       {
 	magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
-	magBField=magBField*(1-(radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
+	magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
       }
   }
-
+  /*
+  if (Point[2]>92*cm&&Point[2]<92.1*cm) {
+    G4cout<<"ICMag: "<<myVolume->GetName()<<" "
+	<<Point[0]<<" "
+	<<Point[1]<<" "
+	<<Point[2]<<" "
+	<<sqrt(Point[0]*Point[0]+Point[1]*Point[1])<<" "
+	<<magBField<<G4endl;
+  }
+  */
   if (radius!=0){
     Bfield[0] = -magBField*Point[1]/radius;
     Bfield[1] = magBField*Point[0]/radius;

@@ -20,7 +20,7 @@
 
 static const G4double in=2.54*cm;
 
-void NumiDetectorConstruction::ConstructHorn1()
+void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationMatrix hornrot)
 {
   G4ThreeVector translation;
   G4RotationMatrix rotation;
@@ -28,7 +28,6 @@ void NumiDetectorConstruction::ConstructHorn1()
   // subtract TargetHallPosition to get origin at the face of Horn1
   G4ThreeVector TargetHallPosition=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0);
   // G4double MHorn1Length=133.966*2.54*cm+3.938*in+1.75*in+2.5*in;
-  G4double THallHorn1Z0=0.*m; // Target Hall location of the origin of Horn 
   G4double Horn1Z0=-2.436*in;// HornZ0 in Horn coordinate system
   G4double MVgap=0.01*mm;
   G4double Fgap=0.1*mm; 
@@ -144,8 +143,8 @@ void NumiDetectorConstruction::ConstructHorn1()
   G4LogicalVolume *lvMHorn1 = new G4LogicalVolume(sMHorn1,material,"lvMHorn1",0,0,0);
   G4VisAttributes* invisible=new G4VisAttributes(false);
   lvMHorn1->SetVisAttributes(invisible);
-  rotation=G4RotationMatrix(0.,0.,0.);
-  translation=G4ThreeVector(0.,0.,THallHorn1Z0)-TargetHallPosition;
+  rotation=hornrot;
+  translation=hornpos-TargetHallPosition;
   G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn1",lvMHorn1,TGAR,false,0);
     
    //Front part

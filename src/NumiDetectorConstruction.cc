@@ -70,8 +70,14 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   if (NumiData->constructTarget){
     ConstructTarget();
   }
-  ConstructHorn1();
-  ConstructHorn2();
+  // insertion point for horn 1 is @3cm
+  // drawings have z=0 at insertion point
+  G4ThreeVector horn1pos(0.,0.,3.*cm);
+  G4RotationMatrix horn1rot(0.,0.,0.);
+  ConstructHorn1(horn1pos,horn1rot);
+  G4ThreeVector horn2pos(0.,0.,10.*m);
+  G4RotationMatrix horn2rot(0.,0.,0.);
+  ConstructHorn2(horn2pos,horn2rot);
   ConstructHadronAbsorber(); 
   ConstructSecMonitors();
 

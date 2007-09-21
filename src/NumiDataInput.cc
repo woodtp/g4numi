@@ -16,13 +16,13 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
   debugOn = false;
-  NImpWeightOn = false; createNuNtuple=true; createHadmmNtuple=true;
+  NImpWeightOn = true; createNuNtuple=true; createHadmmNtuple=false;
   createASCII=false; useFlukaInput = false; useMarsInput=false; 
-  useMuonBeam = true; KillTracking = false;
+  useMuonBeam = false; KillTracking = true;
 
   extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
-  KillTrackingThreshold = 0.05*GeV;
+  KillTrackingThreshold = 0.5*GeV;
 
   //base name for output files:
   nuNtupleName = "nuNtuple"; 

@@ -51,7 +51,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   void ConstructDecayPipe();
   void ConstructHadronAbsorber();  
   void ConstructHorns();  
-  void ConstructHorn1();
+  void ConstructHorn1(G4ThreeVector pos, G4RotationMatrix rot);
   void ConstructSpiderSupport(NumiHornSpiderSupport *HSS,
 			      G4double angle,
 			      G4double zPos,
@@ -59,7 +59,7 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
 			      G4double rOut,
 			      G4VPhysicalVolume *motherVolume,
 			      G4int copyNo); 
-  void ConstructHorn2();
+  void ConstructHorn2(G4ThreeVector pos, G4RotationMatrix rot);
   void ConstructSecMonitors();
   void DefineMaterials();
   G4VisAttributes* GetMaterialVisAttrib(G4int matCode);

@@ -45,7 +45,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 
   G4Track * theTrack = theStep->GetTrack();
   G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
-  if (((NDI->GetKillTracking() && (theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold())) || theTrack->GetKineticEnergy() < 0.05 * GeV) &&
+  if ((NDI->GetKillTracking() && theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold() ) &&
       (particleDefinition != G4NeutrinoE::NeutrinoEDefinition())&&
       (particleDefinition != G4NeutrinoMu::NeutrinoMuDefinition()) &&
       (particleDefinition != G4NeutrinoTau::NeutrinoTauDefinition()) &&
@@ -60,7 +60,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   // or muon monitors, and if so calls the NumiAnalysis class
   // to record the particle properties through the monitors.-DJK
 
-  if (theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
+  if (NDI->createHadmmNtuple && theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL){
 
     //    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 
@@ -167,13 +167,6 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	newinfo->SetDecayCode(decay_code);                                                       
 	theTrack->SetUserInformation(newinfo); 
       }
-      /*
-      NumiTrackInformation* oldinfo=(NumiTrackInformation*)(theTrack->GetUserInformation());
-      NumiTrackInformation* newinfo=new NumiTrackInformation();
-      if (oldinfo!=0) newinfo=oldinfo;
-      newinfo->SetDecayCode(decay_code);
-      theTrack->SetUserInformation(newinfo);
-      */
     }
   }
 }

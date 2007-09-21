@@ -54,7 +54,7 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
       (particleType!=G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
       G4double energy = aTrack->GetKineticEnergy();
-      if (((NumiData->GetKillTracking() && energy < NumiData->GetKillTrackingThreshold()) || energy < 0.05*GeV) &&
+      if (( NumiData->GetKillTracking() && energy < NumiData->GetKillTrackingThreshold() ) &&
 	  (classification != fKill))
 	{classification = fKill;} 
     }
@@ -81,13 +81,11 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
     if (trackInfo!=0) 
       {
 	G4double Nimpweight=NumiImpWeight::CalculateImpWeight(aTrack);
-	if(Nimpweight==0.)
-	  {
+	if(Nimpweight==0.) {
 	    classification = fKill;
-	  } 
-	
-	else 
+	} else {
 	  trackInfo->SetNImpWt(Nimpweight);
+	}
       }
   }
   return classification;

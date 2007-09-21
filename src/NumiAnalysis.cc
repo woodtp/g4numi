@@ -1,28 +1,17 @@
 //
 // NumiAnalysis.cc
 //
+// $Id: NumiAnalysis.cc,v 1.14 2007/09/21 20:44:52 zarko Exp $
 
 #include <fstream>
 #include <iomanip>
 #include <stdlib.h>
 
 //Root 
-#include "TROOT.h"          // Top level (or root) structure for all classes
-#include "TApplication.h"   // ROOT head file for GUI application singleton
-#include <TH1.h>            // ROOT head file for 1 dimension histograms
-#include <TH2.h>            // ROOT head file for 2 dimension histograms
 #include <TSystem.h>        // ROOT head file for a generic interface to the OS
 #include <TStopwatch.h>     // ROOT head file for stopwatch for real and cpu time
-#include <TStyle.h>         // ROOT head file for all graphics attributes
 #include <TFile.h>          
-#include <TText.h>
 #include <TTree.h>
-#include <TF1.h>
-#include <TLine.h>
-#include <TCanvas.h>
-#include <TPaveLabel.h>
-#include <TPostScript.h>
-#include <TGraph.h>
 
 //GEANT4 
 #include "globals.hh"
@@ -46,6 +35,7 @@
 #include "NumiTrackInformation.hh"
 #include "NumiPrimaryGeneratorAction.hh"
 #include "NumiDataInput.hh"
+#include "NumiNuWeight.hh"
 
 using namespace std;
 
@@ -186,6 +176,8 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num)
 
 void NumiAnalysis::WriteHadmmNtuple(){
 
+  if (!NumiData->createHadmmNtuple) return;
+  
   hadmmtree->Fill(); 
   
   g4hmmdata->hmmxpos = -81579;
@@ -230,7 +222,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   G4double Parent_mass = NuParentTrack->GetMass();
   G4double gamma = sqrt(ParentMomentumFinal*ParentMomentumFinal+Parent_mass*Parent_mass)/Parent_mass; 
   G4double Parent_energy = gamma*Parent_mass;
-  G4double beta = sqrt((gamma*gamma-1.)/(gamma*gamma));
   G4ThreeVector beta_vec = ParentMomentumFinal/Parent_energy;
   G4double partial = gamma*(beta_vec*NuMomentum);
  
@@ -248,11 +239,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data->beamY = NumiData->beamPosition[1]/cm;
  
   G4int particleID = track.GetParentID();
-  // NumiTrajectory* dummyTrack=GetParentTrajectory(particleID);
-  //  while (particleID!=1){ 
-  //  particleID = dummyTrack->GetParentID();
-  //  dummyTrack = GetParentTrajectory(particleID);
-  // }
   G4ThreeVector protonOrigin = NPGA->GetProtonOrigin();
   g4data->protonX = protonOrigin[0];
   g4data->protonY = protonOrigin[1];
@@ -272,41 +258,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data->Npz = NuMomentum[2]/GeV;
   g4data->Nenergy = track.GetTotalEnergy()/GeV;
 
-  // Neutrino data at different points
-
-  for (G4int ii=0;ii<NumiData->nNear;ii++){          // near detector 
-    g4data->NdxdzNear[ii] = (x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
-    g4data->NdydzNear[ii] = (y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
-    
-    G4double theta = GetTheta(vertex_r,ParentMomentumFinal,
-			      NumiData->xdet_near[ii],
-			      NumiData->ydet_near[ii],
-			      NumiData->zdet_near[ii]); 
-
-    g4data->NenergyN[ii] = GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
-    g4data->NWtNear[ii] = GetWeight(track,enuzr,vertex_r,gamma,beta,theta,
-				    NumiData->xdet_near[ii],
-				    NumiData->ydet_near[ii],
-				    NumiData->zdet_near[ii]);
-  }
-
-  for (G4int ii=0;ii<NumiData->nFar;ii++){         // far detector
-    g4data->NdxdzFar[ii] = (x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
-    g4data->NdydzFar[ii] = (y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
-    
-    G4double theta = GetTheta(vertex_r,ParentMomentumFinal,
-			      NumiData->xdet_far[ii],
-			      NumiData->ydet_far[ii],
-			      NumiData->zdet_far[ii]);
-    
-    g4data->NenergyF[ii] = GetNuEnergy(enuzr,gamma,beta,theta)/GeV;
-    g4data->NWtFar[ii] = GetWeight(track,enuzr,vertex_r,gamma,beta,theta,
-				   NumiData->xdet_far[ii],
-				   NumiData->ydet_far[ii],
-				   NumiData->zdet_far[ii]);
-  }
-  
-  //other info
+   //other info
   // Neutrino origin:
   // 3 From muon decay
   // 1 From particle from target
@@ -359,7 +311,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       g4data->muparpx = muparp[0]/GeV; // vector of hadron parent of muon
       g4data->muparpy = muparp[1]/GeV; // 
       g4data->muparpz = muparp[2]/GeV;
-      g4data->mupare = (sqrt(muparp*muparp-muparm*muparm))/GeV;
+      g4data->mupare = (sqrt(muparp*muparp+muparm*muparm))/GeV;
     }
   else
     {
@@ -371,7 +323,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 
   g4data->Necm = enuzr/GeV; // Neutrino energy in parent rest frame
   NumiTrackInformation* info = (NumiTrackInformation*)(track.GetUserInformation());
- 
   g4data->Nimpwt = info->GetNImpWt();  // Importance weight
   g4data->tgen = info->GetTgen()-1;
 
@@ -442,7 +393,42 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
     g4data->trkpy[ii] = -999999.;
     g4data->trkpz[ii] = -999999.;
   }
- 
+  // Neutrino data at different points
+  // need neutrino parent info to be filled in g4data by this point
+
+  for (G4int ii=0;ii<NumiData->nNear;ii++){          // near detector 
+    g4data->NdxdzNear[ii] = (x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
+    g4data->NdydzNear[ii] = (y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
+    
+    NumiNuWeight nuwgh;
+    G4double nu_wght;
+    G4double nu_energy;
+    std::vector<double> r_det;
+    r_det.push_back(NumiData->xdet_near[ii]/cm);
+    r_det.push_back(NumiData->ydet_near[ii]/cm);
+    r_det.push_back(NumiData->zdet_near[ii]/cm);
+    nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+    g4data->NenergyN[ii] = nu_energy; //in GeV
+    g4data->NWtNear[ii]  = nu_wght;
+  }
+
+  for (G4int ii=0;ii<NumiData->nFar;ii++){         // far detector
+    g4data->NdxdzFar[ii] = (x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
+    g4data->NdydzFar[ii] = (y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
+    
+    NumiNuWeight nuwgh;
+    G4double nu_wght;
+    G4double nu_energy;
+    std::vector<double> r_det;
+    r_det.push_back(NumiData->xdet_far[ii]/cm);
+    r_det.push_back(NumiData->ydet_far[ii]/cm);
+    r_det.push_back(NumiData->zdet_far[ii]/cm);
+    nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+    g4data->NenergyF[ii] = nu_energy; //in GeV
+    g4data->NWtFar[ii]   = nu_wght;
+   
+  }
+
   //if(parentID!=0){
   G4ThreeVector ParentMomentum;
   G4ThreeVector ParentPosition;
@@ -553,7 +539,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data->trkpz[7] = ParentMomentum[2]/GeV;
   // }
   
-  tree->Fill();  // since I already defined where does tree get the data
+  tree->Fill();  
 
 
   // Write to file
@@ -583,92 +569,6 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
     if(tr1->GetTrackID() == parentID) return tr1; 
     ii++; 
   }
-  /*
-    G4VTrajectory** tr = vect->begin();
 
-    while(tr!=vect->end())
-    { 
-    NumiTrajectory* tr1 = (NumiTrajectory*)(*tr);
-    if(tr1->GetTrackID()==parentID) return tr1;
-    tr++;
-    }
-  */
   return 0;
-}
-
-G4double NumiAnalysis::GetWeight(const G4Track& nutrack,G4double enuzr,G4ThreeVector vertex_r,G4double gamma,G4ThreeVector beta_vec,G4double theta_pardet, G4double x_det, G4double y_det, G4double z_det)
-{
-  G4double beta = beta_vec.mag();
-  G4double emrat =  1/(gamma*(1-beta*cos(theta_pardet)));
-  
-  // get solid angle/4pi for detector element
-  G4double rdet = 1.;//beam-line.input :FluxAreaR
-  G4double sangdet = (rdet*rdet/((z_det/m-vertex_r[2]/m)*(z_det/m-vertex_r[2]/m)))/4.;
-
-  G4double wgt = sangdet*emrat*emrat;
-
-  // done for all except polarized muon decay
-  // 
-  G4int parentID = nutrack.GetParentID();
-  NumiTrajectory* NuParentTrack = GetParentTrajectory(parentID);
-  G4String parent_name = NuParentTrack->GetParticleName();
-
-  if (((parent_name=="mu+") || (parent_name=="mu-"))&&NuParentTrack->GetParentID()!=0){
-    G4double rad=sqrt((vertex_r[0]/m-x_det/m)*(vertex_r[0]/m-x_det/m)+(vertex_r[1]/m-y_det/m)*(vertex_r[1]/m-y_det/m)+(vertex_r[2]/m-z_det/m)*(vertex_r[2]/m-z_det/m))*m;
-    G4double eneu = enuzr*emrat;
-    G4ThreeVector P_nu = G4ThreeVector((x_det-vertex_r[0])/rad*eneu,(y_det-vertex_r[1])/rad*eneu,(z_det-vertex_r[2])/rad*eneu);
-
-    G4double partial = gamma*(beta_vec*P_nu);
-    partial = eneu-partial/(gamma+1.);
-
-    G4ThreeVector P_dcm_nu = P_nu-beta_vec*gamma*partial;
-
-    //boost parent of mu to mu production cm
-    G4double mu_mass = NuParentTrack->GetMass();
-    G4ThreeVector ParentMomentumInitial = NuParentTrack->GetMomentum(0);  
-    G4double gamma_mu_init = sqrt(ParentMomentumInitial*ParentMomentumInitial+mu_mass*mu_mass)/mu_mass;
-    G4double mu_init_energy = gamma_mu_init*mu_mass;
-    G4ThreeVector beta_mu_init_vec = ParentMomentumInitial/mu_init_energy;
-    
-    G4int muparentID = NuParentTrack->GetParentID();
-    NumiTrajectory* MuParentTrack = GetParentTrajectory(muparentID);
-    G4int point_no = MuParentTrack->GetPointEntries();
-    G4ThreeVector MuParentMomentumFinal = MuParentTrack->GetMomentum(point_no-1);
-    partial = gamma_mu_init*(beta_mu_init_vec*MuParentMomentumFinal);
-    G4double MuParentMass = MuParentTrack->GetMass();
-    G4double MuParentEnergy = sqrt(MuParentMass*MuParentMass+MuParentMomentumFinal*MuParentMomentumFinal);
-    
-    partial = MuParentEnergy-partial/(gamma_mu_init+1);
-    G4ThreeVector P_pcm_mp = MuParentMomentumFinal-beta_mu_init_vec*gamma_mu_init*partial;
-    G4double costh = P_dcm_nu*P_pcm_mp/(P_dcm_nu.mag()*P_pcm_mp.mag());
-    G4double wt_ratio = 0.;
-    if ((nutrack.GetDefinition()==G4NeutrinoE::NeutrinoEDefinition()) ||
-	(nutrack.GetDefinition()==G4AntiNeutrinoE::AntiNeutrinoEDefinition())) 
-      wt_ratio = 1.-costh;
-    else if ((nutrack.GetDefinition()==G4NeutrinoMu::NeutrinoMuDefinition()) ||
-	     (nutrack.GetDefinition()==G4AntiNeutrinoMu::AntiNeutrinoMuDefinition())) {
-      G4double xnu = 2.*enuzr/mu_mass;
-      wt_ratio = ((3.-2.*xnu)-(1.-2*xnu)*costh)/(3.-2.*xnu);}
-    
-    wgt = wgt*wt_ratio;
-  }
-  return wgt;
-}
-
-G4double NumiAnalysis::GetTheta(G4ThreeVector vertex_r,G4ThreeVector momentum,G4double x_det,G4double y_det,G4double z_det)
-{
-  G4double rad = sqrt((vertex_r[0]/m-x_det/m)*(vertex_r[0]/m-x_det/m)+(vertex_r[1]/m-y_det/m)*(vertex_r[1]/m-y_det/m)+(vertex_r[2]/m-z_det/m)*(vertex_r[2]/m-z_det/m))*m;
-  G4double parentp = sqrt(momentum*momentum);
-  G4double theta_pardet = ((momentum[0])*(-vertex_r[0]/m+x_det/m)+(momentum[1])*(-vertex_r[1]/m+y_det/m)+(momentum[2])*(-vertex_r[2]/m+z_det/m))/(parentp*(rad/m));
-  if (theta_pardet>1.) theta_pardet = 1.;
-  if (theta_pardet<-1.) theta_pardet = -1.;
-			 
-  return acos(theta_pardet);
-}
-G4double NumiAnalysis::GetNuEnergy(G4double enuzr,G4double gamma, G4double beta, G4double theta_pardet)
-{
-  //returns energy of the neutrino passing through some point X; depends on the nu energy in parent rest frame (enuzr) and the angle between parent beta and r(vertex->X)
-  
-  G4double emrat = 1/(gamma*(1-beta*cos(theta_pardet)));
-  return enuzr*emrat;  
 }
