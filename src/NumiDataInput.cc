@@ -1,3 +1,7 @@
+//----------------------------------------------------------------------
+// $Id: NumiDataInput.cc,v 1.17 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
+
 #include "NumiDataInput.hh"
 #include "G4ThreeVector.hh"
 #include "NumiHornSpiderSupport.hh"

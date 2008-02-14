@@ -1,3 +1,5 @@
+// $Id: NumiVisManager.cc,v 1.2 2008/02/14 19:30:20 koskinen Exp $
+
 #ifdef G4VIS_USE
 
 #include "NumiVisManager.hh"

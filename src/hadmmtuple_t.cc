@@ -1,10 +1,8 @@
-//
-// data_t.cc
-//
-//  ADM, July 2005
-//  This is a class that defines the hadmmtuple_t object that is used to store the g4numi output
-//   in a root tree.
-//------------------
+//----------------------------------------------------------------------
+// Sets the relevant memebers of the data class for storing the
+// MC data for the Hadron and Muon Monitors.
+// $Id: hadmmtuple_t.cc,v 1.3 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
 
 #include "hadmmtuple_t.hh"
 

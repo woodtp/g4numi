@@ -1,5 +1,15 @@
-// The new and improved Hadron Absorber my D. Jason Koskinen
-// Last Update: December 1, 2006
+//----------------------------------------------------------------------
+// NumiHadronAbsorber.cc covers the elements of the Hadron Absorber in
+// the G4NuMI framework. The blocks and elements within the parent
+// volumes are all oriented in a refernce frame that has gravity going
+// straight down. To properly align the NuMI Decay tunnel and beam,
+// which have a downward slope, with the elements of the MC, the parent
+// volumes are rotated. In the G4NuMI world, the beam is horizontal,
+// while all the MC elements are rotated. 
+//
+// $Id: NumiHadronAbsorber.cc,v 1.8 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
+
 #include "NumiDetectorConstruction.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"

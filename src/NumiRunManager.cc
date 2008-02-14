@@ -1,6 +1,7 @@
-//
+//----------------------------------------------------------------------
 // NumiRunManager.cc
-//
+// $Id: NumiRunManager.cc,v 1.5 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
 #include "NumiRunManager.hh"

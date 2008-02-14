@@ -1,6 +1,11 @@
+//----------------------------------------------------------------------
+// Particle names should match the geant4 particle names since this is 
+// currently used to translate particles from external ntuple to geant 
+// (NumiPrimaryGeneratorAction.cc)
+// $Id: NumiParticleCode.cc,v 1.2 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
+
 #include "NumiParticleCode.hh"
-//Particle names should match the geant4 particle names since this is currently
-// used to translate particles from external ntuple to geant (NumiPrimaryGeneratorAction.cc)
 
 G4String NumiParticleCode::AsString(NumiParticleCode_t pCode)
 {

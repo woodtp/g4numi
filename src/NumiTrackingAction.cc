@@ -1,6 +1,8 @@
-// 
+//----------------------------------------------------------------------
 // NumiTrackingAction.cc
-//
+// $Id: NumiTrackingAction.cc,v 1.7 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
+
 #include "NumiTrackInformation.hh"
 #include "NumiTrackingAction.hh"
 #include "G4TrackingManager.hh"

@@ -1,6 +1,7 @@
-//
+//----------------------------------------------------------------------
 // NumiSteppingAction.cc
-//
+// $Id: NumiSteppingAction.cc,v 1.7 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
 #include "G4SteppingManager.hh"

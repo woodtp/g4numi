@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------
+// NumiSecMonitors covers all the monitors downstream of the 
+// End of the Decay Pipe(EODP). Included is rotation code that orients
+// all of the monitors to be perpendicular to gravity, self-orienting
+// depending on the downward slope NumiDataInput.cc. The muon monitors
+// have been 9x9 arrays of cells that determine the readout.
+// $Id: NumiSecMonitors.cc,v 1.5 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
+
 #include "NumiDetectorConstruction.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
@@ -11,6 +20,14 @@ static const G4double in = 2.54*cm;
 static const G4double ft = 12.*in;
 void NumiDetectorConstruction::ConstructSecMonitors()
 {
+
+  //--------------------------------------------------
+  // Generating variables for systematic
+  // studies
+
+  G4double UpWall_offset    = 0;//0.09*ft;
+  G4double DownWall_offset  = 0;//-0.54*ft;
+
   // Only want to retrieve some information once, i.e. z position of the end of the decay pipe.
 
   G4ThreeVector tunnelPos = G4ThreeVector(0, 0, NumiData->TunnelLength/2. + NumiData->TunnelZ0);
@@ -23,8 +40,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4double Shotcrete_depth = 4*in;
   G4double Backfill_depth = 10*in;
   G4double MM0_downstream = 292.5057*ft;
-  G4double MM1_upstream = 331.9597*ft;
-  G4double MM1_downstream = 341.8983*ft;
+  G4double MM1_upstream = 331.9597*ft + UpWall_offset;
+  G4double MM1_downstream = 341.8983*ft + DownWall_offset;
   G4double MM2_upstream = 401.1375*ft;
   G4double MM2_downstream = 411.3207*ft;
   
@@ -59,8 +76,6 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4double xo = DP_end + 10.25*ft;
   G4double yo = -1.*in;
 
-  //  G4double xp = NumiData->HadrBox_length - 6.0625*ft + MuAlcv0_length/2.0;
-  //  G4double yp = MuAlcv0_height/2.0 - NumiData->HadrBox_height/2.0;
   G4double xp = NumiData->HadrBox_length - 6.0625*ft + MuAlcv0_length/2.0;
   G4double yp = MuAlcv0_height/2.0 - NumiData->HadrBox_height/2.0;
   G4double z_MuAlcv0 = xp*cos(beam_angle) - yp*sin(beam_angle) + xo;
@@ -147,10 +162,11 @@ void NumiDetectorConstruction::ConstructSecMonitors()
 
   G4cout << "Muon Monitor Alcoves(1,2,3) Constructed" << G4endl;
 
-  // The Muon Monitors will be 2.2m x 2.2m x 2.25in boxes which are
-  // perfectly active elements via the NumiSteppingAction.cc 
-  // tracking a particle (hopefully muon) 
-  // through the monitor. 
+  //--------------------------------------------------
+  // The Muon Monitors will be 2.2m x 2.2m x 2.25in 
+  // boxes which are perfectly active elements via the 
+  // NumiSteppingAction.cc tracking a particle through 
+  // the monitor. 
 
   G4double MuMon_x = 2.2*m;
   G4double MuMon_y = 2.2*m;
@@ -163,9 +179,21 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4ThreeVector MuMon_pos1 = G4ThreeVector(0., -y_MuAlcv1/cos(beam_angle), 0.);
   G4ThreeVector MuMon_pos2 = G4ThreeVector(0., -y_MuAlcv2/cos(beam_angle), 0.);
 
-  new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
+  G4PVPlacement *MuMon0 = new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
   new G4PVPlacement(0, MuMon_pos1, "MuMon_1", LVMuMon, MuMonAlcv_1, false, 0);
   new G4PVPlacement(0, MuMon_pos2, "MuMon_2", LVMuMon, MuMonAlcv_2, false, 0);
+
+
+  G4Box *SMuCell = new G4Box( "SMuCell", 3*in/2.0, 3*in/2.0, 1*mm/2.0 );
+  G4LogicalVolume *LVMuCell = new G4LogicalVolume(SMuCell, He, "LVMuCell", 0, 0, 0);  
+  volName = "MuCell";
+
+  for( int i = 0; i < 9; ++i ){
+    for( int j = 0; j < 9; ++j ){
+      cellPos = G4ThreeVector( (i-4)*10.*in, (j-4)*10.*in, 0 );
+      new G4PVPlacement( 0, cellPos, volName, LVMuCell, MuMon0, false, i*9+j ); 
+    }
+  }
 
   G4cout << "Muon Monitors(1,2,3) Constructed" << G4endl;
 

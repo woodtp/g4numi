@@ -1,6 +1,7 @@
-//
+//----------------------------------------------------------------------
 // NumiStackingAction.cc
-//
+// $Id: NumiStackingAction.cc,v 1.8 2008/02/14 19:30:20 koskinen Exp $
+//----------------------------------------------------------------------
 
 #include "NumiStackingAction.hh"
 #include "G4SDManager.hh"
