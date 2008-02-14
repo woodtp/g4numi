@@ -1,10 +1,13 @@
 //----------------------------------------------------------------------
-// NumiSecMonitors covers all the monitors downstream of the 
-// End of the Decay Pipe(EODP). Included is rotation code that orients
-// all of the monitors to be perpendicular to gravity, self-orienting
-// depending on the downward slope NumiDataInput.cc. The muon monitors
-// have been 9x9 arrays of cells that determine the readout.
-// $Id: NumiSecMonitors.cc,v 1.5 2008/02/14 19:30:20 koskinen Exp $
+// The muon alcoves have an in born rotation that is set in 
+// NumiDataInput so that they are always oriented with respect to 
+// vertical, instead of whatever the beam angle is. Also there is the 
+// functionality to move the upstream and downstream alcove wall face
+// in order to represent a shift of 1 sigma. Each of the 81 individual
+// pixels in the muon monitors is modelled and acts as the active
+// elements of the monitors.
+//
+// $Id: NumiSecMonitors.cc,v 1.6 2008/02/14 19:49:34 koskinen Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -18,9 +21,9 @@
 
 static const G4double in = 2.54*cm;
 static const G4double ft = 12.*in;
+
 void NumiDetectorConstruction::ConstructSecMonitors()
 {
-
   //--------------------------------------------------
   // Generating variables for systematic
   // studies
@@ -28,12 +31,14 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4double UpWall_offset    = 0;//0.09*ft;
   G4double DownWall_offset  = 0;//-0.54*ft;
 
-  // Only want to retrieve some information once, i.e. z position of the end of the decay pipe.
+  //--------------------------------------------------
+  // Only want to retrieve some information once, i.e.
+  // z position of the end of the decay pipe.
 
   G4ThreeVector tunnelPos = G4ThreeVector(0, 0, NumiData->TunnelLength/2. + NumiData->TunnelZ0);
   G4double DP_end = NumiData->DecayPipeLength + NumiData->TunnelZ0;
 
-  //-----------------------------------------------------------------------
+  //--------------------------------------------------
   // Establishes the physical quantities associated
   // with the Muon Alcoves location and shotcrete.
 
@@ -48,11 +53,11 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4double MM01RockLength = MM1_upstream - MM0_downstream;
   G4double MM12RockLength = MM2_upstream - MM1_downstream;
 
-  G4double  MuAlcv1_width = 12*ft;
-  G4double  MuAlcv1_height =12*ft;
+  G4double  MuAlcv1_width  = 12*ft;
+  G4double  MuAlcv1_height = 12*ft;
   G4double  MuAlcv1_length = MM1_downstream - MM1_upstream + 2*Shotcrete_depth;
-  G4double  MuAlcv2_width = 12*ft;
-  G4double  MuAlcv2_height =12*ft;
+  G4double  MuAlcv2_width  = 12*ft;
+  G4double  MuAlcv2_height = 12*ft;
   G4double  MuAlcv2_length = MM2_downstream - MM2_upstream + 2*Shotcrete_depth;
 
   // MM0 is different than MM1 and MM2
@@ -111,12 +116,26 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4LogicalVolume *LVhadmon = new G4LogicalVolume(Shadmon, Air, "LVHadMon", 0, 0, 0);
   G4ThreeVector hadmon_pos = G4ThreeVector(0., 0.2*m, 0.2*m);
   
-  new G4PVPlacement(0, hadmon_pos, "PVHadMon", LVhadmon, ShldBox, false, 0);
+  G4PVPlacement *HadMon = new G4PVPlacement(0, hadmon_pos, "PVHadMon", LVhadmon, ShldBox, false, 0);
   
+  G4Box *SHadCell = new G4Box( "SHadCell", 3*in/2.0, 3*in/2.0, 1*mm/2.0 );
+  G4LogicalVolume *LVHadCell = new G4LogicalVolume(SHadCell, He, "LVHadCell", 0, 0, 0);
+  G4ThreeVector cellPos;
+  G4String volName = "HadCell";
+
+  for( int i = 0; i < 9; ++i ){
+    for( int j = 0; j < 9; ++j ){
+      cellPos = G4ThreeVector( (i-4)*11.4*cm, (j-4)*11.4*cm, 0 );
+      new G4PVPlacement( 0, cellPos, volName, LVHadCell, HadMon, false, i*9+j ); 
+    }
+  }
+
+
   G4cout << "Hadron Monitor Constructed" << G4endl;
 
   //-----------------------------------------------------------------
-  // Muon monitor 0 has slightly different dimensions than the other three alcoves.
+  // Muon monitor 0 has slightly different dimensions than the other 
+  // three alcoves.
 
 
   G4VPhysicalVolume* MuMonAlcv_0;
@@ -126,7 +145,6 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4Box *Smumonalcv_0 = new G4Box("SMuMonAlcv_0", MuAlcv0_width/2.0, MuAlcv0_height/2.0, MuAlcv0_length/2.0);
   G4LogicalVolume *LVmumonalcv_0 = new G4LogicalVolume(Smumonalcv_0, Air, "LVMuMonAlcv_0", 0, 0, 0);
   G4ThreeVector mumonalcv_0_pos = G4ThreeVector(0., y_MuAlcv0, z_MuAlcv0) - tunnelPos;
-  //  MuMonAlcv_0 = new G4PVPlacement(zrot, mumonalcv_0_pos, "MuMonAlcv_0", LVmumonalcv_0, ROCK, false, 0);
   MuMonAlcv_0 = new G4PVPlacement(zrot, mumonalcv_0_pos, "MuMonAlcv_0", LVmumonalcv_0, pvTUNE, false, 0);
 
   G4Box *Smumonalcv_1 = new G4Box("SMuMonAlcv_1", MuAlcv1_width/2.0, MuAlcv1_height/2.0, MuAlcv1_length/2.0);
@@ -139,6 +157,9 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   mumonalcv_pos = G4ThreeVector(0., y_MuAlcv2, z_MuAlcv2);
   MuMonAlcv_2 = new G4PVPlacement(zrot, mumonalcv_pos, "MuMonAlcv_2", LVmumonalcv_2, ROCK, false, 0);
 
+
+
+  //--------------------------------------------------
   // Place the Shotcrete on the walls
   // of the Muon Alcoves
   
@@ -160,7 +181,9 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4ThreeVector MuMonAlcvFill_0 = G4ThreeVector(0., 0., MuAlcv0_length/2.0 - Backfill_depth/2.0);
   new G4PVPlacement(0, MuMonAlcvFill_0, "MuMonAlcvFill_0", LVMuMonAlcvFill_0, MuMonAlcv_0, false, 0);
 
+
   G4cout << "Muon Monitor Alcoves(1,2,3) Constructed" << G4endl;
+
 
   //--------------------------------------------------
   // The Muon Monitors will be 2.2m x 2.2m x 2.25in 
@@ -194,7 +217,5 @@ void NumiDetectorConstruction::ConstructSecMonitors()
       new G4PVPlacement( 0, cellPos, volName, LVMuCell, MuMon0, false, i*9+j ); 
     }
   }
-
-  G4cout << "Muon Monitors(1,2,3) Constructed" << G4endl;
 
 }
