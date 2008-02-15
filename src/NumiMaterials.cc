@@ -1,5 +1,6 @@
 //----------------------------------------------------------------------
-// $Id
+//
+// $Id: NumiMaterials.cc,v 1.9 2008/02/15 15:01:50 koskinen Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -16,6 +17,9 @@ void NumiDetectorConstruction::DefineMaterials()
   G4double Z;  // atomic number
   G4String symbol,name;
   G4double density, mass_percent;
+
+  G4double rock_density_offset     = 0.04*g/cm3 * NumiData->GetMaterialSigma();
+  G4double BluBlock_density_offset = 0.16*g/cm3 * NumiData->GetMaterialSigma();
 
   // Air and Vacuum
   A = 1.01*g/mole;
@@ -85,8 +89,8 @@ void NumiDetectorConstruction::DefineMaterials()
   G4Element* elHg  = new G4Element(name="Mercury"  ,symbol="Hg" , Z=80, A);
 
   density = 1.29*mg/cm3; 
-  Air = new G4Material("Air", density, 2); //number of components =2
-  Air->AddElement(elN, 70*perCent); //mass fraction =70%
+  Air = new G4Material("Air", density, 2); // number of components =2
+  Air->AddElement(elN, 70*perCent); // mass fraction =70%
   Air->AddElement(elO, 30*perCent); // 30%
 
   density = 7.75*g/cm3;  
@@ -111,7 +115,7 @@ void NumiDetectorConstruction::DefineMaterials()
   Slab_Stl->AddElement(elNi, 1.0*perCent);
   Slab_Stl->AddElement(elCu, 0.2*perCent);
 
-  density = 7.25*g/cm3;// BluBlock steel
+  density = 7.25*g/cm3 + BluBlock_density_offset;// BluBlock steel
   Blu_Stl = new G4Material("Blu_Stl",density,1);
   Blu_Stl->AddElement(elFe, 100*perCent);
 
@@ -154,75 +158,79 @@ void NumiDetectorConstruction::DefineMaterials()
   density = 2.03*g/cm3;
   G4double fractionmass;
   Concrete = new G4Material("Concrete", density, 10);
-  Concrete->AddElement(elH , fractionmass= 0.01);
-  Concrete->AddElement(elO , fractionmass= 0.529);
-  Concrete->AddElement(elNa , fractionmass= 0.016);
-  Concrete->AddElement(elHg , fractionmass= 0.002);
-  Concrete->AddElement(elAl , fractionmass= 0.034);
-  Concrete->AddElement(elSi , fractionmass= 0.337);
-  Concrete->AddElement(elK , fractionmass= 0.013);
-  Concrete->AddElement(elCa , fractionmass= 0.044);
-  Concrete->AddElement(elFe , fractionmass= 0.014);
-  Concrete->AddElement(elC , fractionmass= 0.001);
+  Concrete->AddElement( elH,  fractionmass = 0.01);
+  Concrete->AddElement( elO,  fractionmass = 0.529);
+  Concrete->AddElement( elNa, fractionmass = 0.016);
+  Concrete->AddElement( elHg, fractionmass = 0.002);
+  Concrete->AddElement( elAl, fractionmass = 0.034);
+  Concrete->AddElement( elSi, fractionmass = 0.337);
+  Concrete->AddElement( elK,  fractionmass = 0.013);
+  Concrete->AddElement( elCa, fractionmass = 0.044);
+  Concrete->AddElement( elFe, fractionmass = 0.014);
+  Concrete->AddElement( elC,  fractionmass = 0.001);
 
   // This comes from the MARS simulation courtesy of 
   // Nancy Grossman
   density = 2.09*g/cm3;
-  Shotcrete = new G4Material("Shotcrete", density, 7);
-  Shotcrete->AddElement(elO , fractionmass= 0.361747);
-  Shotcrete->AddElement(elSi , fractionmass= 0.100031);
-  Shotcrete->AddElement(elAl , fractionmass= 0.026992);
-  Shotcrete->AddElement(elS , fractionmass= 0.013217);
-  Shotcrete->AddElement(elCa , fractionmass= 0.463835);
-  Shotcrete->AddElement(elFe , fractionmass= 0.016087);
-  Shotcrete->AddElement(elC , fractionmass= 0.018091);
+  Shotcrete = new G4Material( "Shotcrete", density, 7 );
+  Shotcrete->AddElement( elO,  fractionmass = 0.361747 );
+  Shotcrete->AddElement( elSi, fractionmass = 0.100031 );
+  Shotcrete->AddElement( elAl, fractionmass = 0.026992 );
+  Shotcrete->AddElement( elS,  fractionmass = 0.013217 );
+  Shotcrete->AddElement( elCa, fractionmass = 0.463835 );
+  Shotcrete->AddElement( elFe, fractionmass = 0.016087 );
+  Shotcrete->AddElement( elC,  fractionmass = 0.018091 );
 
   // This rebar value comes from "Concrete Shielding: Dimensions
   // & Weight" rev. 1988. Which puts the weight at 10150 +/- 50 
   // pounds
+
   density = 2.61*g/cm3;
   Rebar_Concrete = new G4Material("Rebar_Concrete", density, 10);
-  Rebar_Concrete->AddElement(elH , fractionmass= 0.01);
-  Rebar_Concrete->AddElement(elO , fractionmass= 0.529);
-  Rebar_Concrete->AddElement(elNa , fractionmass= 0.016);
-  Rebar_Concrete->AddElement(elHg , fractionmass= 0.002);
-  Rebar_Concrete->AddElement(elAl , fractionmass= 0.034);
-  Rebar_Concrete->AddElement(elSi , fractionmass= 0.337);
-  Rebar_Concrete->AddElement(elK , fractionmass= 0.013);
-  Rebar_Concrete->AddElement(elCa , fractionmass= 0.044);
-  Rebar_Concrete->AddElement(elFe , fractionmass= 0.014);
-  Rebar_Concrete->AddElement(elC , fractionmass= 0.001);
+  Rebar_Concrete->AddElement( elH,  fractionmass = 0.01 );
+  Rebar_Concrete->AddElement( elO,  fractionmass = 0.529 );
+  Rebar_Concrete->AddElement( elNa, fractionmass = 0.016 );
+  Rebar_Concrete->AddElement( elHg, fractionmass = 0.002 );
+  Rebar_Concrete->AddElement( elAl, fractionmass = 0.034 );
+  Rebar_Concrete->AddElement( elSi, fractionmass = 0.337 );
+  Rebar_Concrete->AddElement( elK,  fractionmass = 0.013 );
+  Rebar_Concrete->AddElement( elCa, fractionmass = 0.044 );
+  Rebar_Concrete->AddElement( elFe, fractionmass = 0.014 );
+  Rebar_Concrete->AddElement( elC,  fractionmass = 0.001 );
 
   // Dolomite
-  density = 2.79*g/cm3;//nominally 2.79 g/cm3
-  G4Material *rockMat = new G4Material("rockMat",density,4); //CaMg(CO3)2
-  rockMat->AddElement(elCa, natoms = 1);
-  rockMat->AddElement(elMg, natoms = 1); 
-  rockMat->AddElement(elC, natoms = 2); 
-  rockMat->AddElement(elO, natoms = 6); 
+
+  density = 2.78*g/cm3 + rock_density_offset;
+  G4Material *rockMat = new G4Material( "rockMat", density, 4 ); //CaMg(CO3)2
+  rockMat->AddElement( elCa, natoms = 1 );
+  rockMat->AddElement( elMg, natoms = 1 ); 
+  rockMat->AddElement( elC,  natoms = 2 ); 
+  rockMat->AddElement( elO,  natoms = 6 ); 
   
   // Maquoketa Shale
-  density = 2.79*g/cm3;//2.79 +/- .04 from mindat.org and geotesting
+
+  density = 2.78*g/cm3 + rock_density_offset;
   MaqShale = new G4Material("MaqShale",density,5);
   mass_percent = 25.4/384.75;
-  MaqShale->AddElement(elK, fractionmass = mass_percent);
+  MaqShale->AddElement( elK, fractionmass = mass_percent );
   mass_percent =  71.55/384.75;
-  MaqShale->AddElement(elAl, fractionmass = mass_percent);
+  MaqShale->AddElement( elAl, fractionmass = mass_percent );
   mass_percent =  93.8/384.75;
-  MaqShale->AddElement(elSi, fractionmass = mass_percent);
+  MaqShale->AddElement( elSi, fractionmass = mass_percent );
   mass_percent =  192.0/384.75;
-  MaqShale->AddElement(elO, fractionmass = mass_percent);
+  MaqShale->AddElement( elO, fractionmass = mass_percent );
   mass_percent =  2.0/384.75;
-  MaqShale->AddElement(elH, fractionmass = mass_percent);
+  MaqShale->AddElement( elH, fractionmass = mass_percent );
 
   // Dolostone - a mixture of Dolomite and Maquoketa Shale
   // nominally 44.2/52/3.8 Dolomite/Shale/Water
   // for 3.8% water the density of water needs to be added
-  density = 2.828*g/cm3;
-  DoloStone = new G4Material("DoloStone",density,3);
-  DoloStone->AddMaterial(rockMat, fractionmass = 0.442);
-  DoloStone->AddMaterial(MaqShale, fractionmass = 0.52);
-  DoloStone->AddMaterial(Water, fractionmass = 0.038);
+
+  density = 2.828*g/cm3 + rock_density_offset;
+  DoloStone = new G4Material( "DoloStone", density, 3 );
+  DoloStone->AddMaterial( rockMat, fractionmass = 0.30 );
+  DoloStone->AddMaterial( MaqShale, fractionmass = 0.662 );
+  DoloStone->AddMaterial( Water, fractionmass = 0.038 );
 
   // The variable density bits result from the water cooling 
   // pipes through the core. There is a nuclear Z 
@@ -230,35 +238,35 @@ void NumiDetectorConstruction::DefineMaterials()
   // in these approximations. -DJK
 
   density = 2.45*g/cm3;
-  var_Al = new G4Material("VariableDensityAluminum", density, 3);
-  var_Al->AddElement(elAl, fractionmass = .891);
-  var_Al->AddMaterial(Water, fractionmass = .044);
-  var_Al->AddMaterial(Air, fractionmass = .065);
+  var_Al = new G4Material( "VariableDensityAluminum", density, 3 );
+  var_Al->AddElement( elAl, fractionmass = .891 );
+  var_Al->AddMaterial( Water, fractionmass = .044 );
+  var_Al->AddMaterial( Air, fractionmass = .065 );
 
   density = 6.836*g/cm3;
   var_Stl = new G4Material("VariableDensitySteel", density, 2);
-  var_Stl->AddElement(elFe, fractionmass = .853);
-  var_Stl->AddMaterial(Water, fractionmass = .147);
+  var_Stl->AddElement( elFe,   fractionmass = .853);
+  var_Stl->AddMaterial( Water, fractionmass = .147);
 
   density = 7.8*g/cm3;
-  n1018_Stl = new G4Material("1018Steel", density, 3);
-  n1018_Stl->AddElement(elFe, fractionmass = .989);
-  n1018_Stl->AddElement(elMn, fractionmass = .009);
-  n1018_Stl->AddElement(elC, fractionmass = .002);
+  n1018_Stl = new G4Material( "1018Steel", density, 3 );
+  n1018_Stl->AddElement( elFe, fractionmass = .989 );
+  n1018_Stl->AddElement( elMn, fractionmass = .009 );
+  n1018_Stl->AddElement( elC,  fractionmass = .002 );
 
   density = 7.8*g/cm3;
-  A500_Stl = new G4Material("A500Steel", density, 3);
-  A500_Stl->AddElement(elFe, fractionmass = .995);
-  A500_Stl->AddElement(elCu, fractionmass = .002);
-  A500_Stl->AddElement(elC, fractionmass = .003);
+  A500_Stl = new G4Material( "A500Steel", density, 3 );
+  A500_Stl->AddElement( elFe, fractionmass = .995 );
+  A500_Stl->AddElement( elCu, fractionmass = .002 );
+  A500_Stl->AddElement( elC,  fractionmass = .003 );
 
   density = 7.8*g/cm3;
-  M1018_Stl = new G4Material("M1018Steel", density, 5);
-  M1018_Stl->AddElement(elFe, fractionmass = .9901);
-  M1018_Stl->AddElement(elMn, fractionmass = .007);
-  M1018_Stl->AddElement(elC, fractionmass = .002);
-  M1018_Stl->AddElement(elP, fractionmass = .00045);
-  M1018_Stl->AddElement(elS, fractionmass = .00045);
+  M1018_Stl = new G4Material( "M1018Steel", density, 5 );
+  M1018_Stl->AddElement( elFe, fractionmass = .9901 );
+  M1018_Stl->AddElement( elMn, fractionmass = .007 );
+  M1018_Stl->AddElement( elC,  fractionmass = .002 );
+  M1018_Stl->AddElement( elP,  fractionmass = .00045 );
+  M1018_Stl->AddElement( elS,  fractionmass = .00045 );
 
 }
 
@@ -289,6 +297,7 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   G4cout << G4endl << " **** Wrong material code **** " << matcode << G4endl << G4endl;
   return Vacuum;
 }
+
 G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4int matCode)
 { 
   G4VisAttributes* visAttrib=new G4VisAttributes(G4Color(1., 0., 0.));

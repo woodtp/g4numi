@@ -1,5 +1,7 @@
 //----------------------------------------------------------------------
-// $Id: NumiDataInput.cc,v 1.17 2008/02/14 19:30:20 koskinen Exp $
+//
+//
+// $Id: NumiDataInput.cc,v 1.18 2008/02/15 15:01:50 koskinen Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -20,38 +22,41 @@ NumiDataInput::NumiDataInput()
   fNumiDataInput = this;
 
   debugOn = false;
-  NImpWeightOn = true; createNuNtuple=true; createHadmmNtuple=false;
+  NImpWeightOn = true; createNuNtuple=false; createHadmmNtuple=true;
   createASCII=false; useFlukaInput = false; useMarsInput=false; 
-  useMuonBeam = false; KillTracking = true;
+  useMuonBeam = true; KillTracking = true;
 
   extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
-  KillTrackingThreshold = 0.5*GeV;
+  KillTrackingThreshold = 0.05*GeV;
 
   //base name for output files:
-  nuNtupleName = "nuNtuple"; 
+  nuNtupleName    = "nuNtuple"; 
   hadmmNtupleName = "hadmmNtuple";
-  asciiName = "asciiOut";
-  RunNumber = "0000";
-  geometry = "";
+  asciiName       = "asciiOut";
+  RunNumber       = "0000";
+  geometry        = "_K";
+
+  materialSigma   = 0;// Denotes the change in sigma to the
+                      // rock density and muon alcove wall location
 
 
-  G4float beam_x_dir=0;
-  G4float beam_y_dir=0;
-  G4float beam_z_dir=1;//cos(.01*pi/180);
+  G4float beam_x_dir = 0;
+  G4float beam_y_dir = 0;
+  G4float beam_z_dir = 1;//cos(.01*pi/180);
   //actual dm is 5/13e-4 radians 
-  G4float beam_x_pos=0;
-  G4float beam_y_pos=0;
-  G4float beam_z_pos=-4.0*m;
+  G4float beam_x_pos = 0;
+  G4float beam_y_pos = 0;
+  G4float beam_z_pos = -4.0*m;
   // the reason for the beam_z_pos change was to move the beam to start
   // immediately before the target so that the beam spot interaction point
   // would remain constant, but the angle would change.
 
   protonMomentum = 120.*GeV;  
-  beamSigmaY = 0;//1.25*mm;
-  beamSigmaX = 0;//1.1*mm;
-  beamDirection = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
-  beamPosition = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
+  beamSigmaY     = 0;//1.25*mm;
+  beamSigmaX     = 0;//1.1*mm;
+  beamDirection  = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
+  beamPosition  = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
 
   protonKineticEnergy = sqrt(pow((.938*GeV),2)+pow(protonMomentum,2))-0.938*GeV;
 

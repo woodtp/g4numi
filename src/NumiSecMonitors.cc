@@ -7,7 +7,7 @@
 // pixels in the muon monitors is modelled and acts as the active
 // elements of the monitors.
 //
-// $Id: NumiSecMonitors.cc,v 1.6 2008/02/14 19:49:34 koskinen Exp $
+// $Id: NumiSecMonitors.cc,v 1.7 2008/02/15 15:01:50 koskinen Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -28,8 +28,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   // Generating variables for systematic
   // studies
 
-  G4double UpWall_offset    = 0;//0.09*ft;
-  G4double DownWall_offset  = 0;//-0.54*ft;
+  G4double UpWall_offset    = 0.09*ft * NumiData->GetMaterialSigma();
+  G4double DownWall_offset  = -0.54*ft * NumiData->GetMaterialSigma();
 
   //--------------------------------------------------
   // Only want to retrieve some information once, i.e.

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.7 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiSteppingAction.cc,v 1.8 2008/02/15 15:01:50 koskinen Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -68,22 +68,40 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
     if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
 	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield")){
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->FillHadmmNtuple(*theTrack,4);
+      analysis->FillHadmmNtuple(*theTrack,
+				4,
+				0);
     }
-    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
-	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_0")){
+    else if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
+	      && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0")){
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->FillHadmmNtuple(*theTrack,0);
+      analysis->FillHadmmNtuple(*theTrack, 
+				0, 
+				theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
     }
-    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuMon_1"
-	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_1")){
+    else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
+	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_1")){
+      
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->FillHadmmNtuple(*theTrack,1);
+      analysis->FillHadmmNtuple(*theTrack,
+				1,
+				theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+      
     }
-    if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuMon_2"
-	 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcv_2")){
+    else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
+	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_2")){
+      
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->FillHadmmNtuple(*theTrack,2);
+      analysis->FillHadmmNtuple(*theTrack,
+				2,
+				theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+      
+    }
+    
+    else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "ROCK"
+	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcvShot_2_Down")){      
+      theTrack->SetTrackStatus(fStopAndKill);
+
     }
   }
 

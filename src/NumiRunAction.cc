@@ -57,6 +57,15 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
       G4cout << " SigmaX = "<<ND->beamSigmaX/mm<<" mm"<<G4endl;
       G4cout << " SigmaY = "<<ND->beamSigmaY/mm<<" mm"<<G4endl;
   }
+
+  // Outputs whether the rock density and alcove walls have been
+  // changed, and by what fraction of the sigma values.
+  if ( ND->GetMaterialSigma() != 0 ){
+    G4cout << " Material Sigma = " << ND->GetMaterialSigma() << G4endl;
+    if ( ND->GetMaterialSigma() < 0 ) ND->SetGeometryTag("_Y");
+    else if ( ND->GetMaterialSigma() > 0 ) ND->SetGeometryTag("_V");
+  }
+
   G4cout << "Processing "<<pRunManager->GetNumberOfEvents()<<" particles"<<G4endl;
   //Book histograms and ntuples
   NumiAnalysis* analysis = NumiAnalysis::getInstance();

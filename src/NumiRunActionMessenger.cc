@@ -57,6 +57,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   setRunID->SetDefaultValue (0);
   setRunID->AvailableForStates(G4State_PreInit,G4State_Idle); 
 
+  setMaterialSigma = new G4UIcmdWithADouble("/material/materialSigma",this);
+  setMaterialSigma->SetGuidance("set Sigma");
+  setMaterialSigma->SetParameterName("Sigma value of density/material",true);
+  setMaterialSigma->SetDefaultValue (0);
+  setMaterialSigma->AvailableForStates(G4State_PreInit,G4State_Idle); 
+
   useNImpWeight = new G4UIcmdWithABool("/NuMI/run/useNImpWeight",this);
   useNImpWeight->SetGuidance("use importance weighting (true/false)");
   useNImpWeight->SetParameterName("NImpWeight",true);
@@ -129,6 +135,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete RndmDir;
 
   delete setRunID;
+  delete setMaterialSigma;
   delete useNImpWeight;
   delete NumiRunDir;
   delete useFlukaInput;
@@ -167,6 +174,10 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == setRunID){
     G4RunManager* runManager = G4RunManager::GetRunManager();
     runManager->SetRunIDCounter(setRunID->GetNewIntValue(newValues));
+  }
+
+  if (command == setMaterialSigma){
+    NumiData->materialSigma = setMaterialSigma->GetNewDoubleValue(newValues);
   }
 
   if (command == debugOn){
