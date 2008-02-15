@@ -1,3 +1,8 @@
+//----------------------------------------------------------------------
+//
+// $Id: NumiDataInput.hh,v 1.13 2008/02/15 23:25:03 koskinen Exp $
+//----------------------------------------------------------------------
+
 #ifndef NumiDataInput_h
 #define NumiDataInput_h 1
 
@@ -51,6 +56,15 @@ public:
   G4String GetRunNumber(){
     return RunNumber;
   }
+  void SetGeometryTag(G4String geoName){
+    geometry = geoName;
+  }
+  G4String GetGeometryTag(){
+    return geometry;
+  }
+  G4double GetMaterialSigma(){
+    return materialSigma;
+  }
   void SetExtNtupleFileName(G4String fileName){
     extNtupleFileName=fileName;
   }
@@ -91,7 +105,7 @@ public:
   G4bool KillTracking;
   G4String nuNtupleName, hadmmNtupleName, asciiName, RunNumber, geometry;
 
-  G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy;
+  G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
   G4double KillTrackingThreshold;
   G4ThreeVector beamPosition, beamDirection;
 
