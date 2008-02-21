@@ -33,6 +33,7 @@ private:
   G4UIdirectory*            NumiRunDir;
   G4UIcmdWithABool*         debugOn;
   G4UIcmdWithAnInteger*     setRunID;
+  G4UIcmdWithADouble*       setMaterialSigma;
   G4UIcmdWithABool*         useNImpWeight;
   G4UIcmdWithABool*         useFlukaInput;
   G4UIcmdWithABool*         useMarsInput;

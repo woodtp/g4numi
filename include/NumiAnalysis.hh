@@ -33,7 +33,7 @@ public:
   void book();
   void finish();
   void FillNeutrinoNtuple(const G4Track& track);
-  void FillHadmmNtuple(const G4Track& track,Int_t mm_num);
+  void FillHadmmNtuple(const G4Track& track, Int_t mm_num, Int_t cell);
   void WriteHadmmNtuple();
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
