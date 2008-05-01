@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.18 2008/02/15 15:01:50 koskinen Exp $
+// $Id: NumiDataInput.cc,v 1.19 2008/05/01 18:09:46 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -24,14 +24,15 @@ NumiDataInput::NumiDataInput()
   debugOn = false;
   NImpWeightOn = true; createNuNtuple=false; createHadmmNtuple=true;
   createASCII=false; useFlukaInput = false; useMarsInput=false; 
-  useMuonBeam = true; KillTracking = true;
+  useMuonInput = false; useMuonBeam = true; KillTracking = true;
 
-  extNtupleFileName=""; //fluka or mars ntuple with particles coming of the target
+  extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
-  KillTrackingThreshold = 0.05*GeV;
+  KillTrackingThreshold = 0.001*GeV;
 
   //base name for output files:
   nuNtupleName    = "nuNtuple"; 
+  hadmmNtupleDir = "./";
   hadmmNtupleName = "hadmmNtuple";
   asciiName       = "asciiOut";
   RunNumber       = "0000";

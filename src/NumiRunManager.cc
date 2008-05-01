@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiRunManager.cc
-// $Id: NumiRunManager.cc,v 1.5 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiRunManager.cc,v 1.6 2008/05/01 18:09:46 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
@@ -30,9 +30,13 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
   	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
-       else if(ND->useMuonBeam){   
+       else if(ND->useMuonBeam && !(ND->useMuonInput)){   
 	 G4cout << "Muon Beam is set" << G4endl;  	 
 	 primaryGeneratorAction->SetMuonBeam();
+       }
+       else if(ND->useMuonBeam && ND->useMuonInput){
+	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
+  	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
        else{
      	 primaryGeneratorAction->SetProtonBeam();
@@ -46,6 +50,9 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 	 RunTermination();
 	 
 	 if(ND->useFlukaInput){
+	   primaryGeneratorAction->CloseNtuple();
+	 }
+	 if(ND->useMuonInput){
 	   primaryGeneratorAction->CloseNtuple();
 	 }
 	 

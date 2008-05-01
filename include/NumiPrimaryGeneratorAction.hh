@@ -13,6 +13,8 @@ class TFile;
 class TTree;
 class NumiRunManager;
 
+#include "NtpMuon.hh"
+
 class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
  public:
@@ -52,6 +54,21 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   G4int GetParticleType(){
     return fType;
   }
+  G4double GetMuWeight(){
+    return fmuweight;
+  }
+  G4ThreeVector GetMuParentMomentum(){
+    return fMuParentMomentum;
+  }
+  G4int GetParentType(){
+    return ftpptype;
+  }
+  G4double GetImpWeight(){
+    return fnimpwt;
+  }
+  G4int GetMuParentType(){
+    return fpptype;
+  }
   // *********************************************************************
   G4int GetNoOfPrimaries(){
     return fNoOfPrimaries;
@@ -59,7 +76,7 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
  
 
  private:
-  G4ThreeVector fParticleMomentum,fParticlePosition;    
+  G4ThreeVector fParticleMomentum,fParticlePosition, flocalParticleMomentum;    
   G4int fNoOfPrimaries,fTgen,fType; 
   G4double fWeight;
   G4bool fIsFirst;
@@ -75,6 +92,15 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   NumiDataInput* fND;
   NumiRunManager* fRunManager;
   G4ParticleGun* fParticleGun;
+
+  G4double fmuweight;
+  G4ThreeVector fMuParentMomentum;
+  G4int ftpptype;
+  G4double fnimpwt;
+  G4int fpptype;
+
+
+  NtpMuon* fMuon;
 
 };
 

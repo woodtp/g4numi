@@ -20,6 +20,8 @@ class NumiSteppingAction : public G4UserSteppingAction
 
   NumiDataInput *NDI;
 
+  
+
 };
 
 #endif

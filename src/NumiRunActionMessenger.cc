@@ -81,6 +81,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useMarsInput->SetDefaultValue (NumiData->useMarsInput);
   useMarsInput->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  useMuonInput = new G4UIcmdWithABool("/NuMI/run/useMuonInput",this);
+  useMuonInput->SetGuidance("use muon input ntuple");
+  useMuonInput->SetParameterName("useMuonInput",true);
+  useMuonInput->SetDefaultValue (NumiData->useMuonInput);
+  useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);\
+
   extNtupleFileName = new G4UIcmdWithAString("/NuMI/run/extNtupleFileName",this);
   extNtupleFileName->SetGuidance("set external (fluka/mars) ntuple file name");
   extNtupleFileName->SetParameterName("extNtupleFileName",true);
@@ -101,6 +107,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   outputNuNtuple->SetParameterName("outputNuNtuple",true);
   outputNuNtuple->SetDefaultValue (NumiData->createNuNtuple);
   outputNuNtuple->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setHadmmNtupleDir = new G4UIcmdWithAString("/NuMI/output/setHadmmNtupleDir",this);
+  setHadmmNtupleDir->SetGuidance("set hadron and muon monitor ntuple file directory");
+  setHadmmNtupleDir->SetParameterName("fileDir",true);
+  setHadmmNtupleDir->SetDefaultValue (NumiData->hadmmNtupleDir);
+  setHadmmNtupleDir->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   setHadmmNtupleFile = new G4UIcmdWithAString("/NuMI/output/setHadmmNtupleFile",this);
   setHadmmNtupleFile->SetGuidance("set hadron and muon monitor ntuple file name");
@@ -140,6 +152,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete NumiRunDir;
   delete useFlukaInput;
   delete useMarsInput;
+  delete useMuonInput;
 
   delete setNuNtupleFile;
   delete outputNuNtuple;
@@ -195,6 +208,11 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == useMarsInput){
     NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
   }
+  
+  if (command == useMuonInput){
+    NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues));
+  }
+
   if (command == extNtupleFileName){
     NumiData->SetExtNtupleFileName(newValues);
   }
@@ -204,6 +222,10 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
 
   if (command == outputNuNtuple){
       NumiData->OutputNuNtuple(outputNuNtuple->GetNewBoolValue(newValues));
+  }
+
+  if (command == setHadmmNtupleDir){
+      NumiData->SetHadmmNtupleDir(newValues);
   }
 
   if (command == setHadmmNtupleFile){

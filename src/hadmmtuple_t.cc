@@ -2,7 +2,7 @@
 // Sets the relevant memebers of the data class for storing the
 // MC data for the Hadron and Muon Monitors.
 //
-// $Id: hadmmtuple_t.cc,v 1.4 2008/02/15 15:01:50 koskinen Exp $
+// $Id: hadmmtuple_t.cc,v 1.5 2008/05/01 18:09:46 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "hadmmtuple_t.hh"
@@ -10,30 +10,44 @@
 ClassImp(hadmmtuple_t)
 
 hadmmtuple_t::hadmmtuple_t():
-  run(-1),       
-  evtno(-1), 
-  mtgthpos(-1.e4),
-  mtgtvpos(-1.e4),
-  mtgthsig(-1.e4),
-  mtgtvsig(-1.e4),
-  ptype(-1),
-  hmmenergy(-1.e4),
-  hmmxpos(-1.e4),
-  hmmypos(-1.e4),
-  hmmzpos(-1.e4),
-  hmmpx(-1.e4),
-  hmmpy(-1.e4),
-  hmmpz(-1.e4)
+  run(-81000),       
+  evtno(-81000), 
+  muvx(-81000.),
+  muvy(-81000.),
+  muvz(-81000.),
+  mupx(-81000.),
+  mupy(-81000.),
+  mupz(-81000.),
+  muweight(-81000.),
+  tpx(-81000.),
+  tpy(-81000.),
+  tpz(-81000.),
+  tpptype(-81000),
+  nimpwt(-81000.),
+  mtgthpos(-81000.),
+  mtgtvpos(-81000.),
+  mtgthsig(-81000.),
+  mtgtvsig(-81000.),
+  pptype(-81000),
+  ptype(-81000),
+  hmmenergy(-81000.),
+  hmmxpos(-81000.),
+  hmmypos(-81000.),
+  hmmzpos(-81000.),
+  hmmpx(-81000.),
+  hmmpy(-81000.),
+  hmmpz(-81000.)
 {
   for(Int_t index=0;index<3;index++){
-    mmxpos[index] = -1.e4;
-    mmypos[index] = -1.e4;
-    mmzpos[index] = -1.e4;
-    mmpx[index]   = -1.e4;
-    mmpy[index]   = -1.e4;
-    mmpz[index]   = -1.e4;
-    cell[index]   = -1.e4;
+    mmxpos[index]=-81000.;
+    mmypos[index]=-81000.;
+    mmzpos[index]=-81000.;
+    mmpx[index]=-81000.;
+    mmpy[index]=-81000.;
+    mmpz[index]=-81000.;
+    cell[index]=-81000;
   }
+
 }
   //-----------------------------------------------------------------------------------
 hadmmtuple_t::~hadmmtuple_t()

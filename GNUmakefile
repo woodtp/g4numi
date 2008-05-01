@@ -21,8 +21,10 @@ include $(G4INSTALL)/config/architecture.gmk
 ifndef G4LISTS_BASE
   EXTRALIBS += -L$(G4LIB)/.lists_build/$(G4SYSTEM)
   G4LISTS_BASE = $(G4INSTALL)/hadronic_lists
+  EXTRALIBS += -L$(G4LIB)/plists/$(G4SYSTEM)	
 else
   EXTRALIBS += -L$(G4LISTS_BASE)/hadronic/plists/lib/$(G4SYSTEM)
+  EXTRALIBS += -L$(G4LIB)/plists/$(G4SYSTEM)
 endif
 
 #for root

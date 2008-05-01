@@ -37,7 +37,9 @@ private:
   G4UIcmdWithABool*         useNImpWeight;
   G4UIcmdWithABool*         useFlukaInput;
   G4UIcmdWithABool*         useMarsInput;
+  G4UIcmdWithABool*         useMuonInput;
   G4UIcmdWithAString*       extNtupleFileName;
+  G4UIcmdWithAString*       setHadmmNtupleDir;
   G4UIdirectory*            NumiOutputDir;
   G4UIcmdWithAString*       setNuNtupleFile; 
   G4UIcmdWithAString*       setHadmmNtupleFile; 

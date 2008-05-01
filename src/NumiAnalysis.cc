@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.16 2008/02/15 15:01:50 koskinen Exp $
+// $Id: NumiAnalysis.cc,v 1.17 2008/05/01 18:09:46 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include <fstream>
@@ -51,31 +51,49 @@ NumiAnalysis::NumiAnalysis()
   g4data = new data_t();
   g4hmmdata = new hadmmtuple_t();
 
-  // part of the nasty hack the will be expunged later. -J
+// part of the nasty hack the will be expunged later. -J
+  g4hmmdata->muvx = -81000;
+  g4hmmdata->muvy = -81000;
+  g4hmmdata->muvz = -81000;
+  g4hmmdata->mupx = -81000;
+  g4hmmdata->mupy = -81000;
+  g4hmmdata->mupz = -81000;
+  g4hmmdata->tpx = -81000;
+  g4hmmdata->tpy = -81000;
+  g4hmmdata->tpz = -81000;
+  g4hmmdata->muweight = -81000;
+  g4hmmdata->tpptype = -81000;
+  g4hmmdata->nimpwt = -81000; 
+  g4hmmdata->pptype = -81000;
+  g4hmmdata->ptype = -81000;
 
-  g4hmmdata->run       = -81000;
-  g4hmmdata->mtgthsig  = -81000; 
-  g4hmmdata->mtgtvsig  = -81000; 
-  g4hmmdata->mtgthpos  = -81000; 
-  g4hmmdata->mtgtvpos  = -81000; 
-  g4hmmdata->evtno     = -81000; 
-  g4hmmdata->ptype     = -81000;
+  g4hmmdata->run = -81000;
+  g4hmmdata->mtgthsig = -81000; 
+  g4hmmdata->mtgtvsig = -81000; 
+  g4hmmdata->mtgthpos = -81000; 
+  g4hmmdata->mtgtvpos = -81000; 
+  g4hmmdata->evtno = -81000; 
+  g4hmmdata->ptype = -81000;
   g4hmmdata->hmmenergy = -81000;
 
   g4hmmdata->hmmxpos = -81000;
   g4hmmdata->hmmypos = -81000;
   g4hmmdata->hmmzpos = -81000;
-  g4hmmdata->hmmpx   = -81000;
-  g4hmmdata->hmmpy   = -81000;
-  g4hmmdata->hmmpz   = -81000;
-  for(Int_t i=0; i < 3; ++i){
+  g4hmmdata->hmmpx = -81000;
+  g4hmmdata->hmmpy = -81000;
+  g4hmmdata->hmmpz = -81000;
+  for(Int_t i=0;i<3;++i){
     g4hmmdata->mmxpos[i] = -81000;
     g4hmmdata->mmpx[i]   = -81000;
     g4hmmdata->mmypos[i] = -81000;
     g4hmmdata->mmpy[i]   = -81000;
     g4hmmdata->mmzpos[i] = -81000;
     g4hmmdata->mmpz[i]   = -81000; 
+    g4hmmdata->cell[i]   = -81000;
   }
+
+  fcount = 0;
+    fentry = 0;
 }
 
 NumiAnalysis::~NumiAnalysis()
@@ -104,11 +122,22 @@ void NumiAnalysis::book()
   }
  
   if (NumiData->createHadmmNtuple){
-    sprintf(hadmmNtupleFileName,"%s_%04d%s.root",(NumiData->hadmmNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
-    G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileName<<G4endl;
-    hadmmNtuple = new TFile(hadmmNtupleFileName, "RECREATE","hadmm ntuple");
-    hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
-    hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
+    if(NumiData->useMuonInput)
+    {
+      std::string hadmmNtupleFileNameStr = GetOFileName(NumiData->GetExtNtupleFileName());
+      G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileNameStr.c_str()<<G4endl;
+      hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","hadmm ntuple");
+      hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
+      hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
+    }
+    else
+    {
+      sprintf(hadmmNtupleFileName,"%s_%04d%s.root",(NumiData->hadmmNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
+      G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileName<<G4endl;
+      hadmmNtuple = new TFile(hadmmNtupleFileName, "RECREATE","hadmm ntuple");
+      hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
+      hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
+    }
   }
 
   if (NumiData->createASCII) {
@@ -120,6 +149,43 @@ void NumiAnalysis::book()
 
   //book histograms
 }
+
+
+std::string NumiAnalysis::GetOFileName(std::string ifilename)
+{
+   std::string filestart = ifilename;
+   
+   string::size_type slash_pos = ifilename.find_last_of('/');
+   if(slash_pos == string::npos)
+   {
+      cerr << "MakeMuNtp::GetOFileName() - bad filename" << endl;
+      return string("temp.root");
+   }
+
+   ifilename.erase(0, slash_pos+1);
+   //cout << "filename = " << ifilename << endl;
+
+   filestart.erase(slash_pos+1);
+
+   string::size_type loc_underscore = ifilename.find("_", 0);
+   if(loc_underscore == string::npos)
+   {
+      cerr << "MakeMuNtp::GetOFileName() - bad filename" << endl;
+      return string("temp.root");
+   }
+
+   ifilename.erase(0, loc_underscore);
+   //cout << "filename = " << ifilename << endl;
+
+   stringstream ofilename;
+
+   ofilename << NumiData->GetHadmmNtupleDir() << "/" << "hadmmNtuple" << ifilename;
+   //cout << "filename = " << ofilename.str() << endl;
+   
+
+   return ofilename.str();
+}
+
 
 void NumiAnalysis::finish()
 {  
@@ -141,53 +207,203 @@ void NumiAnalysis::finish()
 void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t cellNum)
 {
   if (!NumiData->createHadmmNtuple) return;
-
+  
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
+  
+  if(NumiData->useMuonInput)
+    {
+      NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
+      
+      G4ThreeVector particlePosition = NPGA->GetParticlePosition();
+      g4hmmdata->muvx = particlePosition[0];
+      g4hmmdata->muvy = particlePosition[1];
+      g4hmmdata->muvz = particlePosition[2];
+      
+      G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
+      g4hmmdata->mupx = particleMomentum[0];
+      g4hmmdata->mupy = particleMomentum[1];
+      g4hmmdata->mupz = particleMomentum[2];
+      
+      G4ThreeVector parentMomentum = NPGA->GetMuParentMomentum();
+      g4hmmdata->tpx = parentMomentum[0];
+      g4hmmdata->tpy = parentMomentum[1];
+      g4hmmdata->tpz = parentMomentum[2];
+      
+      g4hmmdata->muweight = NPGA->GetMuWeight(); 
+      g4hmmdata->tpptype = NPGA->GetParentType(); 
+      g4hmmdata->nimpwt = NPGA->GetImpWeight(); 
+      g4hmmdata->pptype = NPGA->GetMuParentType(); 
 
-  g4hmmdata->run      = pRunManager->GetCurrentRun()->GetRunID();
-  g4hmmdata->mtgthsig = NumiData->beamSigmaX/cm;
-  g4hmmdata->mtgtvsig = NumiData->beamSigmaY/cm;
-  g4hmmdata->mtgthpos = NumiData->beamPosition[0]/cm;
-  g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/cm;
-  g4hmmdata->evtno    = pRunManager->GetCurrentEvent()->GetEventID();
+      g4hmmdata->evtno = GetEntry();      
+    }
+  else
+    {  
+      g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
+      g4hmmdata->mtgthsig = NumiData->beamSigmaX/cm;
+      g4hmmdata->mtgtvsig = NumiData->beamSigmaY/cm;
+      g4hmmdata->mtgthpos = NumiData->beamPosition[0]/cm;
+      g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/cm;
+      g4hmmdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+    }
+
+
 
   G4ParticleDefinition* particleDefinition = track.GetDefinition();
-
-  g4hmmdata->ptype     = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
-  g4hmmdata->hmmenergy = track.GetTotalEnergy();  
   
-  if(hmm_num == 4){
-    g4hmmdata->hmmxpos = track.GetPosition()[0];
-    g4hmmdata->hmmypos = track.GetPosition()[1];
-    g4hmmdata->hmmzpos = track.GetPosition()[2];
-    g4hmmdata->hmmpx   = track.GetMomentum()[0];
-    g4hmmdata->hmmpy   = track.GetMomentum()[1];
-    g4hmmdata->hmmpz   = track.GetMomentum()[2]; 
+  g4hmmdata->ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
+  
+  if(!(NumiData->useMuonInput))
+    {
+      g4hmmdata->hmmenergy = track.GetTotalEnergy();
+      
+      if(hmm_num == 4)
+	{
+	  g4hmmdata->hmmxpos = track.GetPosition()[0];
+	  g4hmmdata->hmmypos = track.GetPosition()[1];
+	  g4hmmdata->hmmzpos = track.GetPosition()[2];
+	  g4hmmdata->hmmpx = track.GetMomentum()[0];
+	  g4hmmdata->hmmpy = track.GetMomentum()[1];
+	  g4hmmdata->hmmpz = track.GetMomentum()[2]; 
+	}
+    }
+
+
+  if(hmm_num != 4)
+    {
+      g4hmmdata->mmxpos[hmm_num] = track.GetPosition()[0];
+      g4hmmdata->mmpx[hmm_num]   = track.GetMomentum()[0];
+      g4hmmdata->mmypos[hmm_num] = track.GetPosition()[1];
+      g4hmmdata->mmpy[hmm_num]   = track.GetMomentum()[1];
+      g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
+      g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2]; 
+      g4hmmdata->cell[hmm_num]   = cellNum;
+    } 
+
+} 
+
+
+
+void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuonInput = true
+{
+  if (!NumiData->createHadmmNtuple) return;
+  
+
+  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+  NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
+  
+
+  G4ThreeVector particlePosition = NPGA->GetParticlePosition();
+  g4hmmdata->muvx = particlePosition[0];
+  g4hmmdata->muvy = particlePosition[1];
+  g4hmmdata->muvz = particlePosition[2];
+
+  
+  G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
+  g4hmmdata->mupx = particleMomentum[0];
+  g4hmmdata->mupy = particleMomentum[1];
+  g4hmmdata->mupz = particleMomentum[2];
+
+  
+  G4ThreeVector parentMomentum = NPGA->GetMuParentMomentum();
+  g4hmmdata->tpx = parentMomentum[0];
+  g4hmmdata->tpy = parentMomentum[1];
+  g4hmmdata->tpz = parentMomentum[2];
+
+  
+  g4hmmdata->muweight = NPGA->GetMuWeight(); 
+  g4hmmdata->tpptype = NPGA->GetParentType(); 
+  g4hmmdata->nimpwt = NPGA->GetImpWeight(); 
+  g4hmmdata->pptype = NPGA->GetMuParentType(); 
+
+  g4hmmdata->ptype = 6; 
+
+  
+  //g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
+  //g4hmmdata->mtgthsig = NumiData->beamSigmaX/cm;
+  //g4hmmdata->mtgtvsig = NumiData->beamSigmaY/cm;
+  //g4hmmdata->mtgthpos = NumiData->beamPosition[0]/cm;
+  //g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/cm;
+  //g4hmmdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+
+  g4hmmdata->evtno = GetEntry();
+
+  //g4hmmdata->hmmenergy = -81000;
+  //g4hmmdata->hmmxpos = -81000;
+  //g4hmmdata->hmmypos = -81000;
+  //g4hmmdata->hmmzpos = -81000;
+  //g4hmmdata->hmmpx = -81000;
+  //g4hmmdata->hmmpy = -81000;
+  //g4hmmdata->hmmpz = -81000;
+  
+
+  for(Int_t i=0;i<3;++i){
+    g4hmmdata->mmxpos[i] = -81000;
+    g4hmmdata->mmpx[i]   = -81000;
+    g4hmmdata->mmypos[i] = -81000;
+    g4hmmdata->mmpy[i]   = -81000;
+    g4hmmdata->mmzpos[i] = -81000;
+    g4hmmdata->mmpz[i]   = -81000; 
+    g4hmmdata->cell[i]   = -81000; 
+
   }
-  else{
-    g4hmmdata->mmxpos[hmm_num] = track.GetPosition()[0];
-    g4hmmdata->mmpx[hmm_num]   = track.GetMomentum()[0];
-    g4hmmdata->mmypos[hmm_num] = track.GetPosition()[1];
-    g4hmmdata->mmpy[hmm_num]   = track.GetMomentum()[1];
-    g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
-    g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2]; 
-    g4hmmdata->cell[hmm_num]   = cellNum; 
-  } 
 }
 
+
+void NumiAnalysis::SetCount(G4int count)
+{
+  fcount = count;
+}
+
+G4int NumiAnalysis::GetCount()
+{
+  return fcount;
+}
+
+void NumiAnalysis::SetEntry(G4int entry)
+{
+  fentry = entry;
+}
+
+G4int NumiAnalysis::GetEntry()
+{
+  return fentry;
+}
 
 void NumiAnalysis::WriteHadmmNtuple(){
 
   if (!NumiData->createHadmmNtuple) return;
+
+  ++fcount;
+
+  if(fcount > 1 && g4hmmdata->mupz > 0)
+  {
+    G4cout << "entry = "<< fentry << ", count = " << fcount << ", mupz = " << g4hmmdata->mupz << ", mm1pz = " << g4hmmdata->mmpz[0] <<", mm2pz = " << g4hmmdata->mmpz[1] << ", mm3pz = " << g4hmmdata->mmpz[2] << G4endl; 
+  }
+
   
   hadmmtree->Fill(); 
-  
+  g4hmmdata->muvx = -81000;
+  g4hmmdata->muvy = -81000;
+  g4hmmdata->muvz = -81000;
+  g4hmmdata->mupx = -81000;
+  g4hmmdata->mupy = -81000;
+  g4hmmdata->mupz = -81000;
+  g4hmmdata->tpx = -81000;
+  g4hmmdata->tpy = -81000;
+  g4hmmdata->tpz = -81000;
+  g4hmmdata->muweight = -81000;
+  g4hmmdata->tpptype = -81000;
+  g4hmmdata->nimpwt = -81000; 
+  g4hmmdata->pptype = -81000;
+  g4hmmdata->ptype = -81000;
+
+  g4hmmdata->hmmenergy = -81000;
   g4hmmdata->hmmxpos = -81000;
   g4hmmdata->hmmypos = -81000;
   g4hmmdata->hmmzpos = -81000;
-  g4hmmdata->hmmpx   = -81000;
-  g4hmmdata->hmmpy   = -81000;
-  g4hmmdata->hmmpz   = -81000;
+  g4hmmdata->hmmpx = -81000;
+  g4hmmdata->hmmpy = -81000;
+  g4hmmdata->hmmpz = -81000;
 
   for(G4int i=0; i<3; ++i){
     g4hmmdata->mmxpos[i] = -81000;

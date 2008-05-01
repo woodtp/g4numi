@@ -33,10 +33,19 @@ public:
   void book();
   void finish();
   void FillNeutrinoNtuple(const G4Track& track);
-  void FillHadmmNtuple(const G4Track& track, Int_t mm_num, Int_t cell);
+  void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
+  void FillHadmmNtuple();
   void WriteHadmmNtuple();
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
+
+  void SetCount(G4int count);
+  G4int GetCount();
+  void SetEntry(G4int entry);
+  G4int GetEntry();
+
+private:
+  std::string GetOFileName(std::string ifilename);
 
 private:
   static NumiAnalysis* instance;
@@ -58,6 +67,9 @@ private:
 
   data_t *g4data;
   hadmmtuple_t *g4hmmdata;
+
+  G4int fcount;
+  G4int fentry;
 
 };
 

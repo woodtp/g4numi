@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.13 2008/02/15 23:25:03 koskinen Exp $
+// $Id: NumiDataInput.hh,v 1.14 2008/05/01 18:09:46 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -50,6 +50,9 @@ public:
   void SetMarsInput(G4bool val) {
     useMarsInput = val;
   }
+  void SetMuonInput(G4bool val) {
+    useMuonInput = val;
+  }
   void SetRunNumber(G4String runNum){
     RunNumber=runNum;
   }
@@ -77,6 +80,12 @@ public:
   void SetHadmmNtupleName(G4String fileName){
     hadmmNtupleName=fileName;
   }
+  void SetHadmmNtupleDir(G4String fileDir){
+    hadmmNtupleDir=fileDir;
+  }
+  G4String GetHadmmNtupleDir(){
+    return hadmmNtupleDir;
+  }
   void SetASCIIName(G4String fileName){
     asciiName=fileName;
   }
@@ -95,15 +104,18 @@ public:
   G4double GetKillTrackingThreshold(){
     return KillTrackingThreshold;
   }
+  
+
+
  private:
   G4bool debugOn;
   G4String extNtupleFileName;
 
  public:
   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
-  G4bool useFlukaInput, useMarsInput, useMuonBeam;
+  G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput;
   G4bool KillTracking;
-  G4String nuNtupleName, hadmmNtupleName, asciiName, RunNumber, geometry;
+  G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
   G4double KillTrackingThreshold;
