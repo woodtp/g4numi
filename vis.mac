@@ -1,4 +1,9 @@
-
+#----------------------------------------------------------------------
+# Visualization macro used to produced a heprep file for viewing with
+# the HepRApp java application.
+#
+#$Id: vis.mac,v 1.5 2008/05/08 15:45:04 koskinen Exp $
+#----------------------------------------------------------------------
 #
 # create empty scene
 #
@@ -31,5 +36,6 @@
 #/control/verbose 2
 #/run/verbose 2
 #/gun/particle geantino
+/gun/energy 20
 /vis/scene/endOfEventAction accumulate
 /run/beamOn 1
