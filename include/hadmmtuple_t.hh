@@ -5,7 +5,7 @@
 // This is a class that defines the hadmmtuple_t object that is used to store 
 // the g4numi output in a root tree.
 //
-// $Id: hadmmtuple_t.hh,v 1.4 2008/05/01 18:09:46 loiacono Exp $
+// $Id: hadmmtuple_t.hh,v 1.5 2008/09/17 17:36:23 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef HADMMTUPLE_T_HH
@@ -57,7 +57,13 @@ class  hadmmtuple_t
   Double_t mmpy[3];
   Double_t mmpz[3];
   Double_t cell[3];
-    
+  Double_t mmxpos_Edep[3];
+  Double_t mmypos_Edep[3];
+  Double_t mmzpos_Edep[3];
+  Double_t mmpx_Edep[3];
+  Double_t mmpy_Edep[3];
+  Double_t mmpz_Edep[3];
+  
  private:
   ClassDef(hadmmtuple_t , 1)
     

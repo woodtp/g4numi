@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.9 2008/05/01 18:09:46 loiacono Exp $
+// $Id: NumiSteppingAction.cc,v 1.10 2008/09/17 17:36:23 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -95,9 +95,36 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
     }
 
   }
+
+
+
+  //To see if the particle has just past the point that is 0.5m upstream into the rock before
+  //monitor. Record the particle momentum in order to apply delta ray corrections. --LL
+  if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 728902.) //for alc0; info will only be recorded the first time this executes
+    {
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillAlcEdepInfo(*theTrack, 0);
+    }
+  if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 751406.) //for alc1; info will only be recorded the first time this executes
+    {
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillAlcEdepInfo(*theTrack, 1);
+    }
+  if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 771992.) //for alc2; info will only be recorded the first time this executes
+    {
+      NumiAnalysis* analysis = NumiAnalysis::getInstance();
+      analysis->FillAlcEdepInfo(*theTrack, 2);
+    }
+
+
+
+
+
+
   // Checks to see whether the particle has entered the Hadron
   // or muon monitors, and if so calls the NumiAnalysis class
   // to record the particle properties through the monitors.-DJK
+
 
   if (NDI->createHadmmNtuple && theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL)
   {

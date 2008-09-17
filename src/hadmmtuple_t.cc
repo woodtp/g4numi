@@ -2,7 +2,7 @@
 // Sets the relevant memebers of the data class for storing the
 // MC data for the Hadron and Muon Monitors.
 //
-// $Id: hadmmtuple_t.cc,v 1.5 2008/05/01 18:09:46 loiacono Exp $
+// $Id: hadmmtuple_t.cc,v 1.6 2008/09/17 17:36:23 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "hadmmtuple_t.hh"
@@ -38,15 +38,23 @@ hadmmtuple_t::hadmmtuple_t():
   hmmpy(-81000.),
   hmmpz(-81000.)
 {
-  for(Int_t index=0;index<3;index++){
-    mmxpos[index]=-81000.;
-    mmypos[index]=-81000.;
-    mmzpos[index]=-81000.;
-    mmpx[index]=-81000.;
-    mmpy[index]=-81000.;
-    mmpz[index]=-81000.;
-    cell[index]=-81000;
-  }
+  for(Int_t index=0;index<3;++index)
+    {
+      mmxpos[index]=-81000.;
+      mmypos[index]=-81000.;
+      mmzpos[index]=-81000.;
+      mmpx[index]=-81000.;
+      mmpy[index]=-81000.;
+      mmpz[index]=-81000.;
+      cell[index]=-81000;
+
+      mmxpos_Edep[index]=-81000.;
+      mmypos_Edep[index]=-81000.;
+      mmzpos_Edep[index]=-81000.;
+      mmpx_Edep[index]=-81000.;
+      mmpy_Edep[index]=-81000.;
+      mmpz_Edep[index]=-81000.;
+    }
 
 }
   //-----------------------------------------------------------------------------------

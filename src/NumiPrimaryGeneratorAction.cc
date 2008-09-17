@@ -251,6 +251,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     NumiAnalysis* analysis2 = NumiAnalysis::getInstance();
     analysis2->SetCount(0);
     analysis2->SetEntry(fCurrentPrimaryNo);
+    analysis2->SetAlcEdepFlag(false);
+    
 
     fMuon -> Clear();
     fMuon -> GetEntry(fCurrentPrimaryNo);
@@ -274,7 +276,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     }
     analysis->FillHadmmNtuple();
     
-    if(fMuon->mupz < 3.0)
+    if(fMuon->mupz < 1.0)
     {
       flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.00*GeV);
       fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.00*GeV*0.00*GeV)-mass);

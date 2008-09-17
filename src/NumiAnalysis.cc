@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.17 2008/05/01 18:09:46 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.18 2008/09/17 17:36:23 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include <fstream>
@@ -90,10 +90,21 @@ NumiAnalysis::NumiAnalysis()
     g4hmmdata->mmzpos[i] = -81000;
     g4hmmdata->mmpz[i]   = -81000; 
     g4hmmdata->cell[i]   = -81000;
+
+    g4hmmdata->mmxpos_Edep[i]=-81000.;
+    g4hmmdata->mmypos_Edep[i]=-81000.;
+    g4hmmdata->mmzpos_Edep[i]=-81000.;
+    g4hmmdata->mmpx_Edep[i]=-81000.;
+    g4hmmdata->mmpy_Edep[i]=-81000.;
+    g4hmmdata->mmpz_Edep[i]=-81000.;
   }
 
   fcount = 0;
-    fentry = 0;
+  fentry = 0;
+  fAlcEdep_called.push_back(false);
+  fAlcEdep_called.push_back(false);
+  fAlcEdep_called.push_back(false);
+
 }
 
 NumiAnalysis::~NumiAnalysis()
@@ -283,6 +294,41 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
 
 
 
+
+
+
+//record mu momentum and position at 0.5m into the rock upstream
+//of the monitors to apply delta ray corrections
+void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
+{
+  if(fAlcEdep_called[alc] == true) return;
+
+  //G4cout << "fentry = " << fentry << " Calling NumiAnalysis::FillAlcEdepInfo() for alc "<< alc << " zpos = " << track.GetPosition()[2] << G4endl; 
+  
+  g4hmmdata->mmxpos_Edep[alc] = track.GetPosition()[0];
+  g4hmmdata->mmpx_Edep[alc]   = track.GetMomentum()[0];
+  g4hmmdata->mmypos_Edep[alc] = track.GetPosition()[1];
+  g4hmmdata->mmpy_Edep[alc]   = track.GetMomentum()[1];
+  g4hmmdata->mmzpos_Edep[alc] = track.GetPosition()[2];
+  g4hmmdata->mmpz_Edep[alc]   = track.GetMomentum()[2];
+      
+  fAlcEdep_called[alc] = true;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuonInput = true
 {
   if (!NumiData->createHadmmNtuple) return;
@@ -345,8 +391,19 @@ void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuon
     g4hmmdata->mmpz[i]   = -81000; 
     g4hmmdata->cell[i]   = -81000; 
 
+
   }
 }
+
+
+
+void NumiAnalysis::SetAlcEdepFlag(G4bool AlcEdep)
+{
+  fAlcEdep_called[0] = AlcEdep;
+  fAlcEdep_called[1] = AlcEdep;
+  fAlcEdep_called[2] = AlcEdep;
+}
+
 
 
 void NumiAnalysis::SetCount(G4int count)
@@ -405,15 +462,23 @@ void NumiAnalysis::WriteHadmmNtuple(){
   g4hmmdata->hmmpy = -81000;
   g4hmmdata->hmmpz = -81000;
 
-  for(G4int i=0; i<3; ++i){
-    g4hmmdata->mmxpos[i] = -81000;
-    g4hmmdata->mmpx[i]   = -81000;
-    g4hmmdata->mmypos[i] = -81000;
-    g4hmmdata->mmpy[i]   = -81000;
-    g4hmmdata->mmzpos[i] = -81000;
-    g4hmmdata->mmpz[i]   = -81000; 
-    g4hmmdata->cell[i]   = -81000; 
-  }
+  for(G4int i=0; i<3; ++i)
+    {
+      g4hmmdata->mmxpos[i] = -81000;
+      g4hmmdata->mmpx[i]   = -81000;
+      g4hmmdata->mmypos[i] = -81000;
+      g4hmmdata->mmpy[i]   = -81000;
+      g4hmmdata->mmzpos[i] = -81000;
+      g4hmmdata->mmpz[i]   = -81000; 
+      g4hmmdata->cell[i]   = -81000; 
+      
+      g4hmmdata->mmxpos_Edep[i] = -81000.;
+      g4hmmdata->mmypos_Edep[i] = -81000.;
+      g4hmmdata->mmzpos_Edep[i] = -81000.;
+      g4hmmdata->mmpx_Edep[i] = -81000.;
+      g4hmmdata->mmpy_Edep[i] = -81000.;
+      g4hmmdata->mmpz_Edep[i] = -81000.;
+    }
 }
 
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)

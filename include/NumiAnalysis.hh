@@ -35,9 +35,12 @@ public:
   void FillNeutrinoNtuple(const G4Track& track);
   void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
   void FillHadmmNtuple();
+  void FillAlcEdepInfo(const G4Track& track, G4int alc);
   void WriteHadmmNtuple();
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
+
+  void SetAlcEdepFlag(G4bool AlcEdep);
 
   void SetCount(G4int count);
   G4int GetCount();
@@ -70,6 +73,9 @@ private:
 
   G4int fcount;
   G4int fentry;
+
+  std::vector<bool> fAlcEdep_called;
+
 
 };
 
