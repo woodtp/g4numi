@@ -2,6 +2,10 @@
 // $Id
 //----------------------------------------------------------------------
 
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
 #include "NumiPrimaryGeneratorAction.hh"
 
 #include "G4Event.hh"
@@ -23,6 +27,7 @@
 #include <TLeaf.h>
 #include <TSystem.h>
 
+using namespace std;
 
 NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
 {
@@ -102,7 +107,11 @@ G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
       }
 
       fCurrentPrimaryNo=0;
+
+      //??????????????????
       fNoOfPrimaries=fPrimaryNtuple->GetEntries();
+      //fNoOfPrimaries=100;
+
       //G4cout << "*****************entries = " <<fPrimaryNtuple->GetEntries() << G4endl;
       fIsOpen=true;
     }
@@ -256,13 +265,23 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     fMuon -> Clear();
     fMuon -> GetEntry(fCurrentPrimaryNo);
+    fevtno = fMuon->evtno;
     fmuweight = fMuon->muweight;
+
     fMuParentMomentum=G4ThreeVector(fMuon->tpx*GeV,fMuon->tpy*GeV,fMuon->tpz*GeV);
     ftpptype = fMuon->tptype;
     fnimpwt = fMuon->nimpwt;
     fpptype = fMuon->ptype;
-  
-    fParticlePosition=G4ThreeVector(fMuon->muvx*cm,fMuon->muvy*cm,fMuon->muvz*cm);
+
+
+    //z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap this is what Jason uses.
+    //z0 =        676681        + 45698.5       - 1 = 722378.5 mm
+    //which means the endcap is at 722379.5 mm
+    //fMuon->muvz*cm = 722380, so subtract 1mm to get 722379 just to be safe
+
+    G4double z0 = fMuon->muvz*cm - 1; //this is - 1 mm.
+    
+    fParticlePosition=G4ThreeVector(fMuon->muvx*cm,fMuon->muvy*cm,z0);
     fParticleMomentum=G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
        
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();

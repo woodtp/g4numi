@@ -24,21 +24,24 @@ NtpMuon::NtpMuon()
     mupy(-999.0),
     mupz(-999.0),
     muweight(-999.0),
-    tvx(-999.0),
-    tvy(-999.0),
-    tvz(-999.0),
     tpx(-999.0),
     tpy(-999.0),
     tpz(-999.0),
     tptype(-999),
     nimpwt(-999.0),
-    pdvx(-999.0),
-    pdvy(-999.0),
-    pdvz(-999.0),
-    pdpx(-999.0),
-    pdpy(-999.0),
-    pdpz(-999.0),
     ptype(-999),
+    evtnoS(65535),
+    muvxF(-999.0),
+    muvyF(-999.0),
+    muvzF(-999.0),
+    mupxF(-999.0),
+    mupyF(-999.0),
+    mupzF(-999.0),
+    tpxF(-999.0),
+    tpyF(-999.0),
+    tpzF(-999.0),
+    tptypeS(-999),
+    ptypeS(-999),
     ftree(0)
 {
 }
@@ -64,7 +67,7 @@ void NtpMuon::SetBranchesStatus()
 //   cout << "NtpMuon::SetBranchesStatus executed" << endl;
 
    
-   ftree -> SetBranchStatus("evtno", 0, 0);
+   ftree -> SetBranchStatus("evtno", 1, 0);
    ftree -> SetBranchStatus("muvx", 1, 0);
    ftree -> SetBranchStatus("muvy", 1, 0);
    ftree -> SetBranchStatus("muvz", 1, 0);
@@ -72,20 +75,11 @@ void NtpMuon::SetBranchesStatus()
    ftree -> SetBranchStatus("mupy", 1, 0);
    ftree -> SetBranchStatus("mupz", 1, 0);
    ftree -> SetBranchStatus("muweight", 1, 0);
-   ftree -> SetBranchStatus("tvx", 0, 0);
-   ftree -> SetBranchStatus("tvy", 0, 0);
-   ftree -> SetBranchStatus("tvz", 0, 0);
    ftree -> SetBranchStatus("tpx", 1, 0);
    ftree -> SetBranchStatus("tpy", 1, 0);
    ftree -> SetBranchStatus("tpz", 1, 0);
    ftree -> SetBranchStatus("tptype", 1, 0);
    ftree -> SetBranchStatus("nimpwt", 1, 0);
-   ftree -> SetBranchStatus("pdvx", 0, 0);
-   ftree -> SetBranchStatus("pdvy", 0, 0);
-   ftree -> SetBranchStatus("pdvz", 0, 0);
-   ftree -> SetBranchStatus("pdpx", 0, 0);
-   ftree -> SetBranchStatus("pdpy", 0, 0);
-   ftree -> SetBranchStatus("pdpz", 0, 0);
    ftree -> SetBranchStatus("ptype", 1, 0);
    
 }
@@ -98,29 +92,20 @@ bool NtpMuon::SetBranches()
 //   cout << "NtpMuon::SetBranches executed" << endl;
 
       
-   SetBranch(&evtno, "evtno");
-   SetBranch(&muvx, "muvx");
-   SetBranch(&muvy, "muvy");
-   SetBranch(&muvz, "muvz");
-   SetBranch(&mupx, "mupx");
-   SetBranch(&mupy, "mupy");
-   SetBranch(&mupz, "mupz");
+   SetBranch(&evtnoS, "evtno");
+   SetBranch(&muvxF, "muvx");
+   SetBranch(&muvyF, "muvy");
+   SetBranch(&muvzF, "muvz");
+   SetBranch(&mupxF, "mupx");
+   SetBranch(&mupyF, "mupy");
+   SetBranch(&mupzF, "mupz");
    SetBranch(&muweight, "muweight");
-   SetBranch(&tvx, "tvx");
-   SetBranch(&tvy, "tvy");
-   SetBranch(&tvz, "tvz");
-   SetBranch(&tpx, "tpx");
-   SetBranch(&tpy, "tpy");
-   SetBranch(&tpz, "tpz");
-   SetBranch(&tptype, "tptype");
+   SetBranch(&tpxF, "tpx");
+   SetBranch(&tpyF, "tpy");
+   SetBranch(&tpzF, "tpz");
+   SetBranch(&tptypeS, "tptype");
    SetBranch(&nimpwt, "nimpwt");
-   SetBranch(&pdvx, "pdvx");
-   SetBranch(&pdvy, "pdvy");
-   SetBranch(&pdvz, "pdvz");
-   SetBranch(&pdpx, "pdpx");
-   SetBranch(&pdpy, "pdpy");
-   SetBranch(&pdpz, "pdpz");
-   SetBranch(&ptype, "ptype");
+   SetBranch(&ptypeS, "ptype");
 
    return true;
 }
@@ -192,6 +177,19 @@ void NtpMuon::GetEntry(unsigned int entry)
    //cout << "NtpMuon::FillTree executed" << endl;
 
    ftree -> GetEntry(entry);
+
+   evtno = (Int_t)evtnoS;
+   muvx = (Double_t)muvxF;
+   muvy = (Double_t)muvyF;
+   muvz = (Double_t)muvzF;
+   mupx = (Double_t)mupxF;
+   mupy = (Double_t)mupyF;
+   mupz = (Double_t)mupzF;
+   tpx = (Double_t)tpxF;
+   tpy = (Double_t)tpyF;
+   tpz = (Double_t)tpzF;
+   tptype = (Int_t)tptypeS;
+   ptype = (Int_t)ptypeS;
     
 }
 
@@ -221,21 +219,25 @@ void NtpMuon::Clear()
    mupy = -999.0;
    mupz = -999.0;
    muweight = -999.0;
-   tvx = -999.0;
-   tvy = -999.0;
-   tvz = -999.0;
    tpx = -999.0;
    tpy = -999.0;
    tpz = -999.0;
    tptype = -999;
    nimpwt = -999.0;
-   pdvx = -999.0;
-   pdvy = -999.0;
-   pdvz = -999.0;
-   pdpx = -999.0;
-   pdpy = -999.0;
-   pdpz = -999.0;
    ptype = -999;
+
+   evtnoS = 65535;
+   muvxF = -999.0;
+   muvyF = -999.0;
+   muvzF = -999.0;
+   mupxF = -999.0;
+   mupyF = -999.0;
+   mupzF = -999.0;
+   tpxF = -999.0;
+   tpyF = -999.0;
+   tpzF = -999.0;
+   tptypeS = -999;
+   ptypeS = -999;
 
 }
 

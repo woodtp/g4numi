@@ -36,7 +36,7 @@ public:
   void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
   void FillHadmmNtuple();
   void FillAlcEdepInfo(const G4Track& track, G4int alc);
-  void WriteHadmmNtuple();
+  void WriteHadmmNtuple(const G4Track* aTrack = 0);
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
 

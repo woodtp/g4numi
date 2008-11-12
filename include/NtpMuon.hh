@@ -33,7 +33,7 @@ public:
    
 public:
 
-    Int_t    evtno;
+   Int_t    evtno;
    Double_t muvx;
    Double_t muvy;
    Double_t muvz;
@@ -41,21 +41,27 @@ public:
    Double_t mupy;
    Double_t mupz;
    Double_t muweight;
-   Double_t tvx;
-   Double_t tvy;
-   Double_t tvz;
    Double_t tpx;
    Double_t tpy;
    Double_t tpz;
    Int_t    tptype;
    Double_t nimpwt;
-   Double_t pdvx;
-   Double_t pdvy;
-   Double_t pdvz;
-   Double_t pdpx;
-   Double_t pdpy;
-   Double_t pdpz;
    Int_t ptype;
+
+   UShort_t evtnoS;
+   Float_t muvxF;
+   Float_t muvyF;
+   Float_t muvzF;
+   Float_t mupxF;
+   Float_t mupyF;
+   Float_t mupzF;
+   Float_t tpxF;
+   Float_t tpyF;
+   Float_t tpzF;
+   Short_t tptypeS;
+   Short_t ptypeS;
+
+
         
 private:
 

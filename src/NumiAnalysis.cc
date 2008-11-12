@@ -1,9 +1,10 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.18 2008/09/17 17:36:23 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.19 2008/11/12 00:21:40 loiacono Exp $
 //----------------------------------------------------------------------
 
+#include <vector>
 #include <fstream>
 #include <iomanip>
 #include <stdlib.h>
@@ -51,53 +52,7 @@ NumiAnalysis::NumiAnalysis()
   g4data = new data_t();
   g4hmmdata = new hadmmtuple_t();
 
-// part of the nasty hack the will be expunged later. -J
-  g4hmmdata->muvx = -81000;
-  g4hmmdata->muvy = -81000;
-  g4hmmdata->muvz = -81000;
-  g4hmmdata->mupx = -81000;
-  g4hmmdata->mupy = -81000;
-  g4hmmdata->mupz = -81000;
-  g4hmmdata->tpx = -81000;
-  g4hmmdata->tpy = -81000;
-  g4hmmdata->tpz = -81000;
-  g4hmmdata->muweight = -81000;
-  g4hmmdata->tpptype = -81000;
-  g4hmmdata->nimpwt = -81000; 
-  g4hmmdata->pptype = -81000;
-  g4hmmdata->ptype = -81000;
-
-  g4hmmdata->run = -81000;
-  g4hmmdata->mtgthsig = -81000; 
-  g4hmmdata->mtgtvsig = -81000; 
-  g4hmmdata->mtgthpos = -81000; 
-  g4hmmdata->mtgtvpos = -81000; 
-  g4hmmdata->evtno = -81000; 
-  g4hmmdata->ptype = -81000;
-  g4hmmdata->hmmenergy = -81000;
-
-  g4hmmdata->hmmxpos = -81000;
-  g4hmmdata->hmmypos = -81000;
-  g4hmmdata->hmmzpos = -81000;
-  g4hmmdata->hmmpx = -81000;
-  g4hmmdata->hmmpy = -81000;
-  g4hmmdata->hmmpz = -81000;
-  for(Int_t i=0;i<3;++i){
-    g4hmmdata->mmxpos[i] = -81000;
-    g4hmmdata->mmpx[i]   = -81000;
-    g4hmmdata->mmypos[i] = -81000;
-    g4hmmdata->mmpy[i]   = -81000;
-    g4hmmdata->mmzpos[i] = -81000;
-    g4hmmdata->mmpz[i]   = -81000; 
-    g4hmmdata->cell[i]   = -81000;
-
-    g4hmmdata->mmxpos_Edep[i]=-81000.;
-    g4hmmdata->mmypos_Edep[i]=-81000.;
-    g4hmmdata->mmzpos_Edep[i]=-81000.;
-    g4hmmdata->mmpx_Edep[i]=-81000.;
-    g4hmmdata->mmpy_Edep[i]=-81000.;
-    g4hmmdata->mmpz_Edep[i]=-81000.;
-  }
+  g4hmmdata->Clear();
 
   fcount = 0;
   fentry = 0;
@@ -139,6 +94,9 @@ void NumiAnalysis::book()
       G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileNameStr.c_str()<<G4endl;
       hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","hadmm ntuple");
       hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
+      //????????????????????
+      //g4hmmdata->SetTree(hadmmtree);
+      //g4hmmdata->MakeBranches();
       hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
     }
     else
@@ -228,7 +186,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
       G4ThreeVector particlePosition = NPGA->GetParticlePosition();
       g4hmmdata->muvx = particlePosition[0];
       g4hmmdata->muvy = particlePosition[1];
-      g4hmmdata->muvz = particlePosition[2];
+      //g4hmmdata->muvz = particlePosition[2];
       
       G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
       g4hmmdata->mupx = particleMomentum[0];
@@ -245,16 +203,18 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
       g4hmmdata->nimpwt = NPGA->GetImpWeight(); 
       g4hmmdata->pptype = NPGA->GetMuParentType(); 
 
-      g4hmmdata->evtno = GetEntry();      
+      g4hmmdata->evtno = NPGA->GetEvtno();      
+   
     }
   else
     {  
-      g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
+      /*g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
       g4hmmdata->mtgthsig = NumiData->beamSigmaX/cm;
       g4hmmdata->mtgtvsig = NumiData->beamSigmaY/cm;
       g4hmmdata->mtgthpos = NumiData->beamPosition[0]/cm;
       g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/cm;
       g4hmmdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      */
     }
 
 
@@ -262,19 +222,20 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
   G4ParticleDefinition* particleDefinition = track.GetDefinition();
   
   g4hmmdata->ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
-  
+
   if(!(NumiData->useMuonInput))
     {
-      g4hmmdata->hmmenergy = track.GetTotalEnergy();
+      //g4hmmdata->hmmenergy = track.GetTotalEnergy();
       
       if(hmm_num == 4)
 	{
-	  g4hmmdata->hmmxpos = track.GetPosition()[0];
+	  /*g4hmmdata->hmmxpos = track.GetPosition()[0];
 	  g4hmmdata->hmmypos = track.GetPosition()[1];
 	  g4hmmdata->hmmzpos = track.GetPosition()[2];
 	  g4hmmdata->hmmpx = track.GetMomentum()[0];
 	  g4hmmdata->hmmpy = track.GetMomentum()[1];
 	  g4hmmdata->hmmpz = track.GetMomentum()[2]; 
+	  */
 	}
     }
 
@@ -285,7 +246,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
       g4hmmdata->mmpx[hmm_num]   = track.GetMomentum()[0];
       g4hmmdata->mmypos[hmm_num] = track.GetPosition()[1];
       g4hmmdata->mmpy[hmm_num]   = track.GetMomentum()[1];
-      g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
+      //g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
       g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2]; 
       g4hmmdata->cell[hmm_num]   = cellNum;
     } 
@@ -305,11 +266,11 @@ void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
 
   //G4cout << "fentry = " << fentry << " Calling NumiAnalysis::FillAlcEdepInfo() for alc "<< alc << " zpos = " << track.GetPosition()[2] << G4endl; 
   
-  g4hmmdata->mmxpos_Edep[alc] = track.GetPosition()[0];
+  //g4hmmdata->mmxpos_Edep[alc] = track.GetPosition()[0];
   g4hmmdata->mmpx_Edep[alc]   = track.GetMomentum()[0];
-  g4hmmdata->mmypos_Edep[alc] = track.GetPosition()[1];
+  //g4hmmdata->mmypos_Edep[alc] = track.GetPosition()[1];
   g4hmmdata->mmpy_Edep[alc]   = track.GetMomentum()[1];
-  g4hmmdata->mmzpos_Edep[alc] = track.GetPosition()[2];
+  //g4hmmdata->mmzpos_Edep[alc] = track.GetPosition()[2];
   g4hmmdata->mmpz_Edep[alc]   = track.GetMomentum()[2];
       
   fAlcEdep_called[alc] = true;
@@ -341,7 +302,7 @@ void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuon
   G4ThreeVector particlePosition = NPGA->GetParticlePosition();
   g4hmmdata->muvx = particlePosition[0];
   g4hmmdata->muvy = particlePosition[1];
-  g4hmmdata->muvz = particlePosition[2];
+  //g4hmmdata->muvz = particlePosition[2];
 
   
   G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
@@ -371,7 +332,7 @@ void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuon
   //g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/cm;
   //g4hmmdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
 
-  g4hmmdata->evtno = GetEntry();
+  g4hmmdata->evtno = NPGA->GetEvtno();
 
   //g4hmmdata->hmmenergy = -81000;
   //g4hmmdata->hmmxpos = -81000;
@@ -383,13 +344,13 @@ void NumiAnalysis::FillHadmmNtuple() //this function only gets called if useMuon
   
 
   for(Int_t i=0;i<3;++i){
-    g4hmmdata->mmxpos[i] = -81000;
-    g4hmmdata->mmpx[i]   = -81000;
-    g4hmmdata->mmypos[i] = -81000;
-    g4hmmdata->mmpy[i]   = -81000;
-    g4hmmdata->mmzpos[i] = -81000;
-    g4hmmdata->mmpz[i]   = -81000; 
-    g4hmmdata->cell[i]   = -81000; 
+    g4hmmdata->mmxpos[i] = -99999.;
+    g4hmmdata->mmpx[i]   = -99999.;
+    g4hmmdata->mmypos[i] = -99999.;
+    g4hmmdata->mmpy[i]   = -99999.;
+    //g4hmmdata->mmzpos[i] = -99999.;
+    g4hmmdata->mmpz[i]   = -99999.;
+    g4hmmdata->cell[i]   = -999;
 
 
   }
@@ -426,59 +387,54 @@ G4int NumiAnalysis::GetEntry()
   return fentry;
 }
 
-void NumiAnalysis::WriteHadmmNtuple(){
-
-  if (!NumiData->createHadmmNtuple) return;
-
-  ++fcount;
-
-  if(fcount > 1 && g4hmmdata->mupz > 0)
+void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
+{
+  if (!(NumiData->createHadmmNtuple)) return;
+  
+  int type;
+  if(aTrack)
   {
-    G4cout << "entry = "<< fentry << ", count = " << fcount << ", mupz = " << g4hmmdata->mupz << ", mm1pz = " << g4hmmdata->mmpz[0] <<", mm2pz = " << g4hmmdata->mmpz[1] << ", mm3pz = " << g4hmmdata->mmpz[2] << G4endl; 
+    G4ParticleDefinition* particleDefinition = aTrack->GetDefinition();
+    type = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
+    if( !(type == 6) )
+    {
+      //check that when type != 6 the variables have non valid values.
+      if( !(g4hmmdata->mupz < -90 && g4hmmdata->muweight < -90 && g4hmmdata->pptype < -90 && g4hmmdata->nimpwt < -90) )
+      {
+	cout << "******** Entry " << fentry << ": Problem in NumiAnalysis::WriteHadmmNtuple() - The particle is " << type << " but the variables have valid values." << endl;
+      }   
+    }  
+    else //if type == 6
+    {
+      //I don't think there is even a remote chance of the following if statement ever executing. Sanity check.
+      //check that if type == 6 then g4hmmdata->ptype == 6
+      if( !(g4hmmdata->ptype ==6) ) cout << "********Entry " << fentry << ": Problem in NumiAnalysis::WriteHadmmNtuple() - The particle type from the track does not match the ptype variable. " << endl; 
+
+      //check that when type == 6  g4hmmdata->mupz is a valid value
+      if(g4hmmdata->mupz < -90) cout << "********Entry " << fentry << ": Problem in NumiAnalysis::WriteHadmmNtuple() - The particle type from the track is 6 but the variable mupz is not a valid value. This should not happen." << endl; 
+    }
+  }
+  else
+  {
+    if( !(g4hmmdata->ptype == 6) ) cout << "********Entry " << fentry << ": Problem in NumiAnalysis::WriteHadmmNtuple() - A track doesn't exist, so ptype should already be set to 6. But it's not! " << endl;
+    type = g4hmmdata->ptype;
   }
 
+  //Note on the above: The code seems to track the two neutrinos from muon decay and calls this function for each neutrino. So if the particle is a neutrino I don't want to write out an entry in the output tree. If it is a neutrino, all of the variables should have nonvalid values(i.e. -81000). I think that it Writes the muon entry first so that means that all of the variables will be cleared right after. So when it goes to fill the neutrino entries all of the varibles are -99999. The above code sanity checks this. So below only muons get written to the output and the intial muon entries (mupz, mupx...etc) should match what is in the muon input files entry for entry.
+
   
-  hadmmtree->Fill(); 
-  g4hmmdata->muvx = -81000;
-  g4hmmdata->muvy = -81000;
-  g4hmmdata->muvz = -81000;
-  g4hmmdata->mupx = -81000;
-  g4hmmdata->mupy = -81000;
-  g4hmmdata->mupz = -81000;
-  g4hmmdata->tpx = -81000;
-  g4hmmdata->tpy = -81000;
-  g4hmmdata->tpz = -81000;
-  g4hmmdata->muweight = -81000;
-  g4hmmdata->tpptype = -81000;
-  g4hmmdata->nimpwt = -81000; 
-  g4hmmdata->pptype = -81000;
-  g4hmmdata->ptype = -81000;
-
-  g4hmmdata->hmmenergy = -81000;
-  g4hmmdata->hmmxpos = -81000;
-  g4hmmdata->hmmypos = -81000;
-  g4hmmdata->hmmzpos = -81000;
-  g4hmmdata->hmmpx = -81000;
-  g4hmmdata->hmmpy = -81000;
-  g4hmmdata->hmmpz = -81000;
-
-  for(G4int i=0; i<3; ++i)
+  ++fcount;
+  
+  if(fcount > 1 && g4hmmdata->mupz > 0)
     {
-      g4hmmdata->mmxpos[i] = -81000;
-      g4hmmdata->mmpx[i]   = -81000;
-      g4hmmdata->mmypos[i] = -81000;
-      g4hmmdata->mmpy[i]   = -81000;
-      g4hmmdata->mmzpos[i] = -81000;
-      g4hmmdata->mmpz[i]   = -81000; 
-      g4hmmdata->cell[i]   = -81000; 
-      
-      g4hmmdata->mmxpos_Edep[i] = -81000.;
-      g4hmmdata->mmypos_Edep[i] = -81000.;
-      g4hmmdata->mmzpos_Edep[i] = -81000.;
-      g4hmmdata->mmpx_Edep[i] = -81000.;
-      g4hmmdata->mmpy_Edep[i] = -81000.;
-      g4hmmdata->mmpz_Edep[i] = -81000.;
+      G4cout << "entry = "<< fentry << ", count = " << fcount << ", mupz = " << g4hmmdata->mupz << ", mm1pz = " << g4hmmdata->mmpz[0] <<", mm2pz = " << g4hmmdata->mmpz[1] << ", mm3pz = " << g4hmmdata->mmpz[2] << G4endl; 
     }
+  
+  //???????????????????
+  if(type == 6) hadmmtree->Fill(); 
+  //if(type == 6) g4hmmdata->Fill(); 
+  g4hmmdata->Clear();
+  
 }
 
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)

@@ -1,5 +1,7 @@
 #Example script for running G4NuMI -LLoiacono
 
+#option to use a muon beam, default is false
+/NuMI/run/useMuonBeam true
 #option to use a muon input file, default is false
 /NuMI/run/useMuonInput true
 

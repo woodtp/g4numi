@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.14 2008/05/01 18:09:46 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.15 2008/11/12 00:21:40 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -49,6 +49,9 @@ public:
   }
   void SetMarsInput(G4bool val) {
     useMarsInput = val;
+  }
+  void SetMuonBeam(G4bool val) {
+    useMuonBeam = val;
   }
   void SetMuonInput(G4bool val) {
     useMuonInput = val;

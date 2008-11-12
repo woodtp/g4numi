@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.7 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiTrackingAction.cc,v 1.8 2008/11/12 00:21:40 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -65,11 +65,10 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-
   // Jtest
   //---
   NumiAnalysis* analysis = NumiAnalysis::getInstance();
-  analysis->WriteHadmmNtuple();
+  analysis->WriteHadmmNtuple(aTrack);
   
   //---
 

@@ -85,7 +85,13 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useMuonInput->SetGuidance("use muon input ntuple");
   useMuonInput->SetParameterName("useMuonInput",true);
   useMuonInput->SetDefaultValue (NumiData->useMuonInput);
-  useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);\
+  useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useMuonBeam = new G4UIcmdWithABool("/NuMI/run/useMuonBeam",this);
+  useMuonBeam->SetGuidance("run the muon MC");
+  useMuonBeam->SetParameterName("useMuonBeam",true);
+  useMuonBeam->SetDefaultValue (NumiData->useMuonBeam);
+  useMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   extNtupleFileName = new G4UIcmdWithAString("/NuMI/run/extNtupleFileName",this);
   extNtupleFileName->SetGuidance("set external (fluka/mars) ntuple file name");
@@ -152,6 +158,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete NumiRunDir;
   delete useFlukaInput;
   delete useMarsInput;
+  delete useMuonBeam;
   delete useMuonInput;
 
   delete setNuNtupleFile;
@@ -209,6 +216,10 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
     NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
   }
   
+  if (command == useMuonBeam){
+    NumiData->SetMuonBeam(useMuonBeam->GetNewBoolValue(newValues));
+  }
+
   if (command == useMuonInput){
     NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues));
   }

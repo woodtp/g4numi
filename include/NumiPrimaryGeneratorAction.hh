@@ -69,6 +69,9 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   G4int GetMuParentType(){
     return fpptype;
   }
+  G4int GetEvtno(){
+    return fevtno;
+  }
   // *********************************************************************
   G4int GetNoOfPrimaries(){
     return fNoOfPrimaries;
@@ -98,6 +101,7 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   G4int ftpptype;
   G4double fnimpwt;
   G4int fpptype;
+  G4int fevtno;
 
 
   NtpMuon* fMuon;
