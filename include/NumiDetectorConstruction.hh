@@ -5,7 +5,9 @@
 #define NumiDetectorConstruction_H 1
 
 #include "G4VUserDetectorConstruction.hh"
+#ifndef FLUGG
 #include "NumiDetectorMessenger.hh"
+#endif
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
@@ -36,10 +38,11 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
 
 	void SetTargetZ0(G4double val);
 	void SetHornCurrent(G4double val);
+#ifndef FLUGG
 	void UpdateGeometry();
-	
+#endif
+  
   private:
-
   NumiDataInput* NumiData;
   NumiMagneticField* numiMagField;
   NumiMagneticFieldIC* numiMagFieldIC;
@@ -66,8 +69,10 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4VisAttributes* GetMaterialVisAttrib(G4String matName);
   void DestroyMaterials();
 
-	// Messenger
-	NumiDetectorMessenger *detectorMessenger;
+#ifndef FLUGG
+  // Messenger
+  NumiDetectorMessenger *detectorMessenger;
+#endif
 	
   G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
   G4Material* GetMaterial(G4int matcode);

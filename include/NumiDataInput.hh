@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.15 2008/11/12 00:21:40 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.16 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -10,6 +10,7 @@
 #include "G4ThreeVector.hh"
 #include <vector>
 #include "NumiHornSpiderSupport.hh"
+#include "G4LogicalVolume.hh"
 
 typedef std::vector<G4double> vdouble_t;
 typedef std::vector<G4int> vint_t;
@@ -43,6 +44,12 @@ public:
   }
   void SetNImpWeight(G4bool val) {
     NImpWeightOn = val;
+  }
+  void SetTestTheta(G4float t){
+	testTheta = t*M_PI/180.;
+  }
+  void SetTestBeam(G4bool val) {
+	useTestBeam = val;
   }
   void SetFlukaInput(G4bool val) {
     useFlukaInput = val;
@@ -92,6 +99,9 @@ public:
   void SetASCIIName(G4String fileName){
     asciiName=fileName;
   }
+  void SetBXDRAWName(G4String fileName){
+    bxdrawName=fileName;
+  }
   void OutputNuNtuple(G4bool output){
     createNuNtuple=output;
   }
@@ -101,6 +111,17 @@ public:
   void OutputASCII(G4bool output){
     createASCII=output;
   }
+  void OutputBXDRAW(G4bool output) {
+	createBXDRAW = output;
+  }
+  void SetDecayPipeSelect(G4bool val) {
+    useDecayPipeSelect = val;
+  }
+  void SetStepLimit(G4double l){
+    StepLimit = l;
+  }
+  void ApplyStepLimits(G4LogicalVolume *);
+  
   G4bool GetKillTracking(){
     return KillTracking;
   }
@@ -119,6 +140,13 @@ public:
   G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput;
   G4bool KillTracking;
   G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
+
+  G4double StepLimit;
+  
+  G4bool createBXDRAW;
+  G4bool useTestBeam, useDecayPipeSelect;
+  G4String bxdrawName;
+  G4float testTheta;   // TestBeam Angle
 
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
   G4double KillTrackingThreshold;

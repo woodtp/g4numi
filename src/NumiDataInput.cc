@@ -1,30 +1,48 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.20 2008/11/12 00:21:40 loiacono Exp $
+// $Id: NumiDataInput.cc,v 1.21 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
 #include "G4ThreeVector.hh"
 #include "NumiHornSpiderSupport.hh"
+#include "G4UserLimits.hh"
+//#include "globals.hh"
 #include <math.h>
 
 static const G4double in=2.54*cm;
 
 NumiDataInput* NumiDataInput::fNumiDataInput = 0;
 
-NumiDataInput* NumiDataInput::GetNumiDataInput(){return fNumiDataInput;}
+NumiDataInput* NumiDataInput::GetNumiDataInput(){
+    G4cout << "Requesting NumiDataInput " << G4endl;
+    if (!fNumiDataInput) {
+        G4cout << "Constructing NumiDataInput " << G4endl;
+        fNumiDataInput = new NumiDataInput();    
+    }
+    return fNumiDataInput;
+}
 
 NumiDataInput::NumiDataInput()
 {
+  G4cout << "NumiDataInput Constructor Called" << G4endl;
   if (fNumiDataInput)
     { G4Exception("NumiDataInput constructed twice.");}
-  fNumiDataInput = this;
+//  fNumiDataInput = this;
 
   debugOn = false;
-  NImpWeightOn = true; createNuNtuple=false; createHadmmNtuple=true;
-  createASCII=false; useFlukaInput = false; useMarsInput=false; 
-  useMuonInput = false; useMuonBeam = false; KillTracking = true;
+  NImpWeightOn = true; 
+  createNuNtuple=false;  createHadmmNtuple=true;
+  createASCII=false;     createBXDRAW = false;
+  useFlukaInput = false; useMarsInput=false; 
+  useMuonInput = false;  useMuonBeam = false; 
+  useTestBeam = true;   
+  useDecayPipeSelect = false;
+  KillTracking = true; // false for ahimmel
+  testTheta = M_PI/6.;
+  
+  StepLimit = 0.;
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
@@ -33,9 +51,10 @@ NumiDataInput::NumiDataInput()
 
   //base name for output files:
   nuNtupleName    = "nuNtuple"; 
-  hadmmNtupleDir = "./";
+  hadmmNtupleDir  = "./";
   hadmmNtupleName = "hadmmNtuple";
   asciiName       = "asciiOut";
+  bxdrawName      = "bxdrawOut";
   RunNumber       = "0000";
   geometry        = "_K";
 
@@ -69,7 +88,7 @@ NumiDataInput::NumiDataInput()
   RockDensity = 2.41*g/cm3; // not
   RockRadLen  = 0.0;        // used
 
-  constructTarget = true;
+  constructTarget = false;
   //TargetArea          1
   //=======================================================================
   TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
@@ -586,4 +605,9 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
 NumiDataInput::~NumiDataInput()
 {
+}
+
+void NumiDataInput::ApplyStepLimits(G4LogicalVolume *vol) {
+  if (StepLimit == 0.0) return;
+  vol->SetUserLimits(new G4UserLimits(StepLimit));
 }

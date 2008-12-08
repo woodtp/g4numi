@@ -1,4 +1,4 @@
-// $Id: NumiVisManager.cc,v 1.2 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiVisManager.cc,v 1.3 2008/12/08 19:49:30 ahimmel Exp $
 
 #ifdef G4VIS_USE
 
@@ -9,7 +9,7 @@
 // Not needing external packages or libraries...
 #include "G4ASCIITree.hh"
 #include "G4DAWNFILE.hh"
-#include "G4GAGTree.hh"
+#include "G4ASCIITree.hh"
 #include "G4HepRepFile.hh"
 #include "G4HepRep.hh"
 #include "G4RayTracer.hh"
@@ -61,7 +61,7 @@ void NumiVisManager::RegisterGraphicsSystems () {
   // Graphics Systems not needing external packages or libraries...
   RegisterGraphicsSystem (new G4ASCIITree);
   RegisterGraphicsSystem (new G4DAWNFILE);
-  RegisterGraphicsSystem (new G4GAGTree);
+  RegisterGraphicsSystem (new G4ASCIITree);
   RegisterGraphicsSystem (new G4HepRepFile);
   RegisterGraphicsSystem (new G4HepRep);
   RegisterGraphicsSystem (new G4RayTracer);

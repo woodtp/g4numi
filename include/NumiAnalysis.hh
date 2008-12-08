@@ -17,6 +17,9 @@
 #include "G4ios.hh"
 #include "G4TrajectoryContainer.hh"
 
+#include <map.h>
+
+class G4Step;
 class TFile;
 class TTree;
 class G4Track;
@@ -35,8 +38,10 @@ public:
   void FillNeutrinoNtuple(const G4Track& track);
   void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
   void FillHadmmNtuple();
+  void FillBXDRAW(const G4Step* aStep);
   void FillAlcEdepInfo(const G4Track& track, G4int alc);
   void WriteHadmmNtuple(const G4Track* aTrack = 0);
+
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
 
@@ -58,7 +63,8 @@ private:
   G4double z;
 
   G4double noProtons;
-  char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50];
+  char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50], bxdrawFileName[50];
+  map<int, int> code;
 
   NumiDataInput* NumiData;
 

@@ -7,9 +7,18 @@
 #include "G4ParticleTypes.hh"
 #include "G4DecayTable.hh"
 #include "G4KL3DecayChannel.hh"
+#include "G4StepLimiter.hh"
 
 #include "NumiDetectorConstruction.hh"
+
+// Interaction Physics Lists
 #include "QGSP.hh"
+//#include "QGSC.hh"
+//#include "QBBC.hh"
+//#include "FTFC.hh"
+//#include "FTFP.hh"
+//#include "LHEP.hh"
+
 #include "NumiPrimaryGeneratorAction.hh"
 #include "NumiStackingAction.hh"
 #include "NumiSteppingAction.hh"
@@ -25,10 +34,12 @@
 int main(int argc,char** argv)
 {
   // Construct the default run manager
-  G4RunManager* runManager = new NumiRunManager;
+  G4RunManager* runManager = new NumiRunManager();
 
   // set mandatory initialization classes
   runManager->SetUserInitialization(new NumiDetectorConstruction);
+
+  // Initialize Physics Lists
   QGSP * theQGSP = new QGSP;
   runManager->SetUserInitialization(theQGSP);
 
@@ -199,6 +210,22 @@ int main(int argc,char** argv)
   }//loop over particles
   // done with kaon form factors
   
+	
+  // Setting the maximum step size to 1 cm
+  G4ParticleTable* ptbl = G4ParticleTable::GetParticleTable();
+  G4ParticleTable::G4PTblDicIterator* piter = ptbl->GetIterator();
+  G4StepLimiter* slim = new G4StepLimiter("StepLimiter");    
+  
+  piter->reset();
+  while ( (*piter)() ) {
+    G4ParticleDefinition* pdef = piter->value();
+    G4ProcessManager* pmgr = pdef->GetProcessManager();
+    
+    // add user limit processes for steps and special cuts
+    if ( pmgr ) {      
+      pmgr->AddProcess( slim, -1, -1, 3);
+    }
+  }		
   
   if(argc==1)
   // Define (G)UI terminal for interactive mode  
@@ -220,6 +247,7 @@ int main(int argc,char** argv)
   { 
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
+    G4cout << "Executing " << command+fileName << G4endl;
     UI->ApplyCommand(command+fileName);
   }
 

@@ -27,24 +27,31 @@ else
   EXTRALIBS += -L$(G4LIB)/plists/$(G4SYSTEM)
 endif
 
+# Assume if G4LISTS_BASE exists that we need to explicitly
+# include these libraries (Geant4.8).  If it doesn't, then
+# we do not (Geant 4.9)
+LISTINC:=$(shell if [ -d G4LISTS_BASE ]; then echo "yes"; fi)
+ifeq ($(LISTINC),yes)
+	EXTRALIBS += -lQGSP
+	EXTRALIBS += -lPackaging
+	CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/QGSP/include
+	CPPFLAGS += -I$(G4LISTS_BASE)/hadronic/Packaging/include
+endif
+
+
 #for root
 #CPPFLAGS   +=  -I$(ROOTSYS)/include
-  CPPFLAGS += $(shell $(ROOTSYS)/bin/root-config --cflags)
+CPPFLAGS += $(shell $(ROOTSYS)/bin/root-config --cflags)
 
-  ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit -lHtml
-  ROOTLIBS      := $(filter-out -lNew,$(ROOTLIBS))
-  ROOTLIBS      := $(filter-out -lThread,$(ROOTLIBS))
-  ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
-  INTYLIBS      += $(ROOTLIBS)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit -lHtml
+ROOTLIBS      := $(filter-out -lNew,$(ROOTLIBS))
+ROOTLIBS      := $(filter-out -lThread,$(ROOTLIBS))
+ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
+INTYLIBS      += $(ROOTLIBS)
 
 #for debuging
-   CPPFLAGS += -g	
+CPPFLAGS += -g -Wno-deprecated
 
-EXTRALIBS += -lQGSP
-EXTRALIBS += -lPackaging
-
-CPPFLAGS += -I$(G4INSTALL)/physics_lists/hadronic/QGSP/include
-CPPFLAGS += -I$(G4INSTALL)/physics_lists/hadronic/Packaging/include
 CPPFLAGS += -I$(G4INCLUDE)
 
 

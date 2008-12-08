@@ -52,6 +52,9 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
   else if(ND->useMuonBeam && ND->useMuonInput){
     G4cout<<" *** Using muon input ntuple " <<ND->GetExtNtupleFileName()<<G4endl;
   }
+  else if(ND->useTestBeam){
+      G4cout<<" *** Using Fluka-like Gun:"<<G4endl;
+  }
   else{
     G4cout<<"Proton beam:"<<G4endl;
       G4cout << " Momentum: "<<ND->protonMomentum/GeV << "GeV" <<G4endl;

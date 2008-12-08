@@ -7,7 +7,6 @@
 #include "G4ios.hh"
 #include "G4TransportationManager.hh"
 #include "NumiDataInput.hh" 
-#include "G4RunManager.hh"
 #include "G4VPhysicalVolume.hh"
 
 //magnetic field between conductors ====================================================

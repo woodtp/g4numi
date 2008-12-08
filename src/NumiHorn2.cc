@@ -138,12 +138,28 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   G4Material* material=Vacuum; 
   sMHorn2= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn2 = new G4LogicalVolume(sMHorn2,material,"lvMHorn2",0,0,0);
+  ND->ApplyStepLimits(lvMHorn2); // Limit Step Size
   G4VisAttributes* invisible=new G4VisAttributes(false);
   lvMHorn2->SetVisAttributes(invisible);
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
   G4VPhysicalVolume* pvMHorn2 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn2",lvMHorn2,TGAR,false,0);
       
+  /**
+   * FLUGG - Volume added to follow particles by Alex Himmel 3-21-07
+   */
+  G4double boxX = NumiData->TargetAreaWidth/2.;
+  G4double boxY = NumiData->TargetAreaHeight/2.;
+  G4double boxZ = 1*cm;
+	
+  G4Box *sHorn2Box = new G4Box("sHorn2Box", boxX, boxY, boxZ);
+  G4Material *boxmat = TGAR->GetLogicalVolume()->GetMaterial();
+  G4LogicalVolume *lvHorn2Box = new G4LogicalVolume(sHorn2Box, boxmat, "lvHorn2Box",0,0,0);
+  ND->ApplyStepLimits(lvHorn2Box); // Limit Step Size
+  translation += G4ThreeVector(0.,0.,(MVzPos[nMV] - MVzPos[0])/2.+.5*cm);
+  new G4PVPlacement(G4Transform3D(rotation,translation),"Horn2Box",lvHorn2Box,TGAR,false,0);
+
+
   //Front part
   G4VSolid* sHorn2Front;
   G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
@@ -153,6 +169,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   sHorn2Front=new G4SubtractionSolid("sHorn2Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
   material=Al;
   G4LogicalVolume* lvHorn2Front=new G4LogicalVolume(sHorn2Front,material,"lvHorn2Front",0,0,0);
+  ND->ApplyStepLimits(lvHorn2Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn2Origin+G4ThreeVector(0.,0.,OCZ0);
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2Front",lvHorn2Front,pvMHorn2,false,0);
@@ -160,6 +177,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   //Outer Conductor
   G4Polycone* sPHorn2OC=new G4Polycone("sPHorn2OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
   G4LogicalVolume* lvPHorn2OC=new G4LogicalVolume(sPHorn2OC,Al,"lvPHorn2OC",0,0,0);
+  ND->ApplyStepLimits(lvPHorn2OC); // Limit Step Size
   G4FieldManager* FieldMgr2 = new G4FieldManager(numiMagFieldOC); //create a local field
   FieldMgr2->SetDetectorField(numiMagFieldOC); //set the field 
   FieldMgr2->CreateChordFinder(numiMagFieldOC); //create the objects which calculate the trajectory
@@ -171,6 +189,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   //Inner Conductor
   G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,Al,"lvPHorn2IC",0,0,0);
+  ND->ApplyStepLimits(lvPHorn2IC); // Limit Step Size
   G4FieldManager* FieldMgr = new G4FieldManager(numiMagFieldIC); //create a local field		 
   FieldMgr->SetDetectorField(numiMagFieldIC); //set the field 
   FieldMgr->CreateChordFinder(numiMagFieldIC); //create the objects which calculate the trajectory
@@ -185,7 +204,12 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn2Z0+frontRmax);
   G4UnionSolid *sPHorn2F=new G4UnionSolid("sPHorn2F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
   G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Ar,"lvPHorn2F",0,0,0);
+  ND->ApplyStepLimits(lvPHorn2F); // Limit Step Size
   lvPHorn2F->SetVisAttributes(invisible);
+  //------ Modification by Alex Himmel 3-19-07----------
+  lvPHorn2F->SetOptimisation(false);
+  //------ End of Modification -------------------------
+  
   G4FieldManager* FieldMgr3 = new G4FieldManager(numiMagField); //create a local field      
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
   FieldMgr3->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
@@ -211,6 +235,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
       G4String volName=ND->PHorn2EndVolName[ii];
       sPHorn2End=new G4Tubs(volName.append("s"),ND->PHorn2EndRin[ii],ND->PHorn2EndRout[ii],ND->PHorn2EndLength[ii]/2.,0.,360.*deg);
       G4LogicalVolume* lvPHorn2End=new G4LogicalVolume(sPHorn2End,GetMaterial(ND->PHorn2EndGeantMat[ii]),volName.append("lv"),0,0,0);
+      ND->ApplyStepLimits(lvPHorn2End); // Limit Step Size
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii]/2.)-MHorn2Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn2End,pvMHorn2,false,0);

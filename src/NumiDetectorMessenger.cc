@@ -86,7 +86,10 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue){
 		NumiData->constructTarget=ConstructTarget->GetNewBoolValue(newValue);
 	}
 	if ( command == UpdateCmd ) {
-		NumiDetector->UpdateGeometry();
+#ifndef FLUGG
+          NumiDetector->UpdateGeometry();
+#endif
+          return;
 	}
 	
 }

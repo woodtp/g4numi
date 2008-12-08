@@ -141,13 +141,32 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4Material* material=Vacuum; 
   sMHorn1= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn1 = new G4LogicalVolume(sMHorn1,material,"lvMHorn1",0,0,0);
+  ND->ApplyStepLimits(lvMHorn1); // Limit Step Size
   G4VisAttributes* invisible=new G4VisAttributes(false);
   lvMHorn1->SetVisAttributes(invisible);
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
   G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn1",lvMHorn1,TGAR,false,0);
-    
-   //Front part
+
+
+  /**
+   * FLUGG - 
+   * Volume added to follow particles by Alex Himmel 3-21-07
+   */
+  G4double boxX = NumiData->TargetAreaWidth/2.;
+  G4double boxY = NumiData->TargetAreaHeight/2.;
+  G4double boxZ = 1*cm;
+	
+  G4Box *sHorn1Box = new G4Box("sHorn1Box", boxX, boxY, boxZ);
+  G4Material *boxmat = TGAR->GetLogicalVolume()->GetMaterial();
+  G4LogicalVolume *lvHorn1Box = new G4LogicalVolume(sHorn1Box, boxmat, "lvHorn1Box",0,0,0);
+  ND->ApplyStepLimits(lvHorn1Box); // Limit Step Size
+  translation += G4ThreeVector(0.,0.,(MVzPos[nMV] - MVzPos[0])/2.+.5*cm);
+  new G4PVPlacement(G4Transform3D(rotation,translation),"Horn1Box",lvHorn1Box,TGAR,false,0);
+
+
+  
+  //Front part
   G4VSolid* sHorn1Front;
   G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
   G4Box* sBox=new G4Box("sBox",frontRtor*2.,frontRtor*2.,frontRmax*2.);
@@ -156,6 +175,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   sHorn1Front=new G4SubtractionSolid("sHorn1Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
   material=Al;
   G4LogicalVolume* lvHorn1Front=new G4LogicalVolume(sHorn1Front,material,"lvHorn1Front",0,0,0);
+  ND->ApplyStepLimits(lvHorn1Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1Front",lvHorn1Front,pvMHorn1,false,0);
@@ -163,6 +183,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   //Outer Conductor
   G4Polycone* sPHorn1OC=new G4Polycone("sPHorn1OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
   G4LogicalVolume* lvPHorn1OC=new G4LogicalVolume(sPHorn1OC,Al,"lvPHorn1OC",0,0,0);
+  ND->ApplyStepLimits(lvPHorn1OC); // Limit Step Size
   G4FieldManager* FieldMgr2 = new G4FieldManager(numiMagFieldOC); //create a local field
   FieldMgr2->SetDetectorField(numiMagFieldOC); //set the field 
   FieldMgr2->CreateChordFinder(numiMagFieldOC); //create the objects which calculate the trajectory
@@ -174,6 +195,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   //Inner Conductor
   G4Polycone* sPHorn1IC=new G4Polycone("sPHorn1IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn1IC=new G4LogicalVolume(sPHorn1IC,Al,"lvPHorn1IC",0,0,0);
+  ND->ApplyStepLimits(lvPHorn1IC); // Limit Step Size
   G4FieldManager* FieldMgr = new G4FieldManager(numiMagFieldIC); //create a local field		 
   FieldMgr->SetDetectorField(numiMagFieldIC); //set the field 
   FieldMgr->CreateChordFinder(numiMagFieldIC); //create the objects which calculate the trajectory
@@ -188,7 +210,12 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn1Z0+frontRmax);
   G4UnionSolid *sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
   G4LogicalVolume* lvPHorn1F=new G4LogicalVolume(sPHorn1F,Ar,"lvPHorn1F",0,0,0);
+  ND->ApplyStepLimits(lvPHorn1F); // Limit Step Size
   lvPHorn1F->SetVisAttributes(invisible);
+  //------ Modification by Alex Himmel 3-19-07----------
+  lvPHorn1F->SetOptimisation(false);
+  //------ End of Modification -------------------------
+  
   G4FieldManager* FieldMgr3 = new G4FieldManager(numiMagField); //create a local field      
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
   FieldMgr3->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
@@ -218,6 +245,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       G4String volName=ND->PHorn1EndVolName[ii];
       sPHorn1End=new G4Tubs(volName.append("s"),ND->PHorn1EndRin[ii],ND->PHorn1EndRout[ii],ND->PHorn1EndLength[ii]/2.,0.,360.*deg);
       G4LogicalVolume* lvPHorn1End=new G4LogicalVolume(sPHorn1End,GetMaterial(ND->PHorn1EndGeantMat[ii]),volName.append("lv"),0,0,0);
+      ND->ApplyStepLimits(lvPHorn1End); // Limit Step Size
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
@@ -227,6 +255,8 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
 
 void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS,G4double angle,G4double zPos,G4double rIn,G4double rOut,G4VPhysicalVolume *motherVolume, G4int copyNo)
 {   
+  NumiDataInput* ND=NumiDataInput::GetNumiDataInput(); 
+  
   G4double stripW=HSS->stripW;
   G4double stripH=HSS->stripH;
   G4double stripL=HSS->stripL;
@@ -256,6 +286,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   sSpider=new G4SubtractionSolid("sSpider",sSpider,sBottomSubtr,G4Transform3D(rotation,translation));
 
   G4LogicalVolume *lvSpider=new G4LogicalVolume(sSpider,Al,"lvBox",0,0,0);
+  ND->ApplyStepLimits(lvSpider); // Limit Step Size
   G4RotationMatrix rotPos=G4RotationMatrix(0.,0.,angle);
   G4ThreeVector transPos=G4ThreeVector((rIn+(bottomThickMid-bottomH/2.))*sin(angle),(rIn+(bottomThickMid-bottomH/2.))*cos(angle),zPos);
   G4Transform3D position3D=G4Transform3D(rotPos,transPos);
@@ -264,6 +295,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   G4double ceramicRodL=rOut-rIn-topH-bottomThickMid-stripH-2.*mm;
   G4Tubs *sCeramicRod=new G4Tubs("sCeramicRod",0.,ceramicRodR,ceramicRodL/2.,0.,360.*deg);
   G4LogicalVolume *lvCeramicRod=new G4LogicalVolume(sCeramicRod,CT852,"lvCeramicRod",0,0,0);
+  ND->ApplyStepLimits(lvCeramicRod); // Limit Step Size
   rotPos=G4RotationMatrix(0.,0.,0.);
   rotPos.rotateX(90.*deg); rotPos.rotateZ(-angle);
   transPos=transPos+G4ThreeVector((bottomH/2.+stripH+topH+ceramicRodL/2.)*sin(angle),(bottomH/2.+stripH+topH+ceramicRodL/2.)*cos(angle),0);

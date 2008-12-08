@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.9 2008/02/15 15:01:50 koskinen Exp $
+// $Id: NumiMaterials.cc,v 1.10 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -38,8 +38,12 @@ void NumiDetectorConstruction::DefineMaterials()
   G4Element* elO  = new G4Element(name="Oxygen"  ,symbol="O" , Z= 8, A);
 
   A = 22.99*g/mole; 
+#ifdef FLUGG
+  G4Element* elNa  = new G4Element(name="Sodium"  ,symbol="Na" , Z=11 , A);
+#else
   G4Element* elNa  = new G4Element(name="Natrium"  ,symbol="Na" , Z=11 , A);
-
+#endif
+  
   A = 24.305*g/mole;  
   G4Element* elMg  = new G4Element(name="Magnesium"  ,symbol="Mg" , Z=12 , A); 
 
@@ -50,8 +54,12 @@ void NumiDetectorConstruction::DefineMaterials()
   G4Element* elSi  = new G4Element(name="Silicon", symbol="Si", Z=14, A);
 
   A = 30.974*g/mole; 
+#ifdef FLUGG
+  G4Element* elP  = new G4Element(name="Phospho"  ,symbol="P" , Z=15 , A);
+#else
   G4Element* elP  = new G4Element(name="Phosphorus"  ,symbol="P" , Z=15 , A);
-
+#endif
+  
   A = 32.065*g/mole; 
   G4Element* elS  = new G4Element(name="Sulfur"  ,symbol="S" , Z=16 , A);
 
@@ -147,13 +155,20 @@ void NumiDetectorConstruction::DefineMaterials()
 
   //other materials  
   He = new G4Material("Helium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
+
+#ifdef FLUGG
+  Be = new G4Material("Berylliu", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
+  Target =  new G4Material("Carbon", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
+#else
   Be = new G4Material("Berillium", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
   C =  new G4Material("Carbon", Z=6., A=12.01*g/mole, density= 1.83*g/cm3);
+  Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
+#endif
   Al = new G4Material("Aluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3);
   Ar = new G4Material("Argon", Z= 18, A=39.948*g/mole,1.784*kg/m3,kStateGas,300*kelvin,atmosphere);
   Pb = new G4Material("Lead", Z= 82., A= 207.19*g/mole, density= 11.35*g/cm3);
   Fe = new G4Material("Iron", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3);
-  Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
+
 
   density = 2.03*g/cm3;
   G4double fractionmass;

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.10 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.11 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -29,21 +29,24 @@
 #include "G4RegionStore.hh"
 #include "G4SolidStore.hh"
 #include "G4GeometryManager.hh"
+#ifndef FLUGG
 #include "G4RunManager.hh"
-
+#endif
 
 NumiDetectorConstruction::NumiDetectorConstruction()
 {
   //Scan the input file     
-  NumiData=new NumiDataInput();
+  NumiData = NumiDataInput::GetNumiDataInput();
 
   // Pointers for magnetic fields ***    
   numiMagField = new NumiMagneticField(); 
   numiMagFieldIC = new NumiMagneticFieldIC();
   numiMagFieldOC = new NumiMagneticFieldOC();
   
+#ifndef FLUGG
   // create commands for interactive definition of the geometry
   detectorMessenger = new NumiDetectorMessenger(this);
+#endif
   DefineMaterials();
 }
 
@@ -54,25 +57,43 @@ NumiDetectorConstruction::~NumiDetectorConstruction()
   delete numiMagFieldOC; 
   delete NumiData;
   DestroyMaterials();
+#ifndef FLUGG
   delete detectorMessenger;
+#endif
 }
 
 G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 {
+  if (!NumiData) {
+      /** FLUGG
+       * Constructor is not called in flugg, only Construct
+       * So constructor code has been moved here.
+       */
+      //Scan the input file     
+      NumiData = NumiDataInput::GetNumiDataInput();
 
-   //Define world volume 
+      // Pointers for magnetic fields ***    
+      numiMagField = new NumiMagneticField(); 
+      numiMagFieldIC = new NumiMagneticFieldIC();
+      numiMagFieldOC = new NumiMagneticFieldOC();
+
+      DefineMaterials();
+  }
+
+  /* FLUGG - Fluka wants a rectangular world volume
+  //Define world volume 
   G4Tubs* ROCK_solid = new G4Tubs("ROCK_solid",0.,NumiData->RockRadius,NumiData->RockHalfLen,0,360.*deg);
-  //  ROCK_log = new G4LogicalVolume(ROCK_solid,DoloStone,"ROCK_log",0,0,0); 
+  //  ROCK_log = new G4LogicalVolume(ROCK_solid,DoloStone,"ROCK_log",0,0,0);
+  */
+  G4Box* ROCK_solid = new G4Box("ROCK_solid",NumiData->RockRadius,
+                                NumiData->RockRadius,NumiData->RockHalfLen); 
   ROCK_log = new G4LogicalVolume(ROCK_solid, DoloStone,"ROCK_log",0,0,0); 
   ROCK_log->SetVisAttributes(G4VisAttributes::Invisible);
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
- 
+  
   ConstructTargetHall();
   ConstructDecayPipe();
   ConstructBaffle();
-  if (NumiData->constructTarget){
-    ConstructTarget();
-  }
   // insertion point for horn 1 is @3cm
   // drawings have z=0 at insertion point
   G4ThreeVector horn1pos(0.,0.,3.*cm);
@@ -81,9 +102,13 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   G4ThreeVector horn2pos(0.,0.,10.*m);
   G4RotationMatrix horn2rot(0.,0.,0.);
   ConstructHorn2(horn2pos,horn2rot);
+  if (NumiData->constructTarget){
+    ConstructTarget();
+  }
   ConstructHadronAbsorber(); 
   ConstructSecMonitors();
 
+#ifndef FLUGG
   //Set Vis Attributes according to solid material (only for volumes not explicitly set)
   G4LogicalVolumeStore* lvStore=G4LogicalVolumeStore::GetInstance();
   lvStore=G4LogicalVolumeStore::GetInstance();
@@ -93,6 +118,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
       (*lvStore)[ii]->SetVisAttributes(GetMaterialVisAttrib(matName));
     }
   }
+#endif
 
   return ROCK;
 }
@@ -128,6 +154,7 @@ void NumiDetectorConstruction::SetHornCurrent(G4double val) {
 
 }
 
+#ifndef FLUGG
 void NumiDetectorConstruction::UpdateGeometry() {
 
 
@@ -141,3 +168,4 @@ void NumiDetectorConstruction::UpdateGeometry() {
   G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
   
 }
+#endif

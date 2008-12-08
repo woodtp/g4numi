@@ -1,13 +1,14 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.19 2008/11/12 00:21:40 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.20 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
 #include <fstream>
 #include <iomanip>
 #include <stdlib.h>
+#include <map.h>
 
 //Root 
 #include <TSystem.h>        // ROOT head file for a generic interface to the OS
@@ -60,6 +61,48 @@ NumiAnalysis::NumiAnalysis()
   fAlcEdep_called.push_back(false);
   fAlcEdep_called.push_back(false);
 
+    /*
+  g4hmmdata->run = -81579;
+  g4hmmdata->mtgthsig = -81579; 
+  g4hmmdata->mtgtvsig = -81579; 
+  g4hmmdata->mtgthpos = -81579; 
+  g4hmmdata->mtgtvpos = -81579; 
+  g4hmmdata->evtno = -81579; 
+  g4hmmdata->ptype = -81579;
+  g4hmmdata->hmmenergy = -81579;
+
+  g4hmmdata->hmmxpos = -81579;
+  g4hmmdata->hmmypos = -81579;
+  g4hmmdata->hmmzpos = -81579;
+  g4hmmdata->hmmpx = -81579;
+  g4hmmdata->hmmpy = -81579;
+  g4hmmdata->hmmpz = -81579;
+  for(Int_t i=0;i<3;i++){
+    g4hmmdata->mmxpos[i] = -81579;
+    g4hmmdata->mmpx[i] = -81579;
+    g4hmmdata->mmypos[i] = -81579;
+    g4hmmdata->mmpy[i] = -81579;
+    g4hmmdata->mmzpos[i] = -81579;
+    g4hmmdata->mmpz[i] = -81579; 
+  }
+*/
+
+  code[-13]   = 10;
+  code[13]    = 11;
+  code[111]   = 23;
+  code[211]   = 13;
+  code[-211]  = 14;
+  code[130]   = 12;
+  code[321]   = 15;
+  code[-321]  = 16;
+  code[2112]  = 8;
+  code[2212]  = 1;
+  code[-2212] = 2;
+  code[310]   = 19;
+  code[3122]  = 17;
+  code[3222]  = 21;
+  code[3212]  = 22;
+  code[3112]  = 20;
 }
 
 NumiAnalysis::~NumiAnalysis()
@@ -116,6 +159,11 @@ void NumiAnalysis::book()
     std::ofstream asciiFile(asciiFileName);
   }
 
+  if (NumiData->createBXDRAW) {
+    sprintf(bxdrawFileName,"%s%s%03d%s",(NumiData->bxdrawName).c_str(),"_",pRunManager->GetCurrentRun()->GetRunID(),".dat");
+    G4cout << "Creating BXDRAW output file : "<< bxdrawFileName <<G4endl;
+    std::ofstream bxdrawFile(bxdrawFileName);
+  }
   //book histograms
 }
 
@@ -791,8 +839,101 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       asciiFile.close();
     }
   }
-
 }
+
+void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
+
+  if (!NumiData->createBXDRAW) return;
+  // Based on Fortran code in mgdraw.f in *_fluka/for/ 
+  G4int JTRACK, LTRACK;
+  G4int TMREG, TNEWREG;
+  G4int NCASE;
+  G4double WTRACK;
+  G4double ETRACK, AM;
+  G4double XSCO, YSCO, RSCO, ZSCO;
+  G4double CXTRCK, CYTRCK, CZTRCK;
+
+  G4Track * theTrack = aStep->GetTrack();
+  G4StepPoint* startPoint = aStep->GetPreStepPoint();
+  G4StepPoint* endPoint = aStep->GetPostStepPoint();
+  
+  
+  G4VPhysicalVolume *Start = startPoint->GetPhysicalVolume();
+  G4VPhysicalVolume *End   = endPoint->GetPhysicalVolume();
+
+  if (!End || !Start) // Left simulated region
+	return;
+
+  G4String StartName = Start->GetName();
+  G4String EndName   = End->GetName();
+
+  TMREG = 0;
+  TNEWREG = 0;
+  WTRACK = theTrack->GetWeight();
+  
+  if (StartName.contains("Horn1Box"))
+	TMREG = 1;             // Horn 1
+  else if (StartName.contains("Horn2Box"))
+	TMREG = 2;             // Horn 2
+  else if (StartName.contains("DVOL") ) 
+	TMREG = 3;             // Decay Pipe - DVOL only
+  
+  if (EndName.contains("Horn1Box"))
+	TNEWREG = 1;             // Horn 1
+  else if (EndName.contains("Horn2Box"))
+	TNEWREG = 2;             // Horn 2
+  else if (EndName.contains("DVOL") ) 
+        TNEWREG = 3;             // Decay Pipe - DVOL only
+
+  ZSCO = theTrack->GetPosition().z()/cm;
+
+  if ( TMREG != TNEWREG )  {                 // Change Regions 
+	if ( TMREG == 1 || TMREG == 2 ||       // Exit horns
+		 (ZSCO > 4569  && ZSCO < 4571) || // Enter Decay Pipe
+		 (ZSCO > 72237 && ZSCO < 72238)   // Exit Decay Pipe
+         ) {
+	  
+	  ETRACK = theTrack->GetTotalEnergy()/GeV;
+	  G4ParticleDefinition * particleType = theTrack->GetDefinition();
+	  JTRACK = code[particleType->GetPDGEncoding()];
+	  if (JTRACK == 8 || JTRACK == 9)
+		return;
+	  if (ETRACK > 0.5 ) { // 0.5 GeV Cut off
+		NumiTrackInformation* info=(NumiTrackInformation*)(theTrack->GetUserInformation());
+		if (info) {
+		  LTRACK = info->GetTgen();
+		}
+		else { 
+		  LTRACK = 0; 
+		}
+		
+		NCASE = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+		
+		AM = particleType->GetPDGMass()/GeV;
+		
+		XSCO = theTrack->GetPosition().x()/cm;
+		YSCO = theTrack->GetPosition().y()/cm;
+		
+		RSCO = sqrt(XSCO*XSCO + YSCO*YSCO);
+		
+		CXTRCK = theTrack->GetMomentumDirection().x();
+		CYTRCK = theTrack->GetMomentumDirection().y();
+		CZTRCK = theTrack->GetMomentumDirection().z();
+
+
+		std::ofstream bxdrawFile(bxdrawFileName, std::ios::app);
+		bxdrawFile << JTRACK << "  " << TMREG  << "  " << TNEWREG<< "  "  // Code, regions
+				   << NCASE  << "  " << WTRACK << "  "                    // Event, Track Weight
+				   << LTRACK << "  " << ETRACK << "  " << AM     << "  "  // Gen, E, M
+				   << XSCO   << "  " << YSCO   << "  " << RSCO   << "  " << ZSCO << "  "  // crossing point
+				   << CXTRCK << "  " << CYTRCK << "  " << CZTRCK << "  "  // direction cosines
+				   << G4endl;
+		bxdrawFile.close();
+	  }
+	}
+  }
+}
+
 
 NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
 {

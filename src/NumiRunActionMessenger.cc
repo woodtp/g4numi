@@ -69,6 +69,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useNImpWeight->SetDefaultValue (NumiData->NImpWeightOn);
   useNImpWeight->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  useTestBeam = new G4UIcmdWithABool("/NuMI/run/useTestBeam",this);
+  useTestBeam->SetGuidance("use test beam source");
+  useTestBeam->SetParameterName("useTestBeam",true);
+  useTestBeam->SetDefaultValue (NumiData->useTestBeam);
+  useTestBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   useFlukaInput = new G4UIcmdWithABool("/NuMI/run/useFlukaInput",this);
   useFlukaInput->SetGuidance("use fluka input ntuple");
   useFlukaInput->SetParameterName("useFlukaInput",true);
@@ -143,6 +149,38 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   outputASCIIFile->SetParameterName("outputASCIIFile",true);
   outputASCIIFile->SetDefaultValue (NumiData->createASCII);
   outputASCIIFile->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setBXDRAWFile = new G4UIcmdWithAString("/NuMI/output/setBXDRAWFile",this);
+  setBXDRAWFile->SetGuidance("set BXDRAW file name");
+  setBXDRAWFile->SetParameterName("fileName",true);
+  setBXDRAWFile->SetDefaultValue (NumiData->bxdrawName);
+  setBXDRAWFile->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  outputBXDRAWFile = new G4UIcmdWithABool("/NuMI/output/outputBXDRAWFile",this);
+  outputBXDRAWFile->SetGuidance("output BXDRAW file (true/false)");
+  outputBXDRAWFile->SetParameterName("outputBXDRAWFile",true);
+  outputBXDRAWFile->SetDefaultValue (NumiData->createBXDRAW);
+  outputBXDRAWFile->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useDecayPipeSelect = new G4UIcmdWithABool("/NuMI/run/useDecayPipeSelect",this);
+  useDecayPipeSelect->SetGuidance("use decay pipe antineutrino selection");
+  useDecayPipeSelect->SetParameterName("useDecayPipeSelect",true);
+  useDecayPipeSelect->SetDefaultValue (NumiData->useDecayPipeSelect);
+  useDecayPipeSelect->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setTestTheta = new G4UIcmdWithADouble("/NuMI/run/setTestTheta",this);
+  setTestTheta->SetGuidance("set angle of test beam");
+  setTestTheta->SetParameterName("setTestTheta",true);
+  setTestTheta->SetDefaultValue (30.);
+  setTestTheta->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setStepLimit = new G4UIcmdWithADoubleAndUnit("/NuMI/run/setStepLimit",this);
+  setStepLimit->SetGuidance("Maximum step size in magnetized horns");
+  setStepLimit->SetParameterName("setStepLimit",true);
+  setStepLimit->SetDefaultValue(0.0);
+  setStepLimit->SetRange("setStepLimit>=0.");
+  setStepLimit->SetUnitCategory("Length");
+  setStepLimit->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 NumiRunActionMessenger::~NumiRunActionMessenger()
@@ -156,6 +194,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setMaterialSigma;
   delete useNImpWeight;
   delete NumiRunDir;
+  delete useTestBeam;
   delete useFlukaInput;
   delete useMarsInput;
   delete useMuonBeam;
@@ -168,11 +207,13 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setASCIIFile;
   delete outputASCIIFile;
   delete NumiOutputDir;
+  delete useDecayPipeSelect;
+  delete setTestTheta;
+  delete setStepLimit;
 }
 
 void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
 {
-  
   if (command == readRndmCmd)
     { 
       G4cout << "\n---> rndm status restored from file: " << newValues << G4endl;
@@ -208,18 +249,19 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
     NumiData->SetNImpWeight(useNImpWeight->GetNewBoolValue(newValues));
   }
 
+  if (command == useTestBeam){
+	NumiData->SetTestBeam(useTestBeam->GetNewBoolValue(newValues));
+  }
   if (command == useFlukaInput){
     NumiData->SetFlukaInput(useFlukaInput->GetNewBoolValue(newValues));
   }
-
   if (command == useMarsInput){
     NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
   }
-  
+
   if (command == useMuonBeam){
     NumiData->SetMuonBeam(useMuonBeam->GetNewBoolValue(newValues));
   }
-
   if (command == useMuonInput){
     NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues));
   }
@@ -247,12 +289,32 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
       NumiData->OutputHadmmNtuple(outputNuNtuple->GetNewBoolValue(newValues));
   }
 
- if (command == setASCIIFile){
+  if (command == setASCIIFile){
       NumiData->SetASCIIName(newValues);
   }
 
   if (command == outputASCIIFile){
       NumiData->OutputASCII(outputASCIIFile->GetNewBoolValue(newValues));
   }
+
+  if (command == setBXDRAWFile){
+      NumiData->SetBXDRAWName(newValues);
+  }
+
+  if (command == outputBXDRAWFile){
+      NumiData->OutputBXDRAW(outputBXDRAWFile->GetNewBoolValue(newValues));
+  }
+
+  if (command == useDecayPipeSelect){
+	NumiData->SetDecayPipeSelect(useDecayPipeSelect->GetNewBoolValue(newValues));
+  }
+  
+  if (command == setTestTheta){
+	NumiData->SetTestTheta(setTestTheta->GetNewDoubleValue(newValues));
+  }
+  
+  if (command == setStepLimit){
+    NumiData->SetStepLimit(setStepLimit->GetNewDoubleValue(newValues));
+  }  
 }
 

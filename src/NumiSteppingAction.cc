@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.11 2008/11/12 00:21:40 loiacono Exp $
+// $Id: NumiSteppingAction.cc,v 1.12 2008/12/08 19:49:30 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -14,7 +14,10 @@
 #include "NumiTrackInformation.hh"
 #include "NumiDataInput.hh"
 #include "NumiAnalysis.hh"
-
+#include "G4VPhysicalVolume.hh"
+#include "G4Event.hh"
+#include "NumiTrackInformation.hh"
+#include "NumiAnalysis.hh"
 
 NumiSteppingAction::NumiSteppingAction()
 {
@@ -30,6 +33,10 @@ NumiSteppingAction::~NumiSteppingAction()
 
 void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 {
+
+  NumiAnalysis* analysis = NumiAnalysis::getInstance();
+  analysis->FillBXDRAW(theStep);
+
   // Check if the Pi+, Pi-, K+, K-, K0L, mu+ or mu- decayed and set Ndecay code:
   // 1  K0L -> nu_e pi- e+
   // 2  K0L -> anti_nu_e pi+ e-

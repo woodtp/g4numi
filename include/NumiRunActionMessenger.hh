@@ -35,6 +35,7 @@ private:
   G4UIcmdWithAnInteger*     setRunID;
   G4UIcmdWithADouble*       setMaterialSigma;
   G4UIcmdWithABool*         useNImpWeight;
+  G4UIcmdWithABool*         useTestBeam;
   G4UIcmdWithABool*         useFlukaInput;
   G4UIcmdWithABool*         useMarsInput;
   G4UIcmdWithABool*         useMuonBeam;
@@ -45,9 +46,14 @@ private:
   G4UIcmdWithAString*       setNuNtupleFile; 
   G4UIcmdWithAString*       setHadmmNtupleFile; 
   G4UIcmdWithAString*       setASCIIFile; 
+  G4UIcmdWithAString*       setBXDRAWFile; 
   G4UIcmdWithABool*         outputNuNtuple;
   G4UIcmdWithABool*         outputHadmmNtuple;
   G4UIcmdWithABool*         outputASCIIFile;
+  G4UIcmdWithABool*         outputBXDRAWFile;
+  G4UIcmdWithADouble*       setTestTheta;
+  G4UIcmdWithABool*         useDecayPipeSelect;
+  G4UIcmdWithADoubleAndUnit*  setStepLimit;
 };
 
 #endif
