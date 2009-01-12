@@ -43,10 +43,10 @@ namespace NumiParticleCode
       kOther                = 99 
     } NumiParticleCode_t;
 
-  G4String NumiParticleCode::AsString(NumiParticleCode_t pCode);
-  G4int NumiParticleCode::AsInt(NumiParticleCode_t pCode);
-  NumiParticleCode_t NumiParticleCode::IntToEnum(G4int particleInt);
-  NumiParticleCode_t NumiParticleCode::StringToEnum(G4String particleName);
+  G4String AsString(NumiParticleCode_t pCode);
+  G4int AsInt(NumiParticleCode_t pCode);
+  NumiParticleCode_t IntToEnum(G4int particleInt);
+  NumiParticleCode_t StringToEnum(G4String particleName);
 
 }
 
