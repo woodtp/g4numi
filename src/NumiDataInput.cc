@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.21 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiDataInput.cc,v 1.22 2009/01/28 19:01:52 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -88,7 +88,7 @@ NumiDataInput::NumiDataInput()
   RockDensity = 2.41*g/cm3; // not
   RockRadLen  = 0.0;        // used
 
-  constructTarget = false;
+  constructTarget = true;
   //TargetArea          1
   //=======================================================================
   TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
