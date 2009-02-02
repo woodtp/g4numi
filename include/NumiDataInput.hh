@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.16 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiDataInput.hh,v 1.17 2009/02/02 21:10:16 jyuko Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -128,6 +128,27 @@ public:
   G4double GetKillTrackingThreshold(){
     return KillTrackingThreshold;
   }
+  void  SetMacroBeam(G4bool val){
+    useMacro=val;
+  }
+  G4bool GetMacroBeam(){
+    return useMacro;
+  }
+  void SetZpNtupleName(G4String fileName){
+    zpNtupleName=fileName;
+  }
+  void OutputZpNtuple(G4bool val){
+    createZpNtuple=val;
+  }
+  G4bool GetMuonBeam(){
+    return useMuonBeam;
+  }
+  void SetKillTracking(G4bool val){
+    KillTracking = val;
+  }
+  void SetKillTrackingThreshold(G4double th ){
+    KillTrackingThreshold=th;
+  }
   
 
 
@@ -147,7 +168,26 @@ public:
   G4bool useTestBeam, useDecayPipeSelect;
   G4String bxdrawName;
   G4float testTheta;   // TestBeam Angle
+  
+  //=================================
+  //  for Raytracing=================
+  //----------------------------------
+  G4bool useMacro;
+      G4int NZpoint ;
+  vdouble_t Zpoint ; // The Z points
+  G4String zpNtupleName;
+  G4bool createZpNtuple;// name of the zp tuple and the bool of zpntuple
+  G4bool raytracing;//
+  //==================================
 
+  //==================================
+  //-- For making the horns the same
+  //----------------------------------
+  G4bool airhrn;
+  G4bool jCompare;
+  G4int hrnmat;
+  G4int hrnmatcr;
+  //===================================
   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
   G4double KillTrackingThreshold;
   G4ThreeVector beamPosition, beamDirection;

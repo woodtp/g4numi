@@ -54,6 +54,15 @@ private:
   G4UIcmdWithADouble*       setTestTheta;
   G4UIcmdWithABool*         useDecayPipeSelect;
   G4UIcmdWithADoubleAndUnit*  setStepLimit;
+
+  
+  G4UIcmdWithABool*         UseMacro;
+  G4UIcmdWithABool*         outputZpNtuple;
+  G4UIcmdWithABool*         UseMuonBeam;
+  G4UIcmdWithAString*       setZpNtupleFile;
+  G4UIcmdWithABool*         KillTracking;
+  G4UIcmdWithADouble*       KillTrackingThreshold;
+
 };
 
 #endif

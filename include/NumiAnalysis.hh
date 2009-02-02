@@ -25,7 +25,7 @@ class TTree;
 class G4Track;
 class data_t;
 class hadmmtuple_t;
-
+class zptuple_t;
 class NumiAnalysis
 {
 public:
@@ -41,7 +41,11 @@ public:
   void FillBXDRAW(const G4Step* aStep);
   void FillAlcEdepInfo(const G4Track& track, G4int alc);
   void WriteHadmmNtuple(const G4Track* aTrack = 0);
-
+  
+  void FillZpNtuple();
+  void FillZpNtuple(const G4Track& track, Int_t zpnum);
+  void WriteZpNtuple();
+  
   NumiTrajectory* GetParentTrajectory(G4int parentID);
   static NumiAnalysis* getInstance();
 
@@ -63,19 +67,23 @@ private:
   G4double z;
 
   G4double noProtons;
-  char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50], bxdrawFileName[50];
+  char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50];
+  char zpNtupleFileName[50], bxdrawFileName[50];
   map<int, int> code;
 
   NumiDataInput* NumiData;
 
   TFile* hadmmNtuple;
   TFile* nuNtuple;
- 
+  TFile* zpNtuple;
+
   TTree* tree;
   TTree* hadmmtree;
+  TTree* zptree;
 
   data_t *g4data;
   hadmmtuple_t *g4hmmdata;
+  zptuple_t* g4zpdata; 
 
   G4int fcount;
   G4int fentry;
