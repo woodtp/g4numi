@@ -275,6 +275,9 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
+  else if (fND->useMacro){
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+  }
   else if (fND->useFlukaInput || fND->useMarsInput) {
     /*
      Fluka and Mars input variables:

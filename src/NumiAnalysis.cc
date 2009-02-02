@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.20 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiAnalysis.cc,v 1.21 2009/02/02 21:09:35 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -33,6 +33,7 @@
 //g4numi 
 #include "data_t.hh"
 #include "hadmmtuple_t.hh"
+#include "zptuple_t.hh" // for raytracing
 #include "NumiParticleCode.hh"
 #include "NumiAnalysis.hh"
 #include "NumiTrackInformation.hh"
@@ -164,6 +165,15 @@ void NumiAnalysis::book()
     G4cout << "Creating BXDRAW output file : "<< bxdrawFileName <<G4endl;
     std::ofstream bxdrawFile(bxdrawFileName);
   }
+  if(NumiData->raytracing){
+    sprintf(zpNtupleFileName,"%s_%04d%s.root",(NumiData->zpNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(),(NumiData->geometry).c_str());
+    G4cout<<"Creating validation and muon tracking ntuple:"<<zpNtupleFileName<<G4endl;
+    zpNtuple = new TFile(zpNtupleFileName, "RECREATE","zptrack ntuple");
+    zptree = new TTree("zp","g4numi Tracking particles through ZPoints");
+    zptree->Branch("zpdata", "zptuple_t", &g4zpdata,32000,1);
+    G4cout<<" End of if statement"<<G4endl;
+  }
+
   //book histograms
 }
 
@@ -218,6 +228,13 @@ void NumiAnalysis::finish()
     hadmmtree->Write();
     hadmmNtuple->Close();
     delete hadmmNtuple;
+  }
+  
+  if (NumiData->createZpNtuple){
+    zpNtuple->cd();
+    zptree->Write();
+    zpNtuple->Close();
+    delete zpNtuple;
   }
 }
 
@@ -952,4 +969,60 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
   }
 
   return 0;
+}
+//=============================================================================
+//-----------------------------------------------------------------------------
+void NumiAnalysis::FillZpNtuple(const G4Track& track,Int_t zpnum)
+{//---Jasmine added
+  if(!NumiData->raytracing) return ;
+  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+
+  /*  if(g4zpdata->evtno!=  pRunManager->GetCurrentEvent()->GetEventID())
+        {
+        g4zpdata->run=pRunManager->GetCurrentRun()->GetRunID();
+        g4zpdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+        WriteZpNtuple();//store info and initialize
+        }*/
+
+  if(zpnum<(Int_t)NumiData->Zpoint.size()){
+
+    G4ParticleDefinition* particleDefinition = track.GetDefinition();
+
+    g4zpdata->xposatz= track.GetPosition()[0]/cm;
+    g4zpdata->yposatz= track.GetPosition()[1]/cm;
+    g4zpdata->zposatz= track.GetPosition()[2]/cm;
+    g4zpdata->xmomatz= track.GetMomentum()[0]/GeV;
+    g4zpdata->ymomatz= track.GetMomentum()[1]/GeV;
+    g4zpdata->zmomatz= track.GetMomentum()[2]/GeV;
+    g4zpdata->matilen= track.GetMaterial()->GetNuclearInterLength();
+    g4zpdata->field= track.GetStepLength()/cm;
+    g4zpdata->pathlength= track.GetTrackLength()/cm;
+    g4zpdata->ptypeatz= track.GetParentID();
+
+    g4zpdata->pidtype= NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
+    g4zpdata->zpoint=NumiData->Zpoint[zpnum]/cm ;
+
+    g4zpdata->run=pRunManager->GetCurrentRun()->GetRunID();
+    g4zpdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+    WriteZpNtuple();//store info and initialize
+
+  }
+}
+void NumiAnalysis::WriteZpNtuple(){//Jasmine added
+  zptree->Fill();
+
+  g4zpdata->xposatz=-10000;
+  g4zpdata->yposatz=-10000;
+  g4zpdata->zposatz=-10000;
+  g4zpdata->xmomatz=-10000;
+  g4zpdata->ymomatz=-10000;
+  g4zpdata->zmomatz=-10000;
+  g4zpdata->matilen=-10000;
+  g4zpdata->field=-10000;
+  g4zpdata->pathlength=-10000;
+  g4zpdata->zpoint=-10000;
+  g4zpdata->ptypeatz=-10;
+  g4zpdata->pidtype=-10;
+  g4zpdata->run=-100;
+  g4zpdata->evtno=-100;
 }

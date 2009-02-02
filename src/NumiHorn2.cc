@@ -167,8 +167,8 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,frontRmax*2);
   sHorn2Front=new G4SubtractionSolid("sHorn2Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
-  material=Al;
-  G4LogicalVolume* lvHorn2Front=new G4LogicalVolume(sHorn2Front,material,"lvHorn2Front",0,0,0);
+  //  material=GetMaterial(ND->hrnmat);
+  G4LogicalVolume* lvHorn2Front=new G4LogicalVolume(sHorn2Front,GetMaterial(ND->hrnmat),"lvHorn2Front",0,0,0);
   ND->ApplyStepLimits(lvHorn2Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn2Origin+G4ThreeVector(0.,0.,OCZ0);
@@ -176,7 +176,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
     
   //Outer Conductor
   G4Polycone* sPHorn2OC=new G4Polycone("sPHorn2OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
-  G4LogicalVolume* lvPHorn2OC=new G4LogicalVolume(sPHorn2OC,Al,"lvPHorn2OC",0,0,0);
+  G4LogicalVolume* lvPHorn2OC=new G4LogicalVolume(sPHorn2OC,GetMaterial(ND->hrnmat),"lvPHorn2OC",0,0,0);
   ND->ApplyStepLimits(lvPHorn2OC); // Limit Step Size
   G4FieldManager* FieldMgr2 = new G4FieldManager(numiMagFieldOC); //create a local field
   FieldMgr2->SetDetectorField(numiMagFieldOC); //set the field 
@@ -188,7 +188,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 
   //Inner Conductor
   G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
-  G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,Al,"lvPHorn2IC",0,0,0);
+  G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,GetMaterial(ND->hrnmat),"lvPHorn2IC",0,0,0);
   ND->ApplyStepLimits(lvPHorn2IC); // Limit Step Size
   G4FieldManager* FieldMgr = new G4FieldManager(numiMagFieldIC); //create a local field		 
   FieldMgr->SetDetectorField(numiMagFieldIC); //set the field 
@@ -203,7 +203,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn2Z0+frontRmax);
   G4UnionSolid *sPHorn2F=new G4UnionSolid("sPHorn2F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
-  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Ar,"lvPHorn2F",0,0,0);
+  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Air,"lvPHorn2F",0,0,0);
   ND->ApplyStepLimits(lvPHorn2F); // Limit Step Size
   lvPHorn2F->SetVisAttributes(invisible);
   //------ Modification by Alex Himmel 3-19-07----------
@@ -323,7 +323,26 @@ G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
   if (z<-0.00331*in){
     r=(10.9108+(0.1780*0.00331))*in; //for MV
   } 
-  
+
+  //===========================================
+  // These are the equations i gnumi used by me (jasmine ma) commented here
+  // because no one else uses them  
+  /*  
+  else if((z/cm)>=-0.00840   && (z/cm)< 97.617)
+  {
+    r= (sqrt((100-(z/cm))/0.1351))*cm;
+  }
+  else if( (z/cm)>=97.617 && (z/cm)<104.803)
+  { // Neck
+    r = 4.2*cm;
+  }
+  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+  {
+    r= (sqrt(((z/cm)-100)/0.2723))*cm ;
+  }
+  */
+  //===========================================
+
   //IC from drawings
   else if ((z>=-0.00331*in)&&(z<5.862*in)){
     r=(10.9108-(0.1780)*(z/in))*in;
@@ -423,7 +442,25 @@ G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
   if (z<0.0*in){
     r=sqrt(114.73006)*in-0.11811*in-0.05*in;//for MV; added 0.05 because ic was outside of mv
   }
-
+  //===========================================
+  // These are the equations i gnumi used by me (jasmine ma) commented here
+  // because no one else uses them
+  /*
+   else if(z/cm>=0.0 && (z/cm)< 97.617)
+  {
+  r= (sqrt((100-(z/cm))/0.1351)-0.2)*cm;
+  }
+  else if( (z/cm)>=97.617 && (z/cm)<104.803)
+  { // Neck
+    r = 4*cm;
+  }
+  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+  {
+    r= (sqrt(((z/cm)-100)/0.2723)-0.2)*cm ;
+  }
+  */
+  //---------------------------------------------------------
+  // This stuff is originally what zarko had in here from drawings
   //IC from drawings
   else if ((z>=0.0*in)&&(z<5.8*in)){
     r=sqrt(114.73006-(2.91414)*(z/in))*in-0.11811*in;
@@ -457,6 +494,7 @@ G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
   else if ((z>=93.8920*in)&&(z<118.156*in)){
     r=(1.81456+(0.07398)*(z/in))*in;
   }
+  //-----differences in g4numi/gnumi end here -----------
   //Flange inner downstream
  else if ((z>=118.156*in)&&(z<139.21*in)){
    r=21.342/2.*in;

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.22 2009/01/28 19:01:52 ahimmel Exp $
+// $Id: NumiDataInput.cc,v 1.23 2009/02/02 21:09:35 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -42,7 +42,7 @@ NumiDataInput::NumiDataInput()
   KillTracking = true; // false for ahimmel
   testTheta = M_PI/6.;
   
-  StepLimit = 0.;
+  StepLimit = 0.; 
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
@@ -56,12 +56,89 @@ NumiDataInput::NumiDataInput()
   asciiName       = "asciiOut";
   bxdrawName      = "bxdrawOut";
   RunNumber       = "0000";
-  geometry        = "_K";
+  geometry        = "";
 
   materialSigma   = 0;// Denotes the change in sigma to the
                       // rock density and muon alcove wall location
+  //===================================
+  //------ Use Macro---------------
+  // useMacro = true if you actually want to change beam parameters
+  // from the macro 
+  
+  useMacro = false;
+  //====================================
+  //-- Changes for "Air Horns"---------- >> G4numi validation
+  //-- Changes for "Truncated Horns"-----
+  G4bool airhrn =true; // airhrn must be changed before compilation
+  jCompare = true; // make horns have the same B field;
+  if(airhrn){
+    hrnmat=15;
+    hrnmatcr=15;
+  }
+  else{
+    hrnmat = 20;
+    hrnmatcr =31;
+  }
+  //======================================
 
+  //======================================
+  //--Ray Tracing parameters -------------
+  //--------------------------------------
+    useMacro = false;
+   raytracing =false;
+   //==============================
+   //------------------------------
 
+   //initialize zpoints
+    NZpoint=45;
+    Zpoint.push_back(0*m); //1
+    Zpoint.push_back(0.5*m); //2
+    Zpoint.push_back(0.7*m); //3
+    Zpoint.push_back(0.75*m); //4
+    Zpoint.push_back(0.8*m); //5
+    Zpoint.push_back(0.85*m); //6
+    Zpoint.push_back(0.9*m); //7
+    Zpoint.push_back(1*m); //8
+    Zpoint.push_back(1.25*m); //9
+    Zpoint.push_back(1.5*m); //10
+    Zpoint.push_back(1.75*m); //11
+    Zpoint.push_back(2*m);//12
+    Zpoint.push_back(2.25*m);//13
+    Zpoint.push_back(2.5*m);//14
+    Zpoint.push_back(2.75*m); //15
+    Zpoint.push_back(3*m);//16
+    Zpoint.push_back(3.25*m);//17
+    Zpoint.push_back(3.5*m);//18
+    Zpoint.push_back(4*m);//19
+    Zpoint.push_back(6*m);//20
+    Zpoint.push_back(9*m);//21
+    Zpoint.push_back(9.5*m); //22
+    Zpoint.push_back(9.25*m); //23
+    Zpoint.push_back(10*m);//24
+    Zpoint.push_back(10.25*m);//25
+    Zpoint.push_back(10.5*m);//26
+    Zpoint.push_back(10.75*m);//27
+    Zpoint.push_back(11.80*m);//28
+    Zpoint.push_back(11.9*m);//29
+    Zpoint.push_back(11*m);//30
+    Zpoint.push_back(11.1*m);//31
+    Zpoint.push_back(11.2*m);//32
+    Zpoint.push_back(11.25*m);//33
+    Zpoint.push_back(11.5*m);//34
+    Zpoint.push_back(11.75*m);//35
+    Zpoint.push_back(12*m);//36
+    Zpoint.push_back(12.25*m);//37
+    Zpoint.push_back(12.5*m);//38
+    Zpoint.push_back(12.75*m);//39
+    Zpoint.push_back(13*m);//40
+    Zpoint.push_back(13.25*m);//41
+    Zpoint.push_back(13.5*m);//42
+    Zpoint.push_back(14*m);//43
+    Zpoint.push_back(20*m);//44
+    Zpoint.push_back(45.7*m);//45
+    createZpNtuple=true;
+    zpNtupleName="zpNtuple";
+    //==============================================================
   G4float beam_x_dir = 0;
   G4float beam_y_dir = 0;
   G4float beam_z_dir = 1;//cos(.01*pi/180);
@@ -245,7 +322,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //DecayPipe          1    
   //=======================================================================
   DecayPipeZ0        = 45.699*m; //was 45.28*m (08/09/05);
-  DecayPipeRadius    = 0.9906*m;
+  DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
   DecayPipeLength    = 676.681*m; //was 677.1*m (08/09/05);
   DecayPipeFWinThick = 1.60E-3*m;
   DecayPipeEWinThick = 4.76E-3*m;
@@ -484,7 +561,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     PHorn2EndLength.push_back(PHorn2EndLength_[ii]*in);
     PHorn2EndRin.push_back(PHorn2EndRin_[ii]*in);
     PHorn2EndRout.push_back(PHorn2EndRout_[ii]*in);
+    if(airhrn){
+      PHorn2EndGeantMat.push_back(PHorn2EndGeantMat_[ii]);
+    }
+    else{
     PHorn2EndGeantMat.push_back(PHorn2EndGeantMat_[ii]);
+    }
     PHorn2EndVolName.push_back(PHorn2EndVolName_[ii]);
   }
 
@@ -501,7 +583,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     PHorn1EndLength.push_back(PHorn1EndLength_[ii]*in);
     PHorn1EndRin.push_back(PHorn1EndRin_[ii]*in);
     PHorn1EndRout.push_back(PHorn1EndRout_[ii]*in);
-    PHorn1EndGeantMat.push_back(PHorn1EndGeantMat_[ii]);
+    if(airhrn){ 
+      PHorn1EndGeantMat.push_back(15);
+    }
+    else{
+      PHorn1EndGeantMat.push_back(PHorn1EndGeantMat_[ii]);
+    }
     PHorn1EndVolName.push_back(PHorn1EndVolName_[ii]);
   }
 

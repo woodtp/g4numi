@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.12 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiSteppingAction.cc,v 1.13 2009/02/02 21:09:35 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -123,9 +123,22 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	analysis->FillAlcEdepInfo(*theTrack, 2);
       }
     
-    
-
-
+  }// I think this is the end of the muon beam stuff. Why the end bracket for this was lower in the program? I don't know
+  // because this is the first version I have seen with the bracket lower. I left it there but commented it out.
+    //================================
+    //=======for Raytracing===========
+    //--------------------------------
+	   if(NDI->raytracing || NDI->createZpNtuple){
+	     for(G4int in = 0; in<(NDI->NZpoint);in++)//---Jasmine Added
+	       {
+	           if((theStep->GetPostStepPoint()->GetPosition()[2]>=NDI->Zpoint[in]&&
+		       theStep->GetPreStepPoint()->GetPosition()[2]<NDI->Zpoint[in]))
+		     {
+		       NumiAnalysis* analysis=NumiAnalysis::getInstance();
+	                 analysis->FillZpNtuple(*theTrack,in);
+		     }
+	       }
+	   }
 
 
     // Checks to see whether the particle has entered the Hadron
@@ -185,7 +198,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	  }
       }
     
-  }//end if(NDI->useMuonBeam)
+    //  }//end if(NDI->useMuonBeam)
 
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
     G4int decay_code=0;

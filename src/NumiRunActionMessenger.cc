@@ -181,6 +181,43 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   setStepLimit->SetRange("setStepLimit>=0.");
   setStepLimit->SetUnitCategory("Length");
   setStepLimit->AvailableForStates(G4State_PreInit,G4State_Idle);
+   //----------------------Jasmine Added the Following
+  UseMacro = new G4UIcmdWithABool("/NuMI/output/useMacroBeam",this);
+  UseMacro->SetGuidance("sets macro input as final input");
+  UseMacro->SetParameterName("useMacro",true);
+  UseMacro->SetDefaultValue(NumiData->useMacro);
+  UseMacro->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  outputZpNtuple = new G4UIcmdWithABool("/NuMI/output/outputZpNtuple",this);
+  outputZpNtuple->SetGuidance("sets yes/no Zp Ntuple");
+  outputZpNtuple->SetParameterName("createZpNtuple",true);
+  outputZpNtuple->SetDefaultValue(NumiData->createZpNtuple);
+  outputZpNtuple->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  UseMuonBeam = new G4UIcmdWithABool("/NuMI/output/useMuonBeam",this);
+  UseMuonBeam->SetGuidance("sets muon beam as starting beam");
+  UseMuonBeam->SetParameterName("useMuonBeam",true);
+  UseMuonBeam->SetDefaultValue(NumiData->useMuonBeam);
+  UseMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  setZpNtupleFile = new G4UIcmdWithAString("/NuMI/output/setZpNtupleFile",this);
+  setZpNtupleFile->SetGuidance("set neutrino ntuple file name");
+  setZpNtupleFile->SetParameterName("fileName",true);
+  setZpNtupleFile->SetDefaultValue (NumiData->zpNtupleName);
+  setZpNtupleFile->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  KillTracking=new G4UIcmdWithABool("/NuMI/run/KillTracking",this);
+  KillTracking->SetGuidance("Sets Kill Tracking on or off");
+  KillTracking->SetParameterName("KillTracking",true);
+  KillTracking->SetDefaultValue(NumiData->KillTracking);
+  KillTracking->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  KillTrackingThreshold = new G4UIcmdWithADouble("/NuMI/run/KillTrackingThreshold",this);
+  KillTrackingThreshold->SetGuidance("Sets Kill Tracking on or off");
+  KillTrackingThreshold->SetParameterName("KillTrackingThreshold",true);
+  KillTrackingThreshold->SetDefaultValue(NumiData->KillTrackingThreshold);
+  KillTrackingThreshold->AvailableForStates(G4State_PreInit,G4State_Idle);
+
 }
 
 NumiRunActionMessenger::~NumiRunActionMessenger()
@@ -210,6 +247,16 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete useDecayPipeSelect;
   delete setTestTheta;
   delete setStepLimit;
+  //=============================
+  //==  For Raytracing ==========
+  //-----------------------------
+  delete UseMacro;
+  delete outputZpNtuple;
+  delete UseMuonBeam;
+  delete setZpNtupleFile;
+  delete KillTracking;
+  delete KillTrackingThreshold;
+
 }
 
 void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
@@ -219,17 +266,17 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
       G4cout << "\n---> rndm status restored from file: " << newValues << G4endl;
       G4String rndmFile="rndm/";
       rndmFile.append(newValues);
-      HepRandom::restoreEngineStatus(rndmFile);
+      CLHEP::HepRandom::restoreEngineStatus(rndmFile);
     }   
 
   if (command == showRndmCmd)
     { 
-      HepRandom::showEngineStatus();
+      CLHEP::HepRandom::showEngineStatus();
     }  
 
   if (command == setRndmSeedCmd)
     { 
-      HepRandom::setTheSeed(setRndmSeedCmd->GetNewIntValue(newValues));
+      CLHEP::HepRandom::setTheSeed(setRndmSeedCmd->GetNewIntValue(newValues));
     }  
 
   if (command == setRunID){
@@ -316,5 +363,26 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == setStepLimit){
     NumiData->SetStepLimit(setStepLimit->GetNewDoubleValue(newValues));
   }  
+  if (command== UseMacro){
+    NumiData->SetMacroBeam(UseMacro->GetNewBoolValue(newValues));
+  }
+  
+  if (command==outputZpNtuple){
+    NumiData->OutputZpNtuple(outputZpNtuple->GetNewBoolValue(newValues));
+  }
+  
+  if (command== UseMuonBeam){
+    NumiData->SetMuonBeam(UseMuonBeam->GetNewBoolValue(newValues));
+  }        
+  if (command==setZpNtupleFile){
+     NumiData->SetZpNtupleName(newValues);
+  }
+  if (command== KillTracking){
+     NumiData->SetKillTracking(KillTracking->GetNewBoolValue(newValues));
+   }
+   if (command== KillTrackingThreshold){
+     NumiData->SetKillTrackingThreshold(KillTrackingThreshold->GetNewDoubleValue(newValues));
+   }
+
 }
 

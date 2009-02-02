@@ -173,8 +173,8 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,frontRmax*2);
   sHorn1Front=new G4SubtractionSolid("sHorn1Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
-  material=Al;
-  G4LogicalVolume* lvHorn1Front=new G4LogicalVolume(sHorn1Front,material,"lvHorn1Front",0,0,0);
+
+  G4LogicalVolume* lvHorn1Front=new G4LogicalVolume(sHorn1Front,GetMaterial(ND->hrnmat),"lvHorn1Front",0,0,0);
   ND->ApplyStepLimits(lvHorn1Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
@@ -182,7 +182,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   
   //Outer Conductor
   G4Polycone* sPHorn1OC=new G4Polycone("sPHorn1OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
-  G4LogicalVolume* lvPHorn1OC=new G4LogicalVolume(sPHorn1OC,Al,"lvPHorn1OC",0,0,0);
+  G4LogicalVolume* lvPHorn1OC=new G4LogicalVolume(sPHorn1OC,GetMaterial(ND->hrnmat),"lvPHorn1OC",0,0,0);
   ND->ApplyStepLimits(lvPHorn1OC); // Limit Step Size
   G4FieldManager* FieldMgr2 = new G4FieldManager(numiMagFieldOC); //create a local field
   FieldMgr2->SetDetectorField(numiMagFieldOC); //set the field 
@@ -194,7 +194,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
  
   //Inner Conductor
   G4Polycone* sPHorn1IC=new G4Polycone("sPHorn1IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
-  G4LogicalVolume* lvPHorn1IC=new G4LogicalVolume(sPHorn1IC,Al,"lvPHorn1IC",0,0,0);
+  G4LogicalVolume* lvPHorn1IC=new G4LogicalVolume(sPHorn1IC,GetMaterial(ND->hrnmat),"lvPHorn1IC",0,0,0);
   ND->ApplyStepLimits(lvPHorn1IC); // Limit Step Size
   G4FieldManager* FieldMgr = new G4FieldManager(numiMagFieldIC); //create a local field		 
   FieldMgr->SetDetectorField(numiMagFieldIC); //set the field 
@@ -209,7 +209,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn1Z0+frontRmax);
   G4UnionSolid *sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
-  G4LogicalVolume* lvPHorn1F=new G4LogicalVolume(sPHorn1F,Ar,"lvPHorn1F",0,0,0);
+  G4LogicalVolume* lvPHorn1F=new G4LogicalVolume(sPHorn1F,Air,"lvPHorn1F",0,0,0);
   ND->ApplyStepLimits(lvPHorn1F); // Limit Step Size
   lvPHorn1F->SetVisAttributes(invisible);
   //------ Modification by Alex Himmel 3-19-07----------
@@ -285,7 +285,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   translation=G4ThreeVector(0.,(bottomH/2.-bottomThickMid)-bottomR,0.);
   sSpider=new G4SubtractionSolid("sSpider",sSpider,sBottomSubtr,G4Transform3D(rotation,translation));
 
-  G4LogicalVolume *lvSpider=new G4LogicalVolume(sSpider,Al,"lvBox",0,0,0);
+  G4LogicalVolume *lvSpider=new G4LogicalVolume(sSpider,GetMaterial(ND->hrnmat),"lvBox",0,0,0);
   ND->ApplyStepLimits(lvSpider); // Limit Step Size
   G4RotationMatrix rotPos=G4RotationMatrix(0.,0.,angle);
   G4ThreeVector transPos=G4ThreeVector((rIn+(bottomThickMid-bottomH/2.))*sin(angle),(rIn+(bottomThickMid-bottomH/2.))*cos(angle),zPos);
@@ -294,7 +294,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
 
   G4double ceramicRodL=rOut-rIn-topH-bottomThickMid-stripH-2.*mm;
   G4Tubs *sCeramicRod=new G4Tubs("sCeramicRod",0.,ceramicRodR,ceramicRodL/2.,0.,360.*deg);
-  G4LogicalVolume *lvCeramicRod=new G4LogicalVolume(sCeramicRod,CT852,"lvCeramicRod",0,0,0);
+  G4LogicalVolume *lvCeramicRod=new G4LogicalVolume(sCeramicRod,GetMaterial(ND->hrnmatcr),"lvCeramicRod",0,0,0);
   ND->ApplyStepLimits(lvCeramicRod); // Limit Step Size
   rotPos=G4RotationMatrix(0.,0.,0.);
   rotPos.rotateX(90.*deg); rotPos.rotateZ(-angle);
@@ -380,7 +380,7 @@ G4double NumiDetectorConstruction::PHorn1ICRout(G4double z)
   }
   
   //IC from drawings
-  if ((z>=3.2645*in)&&(z<30.3150*in)){
+  if ((z>=3.32645*in)&&(z<30.3150*in)){
     r=sqrt(1.975805-(0.05585)*(z/in))*in;
   }
   else if ((z>=30.3150*in)&&(z<31.8827*in)){
