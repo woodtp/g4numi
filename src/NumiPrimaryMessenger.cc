@@ -55,7 +55,7 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   setDivergence = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/divergence",this);
   setDivergence->SetGuidance("Beam Divergence in mrad");
   setDivergence->SetParameterName("divergence",true);
-  setDivergence->SetDefaultValue (20.);
+  setDivergence->SetDefaultValue (0.);
 
 
   setInnerR = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/innerR",this);

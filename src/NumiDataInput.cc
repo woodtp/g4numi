@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.23 2009/02/02 21:09:35 jyuko Exp $
+// $Id: NumiDataInput.cc,v 1.24 2009/02/03 16:06:18 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -33,11 +33,11 @@ NumiDataInput::NumiDataInput()
 
   debugOn = false;
   NImpWeightOn = true; 
-  createNuNtuple=false;  createHadmmNtuple=true;
+  createNuNtuple=false;  createHadmmNtuple=false;
   createASCII=false;     createBXDRAW = false;
   useFlukaInput = false; useMarsInput=false; 
   useMuonInput = false;  useMuonBeam = false; 
-  useTestBeam = true;   
+  useTestBeam = false;   
   useDecayPipeSelect = false;
   KillTracking = true; // false for ahimmel
   testTheta = M_PI/6.;
@@ -82,10 +82,9 @@ NumiDataInput::NumiDataInput()
   //======================================
 
   //======================================
-  //--Ray Tracing parameters -------------
+  //--Ray Tracing parameter-------------
   //--------------------------------------
-    useMacro = false;
-   raytracing =false;
+   raytracing =true;
    //==============================
    //------------------------------
 

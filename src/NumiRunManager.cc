@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiRunManager.cc
-// $Id: NumiRunManager.cc,v 1.7 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiRunManager.cc,v 1.8 2009/02/03 16:06:18 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
@@ -41,6 +41,9 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
        }
        else if(ND->useTestBeam) {
 	 G4cout << "Test Beam is set" << G4endl;  	 
+       }
+       else if(ND->useMacro) {
+	 G4cout << "using macro parameters" << G4endl;  	 
        }
        else{
      	 primaryGeneratorAction->SetProtonBeam();

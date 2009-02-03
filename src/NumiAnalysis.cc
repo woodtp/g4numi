@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.21 2009/02/02 21:09:35 jyuko Exp $
+// $Id: NumiAnalysis.cc,v 1.22 2009/02/03 16:06:18 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -53,7 +53,7 @@ NumiAnalysis::NumiAnalysis()
 
   g4data = new data_t();
   g4hmmdata = new hadmmtuple_t();
-
+  g4zpdata = new zptuple_t();
   g4hmmdata->Clear();
 
   fcount = 0;
@@ -138,9 +138,6 @@ void NumiAnalysis::book()
       G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileNameStr.c_str()<<G4endl;
       hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","hadmm ntuple");
       hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
-      //????????????????????
-      //g4hmmdata->SetTree(hadmmtree);
-      //g4hmmdata->MakeBranches();
       hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
     }
     else
@@ -169,8 +166,14 @@ void NumiAnalysis::book()
     sprintf(zpNtupleFileName,"%s_%04d%s.root",(NumiData->zpNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(),(NumiData->geometry).c_str());
     G4cout<<"Creating validation and muon tracking ntuple:"<<zpNtupleFileName<<G4endl;
     zpNtuple = new TFile(zpNtupleFileName, "RECREATE","zptrack ntuple");
-    zptree = new TTree("zp","g4numi Tracking particles through ZPoints");
-    zptree->Branch("zpdata", "zptuple_t", &g4zpdata,32000,1);
+    if(zpNtuple){
+      zpNtuple->cd();
+      zptree = new TTree("zp","g4numi Tracking particles through ZPoints");
+      zptree->Branch("zpdata", "zptuple_t", &g4zpdata,32000,1);
+    }
+    else{
+      G4Exception("Something went wrong with zpNtuple");
+    }
     G4cout<<" End of if statement"<<G4endl;
   }
 
@@ -272,8 +275,10 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
    
     }
   else
-    {  
-      /*g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
+    { 
+      
+      /*
+      g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
       g4hmmdata->mtgthsig = NumiData->beamSigmaX/cm;
       g4hmmdata->mtgtvsig = NumiData->beamSigmaY/cm;
       g4hmmdata->mtgthpos = NumiData->beamPosition[0]/cm;
@@ -290,17 +295,17 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
 
   if(!(NumiData->useMuonInput))
     {
-      //g4hmmdata->hmmenergy = track.GetTotalEnergy();
+      //      g4hmmdata->hmmenergy = track.GetTotalEnergy();
       
       if(hmm_num == 4)
-	{
-	  /*g4hmmdata->hmmxpos = track.GetPosition()[0];
+	{/*
+	  g4hmmdata->hmmxpos = track.GetPosition()[0];
 	  g4hmmdata->hmmypos = track.GetPosition()[1];
 	  g4hmmdata->hmmzpos = track.GetPosition()[2];
 	  g4hmmdata->hmmpx = track.GetMomentum()[0];
 	  g4hmmdata->hmmpy = track.GetMomentum()[1];
 	  g4hmmdata->hmmpz = track.GetMomentum()[2]; 
-	  */
+	 */
 	}
     }
 
@@ -311,9 +316,10 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
       g4hmmdata->mmpx[hmm_num]   = track.GetMomentum()[0];
       g4hmmdata->mmypos[hmm_num] = track.GetPosition()[1];
       g4hmmdata->mmpy[hmm_num]   = track.GetMomentum()[1];
-      //g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
+      //      g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
       g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2]; 
       g4hmmdata->cell[hmm_num]   = cellNum;
+     
     } 
 
 } 
@@ -341,13 +347,6 @@ void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
   fAlcEdep_called[alc] = true;
 
 }
-
-
-
-
-
-
-
 
 
 
@@ -495,7 +494,6 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
       G4cout << "entry = "<< fentry << ", count = " << fcount << ", mupz = " << g4hmmdata->mupz << ", mm1pz = " << g4hmmdata->mmpz[0] <<", mm2pz = " << g4hmmdata->mmpz[1] << ", mm3pz = " << g4hmmdata->mmpz[2] << G4endl; 
     }
   
-  //???????????????????
   if(type == 6) hadmmtree->Fill(); 
   //if(type == 6) g4hmmdata->Fill(); 
   g4hmmdata->Clear();

@@ -114,10 +114,7 @@ G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
       }
 
       fCurrentPrimaryNo=0;
-
-      //??????????????????
       fNoOfPrimaries=fPrimaryNtuple->GetEntries();
-      //fNoOfPrimaries=100;
 
       //G4cout << "*****************entries = " <<fPrimaryNtuple->GetEntries() << G4endl;
       fIsOpen=true;
@@ -151,7 +148,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
   
   if(fND->useMuonBeam && !(fND->useMuonInput)){
-    
+ 
     G4double x0 = fND->DecayPipeRadius*2.0;
     G4double y0 = fND->DecayPipeRadius*2.0; 
     G4double z0;
