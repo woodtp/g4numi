@@ -8,10 +8,12 @@
 #include "G4DecayTable.hh"
 #include "G4KL3DecayChannel.hh"
 #include "G4StepLimiter.hh"
+#include "G4ParticleTable.hh"
 
 #include "NumiDetectorConstruction.hh"
 
 // Interaction Physics Lists
+
 #include "QGSP.hh"
 //#include "QGSC.hh"
 //#include "QBBC.hh"
@@ -29,6 +31,7 @@
 #ifdef G4VIS_USE
 #include "NumiVisManager.hh"
 #endif
+
 
 
 int main(int argc,char** argv)
@@ -210,7 +213,7 @@ int main(int argc,char** argv)
   }//loop over particles
   // done with kaon form factors
   
-	
+ 
   // Setting the maximum step size to 1 cm
   G4ParticleTable* ptbl = G4ParticleTable::GetParticleTable();
   G4ParticleTable::G4PTblDicIterator* piter = ptbl->GetIterator();
@@ -242,8 +245,7 @@ int main(int argc,char** argv)
     session->SessionStart();
     delete session;
   }
-  else
-  // Batch mode
+  else  // Batch mode
   { 
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
@@ -256,6 +258,7 @@ int main(int argc,char** argv)
 #endif
 
 #  // job termination
+  G4cout<<"Delete RunManager"<<G4endl;
   delete runManager;
   return 0;
 }
