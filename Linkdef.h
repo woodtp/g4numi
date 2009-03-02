@@ -6,4 +6,6 @@
 
 #pragma link C++ class data_t+;
 #pragma link C++ class hadmmtuple_t+;
+#pragma link C++ class zptuple_t+;
+
 #endif
