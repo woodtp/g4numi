@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.23 2009/03/02 03:32:41 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.24 2009/03/02 17:30:57 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -283,13 +283,13 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
    
    
    G4ParticleDefinition* particleDefinition = track.GetDefinition();
-   
+////////??????????????   
    g4hmmdata->ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
-   if( !(g4hmmdata->ptype == 6) )
+   if( !(g4hmmdata->ptype == 5) && !(g4hmmdata->ptype == 6) )
    {
       cout << "******** Entry " << fentry
            << ": Problem in NumiAnalysis::FillHadmmNtuple() - The particle is "
-           << g4hmmdata->ptype << ", not a muon (6)" << endl;
+           << g4hmmdata->ptype << ", not a muon " << endl;
    }
    
    if(!(NumiData->useMuonInput))
@@ -399,8 +399,8 @@ void NumiAnalysis::FillHadmmNtuple()
   g4hmmdata->pptype = NPGA->GetMuParentType(); 
   g4hmmdata->ppmedium = NPGA->GetMuParentProdMedium();
   g4hmmdata->pgen = NPGA->GetMuParentGen(); 
-  
-  g4hmmdata->ptype = 6; 
+  ////////??????????????
+  g4hmmdata->ptype = NPGA->GetMuType(); 
 
   
   //g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
@@ -475,10 +475,11 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
    {
       G4ParticleDefinition* particleDefinition = aTrack->GetDefinition();
       type = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
-      if( !(type == 6) )
+      ////////??????????????
+      if( !(type == 5) && !(type == 6))
       {
          //
-         //check that when type != 6 the variables have non valid values.
+         //check that when type != 6 and type != 5 the variables have non valid values.
          //
          if( !(g4hmmdata->mupz < -90 && g4hmmdata->muweight < -90
                && g4hmmdata->pptype < -90 && g4hmmdata->nimpwt < -90) )
@@ -488,14 +489,14 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
                  << type << " but the variables have valid values." << endl;
          }   
       }  
-      else //if type == 6
+      else //if type == 5 || type == 6
       {
          //
          //I don't think there is even a remote chance of the following
          //if statement ever executing. Sanity check.
-         //check that if type == 6 then g4hmmdata->ptype == 6
+         //check that if type == 5(6) then g4hmmdata->ptype == 5(6)
          //
-         if( !(g4hmmdata->ptype ==6) )
+         if( (type == 5 && !(g4hmmdata->ptype == 5)) || (type == 6 && !(g4hmmdata->ptype == 6)) )
          {
             cout << "********Entry " << fentry
                  << ": Problem in NumiAnalysis::WriteHadmmNtuple() - " 
@@ -503,13 +504,13 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
                  << "ptype variable. " << endl;
          }
          //
-         //check that when type == 6  g4hmmdata->mupz is a valid value
+         //check that when type == 5(6)  g4hmmdata->mupz is a valid value
          //
          if(g4hmmdata->mupz < -90)
          {
             cout << "********Entry " << fentry
                  << ": Problem in NumiAnalysis::WriteHadmmNtuple() - "
-                 << "The particle type from the track is 6 but the "
+                 << "The particle type from the track is 5 or 6 but the "
                  << "variable mupz is not a valid value. This should not happen."
                  << endl;
          }
@@ -517,13 +518,14 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
    }
    else
    {
-      if( !(g4hmmdata->ptype == 6) )
+      if( !(g4hmmdata->ptype == 5) && !(g4hmmdata->ptype == 6) )
       {
          cout << "********Entry " << fentry
               << ": Problem in NumiAnalysis::WriteHadmmNtuple() - A track "
-              << "doesn't exist, so ptype should already be set to 6. "
+              << "doesn't exist, so ptype should already be set to 5 or 6. "
               << "But it's not! " << endl;
       }
+      
       type = g4hmmdata->ptype;
    }
 
@@ -550,7 +552,7 @@ void NumiAnalysis::WriteHadmmNtuple(const G4Track* aTrack)
    }
 
    
-   if(type == 6) hadmmtree->Fill(); 
+   if(type == 5 || type == 6) hadmmtree->Fill(); 
    g4hmmdata->Clear();
    
 }

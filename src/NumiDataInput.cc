@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.25 2009/03/02 03:32:41 loiacono Exp $
+// $Id: NumiDataInput.cc,v 1.26 2009/03/02 17:30:58 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -40,7 +40,7 @@ NumiDataInput::NumiDataInput()
   //
   //can set useMuonInupt and useMuonBeam from macro
   //
-  useMuonInput = false;  useMuonBeam = false; 
+  useMuonInput = false;  useMuonBeam = false; fNEvents = -1;
   useTestBeam = false;   
   useDecayPipeSelect = false;
   KillTracking = true; // false for ahimmel

@@ -102,7 +102,6 @@ G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 	fPrimaryNtuple=(TTree*)(fRootFile->Get("muon"));
 	fMuon = new NtpMuon();
 	fMuon -> SetTree(fPrimaryNtuple);
-
       }
       else
       {
@@ -113,10 +112,21 @@ G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 	G4cout<<"NumiPrimaryGeneratorAction: Can't find tree "<< G4endl;
       }
 
-      fCurrentPrimaryNo=0;
-      fNoOfPrimaries=fPrimaryNtuple->GetEntries();
+      if(fND->useMuonInput && fND->useMuonBeam)
+      {
+         fCurrentPrimaryNo=0;
+         G4int entries = fPrimaryNtuple->GetEntries();
+         if(fND->GetNEvents() > 0 && fND->GetNEvents() < entries)
+            fNoOfPrimaries = fND->GetNEvents();
+         else   
+            fNoOfPrimaries = fPrimaryNtuple->GetEntries();
+      }
+      else
+      {
+         fCurrentPrimaryNo=0;
+         fNoOfPrimaries=fPrimaryNtuple->GetEntries();
+      }
 
-      //G4cout << "*****************entries = " <<fPrimaryNtuple->GetEntries() << G4endl;
       fIsOpen=true;
     }
   else
@@ -199,6 +209,22 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fppmedium = fMuon->ppmedium;
     fpgen = fMuon->pgen;
 
+    G4String muon_type;
+    G4String muplus = "mu+";
+    G4String muminus = "mu-";
+    G4String type = NumiParticleCode::AsString(NumiParticleCode::IntToEnum(fpptype));
+    if      (type == "kaon+" || type == "pi+") { muon_type = muplus; }
+    else if (type == "kaon-" || type == "pi-") { muon_type = muminus; }
+    else
+    {
+       muon_type = muplus;
+       G4cout << "Parent is " << type
+              << ", not a pi +/- or K +/-. Setting muon to "
+              << muon_type << G4endl;
+    }
+
+    fptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(muon_type));
+    
 
     //
     //z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap this is what Jason uses.
@@ -213,8 +239,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleMomentum=G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
        
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
-    G4double mass=particleTable->FindParticle("mu-")->GetPDGMass();
+    fParticleGun->SetParticleDefinition(particleTable->FindParticle(muon_type));
+    G4double mass=particleTable->FindParticle(muon_type)->GetPDGMass();
 
     NumiAnalysis* analysis = NumiAnalysis::getInstance();
     if(!analysis)
@@ -225,8 +251,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     if(fMuon->mupz < 1.0)
     {
-      flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.00*GeV);
-      fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.00*GeV*0.00*GeV)-mass);
+      flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.0*GeV);
+      fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.0*GeV*0.0*GeV)-mass);
 
       analysis->WriteHadmmNtuple();    
       
@@ -237,7 +263,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
 
     }
-  
+
     fParticleGun->SetParticlePosition(fParticlePosition);
     fParticleGun->SetParticleMomentum(flocalParticleMomentum);
     fParticleGun->GeneratePrimaryVertex(anEvent);

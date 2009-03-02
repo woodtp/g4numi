@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.14 2009/03/02 03:32:41 loiacono Exp $
+// $Id: NumiSteppingAction.cc,v 1.15 2009/03/02 17:30:58 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -75,7 +75,8 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	theTrack->SetTrackStatus(fStopAndKill);
      }
      
-     if( particleDefinition != G4MuonMinus::MuonMinusDefinition()  )      
+     if( particleDefinition != G4MuonPlus::MuonPlusDefinition()
+         && particleDefinition != G4MuonMinus::MuonMinusDefinition() )      
      {
 	//NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	//G4cout << "Event " << analysis->GetEntry() << ", Process = "
@@ -111,7 +112,9 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      //
      //for alc0; info will only be recorded the first time this executes
      //
-     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 729811.) 
+     if( (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+          || particleDefinition == G4MuonMinus::MuonMinusDefinition())
+         && theTrack->GetPosition()[2] > 729811.) 
      {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 0);
@@ -119,7 +122,9 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      //
      //for alc1; info will only be recorded the first time this executes
      //
-     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 750941.) 
+     if( (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+          || particleDefinition == G4MuonMinus::MuonMinusDefinition())
+         && theTrack->GetPosition()[2] > 750941.) 
      {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 1);
@@ -127,7 +132,9 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      //
      //for alc2; info will only be recorded the first time this executes
      //
-     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 772062.) 
+     if( (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+          || particleDefinition == G4MuonMinus::MuonMinusDefinition())
+         && theTrack->GetPosition()[2] > 772062.) 
      {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 2);
@@ -140,35 +147,39 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      {
 	//    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 	
-	if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
+	if(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
 	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield"
-	     && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
+	     && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+                 || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
         {
-           NumiAnalysis* analysis = NumiAnalysis::getInstance();
+           //NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	   
            //analysis->FillHadmmNtuple(*theTrack, 4, 0);
         }
-	else if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
+	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
 		  && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
-		  && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
+		  && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+                      || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
         {
            NumiAnalysis* analysis = NumiAnalysis::getInstance();
            analysis->FillHadmmNtuple(*theTrack, 
                                      0, 
                                      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
         }
-	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
+	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_1"
-		 && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
+		 && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+                     || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
         {  
            NumiAnalysis* analysis = NumiAnalysis::getInstance();
            analysis->FillHadmmNtuple(*theTrack,
                                      1,
                                      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
         }
-	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
+	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_2"
-		 && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
+		 && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+                     || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
         {  
            NumiAnalysis* analysis = NumiAnalysis::getInstance();
            analysis->FillHadmmNtuple(*theTrack,

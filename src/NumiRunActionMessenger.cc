@@ -104,6 +104,12 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   extNtupleFileName->SetParameterName("extNtupleFileName",true);
   extNtupleFileName->SetDefaultValue (NumiData->GetExtNtupleFileName());
   extNtupleFileName->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setNEvents = new G4UIcmdWithAnInteger("/NuMI/run/NEvents",this);
+  setNEvents->SetGuidance("Set the number of Events to process");
+  setNEvents->SetParameterName("NEvents",true);
+  setNEvents->SetDefaultValue (NumiData->GetNEvents());
+  setNEvents->AvailableForStates(G4State_PreInit,G4State_Idle);
   
   NumiOutputDir = new G4UIdirectory("/NuMI/output/");
   NumiOutputDir->SetGuidance("NuMI output management");
@@ -235,6 +241,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete outputNuNtuple;
   delete setHadmmNtupleFile;
   delete outputHadmmNtuple;
+  delete setNEvents;
   delete setASCIIFile;
   delete outputASCIIFile;
   delete NumiOutputDir;
@@ -290,7 +297,7 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   }
 
   if (command == useTestBeam){
-	NumiData->SetTestBeam(useTestBeam->GetNewBoolValue(newValues));
+     NumiData->SetTestBeam(useTestBeam->GetNewBoolValue(newValues));
   }
   if (command == useFlukaInput){
     NumiData->SetFlukaInput(useFlukaInput->GetNewBoolValue(newValues));
@@ -327,6 +334,10 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
 
   if (command == outputHadmmNtuple){
       NumiData->OutputHadmmNtuple(outputNuNtuple->GetNewBoolValue(newValues));
+  }
+
+  if (command == setNEvents){
+      NumiData->SetNEvents(setNEvents->GetNewIntValue(newValues));
   }
 
   if (command == setASCIIFile){
