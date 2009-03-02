@@ -41,6 +41,12 @@
 #/material/materialSigma 0
 #/NuMI/det/update false
 
+#if this is set only this number of events
+#will be processed. If this is not set or
+#it is < 1 all events
+#in the input ntuple will be processed
+/NuMI/run/NEvents 1000
+
 /NuMI/run/setRunID 1
 /NuMI/rndm/setRndmSeed 1
 /run/beamOn
