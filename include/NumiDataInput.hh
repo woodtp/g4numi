@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.18 2009/03/02 03:35:11 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.19 2009/03/02 17:31:58 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -99,6 +99,13 @@ public:
    G4String GetHadmmNtupleDir(){
       return hadmmNtupleDir;
    }
+   void SetNEvents(G4int events){
+      fNEvents=events;
+   }
+   G4int GetNEvents(){
+      return fNEvents;
+   }
+   
    void SetASCIIName(G4String fileName){
       asciiName=fileName;
    }
@@ -160,75 +167,76 @@ public:
   G4String extNtupleFileName;
 
  public:
-  G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
-  G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput;
-  G4bool KillTracking;
-  G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
-
-  G4double StepLimit;
-  
-  G4bool createBXDRAW;
-  G4bool useTestBeam, useDecayPipeSelect;
-  G4String bxdrawName;
-  G4float testTheta;   // TestBeam Angle
-  
+   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
+   G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput;
+   G4int fNEvents;
+   G4bool KillTracking;
+   G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
+   
+   G4double StepLimit;
+   
+   G4bool createBXDRAW;
+   G4bool useTestBeam, useDecayPipeSelect;
+   G4String bxdrawName;
+   G4float testTheta;   // TestBeam Angle
+   
   //=================================
   //  for Raytracing=================
   //----------------------------------
-  G4bool useMacro;
-      G4int NZpoint ;
-  vdouble_t Zpoint ; // The Z points
-  G4String zpNtupleName;
-  G4bool createZpNtuple;// name of the zp tuple and the bool of zpntuple
-  G4bool raytracing;//
-  //==================================
-
-  //==================================
-  //-- For making the horns the same
-  //----------------------------------
-  G4bool airhrn;
-  G4bool jCompare;
-  G4int hrnmat;
-  G4int hrnmatcr;
-  //===================================
-  G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
-  G4double KillTrackingThreshold;
-  G4ThreeVector beamPosition, beamDirection;
-
-  // World Volume
-  G4double RockRadius, RockHalfLen, RockDensity, RockRadLen;
-
-  // Target Area
-  G4double TargetAreaZ0, TargetAreaLength, TargetAreaHeight,TargetAreaWidth;
-  G4int TargetAreaGEANTmat;
-
- // added by Zachary Barnett - Target Area ConcretePit
-  G4int NTHConcreteSectionsN;
-  vdouble_t THConcreteX0, THConcreteY0, THConcreteZ0;
-  vdouble_t THConcreteLength, THConcreteHdx, THConcreteHdy;
-  vdouble_t THConcreteDxdz, THConcreteDydz;
-  vint_t THConcreteGeantMaterial;
-  vstring_t THConcreteName;
-  //-------------------------------------
-  
-  // Target
-  G4bool constructTarget;
-  G4double TargetX0, TargetY0, TargetZ0, TargetDxdz, TargetDydz;
-  G4double TargetSLength, TargetSWidth, TargetSHeight, TargetA, TargetDensity;
-  G4double  TargetZ, TargetRL;
-  G4int TargetGEANTmat,TargetSegmentNo;
-  G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
-  G4bool TargetEndRounded;
-	
-  //Rings holding target and cooling pipes
-  G4int NTgtRingN;
-  vdouble_t TgtRingZ0, TgtRingLength, TgtRingRin,TgtRingRout;
-  vint_t TgtRingGeantMaterial;
-  vstring_t TgtRingVolName;
-
-  //Budal
-  G4double BudalX0,BudalY0,BudalZ0,BudalDxdz,BudalDydz;
-
+   G4bool useMacro;
+   G4int NZpoint ;
+   vdouble_t Zpoint ; // The Z points
+   G4String zpNtupleName;
+   G4bool createZpNtuple;// name of the zp tuple and the bool of zpntuple
+   G4bool raytracing;//
+   //==================================
+   
+   //==================================
+   //-- For making the horns the same
+   //----------------------------------
+   G4bool airhrn;
+   G4bool jCompare;
+   G4int hrnmat;
+   G4int hrnmatcr;
+   //===================================
+   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
+   G4double KillTrackingThreshold;
+   G4ThreeVector beamPosition, beamDirection;
+   
+   // World Volume
+   G4double RockRadius, RockHalfLen, RockDensity, RockRadLen;
+   
+   // Target Area
+   G4double TargetAreaZ0, TargetAreaLength, TargetAreaHeight,TargetAreaWidth;
+   G4int TargetAreaGEANTmat;
+   
+   // added by Zachary Barnett - Target Area ConcretePit
+   G4int NTHConcreteSectionsN;
+   vdouble_t THConcreteX0, THConcreteY0, THConcreteZ0;
+   vdouble_t THConcreteLength, THConcreteHdx, THConcreteHdy;
+   vdouble_t THConcreteDxdz, THConcreteDydz;
+   vint_t THConcreteGeantMaterial;
+   vstring_t THConcreteName;
+   //-------------------------------------
+   
+   // Target
+   G4bool constructTarget;
+   G4double TargetX0, TargetY0, TargetZ0, TargetDxdz, TargetDydz;
+   G4double TargetSLength, TargetSWidth, TargetSHeight, TargetA, TargetDensity;
+   G4double  TargetZ, TargetRL;
+   G4int TargetGEANTmat,TargetSegmentNo;
+   G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
+   G4bool TargetEndRounded;
+   
+   //Rings holding target and cooling pipes
+   G4int NTgtRingN;
+   vdouble_t TgtRingZ0, TgtRingLength, TgtRingRin,TgtRingRout;
+   vint_t TgtRingGeantMaterial;
+   vstring_t TgtRingVolName;
+   
+   //Budal
+   G4double BudalX0,BudalY0,BudalZ0,BudalDxdz,BudalDydz;
+   
   //HPBaffle 
   G4int HPBaffle, HPBaffleGEANTMat;
   G4double HPBaffleX0,HPBaffleY0,HPBaffleZ0,HPBaffleDXDZ,HPBaffleDYDZ;

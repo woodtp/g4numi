@@ -65,6 +65,7 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
    G4int GetTParentType()                  { return ftpptype; }
    G4double GetImpWeight()                 { return fnimpwt; }
    G4int GetMuParentType()                 { return fpptype; }
+   G4int GetMuType()                       { return fptype; }
    G4int GetMuParentProdMedium()           { return fppmedium; }
    G4int GetMuParentGen()                  { return fpgen; }
    G4int GetEvtno()                        { return fevtno; }
@@ -114,6 +115,7 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
    G4int ftpptype;
    G4double fnimpwt;
    G4int fpptype;
+   G4int fptype;
    G4int fppmedium;
    G4int fpgen;
    G4int fevtno;
