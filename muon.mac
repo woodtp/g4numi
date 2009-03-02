@@ -21,12 +21,12 @@
 /NuMI/output/outputHadmmNtuple true
 
 #Directory to write the hadmmtuple root file
-/NuMI/output/setHadmmNtupleDir /minos/data/users/loiacono/le010
+/NuMI/output/setHadmmNtupleDir .
 
 #Set the name of the output hadmmtuple root file
 #if this is not set then the file name will be 
 #the input file name with "muon" replaced with "hadmmNtuple"
-/NuMI/output/setHadmmNtupleFile hadmmNtuple_le010i000_20050610_1_cvs_tube_all.root
+/NuMI/output/setHadmmNtupleFile hadmmNtuple_test.root
 
 #if using Muon Beam these don't need to be set or they 
 #can be set to anything
