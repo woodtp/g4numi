@@ -1,60 +1,47 @@
-#Example script for running G4NuMI -LLoiacono
-
-#option to use a muon beam, default is false
-/NuMI/run/useMuonBeam true
-#option to use a muon input file, default is false
-/NuMI/run/useMuonInput true
-
-#location of the muon input file, name of file must be of this form.
-/NuMI/run/extNtupleFileName /minos/scratch/loiacono/le000d20050313/le000i000/muon_le000i000_20050313_1.root
-
-# option to create an output ntuple
-/NuMI/output/outputHadmmNtuple true
-
-#location to save the output ntuple, default is ./
-#Output will be the same as the input file name with muon replaced with hadmmNtuple
-/NuMI/output/setHadmmNtupleDir /minos/data/users/loiacono/le000
-
-#not sure what this is
 /control/suppressAbortion 2
 
-#if using Muon Beam these don't need to be set or they can be set to anything
+#To use the muon beam useMuonBeam 
+#must be set to true here
+/NuMI/run/useMuonBeam true
+
+#When using muon beam tracking threshold
+#must be low. Value must be set here.
+/NuMI/run/KillTrackingThreshold 0.001 GeV
+
+#To use input from "muon_XXXXX" files
+#useMuonInput must be set to true here
+/NuMI/run/useMuonInput true
+
+#When useMuonInput = true set the path
+#to the input file here.
+/NuMI/run/extNtupleFileName /minos/scratch/loiacono/le010d20050610/le010i000/muon_le010i000_20050610_1.root
+
+#Whether or not to create output hadmmNtuple
+#when using MuonBeam.
+/NuMI/output/outputHadmmNtuple true
+
+#Directory to write the hadmmtuple root file
+/NuMI/output/setHadmmNtupleDir /minos/data/users/loiacono/le010
+
+#Set the name of the output hadmmtuple root file
+#if this is not set then the file name will be 
+#the input file name with "muon" replaced with "hadmmNtuple"
+/NuMI/output/setHadmmNtupleFile hadmmNtuple_le010i000_20050610_1_cvs_tube_all.root
+
+#if using Muon Beam these don't need to be set or they 
+#can be set to anything
 /NuMI/det/setHornCurrent 182.1 kA
 /NuMI/det/setTargetZ0 -45 cm
 /NuMI/det/constructTarget false
+/NuMI/det/update
 
 # Sets the sigma shift of the rock density
 # and muon alcove walls
-/material/materialSigma 0
-/NuMI/det/update false
+# I don't think this is working right now.
+#/material/materialSigma 0
+#/NuMI/det/update false
 
-
-##When NOT using a muon input file
-## Allows the beginning seed to be set manually.
-## This allows rerunning simulations with the
-## exact same initial conditions to check for
-## possible errors.
-#/NuMI/rndm/setRndmSeed 30
-
-## Allows the RunID, which is included in the
-## output file name(s), to be set at runtime.
-#/NuMI/run/setRunID 8000
-
-## If the 'useMuonBeam' is set to true the
-## initial energy of the Muon Beam is set 
-## here.
-#/gun/energy 8
-
-## Establishes how many particles to used
-## during the simulation.
-#/run/beamOn 500000
-
-
-#When using a muon input file
-#Set to anything, only used in "Random Engine Status" output file
 /NuMI/run/setRunID 1
-
-#Set to anything
 /NuMI/rndm/setRndmSeed 1
-
 /run/beamOn
+
