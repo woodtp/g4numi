@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.24 2009/02/03 16:06:18 jyuko Exp $
+// $Id: NumiDataInput.cc,v 1.25 2009/03/02 03:32:41 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -35,7 +35,11 @@ NumiDataInput::NumiDataInput()
   NImpWeightOn = true; 
   createNuNtuple=false;  createHadmmNtuple=false;
   createASCII=false;     createBXDRAW = false;
-  useFlukaInput = false; useMarsInput=false; 
+  useFlukaInput = false; useMarsInput=false;
+
+  //
+  //can set useMuonInupt and useMuonBeam from macro
+  //
   useMuonInput = false;  useMuonBeam = false; 
   useTestBeam = false;   
   useDecayPipeSelect = false;
@@ -49,23 +53,31 @@ NumiDataInput::NumiDataInput()
    KillTrackingThreshold = 0.05*GeV; //for defaut neutrino MC g4numi 
    //KillTrackingThreshold = 0.001*GeV; //for muon beam MC
 
-  //base name for output files:
-  nuNtupleName    = "nuNtuple"; 
-  hadmmNtupleDir  = "./";
-  hadmmNtupleName = "hadmmNtuple";
-  asciiName       = "asciiOut";
-  bxdrawName      = "bxdrawOut";
-  RunNumber       = "0000";
-  geometry        = "";
+   //base name for output files:
+   nuNtupleName    = "nuNtuple";
+   //
+   //can set hadmmNtupleDir and hadmmNtupleName from macro
+   //
+   hadmmNtupleDir  = "./";
+   hadmmNtupleName = "";
+   asciiName       = "asciiOut";
+   bxdrawName      = "bxdrawOut";
+   RunNumber       = "0000";
+   geometry        = "";
 
-  materialSigma   = 0;// Denotes the change in sigma to the
-                      // rock density and muon alcove wall location
-  //===================================
-  //------ Use Macro---------------
-  // useMacro = true if you actually want to change beam parameters
-  // from the macro 
-  
-  useMacro = false;
+   //
+   // Denotes the change in sigma to the
+   // rock density and muon alcove wall location
+   //
+   materialSigma   = 0;
+   
+
+   //===================================
+   //------ Use Macro---------------
+   // useMacro = true if you actually want to change beam parameters
+   // from the macro 
+   
+   useMacro = false;
   //====================================
   //-- Changes for "Air Horns"---------- >> G4numi validation
   //-- Changes for "Truncated Horns"-----
@@ -84,7 +96,7 @@ NumiDataInput::NumiDataInput()
   //======================================
   //--Ray Tracing parameter-------------
   //--------------------------------------
-   raytracing =true;
+   raytracing = false;
    //==============================
    //------------------------------
 
@@ -135,7 +147,7 @@ NumiDataInput::NumiDataInput()
     Zpoint.push_back(14*m);//43
     Zpoint.push_back(20*m);//44
     Zpoint.push_back(45.7*m);//45
-    createZpNtuple=true;
+    createZpNtuple=false;
     zpNtupleName="zpNtuple";
     //==============================================================
   G4float beam_x_dir = 0;

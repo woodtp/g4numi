@@ -24,44 +24,43 @@ public:
   void SetNewValue(G4UIcommand* ,G4String );
  
 private:
-  NumiRunAction*            runAction;
-  NumiDataInput*            NumiData;
-  G4UIdirectory*            RndmDir;
-  G4UIcmdWithAString*       readRndmCmd;  
-  G4UIcmdWithoutParameter*  showRndmCmd;
-  G4UIcmdWithAnInteger*     setRndmSeedCmd;
-  G4UIdirectory*            NumiRunDir;
-  G4UIcmdWithABool*         debugOn;
-  G4UIcmdWithAnInteger*     setRunID;
-  G4UIcmdWithADouble*       setMaterialSigma;
-  G4UIcmdWithABool*         useNImpWeight;
-  G4UIcmdWithABool*         useTestBeam;
-  G4UIcmdWithABool*         useFlukaInput;
-  G4UIcmdWithABool*         useMarsInput;
-  G4UIcmdWithABool*         useMuonBeam;
-  G4UIcmdWithABool*         useMuonInput;
-  G4UIcmdWithAString*       extNtupleFileName;
-  G4UIcmdWithAString*       setHadmmNtupleDir;
-  G4UIdirectory*            NumiOutputDir;
-  G4UIcmdWithAString*       setNuNtupleFile; 
-  G4UIcmdWithAString*       setHadmmNtupleFile; 
-  G4UIcmdWithAString*       setASCIIFile; 
-  G4UIcmdWithAString*       setBXDRAWFile; 
-  G4UIcmdWithABool*         outputNuNtuple;
-  G4UIcmdWithABool*         outputHadmmNtuple;
-  G4UIcmdWithABool*         outputASCIIFile;
-  G4UIcmdWithABool*         outputBXDRAWFile;
-  G4UIcmdWithADouble*       setTestTheta;
-  G4UIcmdWithABool*         useDecayPipeSelect;
+  NumiRunAction*              runAction;
+  NumiDataInput*              NumiData;
+  G4UIdirectory*              RndmDir;
+  G4UIcmdWithAString*         readRndmCmd;  
+  G4UIcmdWithoutParameter*    showRndmCmd;
+  G4UIcmdWithAnInteger*       setRndmSeedCmd;
+  G4UIdirectory*              NumiRunDir;
+  G4UIcmdWithABool*           debugOn;
+  G4UIcmdWithAnInteger*       setRunID;
+  G4UIcmdWithADouble*         setMaterialSigma;
+  G4UIcmdWithABool*           useNImpWeight;
+  G4UIcmdWithABool*           useTestBeam;
+  G4UIcmdWithABool*           useFlukaInput;
+  G4UIcmdWithABool*           useMarsInput;
+  G4UIcmdWithABool*           useMuonBeam;
+  G4UIcmdWithABool*           useMuonInput;
+  G4UIcmdWithAString*         extNtupleFileName;
+  G4UIcmdWithAString*         setHadmmNtupleDir;
+  G4UIdirectory*              NumiOutputDir;
+  G4UIcmdWithAString*         setNuNtupleFile; 
+  G4UIcmdWithAString*         setHadmmNtupleFile; 
+  G4UIcmdWithAString*         setASCIIFile; 
+  G4UIcmdWithAString*         setBXDRAWFile; 
+  G4UIcmdWithABool*           outputNuNtuple;
+  G4UIcmdWithABool*           outputHadmmNtuple;
+  G4UIcmdWithABool*           outputASCIIFile;
+  G4UIcmdWithABool*           outputBXDRAWFile;
+  G4UIcmdWithADouble*         setTestTheta;
+  G4UIcmdWithABool*           useDecayPipeSelect;
   G4UIcmdWithADoubleAndUnit*  setStepLimit;
 
   
-  G4UIcmdWithABool*         UseMacro;
-  G4UIcmdWithABool*         outputZpNtuple;
-  G4UIcmdWithABool*         UseMuonBeam;
-  G4UIcmdWithAString*       setZpNtupleFile;
-  G4UIcmdWithABool*         KillTracking;
-  G4UIcmdWithADouble*       KillTrackingThreshold;
+  G4UIcmdWithABool*           UseMacro;
+  G4UIcmdWithABool*           outputZpNtuple;
+  G4UIcmdWithAString*         setZpNtupleFile;
+  G4UIcmdWithABool*           KillTracking;
+  G4UIcmdWithADoubleAndUnit*  KillTrackingThreshold;
 
 };
 

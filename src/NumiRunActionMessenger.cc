@@ -194,12 +194,6 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   outputZpNtuple->SetDefaultValue(NumiData->createZpNtuple);
   outputZpNtuple->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  UseMuonBeam = new G4UIcmdWithABool("/NuMI/output/useMuonBeam",this);
-  UseMuonBeam->SetGuidance("sets muon beam as starting beam");
-  UseMuonBeam->SetParameterName("useMuonBeam",true);
-  UseMuonBeam->SetDefaultValue(NumiData->useMuonBeam);
-  UseMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
-  
   setZpNtupleFile = new G4UIcmdWithAString("/NuMI/output/setZpNtupleFile",this);
   setZpNtupleFile->SetGuidance("set neutrino ntuple file name");
   setZpNtupleFile->SetParameterName("fileName",true);
@@ -212,7 +206,7 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   KillTracking->SetDefaultValue(NumiData->KillTracking);
   KillTracking->AvailableForStates(G4State_PreInit,G4State_Idle);
   
-  KillTrackingThreshold = new G4UIcmdWithADouble("/NuMI/run/KillTrackingThreshold",this);
+  KillTrackingThreshold = new G4UIcmdWithADoubleAndUnit("/NuMI/run/KillTrackingThreshold",this);
   KillTrackingThreshold->SetGuidance("Sets Kill Tracking on or off");
   KillTrackingThreshold->SetParameterName("KillTrackingThreshold",true);
   KillTrackingThreshold->SetDefaultValue(NumiData->KillTrackingThreshold);
@@ -252,7 +246,6 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   //-----------------------------
   delete UseMacro;
   delete outputZpNtuple;
-  delete UseMuonBeam;
   delete setZpNtupleFile;
   delete KillTracking;
   delete KillTrackingThreshold;
@@ -371,9 +364,6 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
     NumiData->OutputZpNtuple(outputZpNtuple->GetNewBoolValue(newValues));
   }
   
-  if (command== UseMuonBeam){
-    NumiData->SetMuonBeam(UseMuonBeam->GetNewBoolValue(newValues));
-  }        
   if (command==setZpNtupleFile){
      NumiData->SetZpNtupleName(newValues);
   }

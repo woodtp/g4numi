@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.17 2009/02/02 21:10:16 jyuko Exp $
+// $Id: NumiDataInput.hh,v 1.18 2009/03/02 03:35:11 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -33,123 +33,126 @@ public:
     TargetZ0 = val;
     HPBaffleZ0 += (val + 0.45*m);
   }
-  void SetHornCurrent(G4double val) {
-    HornCurrent = val;
-  }
+   void SetHornCurrent(G4double val) {
+      HornCurrent = val;
+   }
   void SetDebugOn(G4bool val) {
-    debugOn = val;
+     debugOn = val;
   }
   G4bool IsDebugOn(){
-    return debugOn;
+     return debugOn;
   }
-  void SetNImpWeight(G4bool val) {
+   void SetNImpWeight(G4bool val) {
     NImpWeightOn = val;
-  }
-  void SetTestTheta(G4float t){
-	testTheta = t*M_PI/180.;
-  }
-  void SetTestBeam(G4bool val) {
-	useTestBeam = val;
-  }
-  void SetFlukaInput(G4bool val) {
-    useFlukaInput = val;
-  }
-  void SetMarsInput(G4bool val) {
-    useMarsInput = val;
-  }
-  void SetMuonBeam(G4bool val) {
-    useMuonBeam = val;
-  }
-  void SetMuonInput(G4bool val) {
-    useMuonInput = val;
-  }
-  void SetRunNumber(G4String runNum){
-    RunNumber=runNum;
-  }
-  G4String GetRunNumber(){
-    return RunNumber;
-  }
-  void SetGeometryTag(G4String geoName){
-    geometry = geoName;
-  }
-  G4String GetGeometryTag(){
-    return geometry;
-  }
-  G4double GetMaterialSigma(){
-    return materialSigma;
-  }
-  void SetExtNtupleFileName(G4String fileName){
-    extNtupleFileName=fileName;
-  }
-  G4String GetExtNtupleFileName(){
-    return extNtupleFileName;
-  }
-  void SetNuNtupleName(G4String fileName){
-    nuNtupleName=fileName;
-  }
-  void SetHadmmNtupleName(G4String fileName){
+   }
+   void SetTestTheta(G4float t){
+      testTheta = t*M_PI/180.;
+   }
+   void SetTestBeam(G4bool val) {
+      useTestBeam = val;
+   }
+   void SetFlukaInput(G4bool val) {
+      useFlukaInput = val;
+   }
+   void SetMarsInput(G4bool val) {
+      useMarsInput = val;
+   }
+   void SetMuonBeam(G4bool val) {
+      useMuonBeam = val;
+   }
+   void SetMuonInput(G4bool val) {
+      useMuonInput = val;
+   }
+   void SetRunNumber(G4String runNum){
+      RunNumber=runNum;
+   }
+   G4String GetRunNumber(){
+      return RunNumber;
+   }
+   void SetGeometryTag(G4String geoName){
+      geometry = geoName;
+   }
+   G4String GetGeometryTag(){
+      return geometry;
+   }
+   G4double GetMaterialSigma(){
+      return materialSigma;
+   }
+   void SetExtNtupleFileName(G4String fileName){
+      extNtupleFileName=fileName;
+   }
+   G4String GetExtNtupleFileName(){
+      return extNtupleFileName;
+   }
+   void SetNuNtupleName(G4String fileName){
+      nuNtupleName=fileName;
+   }
+   void SetHadmmNtupleName(G4String fileName){
     hadmmNtupleName=fileName;
-  }
-  void SetHadmmNtupleDir(G4String fileDir){
-    hadmmNtupleDir=fileDir;
-  }
-  G4String GetHadmmNtupleDir(){
-    return hadmmNtupleDir;
-  }
-  void SetASCIIName(G4String fileName){
-    asciiName=fileName;
-  }
-  void SetBXDRAWName(G4String fileName){
-    bxdrawName=fileName;
-  }
-  void OutputNuNtuple(G4bool output){
-    createNuNtuple=output;
-  }
-  void OutputHadmmNtuple(G4bool output){
-    createHadmmNtuple=output;
-  }
-  void OutputASCII(G4bool output){
-    createASCII=output;
-  }
-  void OutputBXDRAW(G4bool output) {
-	createBXDRAW = output;
-  }
-  void SetDecayPipeSelect(G4bool val) {
-    useDecayPipeSelect = val;
-  }
-  void SetStepLimit(G4double l){
-    StepLimit = l;
-  }
-  void ApplyStepLimits(G4LogicalVolume *);
-  
-  G4bool GetKillTracking(){
-    return KillTracking;
-  }
-  G4double GetKillTrackingThreshold(){
+   }
+   G4String GetHadmmNtupleName(){
+      return hadmmNtupleName;
+   }
+   void SetHadmmNtupleDir(G4String fileDir){
+      hadmmNtupleDir=fileDir;
+   }
+   G4String GetHadmmNtupleDir(){
+      return hadmmNtupleDir;
+   }
+   void SetASCIIName(G4String fileName){
+      asciiName=fileName;
+   }
+   void SetBXDRAWName(G4String fileName){
+      bxdrawName=fileName;
+   }
+   void OutputNuNtuple(G4bool output){
+      createNuNtuple=output;
+   }
+   void OutputHadmmNtuple(G4bool output){
+      createHadmmNtuple=output;
+   }
+   void OutputASCII(G4bool output){
+      createASCII=output;
+   }
+   void OutputBXDRAW(G4bool output) {
+      createBXDRAW = output;
+   }
+   void SetDecayPipeSelect(G4bool val) {
+      useDecayPipeSelect = val;
+   }
+   void SetStepLimit(G4double l){
+      StepLimit = l;
+   }
+   void ApplyStepLimits(G4LogicalVolume *);
+   
+   G4bool GetKillTracking(){
+      return KillTracking;
+   }
+   G4double GetKillTrackingThreshold(){
     return KillTrackingThreshold;
-  }
-  void  SetMacroBeam(G4bool val){
+   }
+   void  SetMacroBeam(G4bool val){
     useMacro=val;
-  }
-  G4bool GetMacroBeam(){
-    return useMacro;
-  }
-  void SetZpNtupleName(G4String fileName){
-    zpNtupleName=fileName;
-  }
-  void OutputZpNtuple(G4bool val){
+   }
+   G4bool GetMacroBeam(){
+      return useMacro;
+   }
+   void SetZpNtupleName(G4String fileName){
+      zpNtupleName=fileName;
+   }
+   void OutputZpNtuple(G4bool val){
     createZpNtuple=val;
-  }
-  G4bool GetMuonBeam(){
-    return useMuonBeam;
-  }
-  void SetKillTracking(G4bool val){
-    KillTracking = val;
-  }
-  void SetKillTrackingThreshold(G4double th ){
-    KillTrackingThreshold=th;
-  }
-  
+   }
+   G4bool GetMuonBeam(){
+      return useMuonBeam;
+   }
+   void SetKillTracking(G4bool val){
+      KillTracking = val;
+   }
+   void SetKillTrackingThreshold(G4double th ){
+      KillTrackingThreshold=th;
+   }
+   
 
 
  private:

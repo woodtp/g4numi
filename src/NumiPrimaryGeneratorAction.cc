@@ -147,7 +147,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	    <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20)<<G4endl;
   }
   
-  if(fND->useMuonBeam && !(fND->useMuonInput)){
+  if(fND->useMuonBeam && !(fND->useMuonInput))
+  {
  
     G4double x0 = fND->DecayPipeRadius*2.0;
     G4double y0 = fND->DecayPipeRadius*2.0; 
@@ -172,58 +173,71 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
-  else if (fND->useMuonInput && fND->useMuonBeam) {
-    
+  else if (fND->useMuonInput && fND->useMuonBeam)
+  {
+     
     G4String particleName;
-    
+
     NumiAnalysis* analysis2 = NumiAnalysis::getInstance();
     analysis2->SetCount(0);
     analysis2->SetEntry(fCurrentPrimaryNo);
     analysis2->SetAlcEdepFlag(false);
     
-    
     fMuon -> Clear();
     fMuon -> GetEntry(fCurrentPrimaryNo);
     fevtno = fMuon->evtno;
     fmuweight = fMuon->muweight;
-    
-    fMuParentMomentum=G4ThreeVector(fMuon->tpx*GeV,fMuon->tpy*GeV,fMuon->tpz*GeV);
+
+    fMuTParentMomentum = G4ThreeVector(fMuon->tpx*GeV,fMuon->tpy*GeV,fMuon->tpz*GeV);
+    fMuTParentPosition = G4ThreeVector(fMuon->tvx*cm,fMuon->tvy*cm,fMuon->tvz*cm);
+    fMuParentMomentum = G4ThreeVector(fMuon->pdpx*GeV,fMuon->pdpy*GeV,fMuon->pdpz*GeV);
+    fMuParentPosition = G4ThreeVector(fMuon->pdvx*cm,fMuon->pdvy*cm,fMuon->pdvz*cm);
+    fMuParentProdPosition = G4ThreeVector(fMuon->ppvx*cm,fMuon->ppvy*cm,fMuon->ppvz*cm);
     ftpptype = fMuon->tptype;
     fnimpwt = fMuon->nimpwt;
     fpptype = fMuon->ptype;
-    
-    
+    fppmedium = fMuon->ppmedium;
+    fpgen = fMuon->pgen;
+
+
+    //
     //z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap this is what Jason uses.
     //z0 =        676681        + 45698.5       - 1 = 722378.5 mm
     //which means the endcap is at 722379.5 mm
     //fMuon->muvz*cm = 722380, so subtract 1mm to get 722379 just to be safe
-    
+    //
+
     G4double z0 = fMuon->muvz*cm - 1; //this is - 1 mm.
     
     fParticlePosition=G4ThreeVector(fMuon->muvx*cm,fMuon->muvy*cm,z0);
     fParticleMomentum=G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
-    
+       
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
     G4double mass=particleTable->FindParticle("mu-")->GetPDGMass();
-    
+
     NumiAnalysis* analysis = NumiAnalysis::getInstance();
-    if(!analysis) {
+    if(!analysis)
+    {
       G4cout << "Can't get NumiAnalysis pointer" << G4endl;
     }
     analysis->FillHadmmNtuple();
     
-    if(fMuon->mupz < 1.0) {
+    if(fMuon->mupz < 1.0)
+    {
       flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.00*GeV);
       fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.00*GeV*0.00*GeV)-mass);
-      
+
       analysis->WriteHadmmNtuple();    
+      
     }
-    else {
+    else
+    {
       flocalParticleMomentum = G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
       fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
+
     }
-    
+  
     fParticleGun->SetParticlePosition(fParticlePosition);
     fParticleGun->SetParticleMomentum(flocalParticleMomentum);
     fParticleGun->GeneratePrimaryVertex(anEvent);

@@ -16,34 +16,65 @@ using namespace std;
 
 //------------------------------------------------------------------------------------------
 NtpMuon::NtpMuon()
-   :evtno(-999),
-    muvx(-999.0),
-    muvy(-999.0),
-    muvz(-999.0),
-    mupx(-999.0),
-    mupy(-999.0),
-    mupz(-999.0),
-    muweight(-999.0),
-    tpx(-999.0),
-    tpy(-999.0),
-    tpz(-999.0),
-    tptype(-999),
-    nimpwt(-999.0),
-    ptype(-999),
-    evtnoS(65535),
-    muvxF(-999.0),
-    muvyF(-999.0),
-    muvzF(-999.0),
-    mupxF(-999.0),
-    mupyF(-999.0),
-    mupzF(-999.0),
-    tpxF(-999.0),
-    tpyF(-999.0),
-    tpzF(-999.0),
-    tptypeS(-999),
-    ptypeS(-999),
-    ftree(0)
+  :evtno(-999),
+   muvx(-999.0),
+   muvy(-999.0),
+   muvz(-999.0),
+   mupx(-999.0),
+   mupy(-999.0),
+   mupz(-999.0),
+   muweight(-999.0),
+   tvx(-999.0),
+   tvy(-999.0),
+   tvz(-999.0),
+   tpx(-999.0),
+   tpy(-999.0),
+   tpz(-999.0),
+   tptype(-999),
+   nimpwt(-999.0),
+   ppvx(-999.0),
+   ppvy(-999.0),
+   ppvz(-999.0),
+   pdvx(-999.0),
+   pdvy(-999.0),
+   pdvz(-999.0),
+   pdpx(-999.0),
+   pdpy(-999.0),
+   pdpz(-999.0),
+   ptype(-999),
+   ppmedium(-999),
+   pgen(-999),
+   evtnoS(65535),
+   muvxF(-999.0),
+   muvyF(-999.0),
+   muvzF(-999.0),
+   mupxF(-999.0),
+   mupyF(-999.0),
+   mupzF(-999.0),
+   muweightD(-999.0),
+   tvxF(-999.0),
+   tvyF(-999.0),
+   tvzF(-999.0),
+   tpxF(-999.0),
+   tpyF(-999.0),
+   tpzF(-999.0),
+   tptypeS(-999),
+   nimpwtD(-999.0),
+   ppvxF(-999.0),
+   ppvyF(-999.0),
+   ppvzF(-999.0),
+   pdvxF(-999.0),
+   pdvyF(-999.0),
+   pdvzF(-999.0),
+   pdpxF(-999.0),
+   pdpyF(-999.0),
+   pdpzF(-999.0),
+   ptypeS(-999),
+   ppmediumS(-999),
+   pgenS(-999),
+   ftree(0)
 {
+
 }
 
 //------------------------------------------------------------------------------------------
@@ -66,7 +97,6 @@ void NtpMuon::SetBranchesStatus()
 {
 //   cout << "NtpMuon::SetBranchesStatus executed" << endl;
 
-   
    ftree -> SetBranchStatus("evtno", 1, 0);
    ftree -> SetBranchStatus("muvx", 1, 0);
    ftree -> SetBranchStatus("muvy", 1, 0);
@@ -75,13 +105,28 @@ void NtpMuon::SetBranchesStatus()
    ftree -> SetBranchStatus("mupy", 1, 0);
    ftree -> SetBranchStatus("mupz", 1, 0);
    ftree -> SetBranchStatus("muweight", 1, 0);
+   ftree -> SetBranchStatus("tvx", 1, 0);
+   ftree -> SetBranchStatus("tvy", 1, 0);
+   ftree -> SetBranchStatus("tvz", 1, 0);
    ftree -> SetBranchStatus("tpx", 1, 0);
    ftree -> SetBranchStatus("tpy", 1, 0);
    ftree -> SetBranchStatus("tpz", 1, 0);
    ftree -> SetBranchStatus("tptype", 1, 0);
    ftree -> SetBranchStatus("nimpwt", 1, 0);
+   ftree -> SetBranchStatus("ppvx", 1, 0);
+   ftree -> SetBranchStatus("ppvy", 1, 0);
+   ftree -> SetBranchStatus("ppvz", 1, 0);
+   ftree -> SetBranchStatus("pdvx", 1, 0);
+   ftree -> SetBranchStatus("pdvy", 1, 0);
+   ftree -> SetBranchStatus("pdvz", 1, 0);
+   ftree -> SetBranchStatus("pdpx", 1, 0);
+   ftree -> SetBranchStatus("pdpy", 1, 0);
+   ftree -> SetBranchStatus("pdpz", 1, 0);
    ftree -> SetBranchStatus("ptype", 1, 0);
+   ftree -> SetBranchStatus("ppmedium", 1, 0);
+   ftree -> SetBranchStatus("pgen", 1, 0);
    
+
 }
 
 
@@ -91,7 +136,6 @@ bool NtpMuon::SetBranches()
 {
 //   cout << "NtpMuon::SetBranches executed" << endl;
 
-      
    SetBranch(&evtnoS, "evtno");
    SetBranch(&muvxF, "muvx");
    SetBranch(&muvyF, "muvy");
@@ -99,14 +143,29 @@ bool NtpMuon::SetBranches()
    SetBranch(&mupxF, "mupx");
    SetBranch(&mupyF, "mupy");
    SetBranch(&mupzF, "mupz");
-   SetBranch(&muweight, "muweight");
+   SetBranch(&muweightD, "muweight");
+   SetBranch(&tvxF, "tvx");
+   SetBranch(&tvyF, "tvy");
+   SetBranch(&tvzF, "tvz");
    SetBranch(&tpxF, "tpx");
    SetBranch(&tpyF, "tpy");
    SetBranch(&tpzF, "tpz");
    SetBranch(&tptypeS, "tptype");
-   SetBranch(&nimpwt, "nimpwt");
+   SetBranch(&nimpwtD, "nimpwt");
+   SetBranch(&ppvxF, "ppvx");
+   SetBranch(&ppvyF, "ppvy");
+   SetBranch(&ppvzF, "ppvz");
+   SetBranch(&pdvxF, "pdvx");
+   SetBranch(&pdvyF, "pdvy");
+   SetBranch(&pdvzF, "pdvz");
+   SetBranch(&pdpxF, "pdpx");
+   SetBranch(&pdpyF, "pdpy");
+   SetBranch(&pdpzF, "pdpz");
    SetBranch(&ptypeS, "ptype");
+   SetBranch(&ppmediumS, "ppmedium");
+   SetBranch(&pgenS, "pgen");
 
+ 
    return true;
 }
 
@@ -178,6 +237,7 @@ void NtpMuon::GetEntry(unsigned int entry)
 
    ftree -> GetEntry(entry);
 
+
    evtno = (Int_t)evtnoS;
    muvx = (Double_t)muvxF;
    muvy = (Double_t)muvyF;
@@ -185,12 +245,28 @@ void NtpMuon::GetEntry(unsigned int entry)
    mupx = (Double_t)mupxF;
    mupy = (Double_t)mupyF;
    mupz = (Double_t)mupzF;
+   muweight = muweightD;
+   tvx = (Double_t)tvxF;
+   tvy = (Double_t)tvyF;
+   tvz = (Double_t)tvzF;
    tpx = (Double_t)tpxF;
    tpy = (Double_t)tpyF;
    tpz = (Double_t)tpzF;
    tptype = (Int_t)tptypeS;
+   nimpwt = nimpwtD;
+   ppvx = (Double_t)ppvxF;
+   ppvy = (Double_t)ppvyF;
+   ppvz = (Double_t)ppvzF;
+   pdvx = (Double_t)pdvxF;
+   pdvy = (Double_t)pdvyF;
+   pdvz = (Double_t)pdvzF;
+   pdpx = (Double_t)pdpxF;
+   pdpy = (Double_t)pdpyF;
+   pdpz = (Double_t)pdpzF;
    ptype = (Int_t)ptypeS;
-    
+   ppmedium = (Int_t)ppmediumS;
+   pgen = (Int_t)pgenS;
+
 }
 
 //------------------------------------------------------------------------------------------
@@ -219,13 +295,26 @@ void NtpMuon::Clear()
    mupy = -999.0;
    mupz = -999.0;
    muweight = -999.0;
+   tvx = -999.0;
+   tvy = -999.0;
+   tvz = -999.0;
    tpx = -999.0;
    tpy = -999.0;
    tpz = -999.0;
    tptype = -999;
    nimpwt = -999.0;
+   ppvx = -999.0;
+   ppvy = -999.0;
+   ppvz = -999.0;
+   pdvx = -999.0;
+   pdvy = -999.0;
+   pdvz = -999.0;
+   pdpx = -999.0;
+   pdpy = -999.0;
+   pdpz = -999.0;
    ptype = -999;
-
+   ppmedium = -999;
+   pgen = -999;
    evtnoS = 65535;
    muvxF = -999.0;
    muvyF = -999.0;
@@ -233,11 +322,28 @@ void NtpMuon::Clear()
    mupxF = -999.0;
    mupyF = -999.0;
    mupzF = -999.0;
+   muweightD = -999.0;
+   tvxF = -999.0;
+   tvyF = -999.0;
+   tvzF = -999.0;
    tpxF = -999.0;
    tpyF = -999.0;
    tpzF = -999.0;
    tptypeS = -999;
+   nimpwtD = -999.0;
+   ppvxF = -999.0;
+   ppvyF = -999.0;
+   ppvzF = -999.0;
+   pdvxF = -999.0;
+   pdvyF = -999.0;
+   pdvzF = -999.0;
+   pdpxF = -999.0;
+   pdpyF = -999.0;
+   pdpzF = -999.0;
    ptypeS = -999;
+   ppmediumS = -999;
+   pgenS = -999;
+
 
 }
 

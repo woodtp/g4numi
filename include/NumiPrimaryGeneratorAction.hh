@@ -46,55 +46,30 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
 
   
-  // Primary proton information
-  G4ThreeVector GetProtonOrigin(){
-    return fProtonOrigin;
-  }
-  G4ThreeVector GetProtonMomentum(){
-    return fProtonMomentum;
-  }
-  G4ThreeVector GetProtonIntVertex(){
-    return fProtonIntVertex;
-  }
-  // Info about a particle leaving the target (when using external ntuple)
-  G4ThreeVector GetParticlePosition(){
-    return fParticlePosition;
-  }
-  G4ThreeVector GetParticleMomentum(){
-    return fParticleMomentum;
-  }
-  G4double GetWeight(){
-    return fWeight;
-  }
-  G4int GetTgen(){
-    return fTgen;
-  }
-  G4int GetParticleType(){
-    return fType;
-  }
-  G4double GetMuWeight(){
-    return fmuweight;
-  }
-  G4ThreeVector GetMuParentMomentum(){
-    return fMuParentMomentum;
-  }
-  G4int GetParentType(){
-    return ftpptype;
-  }
-  G4double GetImpWeight(){
-    return fnimpwt;
-  }
-  G4int GetMuParentType(){
-    return fpptype;
-  }
-  G4int GetEvtno(){
-    return fevtno;
-  }
-  // *********************************************************************
-  G4int GetNoOfPrimaries(){
-    return fNoOfPrimaries;
-  }    
- 
+   // Primary proton information
+   G4ThreeVector GetProtonOrigin()         { return fProtonOrigin; }
+   G4ThreeVector GetProtonMomentum()       { return fProtonMomentum; }
+   G4ThreeVector GetProtonIntVertex()      { return fProtonIntVertex; }
+   // Info about a particle leaving the target (when using external ntuple)
+   G4ThreeVector GetParticlePosition()     { return fParticlePosition; }
+   G4ThreeVector GetParticleMomentum()     { return fParticleMomentum; }
+   G4double GetWeight()                    { return fWeight; }
+   G4int GetTgen()                         { return fTgen; }
+   G4int GetParticleType()                 { return fType; }
+   G4double GetMuWeight()                  { return fmuweight; }
+   G4ThreeVector GetMuTParentMomentum()    { return fMuTParentMomentum; }
+   G4ThreeVector GetMuParentMomentum()     { return fMuParentMomentum; }
+   G4ThreeVector GetMuTParentPosition()    { return fMuTParentPosition; }
+   G4ThreeVector GetMuParentPosition()     { return fMuParentPosition; }
+   G4ThreeVector GetMuParentProdPosition() { return fMuParentProdPosition; }
+   G4int GetTParentType()                  { return ftpptype; }
+   G4double GetImpWeight()                 { return fnimpwt; }
+   G4int GetMuParentType()                 { return fpptype; }
+   G4int GetMuParentProdMedium()           { return fppmedium; }
+   G4int GetMuParentGen()                  { return fpgen; }
+   G4int GetEvtno()                        { return fevtno; }
+   G4int GetNoOfPrimaries()                { return fNoOfPrimaries; }    
+   
 
  private:
   double                  DoubleRand() {return 2*G4UniformRand()-1.;}
@@ -130,15 +105,20 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   G4String part;
 
   // Muon Inputs
-  G4double fmuweight;
-  G4ThreeVector fMuParentMomentum;
-  G4int ftpptype;
-  G4double fnimpwt;
-  G4int fpptype;
-  G4int fevtno;
-
-
-  NtpMuon* fMuon;
+   G4double fmuweight;
+   G4ThreeVector fMuTParentMomentum;
+   G4ThreeVector fMuParentMomentum;
+   G4ThreeVector fMuTParentPosition;
+   G4ThreeVector fMuParentPosition;
+   G4ThreeVector fMuParentProdPosition;
+   G4int ftpptype;
+   G4double fnimpwt;
+   G4int fpptype;
+   G4int fppmedium;
+   G4int fpgen;
+   G4int fevtno;
+   
+   NtpMuon* fMuon;
 
 };
 

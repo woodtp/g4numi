@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.13 2009/02/02 21:09:35 jyuko Exp $
+// $Id: NumiSteppingAction.cc,v 1.14 2009/03/02 03:32:41 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -69,136 +69,143 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 
   if(NDI->useMuonBeam)
   {
-
-    if ( (NDI->GetKillTracking() && theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold()) )
-      {
+     
+     if ( (NDI->GetKillTracking() && theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold()) )
+     {
 	theTrack->SetTrackStatus(fStopAndKill);
-      }
-    
-    if( particleDefinition != G4MuonMinus::MuonMinusDefinition()  )      
-      {
+     }
+     
+     if( particleDefinition != G4MuonMinus::MuonMinusDefinition()  )      
+     {
 	//NumiAnalysis* analysis = NumiAnalysis::getInstance();
-	//G4cout << "Event " << analysis->GetEntry() << ", Process = " << theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << G4endl;
-	//G4cout<< "Event " << analysis->GetEntry() << ", KE = " << theTrack->GetKineticEnergy() << ", threshold = " << NDI->GetKillTrackingThreshold()  << ", type = " << particleDefinition << ", zpos = " << theTrack->GetPosition()[2] << G4endl; 
+	//G4cout << "Event " << analysis->GetEntry() << ", Process = "
+        //<< theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << G4endl;
+	//G4cout<< "Event " << analysis->GetEntry() << ", KE = " << theTrack->GetKineticEnergy()
+        //<< ", threshold = " << NDI->GetKillTrackingThreshold()  << ", type = "
+        //<< particleDefinition << ", zpos = " << theTrack->GetPosition()[2] << G4endl; 
 	
 	theTrack->SetTrackStatus(fStopAndKill);
-      }
-    else if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL 
-	     && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay")
-      {
-	//NumiAnalysis* analysis = NumiAnalysis::getInstance();
+     }
+     else if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL 
+              && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay")
+     {
+        //NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	
-	//G4cout<< "Event " << analysis->GetEntry() << ": Particle decayed" << ", zpos = " << theTrack->GetPosition()[2] << G4endl; 
+        //G4cout<< "Event " << analysis->GetEntry() << ": Particle decayed" << ", zpos = "
+        //<< theTrack->GetPosition()[2] << G4endl; 
 	theTrack->SetTrackStatus(fStopAndKill);
-      }
-    
-    if(theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="Transportation" &&
-       theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muIoni" &&
-       theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muBrems" &&
-       theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="msc" &&
-       theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muPairProd")
-      {
+     }
+     
+     if(theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="Transportation" &&
+        theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muIoni" &&
+        theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muBrems" &&
+        theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="msc" &&
+        theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()!="muPairProd")
+     {
 	//G4cout << "Process = " << theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << G4endl;
-      }
-    
-  
+     }
 
-
-
-    //To see if the particle has just past the point that is 0.5m upstream into the rock before
-    //monitor. Record the particle momentum in order to apply delta ray corrections. --LL
-    if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 728902.) //for alc0; info will only be recorded the first time this executes
-      {
+     
+     //To see if the particle has just past the point that is 0.5m upstream into the rock before
+     //monitor. Record the particle momentum in order to apply delta ray corrections. --LL
+     //
+     //for alc0; info will only be recorded the first time this executes
+     //
+     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 729811.) 
+     {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 0);
-      }
-    if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 751406.) //for alc1; info will only be recorded the first time this executes
-      {
+     }
+     //
+     //for alc1; info will only be recorded the first time this executes
+     //
+     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 750941.) 
+     {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 1);
-      }
-    if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 771992.) //for alc2; info will only be recorded the first time this executes
-      {
+     }
+     //
+     //for alc2; info will only be recorded the first time this executes
+     //
+     if(particleDefinition == G4MuonMinus::MuonMinusDefinition() && theTrack->GetPosition()[2] > 772062.) 
+     {
 	NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	analysis->FillAlcEdepInfo(*theTrack, 2);
-      }
-    
-  }// I think this is the end of the muon beam stuff. Why the end bracket for this was lower in the program? I don't know
-  // because this is the first version I have seen with the bracket lower. I left it there but commented it out.
-    //================================
-    //=======for Raytracing===========
-    //--------------------------------
-	   if(NDI->raytracing || NDI->createZpNtuple){
-	     for(G4int in = 0; in<(NDI->NZpoint);in++)//---Jasmine Added
-	       {
-	           if((theStep->GetPostStepPoint()->GetPosition()[2]>=NDI->Zpoint[in]&&
-		       theStep->GetPreStepPoint()->GetPosition()[2]<NDI->Zpoint[in]))
-		     {
-		       NumiAnalysis* analysis=NumiAnalysis::getInstance();
-	                 analysis->FillZpNtuple(*theTrack,in);
-		     }
-	       }
-	   }
+     }
 
-
-    // Checks to see whether the particle has entered the Hadron
-    // or muon monitors, and if so calls the NumiAnalysis class
-    // to record the particle properties through the monitors.-DJK
-    
-    
-    if (NDI->createHadmmNtuple && theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL)
-      {
-	
+     // Checks to see whether the particle has entered the Hadron
+     // or muon monitors, and if so calls the NumiAnalysis class
+     // to record the particle properties through the monitors.-DJK
+     if (NDI->createHadmmNtuple && theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL)
+     {
 	//    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 	
 	if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
 	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield"
 	     && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
-	  {
-	    NumiAnalysis* analysis = NumiAnalysis::getInstance();
-	    
-	    //analysis->FillHadmmNtuple(*theTrack, 4, 0);
-	  }
+        {
+           NumiAnalysis* analysis = NumiAnalysis::getInstance();
+	   
+           //analysis->FillHadmmNtuple(*theTrack, 4, 0);
+        }
 	else if ((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
 		  && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
 		  && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
-	  {
-	    NumiAnalysis* analysis = NumiAnalysis::getInstance();
-	    analysis->FillHadmmNtuple(*theTrack, 
-				      0, 
-				      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-	  }
+        {
+           NumiAnalysis* analysis = NumiAnalysis::getInstance();
+           analysis->FillHadmmNtuple(*theTrack, 
+                                     0, 
+                                     theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+        }
 	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_1"
 		 && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
-	  {
-	    
-	    NumiAnalysis* analysis = NumiAnalysis::getInstance();
-	    analysis->FillHadmmNtuple(*theTrack,
-				      1,
-				      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-	  }
+        {  
+           NumiAnalysis* analysis = NumiAnalysis::getInstance();
+           analysis->FillHadmmNtuple(*theTrack,
+                                     1,
+                                     theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+        }
 	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_2"
 		 && particleDefinition == G4MuonMinus::MuonMinusDefinition() ))
-	  {
-	    
-	    NumiAnalysis* analysis = NumiAnalysis::getInstance();
-	    analysis->FillHadmmNtuple(*theTrack,
-				      2,
-				      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-	  }
+        {  
+           NumiAnalysis* analysis = NumiAnalysis::getInstance();
+           analysis->FillHadmmNtuple(*theTrack,
+                                     2,
+                                     theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+        }
 	
 	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "ROCK"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcvShot_2_Down"))
-	  {      
-	  
-	    theTrack->SetTrackStatus(fStopAndKill);
-	    
-	  }
-      }
+        {
+           theTrack->SetTrackStatus(fStopAndKill);   
+        }
+     }
+     
+  }//end if(NDI->useMuonBeam)
+  
+
+    //================================
+    //=======for Raytracing===========
+    //--------------------------------
+    if(NDI->raytracing || NDI->createZpNtuple){
+       for(G4int in = 0; in<(NDI->NZpoint);in++)//---Jasmine Added
+       {
+          if((theStep->GetPostStepPoint()->GetPosition()[2]>=NDI->Zpoint[in]&&
+              theStep->GetPreStepPoint()->GetPosition()[2]<NDI->Zpoint[in]))
+          {
+             NumiAnalysis* analysis=NumiAnalysis::getInstance();
+             analysis->FillZpNtuple(*theTrack,in);
+          }
+       }
+    }
     
-    //  }//end if(NDI->useMuonBeam)
+
+
+
+
+    
 
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
     G4int decay_code=0;
