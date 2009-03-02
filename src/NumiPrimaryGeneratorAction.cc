@@ -185,7 +185,15 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
   else if (fND->useMuonInput && fND->useMuonBeam)
   {
-     
+    //
+    //Need to create a new Gun each time
+    //so Geant v4.9 doesn't complain
+    //about momentum not match KE
+    //
+     if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
+     fParticleGun = new G4ParticleGun(1);
+     fParticleGun->SetParticleEnergy(0.0*GeV);
+
     G4String particleName;
 
     NumiAnalysis* analysis2 = NumiAnalysis::getInstance();
@@ -252,7 +260,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     if(fMuon->mupz < 1.0)
     {
       flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.0*GeV);
-      fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.0*GeV*0.0*GeV)-mass);
+      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.0*GeV*0.0*GeV)-mass);
 
       analysis->WriteHadmmNtuple();    
       
@@ -260,7 +268,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     else
     {
       flocalParticleMomentum = G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
-      fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
+      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
 
     }
 
