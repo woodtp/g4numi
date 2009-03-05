@@ -53,9 +53,9 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   vdouble_t FzPos, FRin, FRout, MVzPos,MVRout,MVRin;
   
   OCzPos.push_back(OCZ0); OCRin.push_back(PHorn2OCRin(OCzPos[0])); OCRout.push_back(PHorn2OCRout(OCzPos[0]));
-  ICzPos.push_back(ICZ0); ICRin.push_back(PHorn2ICRin(ICzPos[0])); ICRout.push_back(PHorn2ICRout(ICzPos[0]));
-  FzPos.push_back(ICZ0) ; FRin.push_back(PHorn2ICRout(FzPos[0])+Fgap) ; FRout.push_back(PHorn2OCRin(FzPos[0])-Fgap);
-  MVzPos.push_back(Horn2Z0-MVgap); MVRin.push_back(PHorn2ICRin(MVzPos[0])-MVgap); MVRout.push_back(PHorn2OCRout(MVzPos[0])+MVgap);
+  ICzPos.push_back(ICZ0); ICRin.push_back(PHorn2ICRin(ICzPos[0],ND->jCompare)); ICRout.push_back(PHorn2ICRout(ICzPos[0], ND->jCompare));
+  FzPos.push_back(ICZ0) ; FRin.push_back(PHorn2ICRout(FzPos[0], ND->jCompare)+Fgap) ; FRout.push_back(PHorn2OCRin(FzPos[0])-Fgap);
+  MVzPos.push_back(Horn2Z0-MVgap); MVRin.push_back(PHorn2ICRin(MVzPos[0], ND->jCompare)-MVgap); MVRout.push_back(PHorn2OCRout(MVzPos[0])+MVgap);
 
   G4double lastICzPos=ICzPos[0];
   G4double maxR,minR,endZ;
@@ -80,58 +80,58 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 	  OCzPos.push_back(zPos); OCRout.push_back(PHorn2OCRout(zPos)); OCRin.push_back(PHorn2OCRin(zPos));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF], ND->jCompare)+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nIn++;
-	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos)); ICRin.push_back(PHorn2ICRin(zPos));
+	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos, ND->jCompare)); ICRin.push_back(PHorn2ICRin(zPos,ND->jCompare));
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap);	MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap);	MVRin.push_back(PHorn2ICRin(zPos, ND->jCompare)-MVgap);
 	}
 	else if (zPos>=OCZ1){
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF],ND->jCompare)+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nMV++;	  
 	  MVzPos.push_back(zPos); 
 	  if (maxR>=PHorn2OCRout(zPos)) MVRout.push_back(maxR+MVgap);
 	  else MVRout.push_back(PHorn2OCRout(zPos)+MVgap);
-	  if (minR<=PHorn2ICRin(zPos)) MVRin.push_back(minR-MVgap);
-	  else 	MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
+	  if (minR<=PHorn2ICRin(zPos,ND->jCompare)) MVRin.push_back(minR-MVgap);
+	  else 	MVRin.push_back(PHorn2ICRin(zPos, ND->jCompare)-MVgap);
 	}
       }
-    if ((fabs(PHorn2ICRout((lastICzPos+zPos)/2.)-(PHorn2ICRout(lastICzPos)+PHorn2ICRout(zPos))/2.)>maxDev)||
-	((fabs(PHorn2ICRin((lastICzPos+zPos)/2.)-(PHorn2ICRin(lastICzPos)+PHorn2ICRin(zPos))/2.)>maxDev))||
-	((fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))<epsilon)&&(fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))>epsilon))||
-	((fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos-deltaZ))>epsilon)&&(fabs(PHorn2ICRout(zPos)-PHorn2ICRout(zPos+deltaZ))<epsilon)))
+    if ((fabs(PHorn2ICRout((lastICzPos+zPos)/2., ND->jCompare)-(PHorn2ICRout(lastICzPos, ND->jCompare)+PHorn2ICRout(zPos, ND->jCompare))/2.)>maxDev)||
+	((fabs(PHorn2ICRin((lastICzPos+zPos)/2., ND->jCompare)-(PHorn2ICRin(lastICzPos, ND->jCompare)+PHorn2ICRin(zPos, ND->jCompare))/2.)>maxDev))||
+	((fabs(PHorn2ICRout(zPos, ND->jCompare)-PHorn2ICRout(zPos-deltaZ, ND->jCompare))<epsilon)&&(fabs(PHorn2ICRout(zPos, ND->jCompare)-PHorn2ICRout(zPos+deltaZ,ND->jCompare))>epsilon))||
+	((fabs(PHorn2ICRout(zPos,ND->jCompare)-PHorn2ICRout(zPos-deltaZ,ND->jCompare))>epsilon)&&(fabs(PHorn2ICRout(zPos, ND->jCompare)-PHorn2ICRout(zPos+deltaZ,ND->jCompare))<epsilon)))
       {
 	lastICzPos=zPos;
 	if (zPos>ICZ0&&zPos<=ICZ1){
 	  nIn++;
-	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos)); ICRin.push_back(PHorn2ICRin(zPos));
+	  ICzPos.push_back(zPos); ICRout.push_back(PHorn2ICRout(zPos, ND->jCompare)); ICRin.push_back(PHorn2ICRin(zPos, ND->jCompare));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn2ICRout(FzPos[nF], ND->jCompare)+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);}
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos, ND->jCompare)-MVgap);
 	}
 	else {
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos, ND->jCompare)-MVgap);
 	}
       }
   }
   
   nF++;
-  FzPos.push_back(FZ1); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);
+  FzPos.push_back(FZ1); FRin.push_back(PHorn2ICRout(FzPos[nF], ND->jCompare)+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);
   nIn++;
-  ICzPos.push_back(ICZ1); ICRin.push_back(PHorn2ICRin(ICzPos[nIn]));ICRout.push_back(PHorn2ICRout(ICzPos[nIn]));
+  ICzPos.push_back(ICZ1); ICRin.push_back(PHorn2ICRin(ICzPos[nIn], ND->jCompare));ICRout.push_back(PHorn2ICRout(ICzPos[nIn], ND->jCompare));
   nOut++;
   OCzPos.push_back(OCZ1); OCRin.push_back(PHorn2OCRin(OCzPos[nOut]));OCRout.push_back(PHorn2OCRout(OCzPos[nOut]));
   nMV++;
   MVzPos.push_back(endZ+MVgap);
   if (maxR>=PHorn2OCRout(zPos)) MVRout.push_back(maxR+MVgap);
   else MVRout.push_back(PHorn2OCRout(zPos)+MVgap);
-  if (minR<=PHorn2ICRin(zPos)) MVRin.push_back(minR-MVgap);
-  else MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
+  if (minR<=PHorn2ICRin(zPos, ND->jCompare)) MVRin.push_back(minR-MVgap);
+  else MVRin.push_back(PHorn2ICRin(zPos, ND->jCompare)-MVgap);
     
   // Create Mother Volume
   G4VSolid* sMHorn2;
@@ -222,7 +222,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   for (G4int ii=0;ii<G4int(ND->Horn2SS.size());ii++){
     for (G4int jj=0;jj<ND->NHorn2SpidersPerPlaneN;jj++){
       G4double angle=G4double(360.*deg*jj/ND->NHorn2SpidersPerPlaneN);
-      G4double rIn=PHorn2ICRout(ND->Horn2SpiderSupportZ0[ii])+Fgap;//
+      G4double rIn=PHorn2ICRout(ND->Horn2SpiderSupportZ0[ii], ND->jCompare)+Fgap;//
       G4double rOut=PHorn2OCRin(ND->Horn2SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
       ConstructSpiderSupport(&(ND->Horn2SS[ii]),angle,ND->Horn2SpiderSupportZ0[ii],rIn,rOut,pvPHorn2F,ii+jj);
     }
@@ -317,107 +317,116 @@ G4double NumiDetectorConstruction::PHorn2OCRin(G4double z)
   }
   return r;
 }
-G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
+G4double NumiDetectorConstruction::PHorn2ICRout(G4double z, G4bool dognumi)
 {
   G4double r=0.;
-  if (z<-0.00331*in){
-    r=(10.9108+(0.1780*0.00331))*in; //for MV
-  } 
+  //  NumiDataInput* ND=NumiDataInput::GetNumiDataInput();
+  if(z/cm<118.156*in){
+    if(dognumi){ // here I added some functionality "gnumi-like horns" resets parabolic shape
+      if (z<-0.00331*in){
+	r=(10.9108+(0.1780*0.00331))*in; //for MV
+      } 
+      
+      //===========================================
+      // These are the equations i gnumi used by me (jasmine ma) commented here
+      // because no one else uses them  
+      
+      else if((z/cm)>=-0.00840   && (z/cm)< 97.617)
+	{
+	  r= (sqrt((100-(z/cm))/0.1351))*cm;
+	}
+      else if( (z/cm)>=97.617 && (z/cm)<104.803)
+	{ // Neck
+	  r = 4.2*cm;
+	}
+      else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+	{
+	  r= (sqrt(((z/cm)-100)/0.2723))*cm ;
+	}
+      //===========================================
+    }
+    else{
+      //IC from drawings
+      
+      if (z<-0.00331*in){
+	r=(10.9108+(0.1780*0.00331))*in; //for MV
+      }
+      else if ((z>=-0.00331*in)&&(z<5.862*in)){
+	r=(10.9108-(0.1780)*(z/in))*in;
+      }
+      //else if ((z>=5.3874*in)&&(z<5.8620*in)){
+      //  r=9.9675*in; //! this is not from eq.
+      // }
+      //else if ((z>=5.862*in)&&(z<6.3629*in)){
+      //  r=(9.9675-(z/in-5.8622)/(6.3629-5.862)*(0.15997))*in; //! this is not from eq.
+      //}
+      else if ((z>=5.862*in)&&(z<30.3611*in)){
+	r=sqrt(114.73006-(2.91414)*(z/in))*in;
+      }
+      //else if ((z>=29.4686*in)&&(z<30.3611*in)){
+      //  r=sqrt(114.73006-(2.91414)*(z/in))*in+1.*mm; //! this is not from eq.
+      //}
+      else if ((z>=30.3611*in)&&(z<36.8888*in)){
+	r=sqrt(114.73006-(2.91414)*(z/in))*in;
+      }   
+      else if ((z>=36.8888*in)&&(z<38.2521*in)){
+	r=(22.68402-(0.54203)*(z/in))*in;
+      }
+      // I think I got this right
+      else if ((z>=38.2521*in)&&(z<39.1092*in)){
+	r=(1.7325+(1.8-sqrt(1.8*1.8-sqr(z/in-39.1092))))*in; //! this is not from eq. ! neck
+      }
+      else if ((z>=39.1092*in)&&(z<40.8688*in)){
+	r=1.7325*in; //! this is not from eq. ! neck
+      }
+      else if ((z>=40.8688*in)&&(z<41.3864*in)){
+	r=(1.7325+(1.8-sqrt(1.8*1.8-sqr(z/in-40.8688))))*in; //! this is not from eq. ! neck
+      }
+      
+      else if ((z>=41.3864*in)&&(z<43.3660*in)){
+	r=(-10.63139+(0.30058)*(z/in))*in;
+      } 
+      else if ((z>=43.3660*in)&&(z<50.2725*in)){
+	r=sqrt(-56.922631+(1.44583)*(z/in))*in;
+      }
+      
+      //else if ((z>=49.3279*in)&&(z<50.2725*in)){
+      //  r=sqrt(-56.922631+(1.44583)*(z/in))*in;// joint , need to correct this
+      //}
+      
+      else if ((z>=50.2725*in)&&(z<69.892*in)){
+	r=sqrt(-56.922631+(1.44583)*(z/in))*in;
+      }
+      
+      //else if ((z>=69.3337*in)&&(z<69.8920*in)){
+      //  r=sqrt(-56.922631+(1.44583)*(z/in))*in;// joint , need to correct this
+      //}
+      //else if ((z>=69.8920*in)&&(z<70.3095*in)){
+      //  r=(0.12835+(0.0932)*(z/in))*in;// joint , need to correct this
+      //}
 
-  //===========================================
-  // These are the equations i gnumi used by me (jasmine ma) commented here
-  // because no one else uses them  
-  /*  
-  else if((z/cm)>=-0.00840   && (z/cm)< 97.617)
-  {
-    r= (sqrt((100-(z/cm))/0.1351))*cm;
+      else if ((z>=69.8920*in)&&(z<93.892*in)){
+	r=(0.12835+(0.0932)*(z/in))*in;
+      }
+      
+      //else if ((z>=93.3359*in)&&(z<93.8920*in)){
+      //  r=(0.12835+(0.0932)*(z/in))*in;// joint , need to correct this
+      //}
+      //else if ((z>=93.8920*in)&&(z<=94.3159*in)){
+      //  r=(1.93227+(0.07398)*(z/in))*in;// joint , need to correct this
+      //}
+      
+      else if ((z>=93.892*in)&&(z<=118.156*in)){
+	r=(1.93227+(0.07398)*(z/in))*in;
+      }
+    }
   }
-  else if( (z/cm)>=97.617 && (z/cm)<104.803)
-  { // Neck
-    r = 4.2*cm;
-  }
-  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
-  {
-    r= (sqrt(((z/cm)-100)/0.2723))*cm ;
-  }
-  */
-  //===========================================
-
-  //IC from drawings
-  else if ((z>=-0.00331*in)&&(z<5.862*in)){
-    r=(10.9108-(0.1780)*(z/in))*in;
-  }
-  //else if ((z>=5.3874*in)&&(z<5.8620*in)){
-  //  r=9.9675*in; //! this is not from eq.
-  // }
-  //else if ((z>=5.862*in)&&(z<6.3629*in)){
-  //  r=(9.9675-(z/in-5.8622)/(6.3629-5.862)*(0.15997))*in; //! this is not from eq.
-  //}
-  else if ((z>=5.862*in)&&(z<30.3611*in)){
-    r=sqrt(114.73006-(2.91414)*(z/in))*in;
-  }
-  //else if ((z>=29.4686*in)&&(z<30.3611*in)){
-  //  r=sqrt(114.73006-(2.91414)*(z/in))*in+1.*mm; //! this is not from eq.
-  //}
-  else if ((z>=30.3611*in)&&(z<36.8888*in)){
-    r=sqrt(114.73006-(2.91414)*(z/in))*in;
-  }   
-  else if ((z>=36.8888*in)&&(z<38.2521*in)){
-    r=(22.68402-(0.54203)*(z/in))*in;
-  }
-  // I think I got this right
-  else if ((z>=38.2521*in)&&(z<39.1092*in)){
-    r=(1.7325+(1.8-sqrt(1.8*1.8-sqr(z/in-39.1092))))*in; //! this is not from eq. ! neck
-  }
-  else if ((z>=39.1092*in)&&(z<40.8688*in)){
-    r=1.7325*in; //! this is not from eq. ! neck
-  }
-   else if ((z>=40.8688*in)&&(z<41.3864*in)){
-    r=(1.7325+(1.8-sqrt(1.8*1.8-sqr(z/in-40.8688))))*in; //! this is not from eq. ! neck
-  }
-
-  else if ((z>=41.3864*in)&&(z<43.3660*in)){
-    r=(-10.63139+(0.30058)*(z/in))*in;
-  } 
-  else if ((z>=43.3660*in)&&(z<50.2725*in)){
-    r=sqrt(-56.922631+(1.44583)*(z/in))*in;
-  }
-
-  //else if ((z>=49.3279*in)&&(z<50.2725*in)){
-  //  r=sqrt(-56.922631+(1.44583)*(z/in))*in;// joint , need to correct this
-  //}
-
-  else if ((z>=50.2725*in)&&(z<69.892*in)){
-    r=sqrt(-56.922631+(1.44583)*(z/in))*in;
-  }
- 
-  //else if ((z>=69.3337*in)&&(z<69.8920*in)){
-  //  r=sqrt(-56.922631+(1.44583)*(z/in))*in;// joint , need to correct this
-  //}
-  //else if ((z>=69.8920*in)&&(z<70.3095*in)){
-  //  r=(0.12835+(0.0932)*(z/in))*in;// joint , need to correct this
-  //}
-
-  else if ((z>=69.8920*in)&&(z<93.892*in)){
-    r=(0.12835+(0.0932)*(z/in))*in;
-  }
-
-  //else if ((z>=93.3359*in)&&(z<93.8920*in)){
-  //  r=(0.12835+(0.0932)*(z/in))*in;// joint , need to correct this
-  //}
-  //else if ((z>=93.8920*in)&&(z<=94.3159*in)){
-  //  r=(1.93227+(0.07398)*(z/in))*in;// joint , need to correct this
-  //}
-
-  else if ((z>=93.892*in)&&(z<=118.156*in)){
-    r=(1.93227+(0.07398)*(z/in))*in;
-  }
-
   //else if ((z>=117.6060*in)&&(z<118.156*in)){
   //  r=(1.93227+(0.07398)*(z/in))*in;// joint , need to correct this
   //}
   //Flange inner downstream
-  else if ((z>=118.156*in)&&(z<=121.388*in)){
+  
+else if ((z>=118.156*in)&&(z<=121.388*in)){
    r=21.498/2.*in+(z/in-118.156)/(121.388-118.156)*(21.853-21.498)/2.;
   }
  else if ((z>=121.388*in)&&(z<137.96*in)){
@@ -435,74 +444,84 @@ G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
  
 return r;
 }
-G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
+G4double NumiDetectorConstruction::PHorn2ICRin(G4double z, G4bool dognumi)
 {
- G4double r=0.;
- 
-  if (z<0.0*in){
-    r=sqrt(114.73006)*in-0.11811*in-0.05*in;//for MV; added 0.05 because ic was outside of mv
-  }
-  //===========================================
-  // These are the equations i gnumi used by me (jasmine ma) commented here
-  // because no one else uses them
-  /*
-   else if(z/cm>=0.0 && (z/cm)< 97.617)
-  {
-  r= (sqrt((100-(z/cm))/0.1351)-0.2)*cm;
-  }
-  else if( (z/cm)>=97.617 && (z/cm)<104.803)
-  { // Neck
-    r = 4*cm;
-  }
-  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
-  {
-    r= (sqrt(((z/cm)-100)/0.2723)-0.2)*cm ;
-  }
-  */
-  //---------------------------------------------------------
-  // This stuff is originally what zarko had in here from drawings
-  //IC from drawings
-  else if ((z>=0.0*in)&&(z<5.8*in)){
-    r=sqrt(114.73006-(2.91414)*(z/in))*in-0.11811*in;
-  }
-  else if ((z>=5.8*in)&&(z<29.8300*in)){
-    r=sqrt(114.73007-(2.91414)*(z/in))*in-0.11811*in;
-  }
-  else if ((z>=29.8300*in)&&(z<37.9435*in)){
-    r=sqrt(114.73006-(2.91414)*(z/in))*in-0.11811*in;
-  }   
+  G4double r=0.;
   
-  else if ((z>=37.9435*in)&&(z<39.12373*in)){
-    r=(1.5355+(2.-sqrt(4.-sqr(z/in-39.12373))))*in; //! NECK !
-  }  
-  else if ((z>=39.12373*in)&&(z<40.86009*in)){
-    r=1.5355*in; //! NECK !
-  }  
-  else if ((z>=40.86009*in)&&(z<41.6144*in)){
-    r=(1.5355+(2.-sqrt(4.-sqr(z/in-40.86009))))*in; //! NECK !
-  }  
-
-  else if ((z>=41.6144*in)&&(z<49.8920*in)){
-    r=sqrt(-56.92263+(1.44583)*(z/in))*in-0.11811*in;
-  } 
-  else if ((z>=49.8920*in)&&(z<69.8920*in)){
-    r=sqrt(-56.922631+(1.44583)*(z/in))*in-0.11811*in;
-  } 
-  else if ((z>=69.8920*in)&&(z<93.8920*in)){
-    r=(0.01064+(0.0932)*(z/in))*in;
-  }
-  else if ((z>=93.8920*in)&&(z<118.156*in)){
-    r=(1.81456+(0.07398)*(z/in))*in;
-  }
+  //  NumiDataInput* ND=NumiDataInput::GetNumiDataInput();
+  if (z<118.156*in){
+    if(dognumi){ // here I added some functionality - "gnumi like horns" resets the parabolic shape of horn 2
+      if (z<0.0*in){
+	r=sqrt(114.73006)*in-0.11811*in-0.05*in;//for MV; added 0.05 because ic was outside of mv
+      }
+      //===========================================
+      // These are the equations i gnumi used by me (jasmine ma) commented here
+      // because no one else uses them
+      
+      else if(z/cm>=0.0 && (z/cm)< 97.617)
+	{
+	  r= (sqrt((100-(z/cm))/0.1351)-0.2)*cm;
+	}
+      else if( (z/cm)>=97.617 && (z/cm)<104.803)
+	{ // Neck
+	  r = 4*cm;
+	}
+      else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+	{
+	  r= (sqrt(((z/cm)-100)/0.2723)-0.2)*cm ;
+    }
+    }
+    else{
+      if (z<0.0*in){
+	r=sqrt(114.73006)*in-0.11811*in-0.05*in;//for MV; added 0.05 because ic was outside of mv
+    }
+      
+      //---------------------------------------------------------
+      // This stuff is originally what zarko had in here from drawings
+      //IC from drawings
+      else if ((z>=0.0*in)&&(z<5.8*in)){
+	r=sqrt(114.73006-(2.91414)*(z/in))*in-0.11811*in;
+      }
+      else if ((z>=5.8*in)&&(z<29.8300*in)){
+	r=sqrt(114.73007-(2.91414)*(z/in))*in-0.11811*in;
+      }
+      else if ((z>=29.8300*in)&&(z<37.9435*in)){
+	r=sqrt(114.73006-(2.91414)*(z/in))*in-0.11811*in;
+      }   
+      
+      else if ((z>=37.9435*in)&&(z<39.12373*in)){
+	r=(1.5355+(2.-sqrt(4.-sqr(z/in-39.12373))))*in; //! NECK !
+      }  
+      else if ((z>=39.12373*in)&&(z<40.86009*in)){
+	r=1.5355*in; //! NECK !
+      }  
+      else if ((z>=40.86009*in)&&(z<41.6144*in)){
+	r=(1.5355+(2.-sqrt(4.-sqr(z/in-40.86009))))*in; //! NECK !
+      }  
+      
+      else if ((z>=41.6144*in)&&(z<49.8920*in)){
+	r=sqrt(-56.92263+(1.44583)*(z/in))*in-0.11811*in;
+      } 
+      else if ((z>=49.8920*in)&&(z<69.8920*in)){
+	r=sqrt(-56.922631+(1.44583)*(z/in))*in-0.11811*in;
+      } 
+      else if ((z>=69.8920*in)&&(z<93.8920*in)){
+	r=(0.01064+(0.0932)*(z/in))*in;
+      }
+      else if ((z>=93.8920*in)&&(z<118.156*in)){
+	r=(1.81456+(0.07398)*(z/in))*in;
+      }
+    } // not jCompare
+  }  // if z<118.156
   //-----differences in g4numi/gnumi end here -----------
   //Flange inner downstream
- else if ((z>=118.156*in)&&(z<139.21*in)){
-   r=21.342/2.*in;
+  else if ((z>=118.156*in)&&(z<139.21*in)){
+      r=21.342/2.*in;
   }
 
   //for mother volume i need r defined up to the end of horn
   else if (z>=139.21*in){
     r=21.342/2.*in;
   }
-return r;
+  return r;
 }

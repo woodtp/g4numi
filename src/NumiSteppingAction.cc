@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.15 2009/03/02 17:30:58 loiacono Exp $
+// $Id: NumiSteppingAction.cc,v 1.16 2009/03/05 16:53:11 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "NumiSteppingAction.hh"
@@ -145,53 +145,53 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      // to record the particle properties through the monitors.-DJK
      if (NDI->createHadmmNtuple && theStep->GetPostStepPoint()->GetPhysicalVolume()!=NULL)
      {
-	//    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
-	
-	if(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
-	     && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield"
-	     && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
-                 || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
-        {
+       //    G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+       
+       if(theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "PVHadMon"
+	  && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "ConcShield"
+	  && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+	      || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
+	 {
            //NumiAnalysis* analysis = NumiAnalysis::getInstance();
 	   
            //analysis->FillHadmmNtuple(*theTrack, 4, 0);
-        }
-	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
-		  && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
-		  && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
-                      || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
-        {
+	 }
+       else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "MuCell"
+		&& theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_0"
+		&& (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+		    || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
+	 {
            NumiAnalysis* analysis = NumiAnalysis::getInstance();
            analysis->FillHadmmNtuple(*theTrack, 
                                      0, 
                                      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-        }
-	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
-		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_1"
-		 && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
-                     || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
-        {  
+	 }
+       else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
+		&& theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_1"
+		&& (particleDefinition == G4MuonPlus::MuonPlusDefinition()
+		    || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
+	 {  
            NumiAnalysis* analysis = NumiAnalysis::getInstance();
            analysis->FillHadmmNtuple(*theTrack,
                                      1,
                                      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-        }
+	 }
 	else if( theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="MuCell"
 		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMon_2"
 		 && (particleDefinition == G4MuonPlus::MuonPlusDefinition()
                      || particleDefinition == G4MuonMinus::MuonMinusDefinition()) )
-        {  
-           NumiAnalysis* analysis = NumiAnalysis::getInstance();
-           analysis->FillHadmmNtuple(*theTrack,
-                                     2,
-                                     theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
-        }
-	
-	else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "ROCK"
-		 && theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcvShot_2_Down"))
-        {
+	  {  
+	    NumiAnalysis* analysis = NumiAnalysis::getInstance();
+	    analysis->FillHadmmNtuple(*theTrack,
+				      2,
+				      theStep->GetPostStepPoint()->GetPhysicalVolume()->GetCopyNo() );
+	  }
+       
+       else if((theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "ROCK"
+		&& theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() == "MuMonAlcvShot_2_Down"))
+	 {
            theTrack->SetTrackStatus(fStopAndKill);   
-        }
+	 }
      }
      
   }//end if(NDI->useMuonBeam)
@@ -212,46 +212,41 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
        }
     }
     
-
-
-
-
     
-
-  if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
-    G4int decay_code=0;
-    if (theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
-      G4int nSecAtRest = fpSteppingManager->GetfN2ndariesAtRestDoIt();
-      G4int nSecAlong  = fpSteppingManager->GetfN2ndariesAlongStepDoIt();
-      G4int nSecPost   = fpSteppingManager->GetfN2ndariesPostStepDoIt();
-      G4int nSecTotal  = nSecAtRest+nSecAlong+nSecPost;
-      G4TrackVector* secVec = fpSteppingManager->GetfSecondary();
-      
-      if (particleDefinition==G4PionPlus::PionPlusDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
-	      decay_code=13;
-	  }
-      }
-      if (particleDefinition==G4PionMinus::PionMinusDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
-	      decay_code=14;
-	  }
-      }
-      if (particleDefinition==G4KaonPlus::KaonPlusDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
-	      {if (nSecTotal==2) decay_code=5;
-	      if (nSecTotal==3) decay_code=7;}
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_e")
-	      decay_code=6;
-	  }
-      }
-      if (particleDefinition==G4KaonMinus::KaonMinusDefinition()) {
+    if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL){
+      G4int decay_code=0;
+      if (theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
+	G4int nSecAtRest = fpSteppingManager->GetfN2ndariesAtRestDoIt();
+	G4int nSecAlong  = fpSteppingManager->GetfN2ndariesAlongStepDoIt();
+	G4int nSecPost   = fpSteppingManager->GetfN2ndariesPostStepDoIt();
+	G4int nSecTotal  = nSecAtRest+nSecAlong+nSecPost;
+	G4TrackVector* secVec = fpSteppingManager->GetfSecondary();
+	
+	if (particleDefinition==G4PionPlus::PionPlusDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
+		decay_code=13;
+	    }
+	}
+	if (particleDefinition==G4PionMinus::PionMinusDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
+		decay_code=14;
+	    }
+	}
+	if (particleDefinition==G4KaonPlus::KaonPlusDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
+		{if (nSecTotal==2) decay_code=5;
+		if (nSecTotal==3) decay_code=7;}
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_e")
+		decay_code=6;
+	    }
+	}
+	if (particleDefinition==G4KaonMinus::KaonMinusDefinition()) {
 	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
 	  {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
@@ -260,10 +255,10 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_e")
 	      decay_code=9;
 	  }
-      }
-      if (particleDefinition==G4KaonZeroLong::KaonZeroLongDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
+	}
+	if (particleDefinition==G4KaonZeroLong::KaonZeroLongDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_e")
 	      decay_code=1;
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_e")
@@ -272,35 +267,35 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	      decay_code=3;
 	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
 	      decay_code=4;	    
-	  }
+	    }
+	}
+	if (particleDefinition==G4MuonPlus::MuonPlusDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
+		decay_code=11;	
+	    }
+	}
+	if (particleDefinition==G4MuonMinus::MuonMinusDefinition()) {
+	  for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
+	    {
+	      if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
+		decay_code=12;	
+	    }
       }
-      if (particleDefinition==G4MuonPlus::MuonPlusDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="anti_nu_mu")
-	      decay_code=11;	
-	  }
-      }
-      if (particleDefinition==G4MuonMinus::MuonMinusDefinition()) {
-	for (size_t partno=(*secVec).size()-nSecTotal;partno<(*secVec).size();partno++)
-	  {
-	    if ((*secVec)[partno]->GetDefinition()->GetParticleName()=="nu_mu")
-	      decay_code=12;	
-	  }
-      }
-
-      NumiTrackInformation* oldinfo=(NumiTrackInformation*)(theTrack->GetUserInformation()); 
-      if (oldinfo!=0) {
-	oldinfo->SetDecayCode(decay_code);                                                      
-	theTrack->SetUserInformation(oldinfo); 
-      }
-      else {
-	NumiTrackInformation* newinfo=new NumiTrackInformation(); 
-	newinfo->SetDecayCode(decay_code);                                                       
-	theTrack->SetUserInformation(newinfo); 
+	
+	NumiTrackInformation* oldinfo=(NumiTrackInformation*)(theTrack->GetUserInformation()); 
+	if (oldinfo!=0) {
+	  oldinfo->SetDecayCode(decay_code);                                                      
+	  theTrack->SetUserInformation(oldinfo); 
+	}
+	else {
+	  NumiTrackInformation* newinfo=new NumiTrackInformation(); 
+	  newinfo->SetDecayCode(decay_code);                                                       
+	  theTrack->SetUserInformation(newinfo); 
+	}
       }
     }
-  }
 }
 
 

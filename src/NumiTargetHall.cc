@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // Target hall chase and duratek blocks modifications by Zachary Barnett.
-// $Id: NumiTargetHall.cc,v 1.7 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiTargetHall.cc,v 1.8 2009/03/05 16:53:11 jyuko Exp $
 //----------------------------------------------------------------------
 #include "NumiDetectorConstruction.hh"
 
@@ -28,7 +28,7 @@ void NumiDetectorConstruction::ConstructTargetHall()
   G4LogicalVolume *lvTGAR=new G4LogicalVolume(sTGAR,Air,"lvTGAR",0,0,0);
   TGAR = new G4PVPlacement(0,targetHallPosition,"TGAR",lvTGAR,ROCK,false,0);
  
-
+  NumiData->ApplyStepLimits(lvTGAR);
   if (NumiData->NTHConcreteSectionsN!=0){
     // Begin constructing Target Hall Concrete Chase
     //=====================================================

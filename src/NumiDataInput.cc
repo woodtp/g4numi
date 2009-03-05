@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.26 2009/03/02 17:30:58 loiacono Exp $
+// $Id: NumiDataInput.cc,v 1.27 2009/03/05 16:53:10 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -46,12 +46,13 @@ NumiDataInput::NumiDataInput()
   KillTracking = true; // false for ahimmel
   testTheta = M_PI/6.;
   
-  StepLimit = 0.; 
+   StepLimit = 0; 
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
    KillTrackingThreshold = 0.05*GeV; //for defaut neutrino MC g4numi 
    //KillTrackingThreshold = 0.001*GeV; //for muon beam MC
+
 
    //base name for output files:
    nuNtupleName    = "nuNtuple";
@@ -78,78 +79,95 @@ NumiDataInput::NumiDataInput()
    // from the macro 
    
    useMacro = false;
+
   //====================================
   //-- Changes for "Air Horns"---------- >> G4numi validation
   //-- Changes for "Truncated Horns"-----
-  G4bool airhrn =true; // airhrn must be changed before compilation
+  airhrn =false; // airhrn must be changed before compilation
+  vacuumworld=false;
   jCompare = true; // make horns have the same B field;
-  if(airhrn){
-    hrnmat=15;
-    hrnmatcr=15;
-  }
-  else{
-    hrnmat = 20;
-    hrnmatcr =31;
-  }
-  //======================================
-
-  //======================================
-  //--Ray Tracing parameter-------------
-  //--------------------------------------
-   raytracing = false;
-   //==============================
-   //------------------------------
-
-   //initialize zpoints
-    NZpoint=45;
-    Zpoint.push_back(0*m); //1
-    Zpoint.push_back(0.5*m); //2
-    Zpoint.push_back(0.7*m); //3
-    Zpoint.push_back(0.75*m); //4
-    Zpoint.push_back(0.8*m); //5
-    Zpoint.push_back(0.85*m); //6
-    Zpoint.push_back(0.9*m); //7
-    Zpoint.push_back(1*m); //8
-    Zpoint.push_back(1.25*m); //9
-    Zpoint.push_back(1.5*m); //10
-    Zpoint.push_back(1.75*m); //11
-    Zpoint.push_back(2*m);//12
-    Zpoint.push_back(2.25*m);//13
-    Zpoint.push_back(2.5*m);//14
-    Zpoint.push_back(2.75*m); //15
-    Zpoint.push_back(3*m);//16
-    Zpoint.push_back(3.25*m);//17
-    Zpoint.push_back(3.5*m);//18
-    Zpoint.push_back(4*m);//19
-    Zpoint.push_back(6*m);//20
-    Zpoint.push_back(9*m);//21
-    Zpoint.push_back(9.5*m); //22
-    Zpoint.push_back(9.25*m); //23
-    Zpoint.push_back(10*m);//24
-    Zpoint.push_back(10.25*m);//25
-    Zpoint.push_back(10.5*m);//26
-    Zpoint.push_back(10.75*m);//27
-    Zpoint.push_back(11.80*m);//28
-    Zpoint.push_back(11.9*m);//29
-    Zpoint.push_back(11*m);//30
-    Zpoint.push_back(11.1*m);//31
-    Zpoint.push_back(11.2*m);//32
-    Zpoint.push_back(11.25*m);//33
-    Zpoint.push_back(11.5*m);//34
-    Zpoint.push_back(11.75*m);//35
-    Zpoint.push_back(12*m);//36
-    Zpoint.push_back(12.25*m);//37
-    Zpoint.push_back(12.5*m);//38
-    Zpoint.push_back(12.75*m);//39
-    Zpoint.push_back(13*m);//40
-    Zpoint.push_back(13.25*m);//41
-    Zpoint.push_back(13.5*m);//42
-    Zpoint.push_back(14*m);//43
-    Zpoint.push_back(20*m);//44
-    Zpoint.push_back(45.7*m);//45
-    createZpNtuple=false;
-    zpNtupleName="zpNtuple";
-    //==============================================================
+  
+if(!vacuumworld && !airhrn){
+  hrnmat = 20;
+  hrnmatcr =31;
+  hallmat=15;
+}
+ else {
+   if(airhrn){
+     hrnmat=15;
+     hrnmatcr=15;
+     hallmat=15;
+    }
+   if(vacuumworld){
+     hrnmat=16;
+     hrnmatcr=16;
+     hallmat=16;
+   }
+ }
+ 
+//======================================
+ 
+//======================================
+//--Ray Tracing parameter-------------
+//--------------------------------------
+ raytracing =false;
+ //==============================
+ //------------------------------
+ 
+ //initialize zpoints
+ NZpoint=48;
+ Zpoint.push_back(0*m); //1
+ Zpoint.push_back(0.5*m); //2
+ Zpoint.push_back(0.7*m); //3
+ Zpoint.push_back(0.75*m); //4
+ Zpoint.push_back(0.8*m); //5
+ Zpoint.push_back(0.85*m); //6
+ Zpoint.push_back(0.9*m); //7
+ Zpoint.push_back(1*m); //8
+ Zpoint.push_back(1.25*m); //9
+ Zpoint.push_back(1.5*m); //10
+ Zpoint.push_back(1.75*m); //11
+ Zpoint.push_back(2*m);//12
+ Zpoint.push_back(2.25*m);//13
+ Zpoint.push_back(2.5*m);//14
+ Zpoint.push_back(2.75*m); //15
+ Zpoint.push_back(3*m);//16
+ Zpoint.push_back(3.25*m);//17
+ Zpoint.push_back(3.5*m);//18
+ Zpoint.push_back(4*m);//19
+ Zpoint.push_back(6*m);//20
+ Zpoint.push_back(9*m);//21
+ Zpoint.push_back(9.5*m); //22
+ Zpoint.push_back(9.25*m); //23
+ Zpoint.push_back(10*m);//24
+ Zpoint.push_back(10.25*m);//25
+ Zpoint.push_back(10.5*m);//26
+ Zpoint.push_back(10.75*m);//27
+ Zpoint.push_back(11.80*m);//28
+ Zpoint.push_back(11.9*m);//29
+ Zpoint.push_back(11*m);//30
+ Zpoint.push_back(11.1*m);//31
+ Zpoint.push_back(11.2*m);//32
+ Zpoint.push_back(11.25*m);//33
+ Zpoint.push_back(11.5*m);//34
+ Zpoint.push_back(11.75*m);//35
+ Zpoint.push_back(12*m);//36
+ Zpoint.push_back(12.25*m);//37
+ Zpoint.push_back(12.5*m);//38
+ Zpoint.push_back(12.75*m);//39
+ Zpoint.push_back(13*m);//40
+ Zpoint.push_back(13.25*m);//41
+ Zpoint.push_back(13.5*m);//42
+ Zpoint.push_back(13.75*m);//43
+ Zpoint.push_back(14*m);//43
+ Zpoint.push_back(14.5*m);//44
+ Zpoint.push_back(15.*m);//45
+ Zpoint.push_back(16.*m);//46
+ Zpoint.push_back(20*m);//47
+ Zpoint.push_back(45.7*m);//48
+ createZpNtuple=false;
+ zpNtupleName="zpNtuple";
+ //==============================================================
   G4float beam_x_dir = 0;
   G4float beam_y_dir = 0;
   G4float beam_z_dir = 1;//cos(.01*pi/180);

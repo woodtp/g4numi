@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.24 2009/03/02 17:30:57 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.25 2009/03/05 16:53:10 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1064,20 +1064,20 @@ void NumiAnalysis::FillZpNtuple(const G4Track& track,Int_t zpnum)
   }
 }
 void NumiAnalysis::WriteZpNtuple(){//Jasmine added
-  zptree->Fill();
 
-  g4zpdata->xposatz=-10000;
-  g4zpdata->yposatz=-10000;
-  g4zpdata->zposatz=-10000;
-  g4zpdata->xmomatz=-10000;
-  g4zpdata->ymomatz=-10000;
-  g4zpdata->zmomatz=-10000;
-  g4zpdata->matilen=-10000;
-  g4zpdata->field=-10000;
-  g4zpdata->pathlength=-10000;
-  g4zpdata->zpoint=-10000;
-  g4zpdata->ptypeatz=-10;
-  g4zpdata->pidtype=-10;
-  g4zpdata->run=-100;
-  g4zpdata->evtno=-100;
+  zptree->Fill();
+    g4zpdata->xposatz=-10000;
+    g4zpdata->yposatz=-10000;
+    g4zpdata->zposatz=-10000;
+    g4zpdata->xmomatz=-10000;
+    g4zpdata->ymomatz=-10000;
+    g4zpdata->zmomatz=-10000;
+    g4zpdata->matilen=-10000;
+    g4zpdata->field =-10000;
+    g4zpdata->pathlength=-10000;
+    g4zpdata->zpoint=-10000;
+    g4zpdata->ptypeatz=-10;
+    g4zpdata->pidtype=-10;
+    g4zpdata->run=-100;
+    g4zpdata->evtno=-100;  
 }

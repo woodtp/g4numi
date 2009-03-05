@@ -26,6 +26,25 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   Bfield[0] = -B*Point[1]/radius;
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
+
+  
+  G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
+  G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+  numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
+  G4ThreeVector Position=G4ThreeVector(Point[0],Point[1],Point[2]);
+  G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
+  G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
+  G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
+
+  if(NumiData->jCompare) // Make gnumi like horns - this is for validation
+   {
+     if(localPosition.z()>3*m || localPosition.z()<0*m) 
+     {
+       Bfield[0]=0;
+       Bfield[1]=0;
+       Bfield[2]=0;
+     }     
+   }
   /*
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
@@ -105,6 +124,13 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[1] = 0.; 
     Bfield[2] = 0.; 
   }
+  if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+    {  
+      Bfield[0]=0;
+      Bfield[1]=0;
+      Bfield[2]=0;
+    }
+
 }
 
 
@@ -158,4 +184,13 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[1] = 0.; 
     Bfield[2] = 0.;
   }
+  
+  if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+    {
+      Bfield[0]=0;
+      Bfield[1]=0;
+      Bfield[2]=0;
+    }
+
+
 }

@@ -13,21 +13,18 @@ ClassImp(zptuple_t)
   zptuple_t::zptuple_t():
   run(-1),
   evtno(-10),
-  xposatz(-1.e4),
-  yposatz(-1.e4),
-  zposatz(-1.e4),
-  xmomatz(-1.e4),
-  ymomatz(-1.e4),
-  zmomatz(-1.e4),
   matilen(-1.e4),
   field(-1.e4),
-  pathlength(-1.e4),
-  ptypeatz(-10),
   pidtype(-10),
-  zpoint(-10000)
+  xposatz(-10000),
+  yposatz(-10000),
+  zposatz(-10000),
+  xmomatz(-10000),
+  ymomatz(-10000),
+  zmomatz(-10000),
+  ptypeatz(-10000)
 {
-
-
+  
 }
   
     
