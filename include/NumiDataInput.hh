@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.19 2009/03/02 17:31:58 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.20 2009/03/16 21:18:04 jyuko Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -195,10 +195,13 @@ public:
    //-- For making the horns the same
    //----------------------------------
    G4bool airhrn;
+   G4bool vacuumworld;
    G4bool jCompare;
    G4int hrnmat;
    G4int hrnmatcr;
+   G4int hallmat;
    //===================================
+
    G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
    G4double KillTrackingThreshold;
    G4ThreeVector beamPosition, beamDirection;
