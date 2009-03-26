@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.10 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiMaterials.cc,v 1.11 2009/03/26 22:51:06 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -290,7 +290,7 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
 
   if (matcode==5) return Be; 
   if (matcode==6) return C;
-  if (matcode==9 || matcode==20) return Al;
+  if (matcode==9) return Al;
   if (matcode==10) return Fe;
   if (matcode==11) return Slab_Stl;
   if (matcode==12) return Blu_Stl;
@@ -299,7 +299,7 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==17) return Concrete;
   if (matcode==18) return Target;
   if (matcode==19) return Rebar_Concrete;
-  if (matcode==20) return Shotcrete;
+  if (matcode==20) {G4cout << "*** Requesting mat=20.  Behavior may have changed!!!" << G4endl; return Shotcrete;}
   if (matcode==21) return var_Al;
   if (matcode==22) return var_Stl;
   if (matcode==23) return n1018_Stl;
