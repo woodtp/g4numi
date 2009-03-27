@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.20 2009/03/16 21:18:04 jyuko Exp $
+// $Id: NumiDataInput.hh,v 1.21 2009/03/27 17:16:07 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -59,6 +59,9 @@ public:
    }
    void SetMuonBeam(G4bool val) {
       useMuonBeam = val;
+   }
+   void SetSolidMuMons(G4bool val) {
+      solidMuMons = val;
    }
    void SetMuonInput(G4bool val) {
       useMuonInput = val;
@@ -153,6 +156,9 @@ public:
    G4bool GetMuonBeam(){
       return useMuonBeam;
    }
+   G4bool GetSolidMuMons(){
+      return solidMuMons;
+   }
    void SetKillTracking(G4bool val){
       KillTracking = val;
    }
@@ -168,7 +174,7 @@ public:
 
  public:
    G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
-   G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput;
+   G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput, solidMuMons;
    G4int fNEvents;
    G4bool KillTracking;
    G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
