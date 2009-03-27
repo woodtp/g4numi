@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.27 2009/03/05 16:53:10 jyuko Exp $
+// $Id: NumiDataInput.cc,v 1.28 2009/03/27 17:15:26 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -41,6 +41,8 @@ NumiDataInput::NumiDataInput()
   //can set useMuonInupt and useMuonBeam from macro
   //
   useMuonInput = false;  useMuonBeam = false; fNEvents = -1;
+  solidMuMons = false;
+
   useTestBeam = false;   
   useDecayPipeSelect = false;
   KillTracking = true; // false for ahimmel
@@ -88,7 +90,7 @@ NumiDataInput::NumiDataInput()
   jCompare = true; // make horns have the same B field;
   
 if(!vacuumworld && !airhrn){
-  hrnmat = 20;
+  hrnmat = 9;
   hrnmatcr =31;
   hallmat=15;
 }
