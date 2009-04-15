@@ -77,14 +77,14 @@ class NumiDetectorConstruction : public G4VUserDetectorConstruction
   G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
   G4Material* GetMaterial(G4int matcode);
   G4double phornRgivenZ(G4double a, G4double b, G4double c, G4double z);
-  G4double PHorn2ICRin(G4double z);
-  G4double PHorn2ICRout(G4double z);
-  G4double PHorn2OCRin(G4double z);
-  G4double PHorn2OCRout(G4double z);
+  G4double PHorn2ICRin(G4double z, G4bool dognumi);
+  G4double PHorn2ICRout(G4double z, G4bool dognumi);
+  G4double PHorn2OCRin(G4double z, G4bool dognumi);
+  G4double PHorn2OCRout(G4double z, G4bool dognumi);
   G4double PHorn1ICRin(G4double z);
   G4double PHorn1ICRout(G4double z);
-  G4double PHorn1OCRin(G4double z);
-  G4double PHorn1OCRout(G4double z);
+  G4double PHorn1OCRin(G4double z, G4bool dognumi);
+  G4double PHorn1OCRout(G4double z, G4bool dognumi);
 
   // Materials
   G4Material* Vacuum;
