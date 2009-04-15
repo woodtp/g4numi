@@ -38,13 +38,14 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
 
   if(NumiData->jCompare) // Make gnumi like horns - this is for validation
    {
-     if(localPosition.z()>3*m || localPosition.z()<0*m) 
+     if(localPosition.z()>3*m) 
      {
        Bfield[0]=0;
        Bfield[1]=0;
        Bfield[2]=0;
      }     
    }
+  delete numinavigator;
   /*
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
@@ -124,7 +125,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[1] = 0.; 
     Bfield[2] = 0.; 
   }
-  if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+  if(NumiData->jCompare &&(localPosition.z()>3*m )) // Make gnumi like horns - this is for validation
     {  
       Bfield[0]=0;
       Bfield[1]=0;
@@ -185,12 +186,10 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[2] = 0.;
   }
   
-  if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+  if(NumiData->jCompare &&(localPosition.z()>3*m)) // Make gnumi like horns - this is for validation
     {
       Bfield[0]=0;
       Bfield[1]=0;
       Bfield[2]=0;
     }
-
-
 }
