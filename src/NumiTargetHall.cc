@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // Target hall chase and duratek blocks modifications by Zachary Barnett.
-// $Id: NumiTargetHall.cc,v 1.8 2009/03/05 16:53:11 jyuko Exp $
+// $Id: NumiTargetHall.cc,v 1.9 2009/04/15 18:22:03 jyuko Exp $
 //----------------------------------------------------------------------
 #include "NumiDetectorConstruction.hh"
 
@@ -97,7 +97,31 @@ void NumiDetectorConstruction::ConstructTargetHall()
     // the tempCovering dimensions are set in the following line
     tempCovering = new G4Box("sDuratekBlockCovering", (1.3554/2.0)*m, (0.665/2.0)*m, NumiData->THBlockLength[0]/2.0);
     G4LogicalVolume *lvDuratekBlockCovering = new G4LogicalVolume(tempCovering, Fe, "lvDuratekBlockCovering",0,0,0);
+    //
+    //For gnumi like target hall
+    //(only used for NumiData->jCompare is true)
+    //---------------------------------------------------------------------------------------------------------
+    G4VSolid* tempgnumiA;
+    G4VSolid* tempgnumiBC;
+    G4VSolid* tempgnumiD; //before
+    G4VSolid* tempgnumiD2; // after
+    G4VSolid* tempgnumiD3; // above horn 2
+    tempgnumiA = new G4Box("sDuratekgnumiA", 0.5842*m , 0.0407125*m , NumiData->THBlockLength[0]/2);
+    G4LogicalVolume *lvDuratekBlockgnumiA  = new G4LogicalVolume(tempgnumiA, Fe, "lvDuratekBlockgnumiA", 0, 0, 0);
     
+    tempgnumiBC = new G4Box("sDuratekgnumiBC", 0.0531*m ,0.99625*m, NumiData->THBlockLength[0]/2);
+    G4LogicalVolume *lvDuratekBlockgnumiBC = new G4LogicalVolume(tempgnumiBC, Fe, "lvDuratekBlockgnumiBC", 0, 0, 0);
+
+    tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*m,0.301475*m, 7.85*m);
+    G4LogicalVolume *lvDuratekBlockgnumiD = new G4LogicalVolume(tempgnumiD, Fe, "lvDuratekBlockgnumiD", 0, 0,0);
+    tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*m, 0.286475*m, (6/2)*m);
+    G4LogicalVolume *lvDuratekBlockgnumiD3 = new G4LogicalVolume(tempgnumiD3, Fe, "lvDuratekBlockgnumiD3",0,0,0);
+    tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*m, 0.301475*m,15.349*m);
+    G4LogicalVolume *lvDuratekBlockgnumiD2 = new G4LogicalVolume(tempgnumiD2, Fe, "lvDuratekBlockgnumiD2",0,0,0);
+
+
+    //-------------------------------------------------------------------------------------------------------
+   
     G4ThreeVector DuratekCasing_position;
     
     //loop to place the Duratek blocks
@@ -113,6 +137,15 @@ void NumiDetectorConstruction::ConstructTargetHall()
 	if (ii == 15 || ii == 16) {
 			 new G4PVPlacement(0, DuratekCasing_position, "DuratekBlockCovering", lvDuratekBlockCovering, TGAR, false, 0);    
 	}
+	else if(ii>=18 &&NumiData->jCompare){//Added by Jasmine to make more like gnumi. 
+	  if(ii==18) new G4PVPlacement(0, DuratekCasing_position,"DuratekBlockgnumi", lvDuratekBlockgnumiA, TGAR, false, 0);    
+	  if(ii==19 || ii==20) new G4PVPlacement(0, DuratekCasing_position,"DuratekBlockgnumi", lvDuratekBlockgnumiBC, TGAR, false, 0);
+	  if(ii==21) new G4PVPlacement(0, DuratekCasing_position, "DuratekBlockgnumi", lvDuratekBlockgnumiD, TGAR, false, 0);
+          if(ii==22) new G4PVPlacement(0, DuratekCasing_position, "DuratekBlockgnumi", lvDuratekBlockgnumiD2, TGAR, false, 0);
+          if(ii==23) new G4PVPlacement(0, DuratekCasing_position, "DuratekBlockgnumi", lvDuratekBlockgnumiD3, TGAR, false, 0);
+   
+	}
+
 	else {
 	  new G4PVPlacement(0, DuratekCasing_position, "DuratekBlock", lvDuratekBlock, TGAR, false, 0);     
 	}

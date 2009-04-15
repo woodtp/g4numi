@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.25 2009/03/05 16:53:10 jyuko Exp $
+// $Id: NumiAnalysis.cc,v 1.26 2009/04/15 18:22:03 jyuko Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1054,7 +1054,7 @@ void NumiAnalysis::FillZpNtuple(const G4Track& track,Int_t zpnum)
     g4zpdata->pathlength= track.GetTrackLength()/cm;
     g4zpdata->ptypeatz= track.GetParentID();
 
-    g4zpdata->pidtype= NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
+    //    g4zpdata->pidtype= NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
     g4zpdata->zpoint=NumiData->Zpoint[zpnum]/cm ;
 
     g4zpdata->run=pRunManager->GetCurrentRun()->GetRunID();
@@ -1077,7 +1077,7 @@ void NumiAnalysis::WriteZpNtuple(){//Jasmine added
     g4zpdata->pathlength=-10000;
     g4zpdata->zpoint=-10000;
     g4zpdata->ptypeatz=-10;
-    g4zpdata->pidtype=-10;
+    //  g4zpdata->pidtype=-10;
     g4zpdata->run=-100;
     g4zpdata->evtno=-100;  
 }
