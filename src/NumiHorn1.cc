@@ -31,12 +31,34 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4double Horn1Z0=-2.436*in;// HornZ0 in Horn coordinate system
   G4double MVgap=0.01*mm;
   G4double Fgap=0.1*mm; 
-  G4double OCZ0=0.*in;
-  G4double OCZ1=126.092*in;
-  G4double ICZ0=0.*in;
-  G4double ICZ1=129.3566*in;
+  G4double ICZ1=0;
+  G4double OCZ1=0;
   G4double FZ0=0.*in;
   G4double FZ1=128.1096*in-Fgap;
+  G4double OCZ0=0.*in;
+  G4double ICZ0=0.*in;
+
+  if(ND->jCompare){
+    ICZ1=116.929*in; // 2.97 meters because horn shape 0 is at 3*cm in target hall coordinates
+    OCZ1=116.929*in;
+    FZ0=0.*in;
+    FZ1=118.11*in-Fgap;
+    OCZ0=-1.1811*in;//-3*cm is 0 in target hall coordinates
+    ICZ0=-1.1811*in;
+
+  }
+  else{
+    ICZ1=129.3566*in;
+    OCZ1=126.092*in;
+    FZ0=0.*in;
+    FZ1=118.11*in-Fgap;
+    OCZ0=0.*in;
+    ICZ0=0.*in;
+
+  }
+
+
+
   G4double frontRmin=2.116*in;
   G4double frontRmax=2.436*in;
   G4double frontRtor=3.763*in;
@@ -54,10 +76,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   vdouble_t OCzPos,OCRout,OCRin, ICzPos,ICRout,ICRin;
   vdouble_t FzPos, FRin, FRout, MVzPos,MVRout,MVRin;
   
-  OCzPos.push_back(OCZ0); OCRin.push_back(PHorn1OCRin(OCzPos[0])); OCRout.push_back(PHorn1OCRout(OCzPos[0]));
+  OCzPos.push_back(OCZ0); OCRin.push_back(PHorn1OCRin(OCzPos[0],ND->jCompare)); OCRout.push_back(PHorn1OCRout(OCzPos[0],ND->jCompare));
   ICzPos.push_back(ICZ0); ICRin.push_back(PHorn1ICRin(ICzPos[0])); ICRout.push_back(PHorn1ICRout(ICzPos[0]));
-  FzPos.push_back(FZ0) ; FRin.push_back(PHorn1ICRout(FzPos[0])+Fgap) ; FRout.push_back(PHorn1OCRin(FzPos[0])-Fgap);
-  MVzPos.push_back(Horn1Z0-MVgap); MVRin.push_back(PHorn1ICRin(MVzPos[0])-MVgap); MVRout.push_back(PHorn1OCRout(MVzPos[0])+MVgap);
+  FzPos.push_back(FZ0) ; FRin.push_back(PHorn1ICRout(FzPos[0])+Fgap) ; FRout.push_back(PHorn1OCRin(FzPos[0],ND->jCompare)-Fgap);
+  MVzPos.push_back(Horn1Z0-MVgap); MVRin.push_back(PHorn1ICRin(MVzPos[0])-MVgap); MVRout.push_back(PHorn1OCRout(MVzPos[0],ND->jCompare)+MVgap);
 
   G4double lastICzPos=ICzPos[0];
   G4double maxR,minR,endZ;
@@ -70,32 +92,32 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
 
   for (G4int ii=1;ii<nPoints;ii++){
     zPos=Horn1Z0+deltaZ*ii;
-    if ((fabs(PHorn1OCRout(zPos)-(PHorn1OCRout(zPos-deltaZ)+PHorn1OCRout(zPos+deltaZ))/2.)>maxDev)||
-	(fabs(PHorn1OCRin(zPos)-(PHorn1OCRin(zPos-deltaZ)+PHorn1OCRin(zPos+deltaZ))/2.)>maxDev)||
-	((fabs(PHorn1OCRout(zPos)-PHorn1OCRout(zPos-deltaZ))<epsilon)&&(fabs(PHorn1OCRout(zPos)-PHorn1OCRout(zPos+deltaZ))>epsilon))||
-	((fabs(PHorn1OCRout(zPos)-PHorn1OCRout(zPos-deltaZ))>epsilon)&&(fabs(PHorn1OCRout(zPos)-PHorn1OCRout(zPos+deltaZ))<epsilon)&&(zPos>OCZ0&&zPos<OCZ1))||
-	((fabs(PHorn1OCRin(zPos)-PHorn1OCRin(zPos-deltaZ))<epsilon)&&(fabs(PHorn1OCRin(zPos)-PHorn1OCRin(zPos+deltaZ))>epsilon))||
-	((fabs(PHorn1OCRin(zPos)-PHorn1OCRin(zPos-deltaZ))>epsilon)&&(fabs(PHorn1OCRin(zPos)-PHorn1OCRin(zPos+deltaZ))<epsilon)&&(zPos>ICZ0)))  
+    if ((fabs(PHorn1OCRout(zPos,ND->jCompare)-(PHorn1OCRout(zPos-deltaZ,ND->jCompare)+PHorn1OCRout(zPos+deltaZ,ND->jCompare))/2.)>maxDev)||
+	(fabs(PHorn1OCRin(zPos,ND->jCompare)-(PHorn1OCRin(zPos-deltaZ,ND->jCompare)+PHorn1OCRin(zPos+deltaZ,ND->jCompare))/2.)>maxDev)||
+	((fabs(PHorn1OCRout(zPos,ND->jCompare)-PHorn1OCRout(zPos-deltaZ,ND->jCompare))<epsilon)&&(fabs(PHorn1OCRout(zPos,ND->jCompare)-PHorn1OCRout(zPos+deltaZ,ND->jCompare))>epsilon))||
+	((fabs(PHorn1OCRout(zPos,ND->jCompare)-PHorn1OCRout(zPos-deltaZ,ND->jCompare))>epsilon)&&(fabs(PHorn1OCRout(zPos,ND->jCompare)-PHorn1OCRout(zPos+deltaZ,ND->jCompare))<epsilon)&&(zPos>OCZ0&&zPos<OCZ1))||
+	((fabs(PHorn1OCRin(zPos,ND->jCompare)-PHorn1OCRin(zPos-deltaZ,ND->jCompare))<epsilon)&&(fabs(PHorn1OCRin(zPos,ND->jCompare)-PHorn1OCRin(zPos+deltaZ,ND->jCompare))>epsilon))||
+	((fabs(PHorn1OCRin(zPos,ND->jCompare)-PHorn1OCRin(zPos-deltaZ,ND->jCompare))>epsilon)&&(fabs(PHorn1OCRin(zPos,ND->jCompare)-PHorn1OCRin(zPos+deltaZ,ND->jCompare))<epsilon)&&(zPos>ICZ0)))  
       { 
 	if (zPos>OCZ0&&zPos<OCZ1){
 	  nOut++;
-	  OCzPos.push_back(zPos); OCRout.push_back(PHorn1OCRout(zPos)); OCRin.push_back(PHorn1OCRin(zPos));
+	  OCzPos.push_back(zPos); OCRout.push_back(PHorn1OCRout(zPos,ND->jCompare)); OCRin.push_back(PHorn1OCRin(zPos,ND->jCompare));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;	  
-	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF],ND->jCompare)-Fgap);}
 	  nIn++;
 	  ICzPos.push_back(zPos); ICRout.push_back(PHorn1ICRout(zPos)); ICRin.push_back(PHorn1ICRin(zPos));
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos)+MVgap);	MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos,ND->jCompare)+MVgap);	MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
 	}
 	else if (zPos>=OCZ1){
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF],ND->jCompare)-Fgap);}
 	  nMV++;	  
 	  MVzPos.push_back(zPos); 
-	  if (maxR>=PHorn1OCRout(zPos)) MVRout.push_back(maxR+MVgap);
-	  else MVRout.push_back(PHorn1OCRout(zPos)+MVgap);
+	  if (maxR>=PHorn1OCRout(zPos,ND->jCompare)) MVRout.push_back(maxR+MVgap);
+	  else MVRout.push_back(PHorn1OCRout(zPos,ND->jCompare)+MVgap);
 	  if (minR<=PHorn1ICRin(zPos)) MVRin.push_back(minR-MVgap);
 	  else 	MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
 	}
@@ -111,28 +133,28 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
 	  ICzPos.push_back(zPos); ICRout.push_back(PHorn1ICRout(zPos)); ICRin.push_back(PHorn1ICRin(zPos));
 	  if (zPos>=FZ0&&zPos<FZ1){
 	    nF++;
-	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF])-Fgap);}
+	    FzPos.push_back(zPos); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF],ND->jCompare)-Fgap);}
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos)+MVgap); MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos,ND->jCompare)+MVgap); MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
 	}
 	else {
 	  nMV++;
-	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos)+MVgap); MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
+	  MVzPos.push_back(zPos); MVRout.push_back(PHorn1OCRout(zPos,ND->jCompare)+MVgap); MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
 	}
       }
   }
   
   nF++;
-  FzPos.push_back(FZ1); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF])-Fgap);
+  FzPos.push_back(FZ1); FRin.push_back(PHorn1ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn1OCRin(FzPos[nF],ND->jCompare)-Fgap);
   nIn++;
   ICzPos.push_back(ICZ1); ICRin.push_back(PHorn1ICRin(ICzPos[nIn]));ICRout.push_back(PHorn1ICRout(ICzPos[nIn]));
   nOut++;
-  OCzPos.push_back(OCZ1); OCRin.push_back(PHorn1OCRin(OCzPos[nOut]));OCRout.push_back(PHorn1OCRout(OCzPos[nOut]));
+  OCzPos.push_back(OCZ1); OCRin.push_back(PHorn1OCRin(OCzPos[nOut],ND->jCompare));OCRout.push_back(PHorn1OCRout(OCzPos[nOut],ND->jCompare));
   nMV++;
   MVzPos.push_back(endZ+MVgap);
 
-  if (maxR>=PHorn1OCRout(zPos)) MVRout.push_back(maxR+MVgap);
-  else MVRout.push_back(PHorn1OCRout(zPos)+MVgap);
+  if (maxR>=PHorn1OCRout(zPos,ND->jCompare)) MVRout.push_back(maxR+MVgap);
+  else MVRout.push_back(PHorn1OCRout(zPos,ND->jCompare)+MVgap);
   if (minR<=PHorn1ICRin(zPos)) MVRin.push_back(minR-MVgap);
   else MVRin.push_back(PHorn1ICRin(zPos)-MVgap);
 
@@ -168,16 +190,22 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   
   //Front part
   G4VSolid* sHorn1Front;
-  G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
-  G4Box* sBox=new G4Box("sBox",frontRtor*2.,frontRtor*2.,frontRmax*2.);
-  rotation=G4RotationMatrix(0.,0.,0.);
-  translation=G4ThreeVector(0.,0.,frontRmax*2);
-  sHorn1Front=new G4SubtractionSolid("sHorn1Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
+  if(ND->jCompare){
+    sHorn1Front=new G4Tubs("PHorn1gnumiFront",PHorn1ICRin(ICZ0),PHorn1OCRout(OCZ0,ND->jCompare),0.15*cm,0., 360.*deg);
+    translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0-0.151*cm);
+  }
+  else{
+    G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
+    G4Box* sBox=new G4Box("sBox",frontRtor*2.,frontRtor*2.,frontRmax*2.);
+    rotation=G4RotationMatrix(0.,0.,0.);
+    translation=G4ThreeVector(0.,0.,frontRmax*2);
+    sHorn1Front=new G4SubtractionSolid("sHorn1Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
+    translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
 
+  }
   G4LogicalVolume* lvHorn1Front=new G4LogicalVolume(sHorn1Front,GetMaterial(ND->hrnmat),"lvHorn1Front",0,0,0);
   ND->ApplyStepLimits(lvHorn1Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
-  translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1Front",lvHorn1Front,pvMHorn1,false,0);
   
   //Outer Conductor
@@ -205,10 +233,16 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1IC",lvPHorn1IC,pvMHorn1,false,0);
    
   //Field Part
+  G4VSolid* sPHorn1F;
+  if(ND->jCompare){
+    sPHorn1F=new G4Polycone("sPCone1F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
+  }
+  else{
   G4Polycone* sPConeF=new G4Polycone("sPCone1F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn1Z0+frontRmax);
-  G4UnionSolid *sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
+  sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
+  }
   G4LogicalVolume* lvPHorn1F=new G4LogicalVolume(sPHorn1F,Air,"lvPHorn1F",0,0,0);
   ND->ApplyStepLimits(lvPHorn1F); // Limit Step Size
   lvPHorn1F->SetVisAttributes(invisible);
@@ -226,31 +260,43 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4VPhysicalVolume *pvPHorn1F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1F",lvPHorn1F,pvMHorn1,false,0);
   
   //Spider Support
-  for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
-    for (G4int jj=0;jj<ND->NHorn1SpidersPerPlaneN;jj++){
-      G4double angle=G4double(360.*deg*jj/ND->NHorn1SpidersPerPlaneN);
-      G4double halfThick=(&ND->Horn1SS[ii])->bottomL/2.;
-      G4double rIn=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]+halfThick)+Fgap;//
-      G4double rIn2=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]-halfThick)+Fgap;
-      if (rIn2>rIn) rIn=rIn2;
-      G4double rOut=PHorn1OCRin(ND->Horn1SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
-      ConstructSpiderSupport(&(ND->Horn1SS[ii]),angle,ND->Horn1SpiderSupportZ0[ii],rIn,rOut,pvPHorn1F,ii+jj);
+  if(!ND->jCompare){// No spider supports for gnumi like horns
+    for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
+      for (G4int jj=0;jj<ND->NHorn1SpidersPerPlaneN;jj++){
+	G4double angle=G4double(360.*deg*jj/ND->NHorn1SpidersPerPlaneN);
+	G4double halfThick=(&ND->Horn1SS[ii])->bottomL/2.;
+	G4double rIn=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]+halfThick)+Fgap;//
+	G4double rIn2=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]-halfThick)+Fgap;
+	if (rIn2>rIn) rIn=rIn2;
+	G4double rOut=PHorn1OCRin(ND->Horn1SpiderSupportZ0[ii],ND->jCompare)-Fgap;//In and out radius of mother vol.
+	ConstructSpiderSupport(&(ND->Horn1SS[ii]),angle,ND->Horn1SpiderSupportZ0[ii],rIn,rOut,pvPHorn1F,ii+jj);
+      }
     }
   }
 
   //Horn end
   G4VSolid* sPHorn1End;
-  for (G4int ii=0;ii<ND->NPHorn1EndN;ii++)
-    {
-      G4String volName=ND->PHorn1EndVolName[ii];
-      sPHorn1End=new G4Tubs(volName.append("s"),ND->PHorn1EndRin[ii],ND->PHorn1EndRout[ii],ND->PHorn1EndLength[ii]/2.,0.,360.*deg);
-      G4LogicalVolume* lvPHorn1End=new G4LogicalVolume(sPHorn1End,GetMaterial(ND->PHorn1EndGeantMat[ii]),volName.append("lv"),0,0,0);
-      ND->ApplyStepLimits(lvPHorn1End); // Limit Step Size
-      rotation=G4RotationMatrix(0.,0.,0.);
-      translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
-      new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
+  if(ND->jCompare){
+    G4String volName= "PHorn1gnumiEnd";
+    sPHorn1End=new G4Tubs(volName.append("s"),PHorn1ICRin(ICZ1),PHorn1OCRout(OCZ1,ND->jCompare),.15*cm,0., 360.*deg);
+    G4LogicalVolume* lvPHorn1End=new G4LogicalVolume(sPHorn1End,GetMaterial(ND->PHorn1EndGeantMat[2]),volName.append("lv"),0,0,0);
+    ND->ApplyStepLimits(lvPHorn1End); // Limit Step Size
+    rotation=G4RotationMatrix(0.,0.,0.);
+    translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[0]+0.151*cm)-MHorn1Origin;
+    new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
+  }
+  else{
+    for (G4int ii=0;ii<ND->NPHorn1EndN;ii++)
+      {
+	G4String volName=ND->PHorn1EndVolName[ii];
+	sPHorn1End=new G4Tubs(volName.append("s"),ND->PHorn1EndRin[ii],ND->PHorn1EndRout[ii],ND->PHorn1EndLength[ii]/2.,0.,360.*deg);
+	G4LogicalVolume* lvPHorn1End=new G4LogicalVolume(sPHorn1End,GetMaterial(ND->PHorn1EndGeantMat[ii]),volName.append("lv"),0,0,0);
+	ND->ApplyStepLimits(lvPHorn1End); // Limit Step Size
+	rotation=G4RotationMatrix(0.,0.,0.);
+	translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
+	new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
     }
-    
+  }
 }
 
 void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS,G4double angle,G4double zPos,G4double rIn,G4double rOut,G4VPhysicalVolume *motherVolume, G4int copyNo)
@@ -303,8 +349,11 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   new G4PVPlacement(position3D,"CeramicRod",lvCeramicRod,motherVolume,false,copyNo);
 }
 
-G4double NumiDetectorConstruction::PHorn1OCRout(G4double z)
+G4double NumiDetectorConstruction::PHorn1OCRout(G4double z,G4bool dognumi)
 {
+  if(dognumi){
+    return 16.20*cm;
+  }
   G4double r=0;
   if (z<0.*in){
     r=3.763*in+2.436*in; // for mother vol.
@@ -342,10 +391,13 @@ G4double NumiDetectorConstruction::PHorn1OCRout(G4double z)
    }
    return r;
 }
-G4double NumiDetectorConstruction::PHorn1OCRin(G4double z)
+G4double NumiDetectorConstruction::PHorn1OCRin(G4double z, G4bool dognumi)
 {
   G4double r=0;
   //OC dimensions from drawings
+  if(dognumi){
+    return 15.33*cm;
+  }
   if ((z>=0.*in)&&(z<1.806*in)){
     r=5.879*in;
   }
@@ -375,7 +427,7 @@ G4double NumiDetectorConstruction::PHorn1OCRin(G4double z)
 G4double NumiDetectorConstruction::PHorn1ICRout(G4double z)
 {
   G4double r=0.;
-  if ((z>=0.*in)&&(z<3.32645*in)){
+  if ((z>=-1.1811*in)&&(z<3.32645*in)){//gnumi horns extend back
     r=sqrt(1.975805-(0.05585)*(z/in))*in;
   }
   
@@ -389,7 +441,7 @@ G4double NumiDetectorConstruction::PHorn1ICRout(G4double z)
   else if ((z>=31.8827*in)&&(z<117.1126*in)){
     r=sqrt(0.180183*z/in-5.462253)*in;
   }
-  else if ((z>=117.1126*in)&&(z<=128.1096*in)){
+  else if ((z>=117.1126*in)&&(z<=128.1096*in)){ 
     r=8.5/2.*in;
   }
   else if((z>=128.1096*in)&&(z<=129.3566*in)){
@@ -407,12 +459,12 @@ G4double NumiDetectorConstruction::PHorn1ICRin(G4double z)
 {
  G4double r=0.;
  
-  if (z<0.0*in){
+ if (z<-1.1811*in){//gnumi horns extend back
     r=1.327*in;//for MV; added 0.05 because ic was outside of mv
   }
 
   //IC from drawings
-  else if ((z>=0.0*in)&&(z<16.1602*in)){
+ else if ((z>=-1.1811*in)&&(z<16.1602*in)){// gnumi horns extend back
     r=sqrt(1.975805-(0.055858)*(z/in))*in-0.078740*in;
   }
   else if ((z>=16.1602*in)&&(z<30.3150*in)){
@@ -428,7 +480,7 @@ G4double NumiDetectorConstruction::PHorn1ICRin(G4double z)
     r=sqrt(0.180183*z/in-5.462253)*in-0.078740*in; 
   }  
   
-  else if ((z>=117.1126*in)&&(z<=129.3566*in)){
+  else if ((z>=117.1126*in)&&(z<=129.3566*in)){ 
     r=7.75/2.*in;
   }
 
