@@ -31,22 +31,12 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4double Horn1Z0=-2.436*in;// HornZ0 in Horn coordinate system
   G4double MVgap=0.01*mm;
   G4double Fgap=0.1*mm; 
-  G4double ICZ1=0;
-  G4double OCZ1=0;
+  G4double OCZ0=0.*in;
+  G4double OCZ1=126.092*in;
+  G4double ICZ0=0.*in;
+  G4double ICZ1=129.3566*in;
   G4double FZ0=0.*in;
   G4double FZ1=128.1096*in-Fgap;
-  G4double OCZ0=0.*in;
-  G4double ICZ0=0.*in;
-  ICZ1=129.3566*in;
-  OCZ1=126.092*in;
-  FZ0=0.*in;
-  FZ1=118.11*in-Fgap;
-  OCZ0=0.*in;
-  ICZ0=0.*in;
-
-
-
-
   G4double frontRmin=2.116*in;
   G4double frontRmax=2.436*in;
   G4double frontRtor=3.763*in;
@@ -178,16 +168,16 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   
   //Front part
   G4VSolid* sHorn1Front;
-
   G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
   G4Box* sBox=new G4Box("sBox",frontRtor*2.,frontRtor*2.,frontRmax*2.);
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,frontRmax*2);
   sHorn1Front=new G4SubtractionSolid("sHorn1Front",sFrontTorus,sBox,G4Transform3D(rotation,translation)); //need only half of torus
-  translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
+
   G4LogicalVolume* lvHorn1Front=new G4LogicalVolume(sHorn1Front,GetMaterial(ND->hrnmat),"lvHorn1Front",0,0,0);
   ND->ApplyStepLimits(lvHorn1Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
+  translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1Front",lvHorn1Front,pvMHorn1,false,0);
   
   //Outer Conductor
@@ -215,13 +205,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1IC",lvPHorn1IC,pvMHorn1,false,0);
    
   //Field Part
-  G4VSolid* sPHorn1F;
-
   G4Polycone* sPConeF=new G4Polycone("sPCone1F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn1Z0+frontRmax);
-  sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
-
+  G4UnionSolid *sPHorn1F=new G4UnionSolid("sPHorn1F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
   G4LogicalVolume* lvPHorn1F=new G4LogicalVolume(sPHorn1F,Air,"lvPHorn1F",0,0,0);
   ND->ApplyStepLimits(lvPHorn1F); // Limit Step Size
   lvPHorn1F->SetVisAttributes(invisible);
@@ -239,19 +226,17 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4VPhysicalVolume *pvPHorn1F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1F",lvPHorn1F,pvMHorn1,false,0);
   
   //Spider Support
-
-    for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
-      for (G4int jj=0;jj<ND->NHorn1SpidersPerPlaneN;jj++){
-	G4double angle=G4double(360.*deg*jj/ND->NHorn1SpidersPerPlaneN);
-	G4double halfThick=(&ND->Horn1SS[ii])->bottomL/2.;
-	G4double rIn=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]+halfThick)+Fgap;//
-	G4double rIn2=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]-halfThick)+Fgap;
-	if (rIn2>rIn) rIn=rIn2;
-	G4double rOut=PHorn1OCRin(ND->Horn1SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
-	ConstructSpiderSupport(&(ND->Horn1SS[ii]),angle,ND->Horn1SpiderSupportZ0[ii],rIn,rOut,pvPHorn1F,ii+jj);
-      }
+  for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
+    for (G4int jj=0;jj<ND->NHorn1SpidersPerPlaneN;jj++){
+      G4double angle=G4double(360.*deg*jj/ND->NHorn1SpidersPerPlaneN);
+      G4double halfThick=(&ND->Horn1SS[ii])->bottomL/2.;
+      G4double rIn=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]+halfThick)+Fgap;//
+      G4double rIn2=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]-halfThick)+Fgap;
+      if (rIn2>rIn) rIn=rIn2;
+      G4double rOut=PHorn1OCRin(ND->Horn1SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
+      ConstructSpiderSupport(&(ND->Horn1SS[ii]),angle,ND->Horn1SpiderSupportZ0[ii],rIn,rOut,pvPHorn1F,ii+jj);
     }
-
+  }
 
   //Horn end
   G4VSolid* sPHorn1End;
@@ -265,7 +250,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
     }
-  
+    
 }
 
 void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS,G4double angle,G4double zPos,G4double rIn,G4double rOut,G4VPhysicalVolume *motherVolume, G4int copyNo)
@@ -361,7 +346,6 @@ G4double NumiDetectorConstruction::PHorn1OCRin(G4double z)
 {
   G4double r=0;
   //OC dimensions from drawings
-
   if ((z>=0.*in)&&(z<1.806*in)){
     r=5.879*in;
   }
@@ -391,7 +375,7 @@ G4double NumiDetectorConstruction::PHorn1OCRin(G4double z)
 G4double NumiDetectorConstruction::PHorn1ICRout(G4double z)
 {
   G4double r=0.;
-  if ((z>=-1.1811*in)&&(z<3.32645*in)){//gnumi horns extend back
+  if ((z>=0.*in)&&(z<3.32645*in)){
     r=sqrt(1.975805-(0.05585)*(z/in))*in;
   }
   
@@ -405,7 +389,7 @@ G4double NumiDetectorConstruction::PHorn1ICRout(G4double z)
   else if ((z>=31.8827*in)&&(z<117.1126*in)){
     r=sqrt(0.180183*z/in-5.462253)*in;
   }
-  else if ((z>=117.1126*in)&&(z<=128.1096*in)){ 
+  else if ((z>=117.1126*in)&&(z<=128.1096*in)){
     r=8.5/2.*in;
   }
   else if((z>=128.1096*in)&&(z<=129.3566*in)){
@@ -423,12 +407,12 @@ G4double NumiDetectorConstruction::PHorn1ICRin(G4double z)
 {
  G4double r=0.;
  
- if (z<-1.1811*in){//gnumi horns extend back
+  if (z<0.0*in){
     r=1.327*in;//for MV; added 0.05 because ic was outside of mv
   }
 
   //IC from drawings
- else if ((z>=-1.1811*in)&&(z<16.1602*in)){// gnumi horns extend back
+  else if ((z>=0.0*in)&&(z<16.1602*in)){
     r=sqrt(1.975805-(0.055858)*(z/in))*in-0.078740*in;
   }
   else if ((z>=16.1602*in)&&(z<30.3150*in)){
@@ -444,7 +428,7 @@ G4double NumiDetectorConstruction::PHorn1ICRin(G4double z)
     r=sqrt(0.180183*z/in-5.462253)*in-0.078740*in; 
   }  
   
-  else if ((z>=117.1126*in)&&(z<=129.3566*in)){ 
+  else if ((z>=117.1126*in)&&(z<=129.3566*in)){
     r=7.75/2.*in;
   }
 
