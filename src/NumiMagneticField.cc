@@ -27,46 +27,7 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
 
-  
-  G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
-  G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-  numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
-  G4ThreeVector Position=G4ThreeVector(Point[0],Point[1],Point[2]);
-  G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
-  G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
-  G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
 
-  if(NumiData->jCompare) // Make gnumi like horns - this is for validation
-   {
-     if(localPosition.z()>3*m) 
-     {
-       Bfield[0]=0;
-       Bfield[1]=0;
-       Bfield[2]=0;
-     }     
-   }
-  delete numinavigator;
-  /*
-  G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
-  G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-  numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
-  G4ThreeVector Position=G4ThreeVector(Point[0],Point[1],Point[2]); 
-  G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
-  G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
-  G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
-
-  delete numinavigator;
-
-  G4VSolid * solid=myVolume->GetLogicalVolume()->GetSolid();
-  if (Point[2]>92*cm&&Point[2]<92.1*cm) {
-    G4cout<<"FMag: "<<myVolume->GetName()<<" "
-	<<Point[0]<<" "
-	<<Point[1]<<" "
-	<<Point[2]<<" "
-	<<sqrt(Point[0]*Point[0]+Point[1]*Point[1])<<" "
-	<<B<<G4endl;
-  }
-  */
 }
 
 //magnetic field in inner conductor ====================================================
@@ -125,12 +86,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[1] = 0.; 
     Bfield[2] = 0.; 
   }
-  if(NumiData->jCompare &&(localPosition.z()>3*m )) // Make gnumi like horns - this is for validation
-    {  
-      Bfield[0]=0;
-      Bfield[1]=0;
-      Bfield[2]=0;
-    }
+
 
 }
 
@@ -186,10 +142,4 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
     Bfield[2] = 0.;
   }
   
-  if(NumiData->jCompare &&(localPosition.z()>3*m)) // Make gnumi like horns - this is for validation
-    {
-      Bfield[0]=0;
-      Bfield[1]=0;
-      Bfield[2]=0;
-    }
 }
