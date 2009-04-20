@@ -248,7 +248,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
        
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     fParticleGun->SetParticleDefinition(particleTable->FindParticle(muon_type));
-    G4double mass=particleTable->FindParticle(muon_type)->GetPDGMass();
+    //G4double mass=particleTable->FindParticle(muon_type)->GetPDGMass();
 
     NumiAnalysis* analysis = NumiAnalysis::getInstance();
     if(!analysis)
@@ -339,6 +339,16 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
      MOMPX,MOMPY,MOMPZ               PPX, PPY, PPZ                             - ???
      MOMTYPE                         PTYPE                                     - ???
      */
+
+    
+    //
+    //Need to create a new Gun each time
+    //so Geant v4.9 doesn't complain
+    //about momentum not match KE
+    //
+    if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
+    fParticleGun = new G4ParticleGun(1);
+    fParticleGun->SetParticleEnergy(0.0*GeV);
     
     G4double x0,y0,z0,px,py,pz;
     G4String particleName;
@@ -378,9 +388,9 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     fParticleGun->SetParticleDefinition(particleTable->FindParticle(particleName));
-    G4double mass=particleTable->FindParticle(particleName)->GetPDGMass();
+    //G4double mass=particleTable->FindParticle(particleName)->GetPDGMass();
     
-    fParticleGun->SetParticleEnergy(sqrt(mass*mass+px*px+py*py+pz*pz)-mass);
+    //fParticleGun->SetParticleEnergy(sqrt(mass*mass+px*px+py*py+pz*pz)-mass);
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentum(G4ThreeVector(px,py,pz));
     fParticleGun->GeneratePrimaryVertex(anEvent);
