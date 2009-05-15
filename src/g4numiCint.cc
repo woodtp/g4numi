@@ -4,7 +4,7 @@
 // Do NOT change. Changes will be lost next time file is generated
 //
 
-#include "RConfig.h"
+#include "RConfig.h" //rootcint 4834
 #if !defined(R__ACCESS_IN_SYMBOL)
 //Break the privacy of classes -- Disabled for the moment
 #define private public
@@ -101,39 +101,6 @@ namespace ROOT {
    static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::hadmmtuple_t*)0x0); R__UseDummy(_R__UNIQUE_(Init));
 } // end of namespace ROOT
 
-namespace ROOT {
-   void zptuple_t_ShowMembers(void *obj, TMemberInspector &R__insp, char *R__parent);
-   static void *new_zptuple_t(void *p = 0);
-   static void *newArray_zptuple_t(Long_t size, void *p);
-   static void delete_zptuple_t(void *p);
-   static void deleteArray_zptuple_t(void *p);
-   static void destruct_zptuple_t(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::zptuple_t*)
-   {
-      ::zptuple_t *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::zptuple_t >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("zptuple_t", ::zptuple_t::Class_Version(), "./include/../include/zptuple_t.hh", 15,
-                  typeid(::zptuple_t), DefineBehavior(ptr, ptr),
-                  &::zptuple_t::Dictionary, isa_proxy, 4,
-                  sizeof(::zptuple_t) );
-      instance.SetNew(&new_zptuple_t);
-      instance.SetNewArray(&newArray_zptuple_t);
-      instance.SetDelete(&delete_zptuple_t);
-      instance.SetDeleteArray(&deleteArray_zptuple_t);
-      instance.SetDestructor(&destruct_zptuple_t);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::zptuple_t*)
-   {
-      return GenerateInitInstanceLocal((::zptuple_t*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::zptuple_t*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
 //______________________________________________________________________________
 TClass *data_t::fgIsA = 0;  // static to hold class pointer
 
@@ -199,40 +166,6 @@ void hadmmtuple_t::Dictionary()
 TClass *hadmmtuple_t::Class()
 {
    if (!fgIsA) fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::hadmmtuple_t*)0x0)->GetClass();
-   return fgIsA;
-}
-
-//______________________________________________________________________________
-TClass *zptuple_t::fgIsA = 0;  // static to hold class pointer
-
-//______________________________________________________________________________
-const char *zptuple_t::Class_Name()
-{
-   return "zptuple_t";
-}
-
-//______________________________________________________________________________
-const char *zptuple_t::ImplFileName()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::zptuple_t*)0x0)->GetImplFileName();
-}
-
-//______________________________________________________________________________
-int zptuple_t::ImplFileLine()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::zptuple_t*)0x0)->GetImplFileLine();
-}
-
-//______________________________________________________________________________
-void zptuple_t::Dictionary()
-{
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::zptuple_t*)0x0)->GetClass();
-}
-
-//______________________________________________________________________________
-TClass *zptuple_t::Class()
-{
-   if (!fgIsA) fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::zptuple_t*)0x0)->GetClass();
    return fgIsA;
 }
 
@@ -424,62 +357,6 @@ namespace ROOT {
    }
 } // end of namespace ROOT for class ::hadmmtuple_t
 
-//______________________________________________________________________________
-void zptuple_t::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class zptuple_t.
-
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(zptuple_t::Class(),this);
-   } else {
-      R__b.WriteClassBuffer(zptuple_t::Class(),this);
-   }
-}
-
-//______________________________________________________________________________
-void zptuple_t::ShowMembers(TMemberInspector &R__insp, char *R__parent)
-{
-      // Inspect the data members of an object of class zptuple_t.
-      TClass *R__cl = ::zptuple_t::IsA();
-      Int_t R__ncp = strlen(R__parent);
-      if (R__ncp || R__cl || R__insp.IsA()) { }
-      R__insp.Inspect(R__cl, R__parent, "run", &run);
-      R__insp.Inspect(R__cl, R__parent, "evtno", &evtno);
-      R__insp.Inspect(R__cl, R__parent, "xposatz", &xposatz);
-      R__insp.Inspect(R__cl, R__parent, "yposatz", &yposatz);
-      R__insp.Inspect(R__cl, R__parent, "zposatz", &zposatz);
-      R__insp.Inspect(R__cl, R__parent, "xmomatz", &xmomatz);
-      R__insp.Inspect(R__cl, R__parent, "ymomatz", &ymomatz);
-      R__insp.Inspect(R__cl, R__parent, "zmomatz", &zmomatz);
-      R__insp.Inspect(R__cl, R__parent, "matilen", &matilen);
-      R__insp.Inspect(R__cl, R__parent, "field", &field);
-      R__insp.Inspect(R__cl, R__parent, "pathlength", &pathlength);
-      R__insp.Inspect(R__cl, R__parent, "ptypeatz", &ptypeatz);
-      R__insp.Inspect(R__cl, R__parent, "pidtype", &pidtype);
-      R__insp.Inspect(R__cl, R__parent, "zpoint", &zpoint);
-}
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_zptuple_t(void *p) {
-      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) ::zptuple_t : new ::zptuple_t;
-   }
-   static void *newArray_zptuple_t(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::TOperatorNewHelper*)p) ::zptuple_t[nElements] : new ::zptuple_t[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_zptuple_t(void *p) {
-      delete ((::zptuple_t*)p);
-   }
-   static void deleteArray_zptuple_t(void *p) {
-      delete [] ((::zptuple_t*)p);
-   }
-   static void destruct_zptuple_t(void *p) {
-      typedef ::zptuple_t current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::zptuple_t
-
 /********************************************************
 * ./src/g4numiCint.cc
 * CAUTION: DON'T CHANGE THIS FILE. THIS FILE IS AUTOMATICALLY GENERATED
@@ -492,6 +369,10 @@ namespace ROOT {
 #undef free
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ > 3) && (__GNUC_MINOR__ > 1)
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
+
 extern "C" void G__cpp_reset_tagtableg4numiCint();
 
 extern "C" void G__set_cpp_environmentg4numiCint() {
@@ -499,7 +380,6 @@ extern "C" void G__set_cpp_environmentg4numiCint() {
   G__add_compiledheader("TMemberInspector.h");
   G__add_compiledheader("../include/data_t.hh");
   G__add_compiledheader("../include/hadmmtuple_t.hh");
-  G__add_compiledheader("../include/zptuple_t.hh");
   G__cpp_reset_tagtableg4numiCint();
 }
 #include <new>
@@ -510,7 +390,7 @@ extern "C" int G__cpp_dllrevg4numiCint() { return(30051515); }
 *********************************************************/
 
 /* data_t */
-static int G__g4numiCint_131_0_1(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_1(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    data_t* p = NULL;
    long gvp = G__getgvp();
@@ -535,84 +415,84 @@ static int G__g4numiCint_131_0_1(G__value* result7, G__CONST char* funcname, str
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_2(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_2(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 85, (long) data_t::Class());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_3(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_3(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) data_t::Class_Name());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_4(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_4(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 115, (long) data_t::Class_Version());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_5(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_5(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       data_t::Dictionary();
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_6(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_6(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 85, (long) ((const data_t*) G__getstructoffset())->IsA());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_7(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_7(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((data_t*) G__getstructoffset())->ShowMembers(*(TMemberInspector*) libp->para[0].ref, (char*) G__int(libp->para[1]));
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_8(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_8(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((data_t*) G__getstructoffset())->Streamer(*(TBuffer*) libp->para[0].ref);
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_9(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_9(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((data_t*) G__getstructoffset())->StreamerNVirtual(*(TBuffer*) libp->para[0].ref);
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_10(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_10(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) data_t::DeclFileName());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_11(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_11(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 105, (long) data_t::ImplFileLine());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_12(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_12(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) data_t::ImplFileName());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_131_0_13(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_13(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 105, (long) data_t::DeclFileLine());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
 // automatic copy constructor
-static int G__g4numiCint_131_0_14(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_14(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 
 {
    data_t* p;
@@ -627,7 +507,7 @@ static int G__g4numiCint_131_0_14(G__value* result7, G__CONST char* funcname, st
 
 // automatic destructor
 typedef data_t G__Tdata_t;
-static int G__g4numiCint_131_0_15(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_15(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    long gvp = G__getgvp();
    long soff = G__getstructoffset();
@@ -664,7 +544,7 @@ static int G__g4numiCint_131_0_15(G__value* result7, G__CONST char* funcname, st
 }
 
 // automatic assignment operator
-static int G__g4numiCint_131_0_16(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_136_0_16(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    data_t* dest = (data_t*) G__getstructoffset();
    *dest = *(data_t*) libp->para[0].ref;
@@ -676,7 +556,7 @@ static int G__g4numiCint_131_0_16(G__value* result7, G__CONST char* funcname, st
 
 
 /* hadmmtuple_t */
-static int G__g4numiCint_132_0_1(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_1(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    hadmmtuple_t* p = NULL;
    long gvp = G__getgvp();
@@ -701,91 +581,91 @@ static int G__g4numiCint_132_0_1(G__value* result7, G__CONST char* funcname, str
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_2(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_2(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((hadmmtuple_t*) G__getstructoffset())->Clear();
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_3(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_3(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 85, (long) hadmmtuple_t::Class());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_4(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_4(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) hadmmtuple_t::Class_Name());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_5(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_5(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 115, (long) hadmmtuple_t::Class_Version());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_6(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_6(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       hadmmtuple_t::Dictionary();
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_7(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_7(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 85, (long) ((const hadmmtuple_t*) G__getstructoffset())->IsA());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_8(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_8(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((hadmmtuple_t*) G__getstructoffset())->ShowMembers(*(TMemberInspector*) libp->para[0].ref, (char*) G__int(libp->para[1]));
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_9(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_9(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((hadmmtuple_t*) G__getstructoffset())->Streamer(*(TBuffer*) libp->para[0].ref);
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_10(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_10(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       ((hadmmtuple_t*) G__getstructoffset())->StreamerNVirtual(*(TBuffer*) libp->para[0].ref);
       G__setnull(result7);
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_11(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_11(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) hadmmtuple_t::DeclFileName());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_12(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_12(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 105, (long) hadmmtuple_t::ImplFileLine());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_13(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_13(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 67, (long) hadmmtuple_t::ImplFileName());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
-static int G__g4numiCint_132_0_14(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_14(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
       G__letint(result7, 105, (long) hadmmtuple_t::DeclFileLine());
    return(1 || funcname || hash || result7 || libp) ;
 }
 
 // automatic copy constructor
-static int G__g4numiCint_132_0_15(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_15(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 
 {
    hadmmtuple_t* p;
@@ -800,7 +680,7 @@ static int G__g4numiCint_132_0_15(G__value* result7, G__CONST char* funcname, st
 
 // automatic destructor
 typedef hadmmtuple_t G__Thadmmtuple_t;
-static int G__g4numiCint_132_0_16(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_16(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    long gvp = G__getgvp();
    long soff = G__getstructoffset();
@@ -837,177 +717,11 @@ static int G__g4numiCint_132_0_16(G__value* result7, G__CONST char* funcname, st
 }
 
 // automatic assignment operator
-static int G__g4numiCint_132_0_17(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
+static int G__g4numiCint_137_0_17(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
 {
    hadmmtuple_t* dest = (hadmmtuple_t*) G__getstructoffset();
    *dest = *(hadmmtuple_t*) libp->para[0].ref;
    const hadmmtuple_t& obj = *dest;
-   result7->ref = (long) (&obj);
-   result7->obj.i = (long) (&obj);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-
-/* zptuple_t */
-static int G__g4numiCint_133_0_1(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-   zptuple_t* p = NULL;
-   long gvp = G__getgvp();
-   int n = G__getaryconstruct();
-   if (n) {
-     if ((gvp == G__PVOID) || (gvp == 0)) {
-       p = new zptuple_t[n];
-     } else {
-       p = new((void*) gvp) zptuple_t[n];
-     }
-   } else {
-     if ((gvp == G__PVOID) || (gvp == 0)) {
-       p = new zptuple_t;
-     } else {
-       p = new((void*) gvp) zptuple_t;
-     }
-   }
-   result7->obj.i = (long) p;
-   result7->ref = (long) p;
-   result7->type = 'u';
-   result7->tagnum = G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_2(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 85, (long) zptuple_t::Class());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_3(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 67, (long) zptuple_t::Class_Name());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_4(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 115, (long) zptuple_t::Class_Version());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_5(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      zptuple_t::Dictionary();
-      G__setnull(result7);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_6(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 85, (long) ((const zptuple_t*) G__getstructoffset())->IsA());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_7(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      ((zptuple_t*) G__getstructoffset())->ShowMembers(*(TMemberInspector*) libp->para[0].ref, (char*) G__int(libp->para[1]));
-      G__setnull(result7);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_8(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      ((zptuple_t*) G__getstructoffset())->Streamer(*(TBuffer*) libp->para[0].ref);
-      G__setnull(result7);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_9(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      ((zptuple_t*) G__getstructoffset())->StreamerNVirtual(*(TBuffer*) libp->para[0].ref);
-      G__setnull(result7);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_10(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 67, (long) zptuple_t::DeclFileName());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_11(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 105, (long) zptuple_t::ImplFileLine());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_12(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 67, (long) zptuple_t::ImplFileName());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-static int G__g4numiCint_133_0_13(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-      G__letint(result7, 105, (long) zptuple_t::DeclFileLine());
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-// automatic copy constructor
-static int G__g4numiCint_133_0_14(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-
-{
-   zptuple_t* p;
-   void* tmp = (void*) G__int(libp->para[0]);
-   p = new zptuple_t(*(zptuple_t*) tmp);
-   result7->obj.i = (long) p;
-   result7->ref = (long) p;
-   result7->type = 'u';
-   result7->tagnum = G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-// automatic destructor
-typedef zptuple_t G__Tzptuple_t;
-static int G__g4numiCint_133_0_15(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-   long gvp = G__getgvp();
-   long soff = G__getstructoffset();
-   int n = G__getaryconstruct();
-   //
-   //has_a_delete: 0
-   //has_own_delete1arg: 0
-   //has_own_delete2arg: 0
-   //
-   if (!soff) {
-     return(1);
-   }
-   if (n) {
-     if (gvp == G__PVOID) {
-       delete[] (zptuple_t*) soff;
-     } else {
-       G__setgvp(G__PVOID);
-       for (int i = n - 1; i >= 0; --i) {
-         ((zptuple_t*) (soff+(sizeof(zptuple_t)*i)))->~G__Tzptuple_t();
-       }
-       G__setgvp(gvp);
-     }
-   } else {
-     if (gvp == G__PVOID) {
-       delete (zptuple_t*) soff;
-     } else {
-       G__setgvp(G__PVOID);
-       ((zptuple_t*) (soff))->~G__Tzptuple_t();
-       G__setgvp(gvp);
-     }
-   }
-   G__setnull(result7);
-   return(1 || funcname || hash || result7 || libp) ;
-}
-
-// automatic assignment operator
-static int G__g4numiCint_133_0_16(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
-{
-   zptuple_t* dest = (zptuple_t*) G__getstructoffset();
-   *dest = *(zptuple_t*) libp->para[0].ref;
-   const zptuple_t& obj = *dest;
    result7->ref = (long) (&obj);
    result7->obj.i = (long) (&obj);
    return(1 || funcname || hash || result7 || libp) ;
@@ -1023,8 +737,6 @@ static int G__g4numiCint_133_0_16(G__value* result7, G__CONST char* funcname, st
 /* data_t */
 
 /* hadmmtuple_t */
-
-/* zptuple_t */
 
 /*********************************************************
 * Global function Stub
@@ -1071,6 +783,14 @@ extern "C" void G__cpp_setup_typetableg4numiCint() {
    /* Setting up typedef entry */
    G__search_typename2("Version_t",115,-1,0,-1);
    G__setnewtype(-1,"Class version identifier (short)",0);
+   G__search_typename2("iterator<std::bidirectional_iterator_tag,TObject*,std::ptrdiff_t,const TObject**,const TObject*&>",117,G__get_linked_tagnum(&G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR),0,-1);
+   G__setnewtype(-1,NULL,0);
+   G__search_typename2("iterator<bidirectional_iterator_tag,TObject*>",117,G__get_linked_tagnum(&G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR),0,-1);
+   G__setnewtype(-1,NULL,0);
+   G__search_typename2("iterator<bidirectional_iterator_tag,TObject*,long>",117,G__get_linked_tagnum(&G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR),0,-1);
+   G__setnewtype(-1,NULL,0);
+   G__search_typename2("iterator<bidirectional_iterator_tag,TObject*,long,const TObject**>",117,G__get_linked_tagnum(&G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR),0,-1);
+   G__setnewtype(-1,NULL,0);
 }
 
 /*********************************************************
@@ -1204,31 +924,6 @@ static void G__setup_memvarhadmmtuple_t(void) {
    G__tag_memvar_reset();
 }
 
-
-   /* zptuple_t */
-static void G__setup_memvarzptuple_t(void) {
-   G__tag_memvar_setup(G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t));
-   { zptuple_t *p; p=(zptuple_t*)0x1000; if (p) { }
-   G__memvar_setup((void*)0,108,0,0,-1,-1,-1,4,"G__virtualinfo=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->run)-(long)(p)),105,0,0,-1,G__defined_typename("Int_t"),-1,1,"run=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->evtno)-(long)(p)),105,0,0,-1,G__defined_typename("Int_t"),-1,1,"evtno=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->xposatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"xposatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->yposatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"yposatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->zposatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"zposatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->xmomatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"xmomatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->ymomatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"ymomatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->zmomatz)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"zmomatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->matilen)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"matilen=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->field)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"field=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->pathlength)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"pathlength=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->ptypeatz)-(long)(p)),105,0,0,-1,G__defined_typename("Int_t"),-1,1,"ptypeatz=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->pidtype)-(long)(p)),105,0,0,-1,G__defined_typename("Int_t"),-1,1,"pidtype=",0,(char*)NULL);
-   G__memvar_setup((void*)((long)(&p->zpoint)-(long)(p)),100,0,0,-1,G__defined_typename("Double_t"),-1,1,"zpoint=",0,(char*)NULL);
-   G__memvar_setup((void*)0,85,0,0,G__get_linked_tagnum(&G__g4numiCintLN_TClass),-1,-2,4,"fgIsA=",0,(char*)NULL);
-   }
-   G__tag_memvar_reset();
-}
-
 extern "C" void G__cpp_setup_memvarg4numiCint() {
 }
 /***********************************************************
@@ -1246,79 +941,53 @@ extern "C" void G__cpp_setup_memvarg4numiCint() {
 static void G__setup_memfuncdata_t(void) {
    /* data_t */
    G__tag_memfunc_setup(G__get_linked_tagnum(&G__g4numiCintLN_data_t));
-   G__memfunc_setup("data_t",621,G__g4numiCint_131_0_1, 105, G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("Class",502,G__g4numiCint_131_0_2, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (TClass* (*)())(&data_t::Class), 0);
-   G__memfunc_setup("Class_Name",982,G__g4numiCint_131_0_3, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::Class_Name), 0);
-   G__memfunc_setup("Class_Version",1339,G__g4numiCint_131_0_4, 115, -1, G__defined_typename("Version_t"), 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (Version_t (*)())(&data_t::Class_Version), 0);
-   G__memfunc_setup("Dictionary",1046,G__g4numiCint_131_0_5, 121, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (void (*)())(&data_t::Dictionary), 0);
-   G__memfunc_setup("IsA",253,G__g4numiCint_131_0_6, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 1, 1, 8, "", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("ShowMembers",1132,G__g4numiCint_131_0_7, 121, -1, -1, 0, 2, 1, 1, 0, 
+   G__memfunc_setup("data_t",621,G__g4numiCint_136_0_1, 105, G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
+   G__memfunc_setup("Class",502,G__g4numiCint_136_0_2, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (TClass* (*)())(&data_t::Class), 0);
+   G__memfunc_setup("Class_Name",982,G__g4numiCint_136_0_3, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::Class_Name), 0);
+   G__memfunc_setup("Class_Version",1339,G__g4numiCint_136_0_4, 115, -1, G__defined_typename("Version_t"), 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (Version_t (*)())(&data_t::Class_Version), 0);
+   G__memfunc_setup("Dictionary",1046,G__g4numiCint_136_0_5, 121, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (void (*)())(&data_t::Dictionary), 0);
+   G__memfunc_setup("IsA",253,G__g4numiCint_136_0_6, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 1, 1, 8, "", (char*)NULL, (void*) NULL, 1);
+   G__memfunc_setup("ShowMembers",1132,G__g4numiCint_136_0_7, 121, -1, -1, 0, 2, 1, 1, 0, 
 "u 'TMemberInspector' - 1 - insp C - - 0 - parent", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("Streamer",835,G__g4numiCint_131_0_8, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("StreamerNVirtual",1656,G__g4numiCint_131_0_9, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("DeclFileName",1145,G__g4numiCint_131_0_10, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::DeclFileName), 0);
-   G__memfunc_setup("ImplFileLine",1178,G__g4numiCint_131_0_11, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&data_t::ImplFileLine), 0);
-   G__memfunc_setup("ImplFileName",1171,G__g4numiCint_131_0_12, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::ImplFileName), 0);
-   G__memfunc_setup("DeclFileLine",1152,G__g4numiCint_131_0_13, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&data_t::DeclFileLine), 0);
+   G__memfunc_setup("Streamer",835,G__g4numiCint_136_0_8, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 1);
+   G__memfunc_setup("StreamerNVirtual",1656,G__g4numiCint_136_0_9, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 0);
+   G__memfunc_setup("DeclFileName",1145,G__g4numiCint_136_0_10, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::DeclFileName), 0);
+   G__memfunc_setup("ImplFileLine",1178,G__g4numiCint_136_0_11, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&data_t::ImplFileLine), 0);
+   G__memfunc_setup("ImplFileName",1171,G__g4numiCint_136_0_12, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&data_t::ImplFileName), 0);
+   G__memfunc_setup("DeclFileLine",1152,G__g4numiCint_136_0_13, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&data_t::DeclFileLine), 0);
    // automatic copy constructor
-   G__memfunc_setup("data_t", 621, G__g4numiCint_131_0_14, (int) ('i'), G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 0, 1, 1, 1, 0, "u 'data_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
+   G__memfunc_setup("data_t", 621, G__g4numiCint_136_0_14, (int) ('i'), G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 0, 1, 1, 1, 0, "u 'data_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
    // automatic destructor
-   G__memfunc_setup("~data_t", 747, G__g4numiCint_131_0_15, (int) ('y'), -1, -1, 0, 0, 1, 1, 0, "", (char*) NULL, (void*) NULL, 1);
+   G__memfunc_setup("~data_t", 747, G__g4numiCint_136_0_15, (int) ('y'), -1, -1, 0, 0, 1, 1, 0, "", (char*) NULL, (void*) NULL, 1);
    // automatic assignment operator
-   G__memfunc_setup("operator=", 937, G__g4numiCint_131_0_16, (int) ('u'), G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 1, 1, 1, 1, 0, "u 'data_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
+   G__memfunc_setup("operator=", 937, G__g4numiCint_136_0_16, (int) ('u'), G__get_linked_tagnum(&G__g4numiCintLN_data_t), -1, 1, 1, 1, 1, 0, "u 'data_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
    G__tag_memfunc_reset();
 }
 
 static void G__setup_memfunchadmmtuple_t(void) {
    /* hadmmtuple_t */
    G__tag_memfunc_setup(G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t));
-   G__memfunc_setup("hadmmtuple_t",1284,G__g4numiCint_132_0_1, 105, G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("Clear",487,G__g4numiCint_132_0_2, 121, -1, -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("Class",502,G__g4numiCint_132_0_3, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (TClass* (*)())(&hadmmtuple_t::Class), 0);
-   G__memfunc_setup("Class_Name",982,G__g4numiCint_132_0_4, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::Class_Name), 0);
-   G__memfunc_setup("Class_Version",1339,G__g4numiCint_132_0_5, 115, -1, G__defined_typename("Version_t"), 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (Version_t (*)())(&hadmmtuple_t::Class_Version), 0);
-   G__memfunc_setup("Dictionary",1046,G__g4numiCint_132_0_6, 121, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (void (*)())(&hadmmtuple_t::Dictionary), 0);
-   G__memfunc_setup("IsA",253,G__g4numiCint_132_0_7, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 1, 1, 8, "", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("ShowMembers",1132,G__g4numiCint_132_0_8, 121, -1, -1, 0, 2, 1, 1, 0, 
+   G__memfunc_setup("hadmmtuple_t",1284,G__g4numiCint_137_0_1, 105, G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
+   G__memfunc_setup("Clear",487,G__g4numiCint_137_0_2, 121, -1, -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
+   G__memfunc_setup("Class",502,G__g4numiCint_137_0_3, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (TClass* (*)())(&hadmmtuple_t::Class), 0);
+   G__memfunc_setup("Class_Name",982,G__g4numiCint_137_0_4, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::Class_Name), 0);
+   G__memfunc_setup("Class_Version",1339,G__g4numiCint_137_0_5, 115, -1, G__defined_typename("Version_t"), 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (Version_t (*)())(&hadmmtuple_t::Class_Version), 0);
+   G__memfunc_setup("Dictionary",1046,G__g4numiCint_137_0_6, 121, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (void (*)())(&hadmmtuple_t::Dictionary), 0);
+   G__memfunc_setup("IsA",253,G__g4numiCint_137_0_7, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 1, 1, 8, "", (char*)NULL, (void*) NULL, 1);
+   G__memfunc_setup("ShowMembers",1132,G__g4numiCint_137_0_8, 121, -1, -1, 0, 2, 1, 1, 0, 
 "u 'TMemberInspector' - 1 - insp C - - 0 - parent", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("Streamer",835,G__g4numiCint_132_0_9, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("StreamerNVirtual",1656,G__g4numiCint_132_0_10, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("DeclFileName",1145,G__g4numiCint_132_0_11, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::DeclFileName), 0);
-   G__memfunc_setup("ImplFileLine",1178,G__g4numiCint_132_0_12, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&hadmmtuple_t::ImplFileLine), 0);
-   G__memfunc_setup("ImplFileName",1171,G__g4numiCint_132_0_13, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::ImplFileName), 0);
-   G__memfunc_setup("DeclFileLine",1152,G__g4numiCint_132_0_14, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&hadmmtuple_t::DeclFileLine), 0);
+   G__memfunc_setup("Streamer",835,G__g4numiCint_137_0_9, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 1);
+   G__memfunc_setup("StreamerNVirtual",1656,G__g4numiCint_137_0_10, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 0);
+   G__memfunc_setup("DeclFileName",1145,G__g4numiCint_137_0_11, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::DeclFileName), 0);
+   G__memfunc_setup("ImplFileLine",1178,G__g4numiCint_137_0_12, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&hadmmtuple_t::ImplFileLine), 0);
+   G__memfunc_setup("ImplFileName",1171,G__g4numiCint_137_0_13, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&hadmmtuple_t::ImplFileName), 0);
+   G__memfunc_setup("DeclFileLine",1152,G__g4numiCint_137_0_14, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&hadmmtuple_t::DeclFileLine), 0);
    // automatic copy constructor
-   G__memfunc_setup("hadmmtuple_t", 1284, G__g4numiCint_132_0_15, (int) ('i'), G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 0, 1, 1, 1, 0, "u 'hadmmtuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
+   G__memfunc_setup("hadmmtuple_t", 1284, G__g4numiCint_137_0_15, (int) ('i'), G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 0, 1, 1, 1, 0, "u 'hadmmtuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
    // automatic destructor
-   G__memfunc_setup("~hadmmtuple_t", 1410, G__g4numiCint_132_0_16, (int) ('y'), -1, -1, 0, 0, 1, 1, 0, "", (char*) NULL, (void*) NULL, 1);
+   G__memfunc_setup("~hadmmtuple_t", 1410, G__g4numiCint_137_0_16, (int) ('y'), -1, -1, 0, 0, 1, 1, 0, "", (char*) NULL, (void*) NULL, 1);
    // automatic assignment operator
-   G__memfunc_setup("operator=", 937, G__g4numiCint_132_0_17, (int) ('u'), G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 1, 1, 1, 1, 0, "u 'hadmmtuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
-   G__tag_memfunc_reset();
-}
-
-static void G__setup_memfunczptuple_t(void) {
-   /* zptuple_t */
-   G__tag_memfunc_setup(G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t));
-   G__memfunc_setup("zptuple_t",999,G__g4numiCint_133_0_1, 105, G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t), -1, 0, 0, 1, 1, 0, "", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("Class",502,G__g4numiCint_133_0_2, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (TClass* (*)())(&zptuple_t::Class), 0);
-   G__memfunc_setup("Class_Name",982,G__g4numiCint_133_0_3, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&zptuple_t::Class_Name), 0);
-   G__memfunc_setup("Class_Version",1339,G__g4numiCint_133_0_4, 115, -1, G__defined_typename("Version_t"), 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (Version_t (*)())(&zptuple_t::Class_Version), 0);
-   G__memfunc_setup("Dictionary",1046,G__g4numiCint_133_0_5, 121, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (void (*)())(&zptuple_t::Dictionary), 0);
-   G__memfunc_setup("IsA",253,G__g4numiCint_133_0_6, 85, G__get_linked_tagnum(&G__g4numiCintLN_TClass), -1, 0, 0, 1, 1, 8, "", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("ShowMembers",1132,G__g4numiCint_133_0_7, 121, -1, -1, 0, 2, 1, 1, 0, 
-"u 'TMemberInspector' - 1 - insp C - - 0 - parent", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("Streamer",835,G__g4numiCint_133_0_8, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 1);
-   G__memfunc_setup("StreamerNVirtual",1656,G__g4numiCint_133_0_9, 121, -1, -1, 0, 1, 1, 1, 0, "u 'TBuffer' - 1 - b", (char*)NULL, (void*) NULL, 0);
-   G__memfunc_setup("DeclFileName",1145,G__g4numiCint_133_0_10, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&zptuple_t::DeclFileName), 0);
-   G__memfunc_setup("ImplFileLine",1178,G__g4numiCint_133_0_11, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&zptuple_t::ImplFileLine), 0);
-   G__memfunc_setup("ImplFileName",1171,G__g4numiCint_133_0_12, 67, -1, -1, 0, 0, 3, 1, 1, "", (char*)NULL, (void*) (const char* (*)())(&zptuple_t::ImplFileName), 0);
-   G__memfunc_setup("DeclFileLine",1152,G__g4numiCint_133_0_13, 105, -1, -1, 0, 0, 3, 1, 0, "", (char*)NULL, (void*) (int (*)())(&zptuple_t::DeclFileLine), 0);
-   // automatic copy constructor
-   G__memfunc_setup("zptuple_t", 999, G__g4numiCint_133_0_14, (int) ('i'), G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t), -1, 0, 1, 1, 1, 0, "u 'zptuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
-   // automatic destructor
-   G__memfunc_setup("~zptuple_t", 1125, G__g4numiCint_133_0_15, (int) ('y'), -1, -1, 0, 0, 1, 1, 0, "", (char*) NULL, (void*) NULL, 1);
-   // automatic assignment operator
-   G__memfunc_setup("operator=", 937, G__g4numiCint_133_0_16, (int) ('u'), G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t), -1, 1, 1, 1, 1, 0, "u 'zptuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
+   G__memfunc_setup("operator=", 937, G__g4numiCint_137_0_17, (int) ('u'), G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t), -1, 1, 1, 1, 1, 0, "u 'hadmmtuple_t' - 11 - -", (char*) NULL, (void*) NULL, 0);
    G__tag_memfunc_reset();
 }
 
@@ -1360,6 +1029,9 @@ static void G__cpp_setup_func1() {
 }
 
 static void G__cpp_setup_func2() {
+}
+
+static void G__cpp_setup_func3() {
 
    G__resetifuncposition();
 }
@@ -1368,6 +1040,7 @@ extern "C" void G__cpp_setup_funcg4numiCint() {
   G__cpp_setup_func0();
   G__cpp_setup_func1();
   G__cpp_setup_func2();
+  G__cpp_setup_func3();
 }
 
 /*********************************************************
@@ -1377,18 +1050,18 @@ extern "C" void G__cpp_setup_funcg4numiCint() {
 G__linked_taginfo G__g4numiCintLN_TClass = { "TClass" , 99 , -1 };
 G__linked_taginfo G__g4numiCintLN_TBuffer = { "TBuffer" , 99 , -1 };
 G__linked_taginfo G__g4numiCintLN_TMemberInspector = { "TMemberInspector" , 99 , -1 };
+G__linked_taginfo G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR = { "iterator<bidirectional_iterator_tag,TObject*,long,const TObject**,const TObject*&>" , 115 , -1 };
 G__linked_taginfo G__g4numiCintLN_data_t = { "data_t" , 99 , -1 };
 G__linked_taginfo G__g4numiCintLN_hadmmtuple_t = { "hadmmtuple_t" , 99 , -1 };
-G__linked_taginfo G__g4numiCintLN_zptuple_t = { "zptuple_t" , 99 , -1 };
 
 /* Reset class/struct taginfo */
 extern "C" void G__cpp_reset_tagtableg4numiCint() {
   G__g4numiCintLN_TClass.tagnum = -1 ;
   G__g4numiCintLN_TBuffer.tagnum = -1 ;
   G__g4numiCintLN_TMemberInspector.tagnum = -1 ;
+  G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR.tagnum = -1 ;
   G__g4numiCintLN_data_t.tagnum = -1 ;
   G__g4numiCintLN_hadmmtuple_t.tagnum = -1 ;
-  G__g4numiCintLN_zptuple_t.tagnum = -1 ;
 }
 
 
@@ -1398,9 +1071,9 @@ extern "C" void G__cpp_setup_tagtableg4numiCint() {
    G__get_linked_tagnum_fwd(&G__g4numiCintLN_TClass);
    G__get_linked_tagnum_fwd(&G__g4numiCintLN_TBuffer);
    G__get_linked_tagnum_fwd(&G__g4numiCintLN_TMemberInspector);
+   G__get_linked_tagnum_fwd(&G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR);
    G__tagtable_setup(G__get_linked_tagnum(&G__g4numiCintLN_data_t),sizeof(data_t),-1,263424,"data_t",G__setup_memvardata_t,G__setup_memfuncdata_t);
    G__tagtable_setup(G__get_linked_tagnum(&G__g4numiCintLN_hadmmtuple_t),sizeof(hadmmtuple_t),-1,263424,(char*)NULL,G__setup_memvarhadmmtuple_t,G__setup_memfunchadmmtuple_t);
-   G__tagtable_setup(G__get_linked_tagnum(&G__g4numiCintLN_zptuple_t),sizeof(zptuple_t),-1,263424,(char*)NULL,G__setup_memvarzptuple_t,G__setup_memfunczptuple_t);
 }
 extern "C" void G__cpp_setupg4numiCint(void) {
   G__check_setup_version(30051515,"G__cpp_setupg4numiCint()");

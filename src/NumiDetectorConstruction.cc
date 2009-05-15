@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.12 2009/04/15 18:14:57 jyuko Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13 2009/05/15 18:13:09 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -105,7 +105,15 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 
   G4ThreeVector horn2pos(0.,0.,10*m); 
   G4RotationMatrix horn2rot(0.,0.,0.);
-  ConstructHorn2(horn2pos,horn2rot);
+  if (NumiData->jCompare) {
+    G4ThreeVector horn2pos(0.,0.,10.03*m);        
+    ConstructHorn2(horn2pos,horn2rot);
+  }
+  else {
+    G4ThreeVector horn2pos(0.,0.,10.*m);
+    ConstructHorn2(horn2pos,horn2rot);    
+  }
+
   if (NumiData->constructTarget){
     ConstructTarget();
   }

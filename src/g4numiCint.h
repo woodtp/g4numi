@@ -31,7 +31,6 @@ extern void G__set_cpp_environmentg4numiCint();
 #include "TMemberInspector.h"
 #include "../include/data_t.hh"
 #include "../include/hadmmtuple_t.hh"
-#include "../include/zptuple_t.hh"
 
 #ifndef G__MEMFUNCBODY
 #endif
@@ -39,8 +38,8 @@ extern void G__set_cpp_environmentg4numiCint();
 extern G__linked_taginfo G__g4numiCintLN_TClass;
 extern G__linked_taginfo G__g4numiCintLN_TBuffer;
 extern G__linked_taginfo G__g4numiCintLN_TMemberInspector;
+extern G__linked_taginfo G__g4numiCintLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR;
 extern G__linked_taginfo G__g4numiCintLN_data_t;
 extern G__linked_taginfo G__g4numiCintLN_hadmmtuple_t;
-extern G__linked_taginfo G__g4numiCintLN_zptuple_t;
 
 /* STUB derived class for protected member access */

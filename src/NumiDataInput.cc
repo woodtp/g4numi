@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.30 2009/04/16 16:10:08 jyuko Exp $
+// $Id: NumiDataInput.cc,v 1.31 2009/05/15 18:13:09 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -85,12 +85,13 @@ NumiDataInput::NumiDataInput()
   //-- Changes for "Truncated Horns"-----
   airhrn =false; // airhrn must be changed before compilation
   vacuumworld=false;
-  jCompare =false; // make horns have the same B field;
+  jCompare = false; // make horns have the same B field;
+  g3Chase = true;
   
 if(!vacuumworld && !airhrn){
-  hrnmat = 9;
-  hrnmatcr =31;
-  hallmat=15;
+  hrnmat = 9;   // Al
+  hrnmatcr =31; // CT852
+  hallmat=15;   // Air
 }
  else {
    if(airhrn){
@@ -356,7 +357,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //DecayPipe          1    
   //=======================================================================
   DecayPipeZ0        = 45.699*m; //was 45.28*m (08/09/05);
-  DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
+  //DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
+  DecayPipeRadius    = 0.9906*m;
   DecayPipeLength    = 676.681*m; //was 677.1*m (08/09/05);
   DecayPipeFWinThick = 1.60E-3*m;
   DecayPipeEWinThick = 4.76E-3*m;
@@ -404,9 +406,13 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   //======================================================================= 
   // Target Hall shielding (18 blocks, numbered 0-17)
-  
+
+  if(g3Chase){
+    THBlockNblock = 24;
+  }
+  else{
     THBlockNblock=18;
-  
+  }
   // reminder: all length dimensions for the target shielding blocks are in meters.
   //These are the Duratek blocks mentioned in the Numi Technical Design Handbook.
 
@@ -431,7 +437,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   0.6904,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   -0.6904,        //Block16 (top block2--one of the slightly enlarged blocks)
 							   0.0,        //Block17 (top block3)
-
+			       0.0,        // Block 18 (bottom gnumi block)
+			       0.6373,  // Block 19 ( side 1 gnumi block)
+			       -0.6373, // Block 20 (Side 2 gnumi block)
+			       0.0, // Block 21 (top gnumi block bf Horn2)
+			       0.0,//
+			       0.0//
   };
 
   G4double THBlockY0_[]    = { -2.03895,      //Block 0
@@ -452,7 +463,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   1.98395,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   1.98395,        //Block16 (top block2--one of the slightly enlarged blocks)
 							   1.29355,        //Block17 (top block3)
-
+			       -0.993215, //Block 18 (bottom gnumi block)
+                               -0.0377, //Block 19 (side 1 gnumi block)
+                               -0.0377, //Block 20 (side 2 gnumi block)
+                               0.657075,//Block 21 (top gnumi block)
+			       0.657075, // Block 22 (top gnumi block after h2)
+                               0.672075 //Block 23 above Horn2
   };
 
   
@@ -483,6 +499,13 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   20.64,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   20.64,        //Block16 (top block2--one of the slightly enlarged blocks)
 							   20.64,        //Block17 (top block3)
+							   19.499,//Block 18 bottom
+							   19.499,//Block 19 side
+							   19.499,//Block 20 side	
+							   19.499,//Block 21 top
+							   19.499,//Block 22 top
+							   19.499,//Block 23 top
+
   };
 
 	  
@@ -554,7 +577,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 			      "BLK14",
 			      "BLK15",
 			      "BLK16",
-			      "BLK17"
+			      "BLK17",
+			      "BLK18",
+			      "BLK19",
+			      "BLK20",
+			      "BLK21",
+			      "BLK22",
+			      "BLK23"
+
                               };
 
   //This next block puts all the block coordinates into vectors and assigns the unit "meters" to the values.
@@ -592,6 +622,11 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   NPHorn2EndN=3;
   
   G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
+  if (jCompare) {
+	PHorn2EndZ0_[0] = 118.11;
+	PHorn2EndZ0_[1] = 119.86;
+	PHorn2EndZ0_[2] = 122.048;	
+  }
   G4double PHorn2EndLength_[] ={1.75           ,2.188       ,.625};
   G4double PHorn2EndRin_[]    ={12.719         ,12.532      ,11.};
   G4double PHorn2EndRout_[]   ={14.405         ,14.469      ,12.532};
@@ -614,6 +649,11 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   NPHorn1EndN=3;
   G4double PHorn1EndZ0_[]     ={126.092        ,127.842     ,129.718};
+  if (jCompare) {
+	PHorn1EndZ0_[0] = 118.11;
+	PHorn1EndZ0_[1] = 119.86;
+	PHorn1EndZ0_[2] = 122.048;	
+  }
   G4double PHorn1EndLength_[] ={1.75           ,2.188       ,.624};
   G4double PHorn1EndRin_[]    ={6.00           ,5.815       ,4.25};
   G4double PHorn1EndRout_[]   ={7.687          ,7.75        ,5.815};

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.21 2009/03/27 17:16:07 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.22 2009/05/15 18:13:09 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -203,6 +203,7 @@ public:
    G4bool airhrn;
    G4bool vacuumworld;
    G4bool jCompare;
+   G4bool g3Chase;
    G4int hrnmat;
    G4int hrnmatcr;
    G4int hallmat;
