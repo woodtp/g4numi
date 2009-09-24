@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.31 2009/05/15 18:13:09 ahimmel Exp $
+// $Id: NumiDataInput.cc,v 1.32 2009/09/24 19:31:04 ahimmel Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -10,6 +10,7 @@
 #include "G4UserLimits.hh"
 //#include "globals.hh"
 #include <math.h>
+#include <fstream>
 
 static const G4double in=2.54*cm;
 
@@ -31,6 +32,34 @@ NumiDataInput::NumiDataInput()
     { G4Exception("NumiDataInput constructed twice.");}
 //  fNumiDataInput = this;
 
+  bool useFile = false;
+  int runPeriodFile = -999;
+  double targetZFile = -999.;
+  double hornCurrentFile = -999.;
+  
+  std::ifstream datafile("../runConfig.inp");
+  if (datafile.is_open()) {
+    useFile = true;
+    datafile  >> runPeriodFile >> targetZFile >> hornCurrentFile;
+    datafile.close();
+    G4cout << G4endl << G4endl << G4endl << G4endl
+    << G4endl << G4endl << G4endl << G4endl 
+    << G4endl << G4endl << G4endl << G4endl 
+    << G4endl << G4endl << G4endl << G4endl 
+        << "Using parameters from runConfig.inp: " << G4endl
+           << "  Run Period = " << runPeriodFile << G4endl
+           << "  Target Z = " << targetZFile << G4endl
+           << "  Horn Current = " << hornCurrentFile << G4endl;
+    if (hornCurrentFile == 185) hornCurrentFile = 182.1;
+    else if (hornCurrentFile == 170) hornCurrentFile = 167.3;
+    else if (hornCurrentFile == 200) hornCurrentFile = 196.9;
+    else if (hornCurrentFile == 0) hornCurrentFile = 0;
+    else {
+        G4cout << "Unrecognized horn current " << hornCurrentFile << ", bailing." << G4endl;
+        assert(false);
+    }
+  }  
+      
   debugOn = false;
   NImpWeightOn = true; 
   createNuNtuple=false;  createHadmmNtuple=false;
@@ -195,10 +224,23 @@ if(!vacuumworld && !airhrn){
   RockDensity = 2.41*g/cm3; // not
   RockRadLen  = 0.0;        // used
 
+
+  //Target Configuration (LE010 = -10.0, LE100 = -100.0, etc.)
+  // runPeriod corresponds to Runs I, II, III, IV
+  //=======================================================================
+  double TargetConfigZ = -10.0*cm;
+  int runPeriod = 1;
+   
+  if (useFile) {
+      runPeriod = runPeriodFile;
+      TargetConfigZ = -1*targetZFile*cm;
+  }
+      
+  
   constructTarget = true;
   //TargetArea          1
   //=======================================================================
-  TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
+  TargetAreaZ0       = -6.7*m;  //was -4.0*m (08/09/05);
   TargetAreaLength   = 52.398*m;//was 49.28*m (08/09/05);
 
   // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version, 
@@ -208,12 +250,12 @@ if(!vacuumworld && !airhrn){
   TargetAreaHeight   = 8.5*m;
   TargetAreaWidth    = 8.5*m;
   TargetAreaGEANTmat = 15;
-
+  
   // Target   1
   //=======================================================================
   TargetX0           = 0.0;
   TargetY0           = -1.1*mm;
-  TargetZ0           = -0.45*m; //-0.35*m-10.*cm;
+  TargetZ0           = -0.35*m + TargetConfigZ;
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
   TargetSLength      = 20.*mm;
@@ -236,13 +278,30 @@ if(!vacuumworld && !airhrn){
   BudalZ0 = -16.72*cm;
   BudalDxdz = 0.0;
   BudalDydz = 0.0;
+
+  if (runPeriod == 1) {
+	TargetY0 = -1.1*mm;
+	BudalY0  = 2.26*mm;
+  }
+  else {
+    // Align Target and Budal
+    TargetY0 = 0.0;
+    BudalY0 = 0.0;	
+  }
+	
+  if (runPeriod == 2 || runPeriod == 3) {
+    // Change LE010 to LE009
+    if (TargetConfigZ == -10.0*cm) {
+        TargetZ0 += 1.1*cm;
+    }
+  }
   
   //HPBaffle           1 // Only the length and position can be changed currently
   //=======================================================================
   HPBaffleGEANTMat   =  18;
   HPBaffleX0         =  0.00;
   HPBaffleY0         =  0.00;
-  HPBaffleZ0         = -3.14*m;
+  HPBaffleZ0         = -3.04*m + TargetConfigZ;
   HPBaffleDXDZ       =  0.0;
   HPBaffleDYDZ       =  0.0;
   HPBaffleLength     =  1.20*m;
@@ -618,7 +677,20 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   
   HornCurrent=182100.*ampere; 
+  if (useFile) {
+    HornCurrent = hornCurrentFile*ampere;
+    if (HornCurrent < 250*ampere) HornCurrent *= 1000.; // Convert to kA
+  }
   
+  if (runPeriod == 4) {
+      HornCurrent *= -1;
+  }
+  
+  G4cout << "Running with: " << G4endl
+       << "  Run Period = " << runPeriod << G4endl
+       << "  Target Z = " << TargetConfigZ/cm << " cm" << G4endl
+       << "  Horn Current = " << HornCurrent/ampere/1000. << " kA" << G4endl;
+
   NPHorn2EndN=3;
   
   G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
@@ -780,3 +852,44 @@ void NumiDataInput::ApplyStepLimits(G4LogicalVolume *vol) {
   if (StepLimit == 0.0) return;
   vol->SetUserLimits(new G4UserLimits(StepLimit));
 }
+
+
+void NumiDataInput::SetjCompare(G4bool _jc) {
+    jCompare = _jc;
+    G4double PHorn1EndZ0_[]     ={126.092        ,127.842     ,129.718};
+    if (jCompare) {
+        PHorn1EndZ0_[0] = 118.11;
+        PHorn1EndZ0_[1] = 119.86;
+        PHorn1EndZ0_[2] = 122.048;	
+    }
+    PHorn1EndZ0.clear();
+    for (G4int ii=0;ii<NPHorn1EndN;ii++){
+        PHorn1EndZ0.push_back(PHorn1EndZ0_[ii]*in);
+    }
+    
+    
+    G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
+    if (jCompare) {
+        PHorn2EndZ0_[0] = 118.11;
+        PHorn2EndZ0_[1] = 119.86;
+        PHorn2EndZ0_[2] = 122.048;	
+    }
+    PHorn2EndZ0.clear();
+    for (G4int ii=0;ii<NPHorn2EndN;ii++){
+        PHorn2EndZ0.push_back(PHorn2EndZ0_[ii]*in);
+    }
+}
+
+
+void NumiDataInput::Setg3Chase(G4bool _gc) {
+    g3Chase = _gc;
+    
+    if(g3Chase){
+        THBlockNblock = 24;
+    }
+    else{
+        THBlockNblock=18;
+    }       
+    
+}
+
