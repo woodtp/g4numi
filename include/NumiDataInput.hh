@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.22 2009/05/15 18:13:09 ahimmel Exp $
+// $Id: NumiDataInput.hh,v 1.23 2010/08/17 14:46:28 jyuko Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -166,7 +166,8 @@ public:
       KillTrackingThreshold=th;
    }
    
-
+  void SetjCompare(G4bool _jc);
+  void Setg3Chase(G4bool _gc);
 
  private:
   G4bool debugOn;
