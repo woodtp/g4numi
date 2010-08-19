@@ -18,9 +18,11 @@
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4UserSteppingAction.hh"
+#include "G4Colour.hh"
 
 class NumiTrajectory;
 class G4Polyline;
+class NumiDataInput;
 
 typedef std::vector<G4VTrajectoryPoint*> NumiTrajectoryPointContainer;
 typedef std::vector<G4ThreeVector> NumiTrajectoryMomentumContainer;
@@ -95,6 +97,8 @@ class NumiTrajectory : public G4VTrajectory
    G4ThreeVector                    fVertexPosition;
    G4double                         fParticleMass;
    NumiTrajectoryVolumeName*        fPreStepVolume;
+
+   NumiDataInput* fND;
 };
 extern G4Allocator<NumiTrajectory> myTrajectoryAllocator;
 

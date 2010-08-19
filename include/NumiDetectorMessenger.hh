@@ -16,22 +16,34 @@ class G4UIcmdWithABool;
 class NumiDetectorMessenger: public G4UImessenger {
 
 public:
-	NumiDetectorMessenger(NumiDetectorConstruction* );
-	~NumiDetectorMessenger();
-
-	void SetNewValue(G4UIcommand*, G4String);
-
+   NumiDetectorMessenger(NumiDetectorConstruction* );
+   ~NumiDetectorMessenger();
+   
+   void SetNewValue(G4UIcommand*, G4String);
+   
 private:
-	NumiDetectorConstruction* NumiDetector;
-
-	G4UIdirectory*              NumiDir;
-	G4UIdirectory*              detDir;
-	G4UIcmdWithAString*         TargetGasCmd;
-        G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
-        G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
-        G4UIcmdWithABool*           ConstructTarget;
-        //G4UIcmdWithAnInteger*     NbLayersCmd;    
-        G4UIcmdWithoutParameter*    UpdateCmd;
+   NumiDetectorConstruction* NumiDetector;
+   
+   G4UIdirectory*              NumiDir;
+   G4UIdirectory*              detDir;
+   G4UIcmdWithAString*         TargetGasCmd;
+   G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
+   G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
+   G4UIcmdWithABool*           ConstructTarget;
+   G4UIcmdWithABool*           ConstructSolidMuMons;
+   G4UIcmdWithAString*         AbsorberConfig;
+   G4UIcmdWithAString*         Mon0AbsMatCmd;
+   G4UIcmdWithAString*         Mon1AbsMatCmd;
+   G4UIcmdWithAString*         Mon2AbsMatCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon0AbsThickCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon1AbsThickCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon2AbsThickCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon0AbsDistCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon1AbsDistCmd;
+   G4UIcmdWithADoubleAndUnit*  Mon2AbsDistCmd;
+   
+   //G4UIcmdWithAnInteger*     NbLayersCmd;    
+   G4UIcmdWithoutParameter*    UpdateCmd;
 };
 
 #endif

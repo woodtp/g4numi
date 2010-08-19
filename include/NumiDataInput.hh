@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23 2010/08/17 14:46:28 jyuko Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -11,6 +11,8 @@
 #include <vector>
 #include "NumiHornSpiderSupport.hh"
 #include "G4LogicalVolume.hh"
+
+class G4Material;
 
 typedef std::vector<G4double> vdouble_t;
 typedef std::vector<G4int> vint_t;
@@ -29,21 +31,21 @@ private:
   static NumiDataInput* fNumiDataInput;
 
 public:
-  void SetTargetZ0(G4double val) {
-    TargetZ0 = val;
-    HPBaffleZ0 += (val + 0.45*m);
-  }
+   void SetTargetZ0(G4double val) {
+      TargetZ0 = val;
+      HPBaffleZ0 += (val + 0.45*m);
+   }
    void SetHornCurrent(G4double val) {
       HornCurrent = val;
    }
-  void SetDebugOn(G4bool val) {
-     debugOn = val;
-  }
-  G4bool IsDebugOn(){
-     return debugOn;
-  }
+   void SetDebugOn(G4bool val) {
+      debugOn = val;
+   }
+   G4bool IsDebugOn(){
+      return debugOn;
+   }
    void SetNImpWeight(G4bool val) {
-    NImpWeightOn = val;
+      NImpWeightOn = val;
    }
    void SetTestTheta(G4float t){
       testTheta = t*M_PI/180.;
@@ -57,15 +59,6 @@ public:
    void SetMarsInput(G4bool val) {
       useMarsInput = val;
    }
-   void SetMuonBeam(G4bool val) {
-      useMuonBeam = val;
-   }
-   void SetSolidMuMons(G4bool val) {
-      solidMuMons = val;
-   }
-   void SetMuonInput(G4bool val) {
-      useMuonInput = val;
-   }
    void SetRunNumber(G4String runNum){
       RunNumber=runNum;
    }
@@ -78,9 +71,6 @@ public:
    G4String GetGeometryTag(){
       return geometry;
    }
-   G4double GetMaterialSigma(){
-      return materialSigma;
-   }
    void SetExtNtupleFileName(G4String fileName){
       extNtupleFileName=fileName;
    }
@@ -90,25 +80,6 @@ public:
    void SetNuNtupleName(G4String fileName){
       nuNtupleName=fileName;
    }
-   void SetHadmmNtupleName(G4String fileName){
-    hadmmNtupleName=fileName;
-   }
-   G4String GetHadmmNtupleName(){
-      return hadmmNtupleName;
-   }
-   void SetHadmmNtupleDir(G4String fileDir){
-      hadmmNtupleDir=fileDir;
-   }
-   G4String GetHadmmNtupleDir(){
-      return hadmmNtupleDir;
-   }
-   void SetNEvents(G4int events){
-      fNEvents=events;
-   }
-   G4int GetNEvents(){
-      return fNEvents;
-   }
-   
    void SetASCIIName(G4String fileName){
       asciiName=fileName;
    }
@@ -117,9 +88,6 @@ public:
    }
    void OutputNuNtuple(G4bool output){
       createNuNtuple=output;
-   }
-   void OutputHadmmNtuple(G4bool output){
-      createHadmmNtuple=output;
    }
    void OutputASCII(G4bool output){
       createASCII=output;
@@ -153,12 +121,6 @@ public:
    void OutputZpNtuple(G4bool val){
     createZpNtuple=val;
    }
-   G4bool GetMuonBeam(){
-      return useMuonBeam;
-   }
-   G4bool GetSolidMuMons(){
-      return solidMuMons;
-   }
    void SetKillTracking(G4bool val){
       KillTracking = val;
    }
@@ -166,19 +128,90 @@ public:
       KillTrackingThreshold=th;
    }
    
-  void SetjCompare(G4bool _jc);
-  void Setg3Chase(G4bool _gc);
+   
+   void SetMuonBeam(G4bool val)                {useMuonBeam = val;}
+   void SetNInputParts(G4int val)              {NInputParts = val;}
+   void SetNInputPart(G4int val)               {NInputPart = val;}
+   void SetReWeightDeltas(G4bool val)          {reWeightDeltas = val;}
+   void SetNSplitDeltas(G4int val)             {nSplitDeltas = val;}
+   void SetSolidMuMons(G4bool val)             {solidMuMons = val;}
+   void SetAbsorberConfig(G4String val)        {absorberConfig = val;}
+   void SetSimAbsBkg(G4bool val)               {simAbsBkg = val;}
+   void SetSimDRays(G4bool val)                {simDRays = val;}
+   void SetUseZPosCut(G4bool val)              {useZPosCut = val;}
+   void SetMuonBeamShape(G4String val)         {muonBeamShape = val;}
+   void SetMuonBeamMomentum(G4double val)      {muonBeamMomentum = val;}
+   void SetMuonBeamZPos(G4double val)          {muonBeamZPos = val;}
+   void SetGaussBeamXSig(G4double val)         {muonBeamGaussXsig = val;}
+   void SetGaussBeamYSig(G4double val)         {muonBeamGaussYsig = val;}
+   void SetMuonInput(G4bool val)               {useMuonInput = val;}
+   void SetNEvents(G4int events)               {fNEvents=events;}
+   void SetDefaultMaterial(G4Material* mat)    {DefaultMaterial = mat;}
+   void OutputHadmmNtuple(G4bool output)       {createHadmmNtuple=output;}
+   void SetHadmmNtupleName(G4String fileName)  {hadmmNtupleName=fileName;}
+   void SetHadmmNtupleDir(G4String fileDir)    {hadmmNtupleDir=fileDir;}
+   void OutputAbsBkgNtuple(G4bool output)      {createAbsBkgNtuple=output;}
+   void SetAbsBkgNtupleName(G4String fileName) {absbkgNtupleName=fileName;}
+   void SetAbsBkgNtupleDir(G4String fileDir)   {absbkgNtupleDir=fileDir;}
+   
+   G4bool   GetMuonBeam()            {return useMuonBeam;}
+   G4int    GetNInputParts()         {return NInputParts;}
+   G4int    GetNInputPart()          {return NInputPart;}
+   G4bool   GetReWeightDeltas()      {return reWeightDeltas;}
+   G4int    GetNSplitDeltas()        {return nSplitDeltas;}
+   G4bool   GetSolidMuMons()         {return solidMuMons;}
+   G4String GetAbsorberConfig()      {return absorberConfig;}
+   G4bool   GetSimAbsBkg()           {return simAbsBkg;}
+   G4bool   GetSimDRays()            {return simDRays;}
+   G4bool   GetUseZPosCut()          {return useZPosCut;}
+   G4String GetMuonBeamShape()       {return muonBeamShape;}
+   G4double GetMuonBeamMomentum()    {return muonBeamMomentum;}
+   G4double GetMuonBeamZPos()        {return muonBeamZPos;}
+   G4double GetGaussBeamXSig()       {return muonBeamGaussXsig;}
+   G4double GetGaussBeamYSig()       {return muonBeamGaussYsig;}
+   G4int    GetNEvents()             {return fNEvents;}
+   G4Material* GetDefaultMaterial()  {return DefaultMaterial;}
+   G4double GetMaterialSigma()       {return materialSigma;}
+   G4String GetHadmmNtupleName()     {return hadmmNtupleName;}
+   G4String GetHadmmNtupleDir()      {return hadmmNtupleDir;}
+   G4bool   GetCreateAbsBkgNtuple()  {return createAbsBkgNtuple;}
+   G4String GetAbsBkgNtupleName()    {return absbkgNtupleName;}
+   G4String GetAbsBkgNtupleDir()     {return absbkgNtupleDir;}
 
+   void SetAbsorberMaterial(G4Material* mat, G4int mon);
+   void SetAbsorberThickness(G4double val, G4int mon);
+   void SetAbsorberMonDist(G4double val, G4int mon);
+
+   G4Material* GetAbsorberMaterial(G4int);
+   G4double GetAbsorberThickness(G4int);
+   G4double GetAbsorberMonDist(G4int);
+
+   
  private:
   G4bool debugOn;
   G4String extNtupleFileName;
 
  public:
-   G4bool NImpWeightOn, createNuNtuple,createHadmmNtuple, createASCII;
-   G4bool useFlukaInput, useMarsInput, useMuonBeam, useMuonInput, solidMuMons;
+   G4bool NImpWeightOn, createNuNtuple, createHadmmNtuple, createASCII;
+   G4bool useFlukaInput, useMarsInput;
+
+   G4bool useMuonBeam, useMuonInput, solidMuMons, simAbsBkg, reWeightDeltas;
+   G4String absorberConfig;
+   G4int    NInputPart, NInputParts, nSplitDeltas;
+   G4bool simDRays, useZPosCut, createAbsBkgNtuple;
+   G4double muonBeamMomentum, muonBeamGaussXsig, muonBeamGaussYsig, muonBeamZPos;
+   G4String muonBeamShape;
+   G4String hadmmNtupleName, hadmmNtupleDir, absbkgNtupleName, absbkgNtupleDir;
    G4int fNEvents;
    G4bool KillTracking;
-   G4String nuNtupleName, hadmmNtupleName, hadmmNtupleDir, asciiName, RunNumber, geometry;
+   G4String nuNtupleName, asciiName, RunNumber, geometry;
+   G4Material* DefaultMaterial;
+   G4Material* Mon1AbsorberMaterial;
+   G4Material* Mon2AbsorberMaterial;
+   G4Material* Mon3AbsorberMaterial;
+   G4double Mon1AbsorberThickness, Mon2AbsorberThickness, Mon3AbsorberThickness;
+   G4double Mon1AbsorberDist,  Mon2AbsorberDist,  Mon3AbsorberDist;
+
    
    G4double StepLimit;
    
@@ -204,7 +237,6 @@ public:
    G4bool airhrn;
    G4bool vacuumworld;
    G4bool jCompare;
-   G4bool g3Chase;
    G4int hrnmat;
    G4int hrnmatcr;
    G4int hallmat;

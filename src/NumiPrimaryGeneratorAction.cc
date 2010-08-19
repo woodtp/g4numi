@@ -33,6 +33,7 @@
 using namespace std;
 
 NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
+   :fStart(false)
 {
   beamMessenger = new NumiPrimaryMessenger(this);
   fND=NumiDataInput::GetNumiDataInput();
@@ -71,8 +72,17 @@ void NumiPrimaryGeneratorAction::SetProtonBeam()
 void NumiPrimaryGeneratorAction::SetMuonBeam()
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu+"));
+  fptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum("mu+"));
 
-  G4float xpos, ypos, zpos;
+  G4double mass = particleTable->FindParticle("mu+")->GetPDGMass();
+  G4double mom = fND->GetMuonBeamMomentum();
+  fParticleGun->SetParticleEnergy( sqrt(mass*mass+mom*mom)-mass );
+  fParticleMomentum=G4ThreeVector(0.0*MeV, 0.0*MeV, mom);
+     
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1)); // straight down the pipe
+
+  /*G4float xpos, ypos, zpos;
 
   xpos = 0;
   ypos = 0;
@@ -85,6 +95,7 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
   //  fParticleGun->SetParticleEnergy(80*GeV);// just a guess right now
   fParticleGun->SetParticlePosition(muonBeamPos);
   fParticleGun->SetParticleMomentumDirection(muonBeamDirection);
+  */
 
   fCurrentPrimaryNo=0;
 }
@@ -92,51 +103,86 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
 
 G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 {
-  G4bool fIsOpen=false;
-  fRootFile=new TFile(ntupleName,"READ");
-  if (!fRootFile->IsZombie())
-    {
-
+   fCurrentPrimaryNo=0;
+   
+   G4bool fIsOpen=false;
+   fRootFile=new TFile(ntupleName,"READ");
+   if (!fRootFile->IsZombie())
+   {
+      
       if(fND->useMuonInput && fND->useMuonBeam)
       {
-	fPrimaryNtuple=(TTree*)(fRootFile->Get("muon"));
-	fMuon = new NtpMuon();
-	fMuon -> SetTree(fPrimaryNtuple);
+         fPrimaryNtuple=(TTree*)(fRootFile->Get("muon"));
+         fMuon = new NtpMuon();
+         fMuon -> SetTree(fPrimaryNtuple);
       }
       else
       {
-	fPrimaryNtuple=(TTree*)(fRootFile->Get("h3"));
+         fPrimaryNtuple=(TTree*)(fRootFile->Get("h3"));
       }
       if(!fPrimaryNtuple)
       {
 	G4cout<<"NumiPrimaryGeneratorAction: Can't find tree "<< G4endl;
       }
-
+      
       if(fND->useMuonInput && fND->useMuonBeam)
+      {
+         const G4int entries = fPrimaryNtuple->GetEntries();
+
+         G4cout << "Total Entries in input file = " << entries << G4endl;
+         
+         if(fND->GetNEvents() > 0 && fND->GetNEvents() < entries)
+            fNoOfPrimaries = fND->GetNEvents();
+         else   
+            fNoOfPrimaries = entries;
+         
+         fCurrentPrimaryNo=0;
+         const G4int NInputParts = fND->GetNInputParts();
+         const G4int    NInputPart  = fND->GetNInputPart();
+         if(NInputPart > 0 )
+         {
+            if(NInputParts < NInputPart)
+            {
+               fNoOfPrimaries = 1;
+            }
+            else
+            {
+               const G4int remainder = (fNoOfPrimaries%NInputParts);
+               fNoOfPrimaries    = (int)(fNoOfPrimaries/NInputParts);
+               
+               fCurrentPrimaryNo = fNoOfPrimaries*(NInputPart-1);
+               
+               if(NInputPart == NInputParts)
+                  fNoOfPrimaries += remainder;
+               
+               fStart = true;
+
+            }
+         }
+         
+      }
+      else
       {
          fCurrentPrimaryNo=0;
          G4int entries = fPrimaryNtuple->GetEntries();
          if(fND->GetNEvents() > 0 && fND->GetNEvents() < entries)
             fNoOfPrimaries = fND->GetNEvents();
          else   
-            fNoOfPrimaries = fPrimaryNtuple->GetEntries();
+            fNoOfPrimaries = entries;
+         //fCurrentPrimaryNo=0;
+         //fNoOfPrimaries=fPrimaryNtuple->GetEntries();
       }
-      else
-      {
-         fCurrentPrimaryNo=0;
-         fNoOfPrimaries=fPrimaryNtuple->GetEntries();
-      }
-
-      fIsOpen=true;
-    }
-  else
-    {
+      
+     fIsOpen=true;
+   }
+   else
+   {
       G4cout<<"NumiPrimaryGeneratorAction: Input (fluka/mars) root file doesn't exist"
-	    <<"   Aborting run"<<G4endl;
+            <<"   Aborting run"<<G4endl;
       fIsOpen=false;
-    }
-  fCurrentPrimaryNo=0;
-  return fIsOpen;
+   }
+   
+   return fIsOpen;
 }
 
 void NumiPrimaryGeneratorAction::CloseNtuple()
@@ -151,37 +197,90 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //G4UImanager* UI=G4UImanager::GetUIpointer();
 
   G4int totNoPrim=fRunManager->GetNumberOfEvents();
-  if (totNoPrim>20){
-    if (fCurrentPrimaryNo%(totNoPrim/20)==0) 
-      G4cout<<"Processing particles #: "
-	    <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20)<<G4endl;
+  if (totNoPrim>20)
+  {
+     if(fStart) 
+     {
+        G4cout<<"Processing " << fNoOfPrimaries << " particles starting with "
+              << fCurrentPrimaryNo << " and ending with " << fCurrentPrimaryNo+fNoOfPrimaries-1 << G4endl;
+         G4cout<<"Processing particles #: "
+                 <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20) - 1 <<G4endl;
+     }
+     
+     if (fCurrentPrimaryNo%(totNoPrim/20)==0)
+           G4cout<<"Processing particles #: "
+                 <<fCurrentPrimaryNo<<" to "<< fCurrentPrimaryNo+(totNoPrim/20) - 1 <<G4endl;
+     
+     fStart = false;
   }
   
   if(fND->useMuonBeam && !(fND->useMuonInput))
   {
- 
-    G4double x0 = fND->DecayPipeRadius*2.0;
-    G4double y0 = fND->DecayPipeRadius*2.0; 
-    G4double z0;
-    
-    // Uniformly distributed circular muon beam 
-    while(sqrt(pow(x0,2)+pow(y0,2)) > fND->DecayPipeRadius){
-      x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
-      y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
-    }
-    
-    //Square beam the fits just inside the decay pipe without
-    // producing particles that would immediatly hit rock outside the
-    // decay pipe.
-    /*
-     x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
-     y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
-     */
-    
-    z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap
-    
-    fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+     G4double x0 = 0.0;
+     G4double y0 = 0.0;
+     G4double z0 = fND->DecayPipeLength + fND->TunnelZ0 - 7*mm;// just before the endcap account for DP window
+     
+     if(fND->GetMuonBeamShape() == "circle")
+     {
+        x0 = fND->DecayPipeRadius*2.0;
+        y0 = fND->DecayPipeRadius*2.0; 
+        
+        
+        // Uniformly distributed circular muon beam 
+        while(sqrt(pow(x0,2)+pow(y0,2)) > fND->DecayPipeRadius)
+        {
+           x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
+           y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius;
+        }
+     }
+     else if(fND->GetMuonBeamShape() == "square")
+     {
+        //
+        //Square beam the fits just inside the decay pipe without
+        // producing particles that would immediatly hit rock outside the
+        // decay pipe.
+        //
+        x0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
+        y0 = 2*(G4UniformRand()-0.5)*fND->DecayPipeRadius/sqrt(2.0);
+     }
+     else if(fND->GetMuonBeamShape() == "gauss" || fND->GetMuonBeamShape() == "gaussian")
+     {
+        x0 = fND->DecayPipeRadius*2.0;
+        y0 = fND->DecayPipeRadius*2.0;
+
+        G4double xsig = fND->GetGaussBeamXSig();
+        G4double ysig = fND->GetGaussBeamYSig();
+
+        //
+        //gaussian beam
+        //
+        while(sqrt(x0*x0+y0*y0) > fND->DecayPipeRadius)
+        {
+           x0 = G4RandGauss::shoot(0.0, xsig); 
+           y0 = G4RandGauss::shoot(0.0, ysig); 
+        }
+     }
+
+     if(fND->GetMuonBeamZPos() > 0.0)
+     {
+        z0 = fND->GetMuonBeamZPos();
+     }
+    //z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap
+     
+     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+     fParticlePosition=G4ThreeVector(x0, y0, z0);
+     
+     NumiAnalysis* analysis = NumiAnalysis::getInstance();
+     if(!analysis)
+     {
+        G4cout << "Can't get NumiAnalysis pointer" << G4endl;
+     }
+     analysis->SetCount(0);
+     analysis->SetEntry(fCurrentPrimaryNo);
+     analysis->SetMuInAlcFlag(false);
+     analysis->FillHadmmNtuple();
+     
+     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
   else if (fND->useMuonInput && fND->useMuonBeam)
   {
@@ -200,9 +299,12 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     analysis2->SetCount(0);
     analysis2->SetEntry(fCurrentPrimaryNo);
     analysis2->SetAlcEdepFlag(false);
+    analysis2->SetMuInAlcFlag(false);
     
     fMuon -> Clear();
     fMuon -> GetEntry(fCurrentPrimaryNo);
+    G4cout << " " << fCurrentPrimaryNo << ", ";
+    
     fevtno = fMuon->evtno;
     fmuweight = fMuon->muweight;
 
@@ -241,9 +343,13 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //fMuon->muvz*cm = 722380, so subtract 1mm to get 722379 just to be safe
     //
 
-    G4double z0 = fMuon->muvz*cm - 1; //this is - 1 mm.
+    //
+    //need to account for DP window thinkness so subtract 7mm
+    //
+    G4double z0 = fMuon->muvz*cm - 7*mm; //this is - 7 mm.
     
     fParticlePosition=G4ThreeVector(fMuon->muvx*cm,fMuon->muvy*cm,z0);
+    //fParticlePosition=G4ThreeVector(0.0,0.0,737000.);
     fParticleMomentum=G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
        
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -256,20 +362,16 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       G4cout << "Can't get NumiAnalysis pointer" << G4endl;
     }
     analysis->FillHadmmNtuple();
-    
+
     if(fMuon->mupz < 1.0)
     {
       flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.0*GeV);
       //fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.0*GeV*0.0*GeV)-mass);
-
-      analysis->WriteHadmmNtuple();    
-      
     }
     else
     {
       flocalParticleMomentum = G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
       //fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
-
     }
 
     fParticleGun->SetParticlePosition(fParticlePosition);
@@ -340,15 +442,14 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
      MOMTYPE                         PTYPE                                     - ???
      */
 
-    
-    //
+      //
     //Need to create a new Gun each time
     //so Geant v4.9 doesn't complain
     //about momentum not match KE
     //
-    if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
-    fParticleGun = new G4ParticleGun(1);
-    fParticleGun->SetParticleEnergy(0.0*GeV);
+     if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
+     fParticleGun = new G4ParticleGun(1);
+     fParticleGun->SetParticleEnergy(0.0*GeV);
     
     G4double x0,y0,z0,px,py,pz;
     G4String particleName;

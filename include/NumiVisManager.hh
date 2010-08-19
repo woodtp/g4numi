@@ -1,5 +1,5 @@
 //
-// $Id: NumiVisManager.hh,v 1.1 2005/01/20 20:30:45 zarko Exp $
+// $Id: NumiVisManager.hh,v 1.1.4.1 2010/08/19 19:50:54 minervacvs Exp $
 // GEANT4 tag $Name:  $
 //
 // 

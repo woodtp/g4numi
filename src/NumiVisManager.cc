@@ -1,4 +1,4 @@
-// $Id: NumiVisManager.cc,v 1.3 2008/12/08 19:49:30 ahimmel Exp $
+// $Id: NumiVisManager.cc,v 1.3.4.1 2010/08/19 19:50:54 minervacvs Exp $
 
 #ifdef G4VIS_USE
 

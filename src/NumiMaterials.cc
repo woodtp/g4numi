@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11 2009/03/26 22:51:06 ahimmel Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -20,6 +20,8 @@ void NumiDetectorConstruction::DefineMaterials()
 
   G4double rock_density_offset     = 0.04*g/cm3 * NumiData->GetMaterialSigma();
   G4double BluBlock_density_offset = 0.16*g/cm3 * NumiData->GetMaterialSigma();
+
+  G4cout << "mat sig = " << NumiData->GetMaterialSigma() << G4endl;
 
   // Air and Vacuum
   A = 1.01*g/mole;
@@ -129,6 +131,7 @@ void NumiDetectorConstruction::DefineMaterials()
 
   density = 1.*g/cm3; 
   G4int natoms;
+  G4int nel;
   Water = new G4Material("Water", density, 2); //number of components =2
   Water->AddElement(elH, natoms=2); 
   Water->AddElement(elO, natoms=1); 
@@ -283,6 +286,62 @@ void NumiDetectorConstruction::DefineMaterials()
   M1018_Stl->AddElement( elP,  fractionmass = .00045 );
   M1018_Stl->AddElement( elS,  fractionmass = .00045 );
 
+  //
+  //Material for Muon Monitors
+  //
+
+  //
+  //Casing/tubes for the muon monitors
+  //Use Aluminum as defined above for this
+  //
+
+  //
+  //Parallel plates of the ionization chamber
+  //
+  Alumina = new G4Material("Alumina",density= 3.97*g/cm3, nel=2);
+  Alumina->AddElement(elAl, natoms=2);
+  Alumina->AddElement(elO, natoms=3);
+
+  //
+  //Helium in muon chambers (at NTP)
+  //
+  HeGas = new G4Material("HeGas", Z=2., A=4.0026*g/mole, 0.1663*kg/m3,
+                                     kStateGas, temperature= 293.15*kelvin,
+                                     pressure= 1*atmosphere);
+
+  //
+  // Material for delta Ray absorbers 
+  //
+  
+  //
+  //Dry wall (CaSO4·2H2O)
+  //
+  Drywall = new G4Material("Drywall", density=2.32*g/cm3, nel=4);
+  Drywall->AddElement(elCa, natoms=1);
+  Drywall->AddElement(elS,  natoms=1);
+  Drywall->AddElement(elO,  natoms=6);
+  Drywall->AddElement(elH,  natoms=4);
+
+  //
+  //Paraffin Wax (assuming a composition, although that can vary)
+  //
+  Paraffin = new G4Material("Paraffin",density= 0.93*g/cm3,nel=2);
+  Paraffin->AddElement(elC, natoms=25);
+  Paraffin->AddElement(elH, natoms=52);
+
+  //
+  //wood?
+  //
+  /*
+  G4Material* wood = new G4Material("Wood", density=0.9*g/cm3, nel=3);
+  wood->AddElement(H , 4);
+  wood->AddElement(O , 1);
+  wood->AddElement(C , 2);
+  */
+
+
+  DefaultMaterial = Air;
+  NumiData->SetDefaultMaterial(DefaultMaterial);
 }
 
 G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
@@ -308,6 +367,11 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==26) return M1018_Stl;
   if (matcode==28) return DecayPipeVacuum;
   if (matcode==31) return CT852;
+  if (matcode==32) return Alumina;
+  if (matcode==33) return HeGas;
+  if (matcode==34) return Drywall;
+  if (matcode==35) return Paraffin;
+  
 
   G4cout << G4endl << " **** Wrong material code **** " << matcode << G4endl << G4endl;
   return Vacuum;
@@ -318,7 +382,7 @@ G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4int matCode)
   G4VisAttributes* visAttrib=new G4VisAttributes(G4Color(1., 0., 0.));
   if (matCode==5) visAttrib=new G4VisAttributes(G4Color(0.1, 0.2, 0.95));//Be 
   if (matCode==6) visAttrib=new G4VisAttributes(G4Color(0.7, 0.7, 0.7)); //C
-  if (matCode==9 || matCode==20) visAttrib=new G4VisAttributes(G4Color(0.2, 0.8, 1.));//Al
+  if (matCode==9) visAttrib=new G4VisAttributes(G4Color(0.2, 0.8, 1.));//Al
   if (matCode==10 || matCode==11) visAttrib=new G4VisAttributes(G4Color(0.5, 0.3, 0.0));//Fe
   if (matCode==12) visAttrib=new G4VisAttributes(G4Color(0.0, 0.4, .9));//BluBlocks
   if (matCode==15) visAttrib=new G4VisAttributes(false); //Air

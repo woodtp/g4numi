@@ -1,4 +1,4 @@
-// $Id: NumiNuWeight.cc,v 1.1 2007/09/21 20:44:52 zarko Exp $
+// $Id: NumiNuWeight.cc,v 1.1.4.1 2010/08/19 19:50:54 minervacvs Exp $
 
 #include <iostream>
 #include <cmath>

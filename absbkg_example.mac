@@ -1,0 +1,32 @@
+#
+#Run Absorber Background simulation
+#
+#
+
+/NuMI/run/simAbsBkg true
+
+#Read in fluka hadrons file
+/NuMI/run/useFlukaInput true
+/NuMI/run/extNtupleFileName /minos/data/users/jyuko/fluka05root/fluka05_005.root
+
+#Set output file and directory
+/NuMI/output/outputAbsBkgNtuple false
+/NuMI/output/setAbsBkgNtupleDir ./
+/NuMI/output/setAbsBkgNtupleFile fluka05_le010z185i_5.root 
+
+#Set tracking threshold low
+/NuMI/run/KillTracking true
+/NuMI/run/KillTrackingThreshold 0.0 GeV
+
+/NuMI/run/useNImpWeight true
+/control/suppressAbortion 2
+/NuMI/det/setHornCurrent 182.1 kA
+/NuMI/det/setTargetZ0 -45 cm
+/NuMI/det/constructTarget false
+/NuMI/det/update
+
+/NuMI/run/setRunID 1
+/NuMI/rndm/setRndmSeed 1
+/NuMI/run/NEvents -1
+/run/beamOn
+

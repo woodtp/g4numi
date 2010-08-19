@@ -10,6 +10,10 @@
 #include "G4StepLimiter.hh"
 #include "G4ParticleTable.hh"
 
+#include "G4ProcessManager.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4VEnergyLossProcess.hh"
+
 #include "NumiDetectorConstruction.hh"
 
 // Interaction Physics Lists
@@ -22,11 +26,16 @@
 //#include "LHEP.hh"
 
 #include "NumiPrimaryGeneratorAction.hh"
+#include "NumiEventAction.hh"
 #include "NumiStackingAction.hh"
 #include "NumiSteppingAction.hh"
 #include "NumiTrackingAction.hh"
 #include "NumiRunAction.hh"
 #include "NumiRunManager.hh"
+
+#include "NumieIonisation.hh"
+#include "NumiMuIonisation.hh"
+
 
 #ifdef G4VIS_USE
 #include "NumiVisManager.hh"
@@ -56,6 +65,7 @@ int main(int argc,char** argv)
   runManager->SetUserAction(new NumiPrimaryGeneratorAction);
 
   // set user action classes
+  runManager->SetUserAction(new NumiEventAction);
   runManager->SetUserAction(new NumiSteppingAction);
   runManager->SetUserAction(new NumiStackingAction);
   runManager->SetUserAction(new NumiTrackingAction);
@@ -64,8 +74,43 @@ int main(int argc,char** argv)
   // Initialize G4 kernel
   runManager->Initialize();
 
+  
+  {
+     G4ProcessManager * pManager = 0; 
+     pManager = G4Electron::Electron()->GetProcessManager();
+     if(!pManager) G4cout << "g4numi::main() - Can't get a valid Electron process manager" << G4endl;
+     
+     //pManager->AddProcess(new NumieIonisation,        -1, 4, -1);
+     
+  }
+  {
+     G4ProcessManager * pManager = 0;
+     pManager = G4Positron::Positron()->GetProcessManager();
+     if(!pManager) G4cout << "g4numi::main() - Can't get a valid Positron process manager" << G4endl;
+     
+     //pManager->AddProcess(new NumieIonisation,        -1, 4, -1);
+  }
+  {
+     G4ProcessManager * pManager = 0;
+     pManager  = G4MuonPlus::MuonPlus()->GetProcessManager();
+     if(!pManager) G4cout << "g4numi::main() - Can't get a valid MuPlus process manager" << G4endl;
+     
+     //pManager->AddProcess(new NumiMuIonisation,       -1, 5, -1);
+     
+  }
+  {
+     G4ProcessManager * pManager = 0;
+     pManager  = G4MuonMinus::MuonMinus()->GetProcessManager();
+     if(!pManager) G4cout << "g4numi::main() - Can't get a valid MuMinus process manager" << G4endl;
+     
+     //pManager->AddProcess(new NumiMuIonisation,       -1, 5, -1);
+    
+               
+  }
+
   // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
+
 
  // ---> April 2006. D.Jaffe modifications to set K0L,K+,K- branching fractions
 
@@ -212,7 +257,7 @@ int main(int argc,char** argv)
     } 
   }//loop over particles
   // done with kaon form factors
-  
+
  
   // Setting the maximum step size to 1 cm
   G4ParticleTable* ptbl = G4ParticleTable::GetParticleTable();

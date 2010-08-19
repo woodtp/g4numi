@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDecayPipe.cc,v 1.8 2009/03/26 22:51:06 ahimmel Exp $
+// $Id: NumiDecayPipe.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -78,7 +78,7 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   G4double UpWnTubeLength[]  ={1.*in    ,6.*in     , .75*in    , .75*in   , 6.*in    };
   G4double UpWnTubeRin[]     ={19.5*in  ,20.8125*in,19.5*in    , 19.5*in  , 20.8125*in };
   G4double UpWnTubeRout[]    ={22.*in   ,21.*in    ,22.*in     , 22.*in   , 21.*in};
-  G4int UpWnTubeVolMaterial[]={ 9       , 9        , 9         ,  10      , 10};
+  G4int UpWnTubeVolMaterial[]={9       , 9       ,  9       ,    10      , 10};
   G4String UpWnTubeVolName[] ={"UpWnAl1","UpWnAl2" ,"UpWnAl3"  ,"UpWnFe1" ,"UpWnFe2" };
   // for (G4int ii=0;ii<NUpWnTubesN;ii++){
   //  UpWnTubeZ0[ii]+=NumiData->DecayPipeZ0;

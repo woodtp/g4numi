@@ -5,7 +5,7 @@
 // This is a class that defines the hadmmtuple_t object that is used to store 
 // the g4numi output in a root tree.
 //
-// $Id: hadmmtuple_t.hh,v 1.8 2009/03/02 06:24:03 loiacono Exp $
+// $Id: hadmmtuple_t.hh,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #ifndef HADMMTUPLE_T_HH
@@ -113,6 +113,30 @@ class  hadmmtuple_t
    Float_t mmpx_Edep[3];
    Float_t mmpy_Edep[3];
    Float_t mmpz_Edep[3];
+
+//////////////////////////////////////////////////////////////////
+   /*
+   //total energy deposited by muon in the cell(s)
+   Float_t mu_edep[3];
+
+   //total energy deposited by electrons/positrons
+   //that are generated from interactions of the
+   //muon with the monitor
+   Float_t int_edep[3];
+
+   //total energy deposited by electrons/positrons
+   //that are generated from interactions of the
+   //muon with the elements external to the monitor
+   Float_t ext_edep[3];
+   */
+   /////////////////////////////////////////////////////////////////////////////
+   //temporary variable which indicates
+   //the zpostion of the cascade which
+   //produced the delta ray that intercepted the chamber
+   //Float_t zpos_edep[3];
+        
+
+
    
    /*Float_t hmmenergy;
      Float_t hmmxpos;

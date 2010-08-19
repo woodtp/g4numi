@@ -2,7 +2,7 @@
 // Particle names should match the geant4 particle names since this is 
 // currently used to translate particles from external ntuple to geant 
 // (NumiPrimaryGeneratorAction.cc)
-// $Id: NumiParticleCode.cc,v 1.2 2008/02/14 19:30:20 koskinen Exp $
+// $Id: NumiParticleCode.cc,v 1.2.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiParticleCode.hh"

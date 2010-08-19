@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8 2008/11/12 00:21:40 loiacono Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -15,6 +15,8 @@
 #include "NumiTrajectory.hh"
 #include "NumiDataInput.hh"
 #include "NumiPrimaryGeneratorAction.hh"
+#include "G4EventManager.hh"
+#include "NumiEventAction.hh"
 
 NumiTrackingAction::NumiTrackingAction()
 {
@@ -28,6 +30,7 @@ NumiTrackingAction::~NumiTrackingAction()
 
 void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
+   
   //set tgen (and weight for fluka nad mars input) 
   if (aTrack->GetTrackID()==1) 
     {   
@@ -61,18 +64,22 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
       analysis->FillNeutrinoNtuple(*aTrack);
     }
+
+
+  
+  if (ND->useMuonBeam && ND->GetSimDRays())
+  {
+     EvtManager = G4EventManager::GetEventManager();
+     NumiEvtAct = (NumiEventAction*)(EvtManager -> GetUserEventAction());
+     NumiEvtAct -> AddTrack(aTrack);
+  }
+
+  
 }
 
 void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-  // Jtest
-  //---
-  NumiAnalysis* analysis = NumiAnalysis::getInstance();
-  analysis->WriteHadmmNtuple(aTrack);
-  
-  //---
-
-
+   
   // set tgen(secondary) = tgen(parent)+1
   NumiTrackInformation* info = (NumiTrackInformation*)(aTrack->GetUserInformation());
     if (info!=0) {
@@ -86,6 +93,8 @@ void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 	 (*SecVector)[ii]->SetUserInformation(newinfo);
        }
     }
+
+
 }
 
 

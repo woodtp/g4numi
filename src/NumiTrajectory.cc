@@ -13,6 +13,7 @@
 #include "G4VVisManager.hh"
 #include "G4UnitsTable.hh"
 #include "NumiTrackInformation.hh"
+#include "NumiDataInput.hh"
 
 G4Allocator<NumiTrajectory> myTrajectoryAllocator;
 
@@ -32,6 +33,8 @@ NumiTrajectory::NumiTrajectory()
    fDecayCode=0;
    fTgen=0;
    fPreStepVolume=0;
+
+   fND=NumiDataInput::GetNumiDataInput();
 
 }
 
@@ -63,6 +66,8 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
      fTgen = 0; 
      fNImpWt = 1.;
    }
+
+   fND=NumiDataInput::GetNumiDataInput();
 }
 
 NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
@@ -96,6 +101,8 @@ NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
   fDecayCode = right.fDecayCode;
   fTgen = right.fTgen;
   fNImpWt = right.fNImpWt;
+
+  fND=NumiDataInput::GetNumiDataInput();
 }
 
 NumiTrajectory::~NumiTrajectory()
@@ -143,6 +150,7 @@ void NumiTrajectory::ShowTrajectory(std::ostream& o) const
 
 void NumiTrajectory::DrawTrajectory(G4int i_mode) const
 {
+
 
    G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
    G4ThreeVector pos;
@@ -201,6 +209,34 @@ void NumiTrajectory::DrawTrajectory(G4int i_mode) const
      if(pVVisManager) pVVisManager->Draw(pPolyline);
    }
 
+   if(fND->useMuonBeam)
+   {
+      if (fParticleDefinition==G4MuonMinus::MuonMinusDefinition()
+          || fParticleDefinition==G4MuonPlus::MuonPlusDefinition())
+      {
+         //colour=G4Colour(0.,1.,0.5);
+         colour=G4Colour(1.,1.,1.);
+         attribs=G4VisAttributes(colour);
+         pPolyline.SetVisAttributes(&attribs);
+         if(pVVisManager) pVVisManager->Draw(pPolyline);
+      }
+      if (fParticleDefinition==G4Gamma::GammaDefinition())
+      {
+         colour=G4Colour(0.,1.,0.);
+         attribs=G4VisAttributes(colour);
+         pPolyline.SetVisAttributes(&attribs);
+         if(pVVisManager) pVVisManager->Draw(pPolyline);
+      }
+      if (fParticleDefinition==G4Electron::ElectronDefinition()
+          || fParticleDefinition==G4Positron::PositronDefinition())
+      {
+         colour=G4Colour(1.,0.,1.);
+         attribs=G4VisAttributes(colour);
+         pPolyline.SetVisAttributes(&attribs);
+         if(pVVisManager) pVVisManager->Draw(pPolyline);
+      }
+   }
+   
    //pPolyline.SetVisAttributes(attribs);
    //if(pVVisManager) pVVisManager->Draw(pPolyline);
 }

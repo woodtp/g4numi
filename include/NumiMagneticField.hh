@@ -1,5 +1,5 @@
 
-// $Id: NumiMagneticField.hh,v 1.2 2005/08/12 19:52:01 zarko Exp $
+// $Id: NumiMagneticField.hh,v 1.2.4.1 2010/08/19 19:50:54 minervacvs Exp $
 // --------------------------------------------------------------
 // NumiMagneticField.hh modified by Yuki 2004/7/16
 // modified by Yuki 8/2/04

@@ -10,6 +10,8 @@
 class NumiDataInput;
 class NumiRunManager;
 class NumiPrimaryGeneratorAction;
+class G4EventManager;
+class NumiEventAction;
 
 class NumiTrackingAction : public G4UserTrackingAction
 {
@@ -21,9 +23,11 @@ class NumiTrackingAction : public G4UserTrackingAction
     virtual void PostUserTrackingAction(const G4Track*);
 
   private:
-  NumiDataInput *ND;
-  NumiRunManager *pRunManager;
-  NumiPrimaryGeneratorAction *NPGA;
+   NumiDataInput *ND;
+   NumiRunManager *pRunManager;
+   NumiPrimaryGeneratorAction *NPGA;
+   G4EventManager *EvtManager;
+   NumiEventAction *NumiEvtAct;
 };
 
 #endif

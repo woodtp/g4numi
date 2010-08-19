@@ -119,6 +119,8 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
    G4int fppmedium;
    G4int fpgen;
    G4int fevtno;
+
+   G4bool fStart;
    
    NtpMuon* fMuon;
 

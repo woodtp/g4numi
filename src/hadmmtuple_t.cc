@@ -2,7 +2,7 @@
 // Sets the relevant memebers of the data class for storing the
 // MC data for the Hadron and Muon Monitors.
 //
-// $Id: hadmmtuple_t.cc,v 1.8 2009/03/02 03:32:41 loiacono Exp $
+// $Id: hadmmtuple_t.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "hadmmtuple_t.hh"
@@ -55,8 +55,8 @@ hadmmtuple_t::hadmmtuple_t()
   */  
   
 {
-  for(Int_t index=0;index<3;++index)
-    {
+   for(Int_t index=0;index<3;++index)
+   {
       mmxpos[index]=-99999.;
       mmypos[index]=-99999.;
       //mmzpos[index]=-99999.;
@@ -64,14 +64,24 @@ hadmmtuple_t::hadmmtuple_t()
       mmpy[index]=-99999.;
       mmpz[index]=-99999.;
       cell[index]=-999;
-
+      
       //mmxpos_Edep[index]=-99999.;
       //mmypos_Edep[index]=-99999.;
       //mmzpos_Edep[index]=-99999.;
       mmpx_Edep[index]=-99999.;
       mmpy_Edep[index]=-99999.;
       mmpz_Edep[index]=-99999.;
-    }
+
+      /////////////////////////////////////////////////
+      /*
+      mu_edep[index] = 0.0;
+      int_edep[index] = 0.0;
+      ext_edep[index] = 0.0;
+      */
+      ////////////////////////////////////////////////
+
+      //zpos_edep[index] = 0.0;
+   }
 
 }
 
@@ -146,6 +156,17 @@ void hadmmtuple_t::Clear()
       mmpx_Edep[index]=-99999.;
       mmpy_Edep[index]=-99999.;
       mmpz_Edep[index]=-99999.;
+
+      //////////////////////////////////////////////////
+      /*
+      mu_edep[index] = 0.0;
+      int_edep[index] = 0.0;
+      ext_edep[index] = 0.0;
+      */
+         /////////////////////////////////////////////////////
+
+      //zpos_edep[index] = 0.0;
+
     }
 
 }

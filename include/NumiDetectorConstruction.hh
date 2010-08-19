@@ -29,93 +29,104 @@ typedef std::vector<G4int> vint_t;
 
 class NumiDetectorConstruction : public G4VUserDetectorConstruction
 {
-  public:
+public:
+   
+   NumiDetectorConstruction();
+   ~NumiDetectorConstruction();
+   
+   G4VPhysicalVolume* Construct();
+   
+   void SetTargetZ0(G4double val);
+   void SetHornCurrent(G4double val);
 
-    NumiDetectorConstruction();
-    ~NumiDetectorConstruction();
-
-  G4VPhysicalVolume* Construct();
-
-	void SetTargetZ0(G4double val);
-	void SetHornCurrent(G4double val);
+   void SetAbsorberConfig(G4String config);
+   void SetMonAbsorberMaterial(G4String materialChoice, G4int mon);
+   void SetMonAbsorberThickness(G4double val, G4int mon);
+   void SetAbsorberDistFromMon(G4double val, G4int mon);
+     
 #ifndef FLUGG
-	void UpdateGeometry();
+   void UpdateGeometry();
 #endif
-  
-  private:
-  NumiDataInput* NumiData;
-  NumiMagneticField* numiMagField;
-  NumiMagneticFieldIC* numiMagFieldIC;
-  NumiMagneticFieldOC* numiMagFieldOC;
-  
-  void ConstructTargetHall();
-  void ConstructTarget();
-  void ConstructBaffle();
-  void ConstructDecayPipe();
-  void ConstructHadronAbsorber();  
-  void ConstructHorns();  
-  void ConstructHorn1(G4ThreeVector pos, G4RotationMatrix rot);
-  void ConstructSpiderSupport(NumiHornSpiderSupport *HSS,
-			      G4double angle,
-			      G4double zPos,
-			      G4double rIn,
-			      G4double rOut,
-			      G4VPhysicalVolume *motherVolume,
-			      G4int copyNo); 
-  void ConstructHorn2(G4ThreeVector pos, G4RotationMatrix rot);
-  void ConstructSecMonitors();
-  void DefineMaterials();
-  G4VisAttributes* GetMaterialVisAttrib(G4int matCode);
-  G4VisAttributes* GetMaterialVisAttrib(G4String matName);
-  void DestroyMaterials();
-
+   
+private:
+   NumiDataInput* NumiData;
+   NumiMagneticField* numiMagField;
+   NumiMagneticFieldIC* numiMagFieldIC;
+   NumiMagneticFieldOC* numiMagFieldOC;
+   
+   void ConstructTargetHall();
+   void ConstructTarget();
+   void ConstructBaffle();
+   void ConstructDecayPipe();
+   void ConstructHadronAbsorber();  
+   void ConstructHorns();  
+   void ConstructHorn1(G4ThreeVector pos, G4RotationMatrix rot);
+   void ConstructSpiderSupport(NumiHornSpiderSupport *HSS,
+                               G4double angle,
+                               G4double zPos,
+                               G4double rIn,
+                               G4double rOut,
+                               G4VPhysicalVolume *motherVolume,
+                               G4int copyNo); 
+   void ConstructHorn2(G4ThreeVector pos, G4RotationMatrix rot);
+   void ConstructSecMonitors();
+   void DefineMaterials();
+   G4VisAttributes* GetMaterialVisAttrib(G4int matCode);
+   G4VisAttributes* GetMaterialVisAttrib(G4String matName);
+   void DestroyMaterials();
+   
 #ifndef FLUGG
-  // Messenger
-  NumiDetectorMessenger *detectorMessenger;
+   // Messenger
+   NumiDetectorMessenger *detectorMessenger;
 #endif
-	
-  G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
-  G4Material* GetMaterial(G4int matcode);
-  G4double phornRgivenZ(G4double a, G4double b, G4double c, G4double z);
-  G4double PHorn2ICRin(G4double z);
-  G4double PHorn2ICRout(G4double z);
-  G4double PHorn2OCRin(G4double z);
-  G4double PHorn2OCRout(G4double z);
-  G4double PHorn1ICRin(G4double z);
-  G4double PHorn1ICRout(G4double z);
-  G4double PHorn1OCRin(G4double z);
-  G4double PHorn1OCRout(G4double z);
-
-  // Materials
-  G4Material* Vacuum;
-  G4Material* DecayPipeVacuum;
-  G4Material* Air;
-  G4Material* Water;
-  G4Material* He;
-  G4Material* Be;
-  G4Material* C;
-  G4Material* Al;
-  G4Material* Ar;
-  G4Material* Pb;
-  G4Material* Fe;
-  G4Material* CT852;
-  G4Material* Concrete;
-  G4Material* Shotcrete;
-  G4Material* Rebar_Concrete;
-  G4Material* Target;
-  G4Material* DolomiteRock;
-  G4Material* DoloStone;
-  G4Material* MaqShale;
-  G4Material* Chert;
-  G4Material* Pyrite;
-  G4Material* MaqSiltstone;
-  G4Material* var_Al;
-  G4Material* var_Stl;
-  G4Material* Slab_Stl;
-  G4Material* Blu_Stl;
-  G4Material* n1018_Stl;
-  G4Material* A500_Stl;
-  G4Material* M1018_Stl;
+   
+   G4VPhysicalVolume* GetPhysicalVolume(G4String PVname);
+   G4Material* GetMaterial(G4int matcode);
+   G4double phornRgivenZ(G4double a, G4double b, G4double c, G4double z);
+   G4double PHorn2ICRin(G4double z);
+   G4double PHorn2ICRout(G4double z);
+   G4double PHorn2OCRin(G4double z);
+   G4double PHorn2OCRout(G4double z);
+   G4double PHorn1ICRin(G4double z);
+   G4double PHorn1ICRout(G4double z);
+   G4double PHorn1OCRin(G4double z);
+   G4double PHorn1OCRout(G4double z);
+   
+   // Materials
+   G4Material* Vacuum;
+   G4Material* DecayPipeVacuum;
+   G4Material* Air;
+   G4Material* Water;
+   G4Material* He;
+   G4Material* Be;
+   G4Material* C;
+   G4Material* Al;
+   G4Material* Ar;
+   G4Material* Pb;
+   G4Material* Fe;
+   G4Material* CT852;
+   G4Material* Concrete;
+   G4Material* Shotcrete;
+   G4Material* Rebar_Concrete;
+   G4Material* Target;
+   G4Material* DolomiteRock;
+   G4Material* DoloStone;
+   G4Material* MaqShale;
+   G4Material* Chert;
+   G4Material* Pyrite;
+   G4Material* MaqSiltstone;
+   G4Material* var_Al;
+   G4Material* var_Stl;
+   G4Material* Slab_Stl;
+   G4Material* Blu_Stl;
+   G4Material* n1018_Stl;
+   G4Material* A500_Stl;
+   G4Material* M1018_Stl;
+   G4Material* Alumina;
+   G4Material* HeGas;
+   G4Material* Drywall;
+   G4Material* Paraffin;
+   G4Material* DefaultMaterial;
 
 
 

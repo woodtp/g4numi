@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13 2009/05/15 18:13:09 ahimmel Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.1 2010/08/19 19:50:54 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -35,19 +35,20 @@
 
 NumiDetectorConstruction::NumiDetectorConstruction()
 {
-  //Scan the input file     
-  NumiData = NumiDataInput::GetNumiDataInput();
 
-  // Pointers for magnetic fields ***    
-  numiMagField = new NumiMagneticField(); 
-  numiMagFieldIC = new NumiMagneticFieldIC();
-  numiMagFieldOC = new NumiMagneticFieldOC();
-  
+   //Scan the input file     
+   NumiData = NumiDataInput::GetNumiDataInput();
+      
+   // Pointers for magnetic fields ***    
+   numiMagField = new NumiMagneticField(); 
+   numiMagFieldIC = new NumiMagneticFieldIC();
+   numiMagFieldOC = new NumiMagneticFieldOC();
+   
 #ifndef FLUGG
   // create commands for interactive definition of the geometry
   detectorMessenger = new NumiDetectorMessenger(this);
 #endif
-  DefineMaterials();
+   DefineMaterials();
 }
 
 NumiDetectorConstruction::~NumiDetectorConstruction()
@@ -90,6 +91,8 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ROCK_log = new G4LogicalVolume(ROCK_solid, DoloStone,"ROCK_log",0,0,0); 
   ROCK_log->SetVisAttributes(G4VisAttributes::Invisible);
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
+
+  G4cout << "*******************************" << (DoloStone -> GetDensity()) * cm3 /g<<G4endl;
   
   ConstructTargetHall();
   ConstructDecayPipe();
@@ -99,26 +102,14 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   G4ThreeVector horn1pos(0.,0.,3.*cm);
   G4RotationMatrix horn1rot(0.,0.,0.);
   ConstructHorn1(horn1pos,horn1rot);
-  // Okay this is confusing. move horn 1 back by 3cm to match position in gnumi (and in drawings)
-  // but horn 2 stays i the same place. If you want to make a 'gnumi-like' horn1 you need to go (in horn1 coordinates)
-  // from -3*cm to 2.97m  (the -3 cm probably doesnt matter since not many particles will make it through there anyway)
-
-  G4ThreeVector horn2pos(0.,0.,10*m); 
+  G4ThreeVector horn2pos(0.,0.,10.*m);
   G4RotationMatrix horn2rot(0.,0.,0.);
-  if (NumiData->jCompare) {
-    G4ThreeVector horn2pos(0.,0.,10.03*m);        
-    ConstructHorn2(horn2pos,horn2rot);
-  }
-  else {
-    G4ThreeVector horn2pos(0.,0.,10.*m);
-    ConstructHorn2(horn2pos,horn2rot);    
-  }
-
+  ConstructHorn2(horn2pos,horn2rot);
   if (NumiData->constructTarget){
     ConstructTarget();
   }
-    ConstructHadronAbsorber(); 
-   ConstructSecMonitors();
+  ConstructHadronAbsorber(); 
+  ConstructSecMonitors();
 
 #ifndef FLUGG
   //Set Vis Attributes according to solid material (only for volumes not explicitly set)
@@ -166,6 +157,43 @@ void NumiDetectorConstruction::SetHornCurrent(G4double val) {
 
 }
 
+
+//----------------------------------------------------------------------------------------  
+void NumiDetectorConstruction::SetAbsorberConfig(G4String config)
+{
+   //
+   // change Absorber configuration
+   //
+   NumiData -> SetAbsorberConfig(config);
+}
+//----------------------------------------------------------------------------------------
+void NumiDetectorConstruction::SetMonAbsorberMaterial(G4String materialChoice, G4int mon)
+{
+  // search the material by its name
+  G4Material* pttoMaterial = G4Material::GetMaterial(materialChoice);
+  if (!pttoMaterial)
+  {
+     G4cout << "DetectorConstruction::SetAbsorberMaterial - Invalid Material: Setting Air" << G4endl;
+     pttoMaterial = G4Material::GetMaterial("Air");
+  }
+
+  NumiData->SetAbsorberMaterial(pttoMaterial, mon);
+}
+//----------------------------------------------------------------------------------------  
+void NumiDetectorConstruction::SetMonAbsorberThickness(G4double val, G4int mon)
+{
+   // change Absorber thickness
+   NumiData->SetAbsorberThickness(val, mon);
+}
+//----------------------------------------------------------------------------------------
+void NumiDetectorConstruction::SetAbsorberDistFromMon(G4double val, G4int mon)
+{
+   // change Distance betw Mon and Absorber
+   NumiData->SetAbsorberMonDist(val, mon);
+}
+
+
+
 #ifndef FLUGG
 void NumiDetectorConstruction::UpdateGeometry() {
 
@@ -177,6 +205,8 @@ void NumiDetectorConstruction::UpdateGeometry() {
   G4PhysicalVolumeStore::GetInstance()->Clean();
   G4LogicalVolumeStore::GetInstance()->Clean();
   G4SolidStore::GetInstance()->Clean();
+  //DestroyMaterials();
+  DefineMaterials();
   G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
   
 }

@@ -93,11 +93,83 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useMuonInput->SetDefaultValue (NumiData->useMuonInput);
   useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  NInputParts = new G4UIcmdWithAnInteger("/NuMI/run/NInputParts",this);
+  NInputParts->SetGuidance("Number of parts to divide the muon input file into");
+  NInputParts->SetParameterName("Number of parts to divide the muon input file into",true);
+  NInputParts->SetDefaultValue (NumiData->GetNInputParts());
+  NInputParts->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  NInputPart = new G4UIcmdWithAnInteger("/NuMI/run/NInputPart",this);
+  NInputPart->SetGuidance("The part of the muon input file to read in");
+  NInputPart->SetParameterName("The part of the muon input file to read in",true);
+  NInputPart->SetDefaultValue (NumiData->GetNInputPart());
+  NInputPart->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  reWeightDeltas = new G4UIcmdWithABool("/NuMI/run/reWeightDeltas",this);
+  reWeightDeltas->SetGuidance("Split the delta rays reaching the Alcoves to get better edep sampling");
+  reWeightDeltas->SetParameterName("reWeightDeltas",true);
+  reWeightDeltas->SetDefaultValue (NumiData->GetReWeightDeltas());
+  reWeightDeltas->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  nSplitDeltas = new G4UIcmdWithAnInteger("/NuMI/run/nSplitDeltas",this);
+  nSplitDeltas->SetGuidance("Total Number of deltas each delta spilt will represent ");
+  nSplitDeltas->SetParameterName("nSplitDeltas",true);
+  nSplitDeltas->SetDefaultValue (NumiData->GetNSplitDeltas());
+  nSplitDeltas->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   useMuonBeam = new G4UIcmdWithABool("/NuMI/run/useMuonBeam",this);
   useMuonBeam->SetGuidance("run the muon MC");
   useMuonBeam->SetParameterName("useMuonBeam",true);
   useMuonBeam->SetDefaultValue (NumiData->useMuonBeam);
   useMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  simAbsBkg = new G4UIcmdWithABool("/NuMI/run/simAbsBkg",this);
+  simAbsBkg->SetGuidance("run the Absorber Backgrounds simulation");
+  simAbsBkg->SetParameterName("simAbsBkg",true);
+  simAbsBkg->SetDefaultValue (NumiData->GetSimAbsBkg());
+  simAbsBkg->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  simDRays = new G4UIcmdWithABool("/NuMI/run/simDRays",this);
+  simDRays->SetGuidance("run the Delta Ray simulation");
+  simDRays->SetParameterName("simDRays",true);
+  simDRays->SetDefaultValue (NumiData->GetSimDRays());
+  simDRays->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useZPosCut = new G4UIcmdWithABool("/NuMI/run/useZPosCut",this);
+  useZPosCut->SetGuidance("Use/Not Use the Z Position cut for delta rays");
+  useZPosCut->SetParameterName("useZPosCut",true);
+  useZPosCut->SetDefaultValue (NumiData->GetUseZPosCut());
+  useZPosCut->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  muonBeamShape = new G4UIcmdWithAString("/NuMI/run/muonBeamShape",this);
+  muonBeamShape->SetGuidance("Set the muon beam shape");
+  muonBeamShape->SetParameterName("muonBeamShape",true);
+  muonBeamShape->SetDefaultValue (NumiData->GetMuonBeamShape());
+  muonBeamShape->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  muonBeamMomentum = new G4UIcmdWithADoubleAndUnit("/NuMI/run/muonBeamMomentum",this);
+  muonBeamMomentum->SetGuidance("Set the muon beam momentum");
+  muonBeamMomentum->SetParameterName("muonBeamMomentum",true);
+  muonBeamMomentum->SetDefaultValue (NumiData->GetMuonBeamMomentum());
+  muonBeamMomentum->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  muonBeamZPos = new G4UIcmdWithADoubleAndUnit("/NuMI/run/muonBeamZPos",this);
+  muonBeamZPos->SetGuidance("Set the muon beam energy");
+  muonBeamZPos->SetParameterName("muonBeamZPos",true);
+  muonBeamZPos->SetDefaultValue (NumiData->GetMuonBeamZPos());
+  muonBeamZPos->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  muonBeamGaussXsig = new G4UIcmdWithADoubleAndUnit("/NuMI/run/muonBeamGaussXSig",this);
+  muonBeamGaussXsig->SetGuidance("Set the X-sig for a gaussian beam");
+  muonBeamGaussXsig->SetParameterName("muonBeamGaussXSig",true);
+  muonBeamGaussXsig->SetDefaultValue (NumiData->GetGaussBeamXSig());
+  muonBeamGaussXsig->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  muonBeamGaussYsig = new G4UIcmdWithADoubleAndUnit("/NuMI/run/muonBeamGaussYSig",this);
+  muonBeamGaussYsig->SetGuidance("Set the Y-sig for a gaussian beam");
+  muonBeamGaussYsig->SetParameterName("muonBeamGaussYSig",true);
+  muonBeamGaussYsig->SetDefaultValue (NumiData->GetGaussBeamYSig());
+  muonBeamGaussYsig->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   extNtupleFileName = new G4UIcmdWithAString("/NuMI/run/extNtupleFileName",this);
   extNtupleFileName->SetGuidance("set external (fluka/mars) ntuple file name");
@@ -143,6 +215,24 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   outputHadmmNtuple->SetParameterName("outputHadmmNtuple",true);
   outputHadmmNtuple->SetDefaultValue (NumiData->createHadmmNtuple);
   outputHadmmNtuple->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  setAbsBkgNtupleDir = new G4UIcmdWithAString("/NuMI/output/setAbsBkgNtupleDir",this);
+  setAbsBkgNtupleDir->SetGuidance("set absorber background ntuple file directory");
+  setAbsBkgNtupleDir->SetParameterName("fileDir",true);
+  setAbsBkgNtupleDir->SetDefaultValue (NumiData->GetAbsBkgNtupleDir());
+  setAbsBkgNtupleDir->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  setAbsBkgNtupleFile = new G4UIcmdWithAString("/NuMI/output/setAbsBkgNtupleFile",this);
+  setAbsBkgNtupleFile->SetGuidance("set absorber background ntuple file name");
+  setAbsBkgNtupleFile->SetParameterName("fileName",true);
+  setAbsBkgNtupleFile->SetDefaultValue (NumiData->GetAbsBkgNtupleName());
+  setAbsBkgNtupleFile->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  outputAbsBkgNtuple = new G4UIcmdWithABool("/NuMI/output/outputAbsBkgNtuple",this);
+  outputAbsBkgNtuple->SetGuidance("output absorber background ntuple (true/false)");
+  outputAbsBkgNtuple->SetParameterName("outputAbsBkgNtuple",true);
+  outputAbsBkgNtuple->SetDefaultValue (NumiData->GetCreateAbsBkgNtuple());
+  outputAbsBkgNtuple->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   setASCIIFile = new G4UIcmdWithAString("/NuMI/output/setASCIIFile",this);
   setASCIIFile->SetGuidance("set ASCII file name");
@@ -235,8 +325,23 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete useFlukaInput;
   delete useMarsInput;
   delete useMuonBeam;
+  delete simAbsBkg;
+  delete simDRays;
+  delete useZPosCut;
+  delete muonBeamShape;
+  delete muonBeamMomentum;
+  delete muonBeamZPos;
+  delete muonBeamGaussXsig;
+  delete muonBeamGaussYsig;
   delete useMuonInput;
+  delete NInputParts;
+  delete NInputPart;
+  delete reWeightDeltas;
+  delete nSplitDeltas;
 
+  delete setAbsBkgNtupleDir;
+  delete setAbsBkgNtupleFile;
+  delete outputAbsBkgNtuple;
   delete setNuNtupleFile;
   delete outputNuNtuple;
   delete setHadmmNtupleFile;
@@ -305,37 +410,75 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == useMarsInput){
     NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
   }
-
   if (command == useMuonBeam){
     NumiData->SetMuonBeam(useMuonBeam->GetNewBoolValue(newValues));
   }
+  if (command == simAbsBkg){
+    NumiData->SetSimAbsBkg(simAbsBkg->GetNewBoolValue(newValues));
+  }
+  if (command == simDRays){
+    NumiData->SetSimDRays(simDRays->GetNewBoolValue(newValues));
+  }
+  if (command == useZPosCut){
+    NumiData->SetUseZPosCut(useZPosCut->GetNewBoolValue(newValues));
+  }
+  if (command == muonBeamShape){
+      NumiData->SetMuonBeamShape(newValues);
+  }
+  if (command == muonBeamMomentum){
+     NumiData->SetMuonBeamMomentum(muonBeamMomentum->GetNewDoubleValue(newValues));
+  }
+  if (command == muonBeamZPos){
+     NumiData->SetMuonBeamZPos(muonBeamZPos->GetNewDoubleValue(newValues));
+  }
+  if (command == muonBeamGaussXsig){
+     NumiData->SetGaussBeamXSig(muonBeamGaussXsig->GetNewDoubleValue(newValues));
+  }
+  if (command == muonBeamGaussYsig){
+     NumiData->SetGaussBeamYSig(muonBeamGaussYsig->GetNewDoubleValue(newValues));
+  }  
   if (command == useMuonInput){
     NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues));
   }
-
+  if (command == NInputParts){
+    NumiData->SetNInputParts(NInputParts->GetNewIntValue(newValues));
+  }
+  if (command == NInputPart){
+    NumiData->SetNInputPart(NInputPart->GetNewIntValue(newValues));
+  }
+  if (command == reWeightDeltas){
+    NumiData->SetReWeightDeltas(reWeightDeltas->GetNewBoolValue(newValues));
+  }
+  if (command == nSplitDeltas){
+    NumiData->SetNSplitDeltas(nSplitDeltas->GetNewIntValue(newValues));
+  }
   if (command == extNtupleFileName){
     NumiData->SetExtNtupleFileName(newValues);
   }
   if (command == setNuNtupleFile){
       NumiData->SetNuNtupleName(newValues);
   }
-
   if (command == outputNuNtuple){
       NumiData->OutputNuNtuple(outputNuNtuple->GetNewBoolValue(newValues));
   }
-
   if (command == setHadmmNtupleDir){
       NumiData->SetHadmmNtupleDir(newValues);
   }
-
   if (command == setHadmmNtupleFile){
       NumiData->SetHadmmNtupleName(newValues);
   }
-
   if (command == outputHadmmNtuple){
-      NumiData->OutputHadmmNtuple(outputNuNtuple->GetNewBoolValue(newValues));
+      NumiData->OutputHadmmNtuple(outputHadmmNtuple->GetNewBoolValue(newValues));
   }
-
+   if (command == setAbsBkgNtupleDir){
+      NumiData->SetAbsBkgNtupleDir(newValues);
+  }
+  if (command == setAbsBkgNtupleFile){
+      NumiData->SetAbsBkgNtupleName(newValues);
+  }
+  if (command == outputAbsBkgNtuple){
+      NumiData->OutputAbsBkgNtuple(outputAbsBkgNtuple->GetNewBoolValue(newValues));
+  }
   if (command == setNEvents){
       NumiData->SetNEvents(setNEvents->GetNewIntValue(newValues));
   }
