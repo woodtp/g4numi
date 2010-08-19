@@ -65,8 +65,8 @@ include $(G4INSTALL)/config/binmake.gmk
 CXXFLAGS_WITHOUT_O := $(filter-out -O% , $(CXXFLAGS))
 CXXFLAGS_WITHOUT_O := $(filter-out +O% , $(CXXFLAGS_WITHOUT_O))
 
-g4numiCint: include/data_t.hh include/hadmmtuple_t.hh  include/zptuple_t.hh Linkdef.h
-	rootcint -f ./src/g4numiCint.cc -c -I./include ../include/data_t.hh ../include/hadmmtuple_t.hh ../include/zptuple_t.hh ../Linkdef.h
+g4numiCint: include/data_t.hh include/hadmmtuple_t.hh include/draytupleSPB_t.hh include/Edep_t.hh include/draytupleMIB_t.hh include/absbkgtuple_t.hh include/zptuple_t.hh Linkdef.h
+	rootcint -f ./src/g4numiCint.cc -c -I./include ../include/data_t.hh ../include/hadmmtuple_t.hh ../include/draytupleSPB_t.hh ../include/Edep_t.hh ../include/draytupleMIB_t.hh ../include/absbkgtuple_t.hh ../include/zptuple_t.hh ../Linkdef.h
 
 libg4numiDict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
 	gcc -g -shared -o libg4numiDict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
