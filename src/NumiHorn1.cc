@@ -142,6 +142,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   sMHorn1= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn1 = new G4LogicalVolume(sMHorn1,material,"lvMHorn1",0,0,0);
   ND->ApplyStepLimits(lvMHorn1); // Limit Step Size
+  ND->ApplyTimeLimits(lvMHorn1);//limit TOF for step
   G4VisAttributes* invisible=new G4VisAttributes(false);
   lvMHorn1->SetVisAttributes(invisible);
   rotation=hornrot;
@@ -153,7 +154,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
    * FLUGG - 
    * Volume added to follow particles by Alex Himmel 3-21-07
    */
-  G4double boxX = NumiData->TargetAreaWidth/2.;
+  /*  G4double boxX = NumiData->TargetAreaWidth/2.;
   G4double boxY = NumiData->TargetAreaHeight/2.;
   G4double boxZ = 1*cm;
 	
@@ -161,9 +162,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4Material *boxmat = TGAR->GetLogicalVolume()->GetMaterial();
   G4LogicalVolume *lvHorn1Box = new G4LogicalVolume(sHorn1Box, boxmat, "lvHorn1Box",0,0,0);
   ND->ApplyStepLimits(lvHorn1Box); // Limit Step Size
+  ND->ApplyTimeLimits(lvHorn1Box);//limit TOF for step
   translation += G4ThreeVector(0.,0.,(MVzPos[nMV] - MVzPos[0])/2.+.5*cm);
   new G4PVPlacement(G4Transform3D(rotation,translation),"Horn1Box",lvHorn1Box,TGAR,false,0);
-
+  */
 
   
   //Front part
@@ -249,8 +251,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
-    }
-    
+    }  
 }
 
 void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS,G4double angle,G4double zPos,G4double rIn,G4double rOut,G4VPhysicalVolume *motherVolume, G4int copyNo)

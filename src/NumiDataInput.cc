@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.2 2010/10/29 16:32:52 mjerkins Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDataInput.hh"
@@ -9,16 +9,16 @@
 #include "NumiHornSpiderSupport.hh"
 #include "G4UserLimits.hh"
 //#include "globals.hh"
-#include "G4Material.hh"
-
 #include <math.h>
+#include <fstream>
+#include "G4Material.hh"
 
 static const G4double in=2.54*cm;
 
 NumiDataInput* NumiDataInput::fNumiDataInput = 0;
 
 NumiDataInput* NumiDataInput::GetNumiDataInput(){
-   //G4cout << "Requesting NumiDataInput " << G4endl;
+  //G4cout << "Requesting NumiDataInput " << G4endl;
     if (!fNumiDataInput) {
         G4cout << "Constructing NumiDataInput " << G4endl;
         fNumiDataInput = new NumiDataInput();    
@@ -33,6 +33,34 @@ NumiDataInput::NumiDataInput()
     { G4Exception("NumiDataInput constructed twice.");}
 //  fNumiDataInput = this;
 
+  bool useFile = false;
+  int runPeriodFile = -999;
+  double targetZFile = -999.;
+  double hornCurrentFile = -999.;
+  
+  std::ifstream datafile("../runConfig.inp");
+  if (datafile.is_open()) {
+    useFile = true;
+    datafile  >> runPeriodFile >> targetZFile >> hornCurrentFile;
+    datafile.close();
+    G4cout << G4endl << G4endl << G4endl << G4endl
+    << G4endl << G4endl << G4endl << G4endl 
+    << G4endl << G4endl << G4endl << G4endl 
+    << G4endl << G4endl << G4endl << G4endl 
+        << "Using parameters from runConfig.inp: " << G4endl
+           << "  Run Period = " << runPeriodFile << G4endl
+           << "  Target Z = " << targetZFile << G4endl
+           << "  Horn Current = " << hornCurrentFile << G4endl;
+    if (hornCurrentFile == 185) hornCurrentFile = 182.1;
+    else if (hornCurrentFile == 170) hornCurrentFile = 167.3;
+    else if (hornCurrentFile == 200) hornCurrentFile = 196.9;
+    else if (hornCurrentFile == 0) hornCurrentFile = 0;
+    else {
+        G4cout << "Unrecognized horn current " << hornCurrentFile << ", bailing." << G4endl;
+        assert(false);
+    }
+  }  
+      
   debugOn = false;
   NImpWeightOn = true; 
   createNuNtuple=false;  createHadmmNtuple=false;
@@ -40,8 +68,7 @@ NumiDataInput::NumiDataInput()
   useFlukaInput = false; useMarsInput=false;
 
   //
-  //For Muon Beam
-  //these can be set from the macro
+  //can set useMuonInupt and useMuonBeam from macro
   //
   useMuonInput = false;
   NInputParts = 0;
@@ -66,15 +93,13 @@ NumiDataInput::NumiDataInput()
   muonBeamGaussXsig = 0.0*mm;
   muonBeamGaussYsig = 0.0*mm;
 
-
-  
-
   useTestBeam = false;   
   useDecayPipeSelect = false;
   KillTracking = true; // false for ahimmel
   testTheta = M_PI/6.;
   
-   StepLimit = 0; 
+   StepLimit = 0.0; 
+   TimeLimit = 60.0*s;
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
@@ -84,6 +109,11 @@ NumiDataInput::NumiDataInput()
 
    //base name for output files:
    nuNtupleName    = "nuNtuple";
+   //
+   //can set hadmmNtupleDir and hadmmNtupleName from macro
+   //
+   //hadmmNtupleDir  = "./";
+   //hadmmNtupleName = "";
    asciiName       = "asciiOut";
    bxdrawName      = "bxdrawOut";
    RunNumber       = "0000";
@@ -109,11 +139,12 @@ NumiDataInput::NumiDataInput()
   airhrn =false; // airhrn must be changed before compilation
   vacuumworld=false;
   jCompare = false; // make horns have the same B field;
+  g3Chase = false;
   
 if(!vacuumworld && !airhrn){
-  hrnmat = 9;
-  hrnmatcr =31;
-  hallmat=15;
+  hrnmat = 9;   // Al
+  hrnmatcr =31; // CT852
+  hallmat=15;   // Air
 }
  else {
    if(airhrn){
@@ -191,20 +222,31 @@ if(!vacuumworld && !airhrn){
  createZpNtuple=false;
  zpNtupleName="zpNtuple";
  //==============================================================
+  //Target Configuration (LE010 = -10.0, LE100 = -100.0, etc.)
+  // runPeriod corresponds to Runs I, II, III, IV
+  //=======================================================================
+  double TargetConfigZ = -10.0*cm;
+  int runPeriod = 0;
+   
+  if (useFile) {
+      runPeriod = runPeriodFile;
+      TargetConfigZ = -1*targetZFile*cm;
+  }   
+
   G4float beam_x_dir = 0;
   G4float beam_y_dir = 0;
   G4float beam_z_dir = 1;//cos(.01*pi/180);
   //actual dm is 5/13e-4 radians 
   G4float beam_x_pos = 0;
   G4float beam_y_pos = 0;
-  G4float beam_z_pos = -4.0*m;
+  G4float beam_z_pos = -4.0*m+ TargetConfigZ;
   // the reason for the beam_z_pos change was to move the beam to start
   // immediately before the target so that the beam spot interaction point
   // would remain constant, but the angle would change.
 
   protonMomentum = 120.*GeV;  
-  beamSigmaY     = 0;//1.25*mm;
-  beamSigmaX     = 0;//1.1*mm;
+  beamSigmaY     = 1.1*mm;//1.25*mm;
+  beamSigmaX     = 1.1*mm;//1.1*mm;
   beamDirection  = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
   beamPosition  = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
 
@@ -217,10 +259,13 @@ if(!vacuumworld && !airhrn){
   RockDensity = 2.41*g/cm3; // not
   RockRadLen  = 0.0;        // used
 
+
+
+  
   constructTarget = true;
   //TargetArea          1
   //=======================================================================
-  TargetAreaZ0       = -6.7*m;//was -4.0*m (08/09/05);
+  TargetAreaZ0       = -6.7*m;  //was -4.0*m (08/09/05);
   TargetAreaLength   = 52.398*m;//was 49.28*m (08/09/05);
 
   // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version, 
@@ -230,12 +275,12 @@ if(!vacuumworld && !airhrn){
   TargetAreaHeight   = 8.5*m;
   TargetAreaWidth    = 8.5*m;
   TargetAreaGEANTmat = 15;
-
+  
   // Target   1
   //=======================================================================
   TargetX0           = 0.0;
   TargetY0           = -1.1*mm;
-  TargetZ0           = -0.45*m; //-0.35*m-10.*cm;
+  TargetZ0           = -0.35*m + TargetConfigZ;
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
   TargetSLength      = 20.*mm;
@@ -254,17 +299,35 @@ if(!vacuumworld && !airhrn){
 
   //Budal Monitor
   BudalX0 = 0.0;
-  BudalY0 = 2.26*mm;
+  //BudalY0 = 2.26*mm;
+  BudalY0 = 0.0;
   BudalZ0 = -16.72*cm;
   BudalDxdz = 0.0;
   BudalDydz = 0.0;
+
+  if (runPeriod == 1) {
+    TargetY0 = -1.1*mm;
+    BudalY0  = 2.26*mm;
+  }
+  else {
+    // Align Target and Budal
+    TargetY0 = 0.0;
+    BudalY0 = 0.0;	
+  }
+	
+  if (runPeriod == 2 || runPeriod == 3) {
+    // Change LE010 to LE009
+    if (TargetConfigZ == -10.0*cm) {
+        TargetZ0 += 1.1*cm;
+    }
+  }
   
   //HPBaffle           1 // Only the length and position can be changed currently
   //=======================================================================
   HPBaffleGEANTMat   =  18;
   HPBaffleX0         =  0.00;
   HPBaffleY0         =  0.00;
-  HPBaffleZ0         = -3.14*m;
+  HPBaffleZ0         = -3.04*m + TargetConfigZ;
   HPBaffleDXDZ       =  0.0;
   HPBaffleDYDZ       =  0.0;
   HPBaffleLength     =  1.20*m;
@@ -294,7 +357,12 @@ if(!vacuumworld && !airhrn){
   G4String CPipeVolName_[]   = {"Pipe1","Pipe2" ,"Pipe3","Pipe4" ,"Pipe5","Pipe6","Pipe7","Pipe8","Pipe9" ,"PipeAdapter1","PipeAdapter2","PipeC1","PipeC2" ,"PipeEndT","PipeEndB","PipeBellowT","PipeBellowB"  ,"Pipe1tp","Pipe2btm" };
   
   for (G4int ii=0;ii<NCPipeN;ii++){
+    if(airhrn){
+      CPGeantMat.push_back(15);
+    }
+    else{
     CPGeantMat.push_back(CPGeantMat_[ii]);
+    }
     CPipeFilledWater.push_back(CPipeFilledWater_[ii]);
     CPipeX0.push_back(CPipeX0_[ii]*m);
     CPipeY0.push_back(CPipeY0_[ii]*m);    
@@ -374,7 +442,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //DecayPipe          1    
   //=======================================================================
   DecayPipeZ0        = 45.699*m; //was 45.28*m (08/09/05);
-  DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
+  //DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
+  DecayPipeRadius    = 0.9906*m;
   DecayPipeLength    = 676.681*m; //was 677.1*m (08/09/05);
   DecayPipeFWinThick = 1.60E-3*m;
   DecayPipeEWinThick = 4.76E-3*m;
@@ -422,9 +491,13 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   //======================================================================= 
   // Target Hall shielding (18 blocks, numbered 0-17)
- 
-  THBlockNblock = 18;
-  
+
+  if(g3Chase){
+    THBlockNblock = 24;
+  }
+  else{
+    THBlockNblock=18;
+  }
   // reminder: all length dimensions for the target shielding blocks are in meters.
   //These are the Duratek blocks mentioned in the Numi Technical Design Handbook.
 
@@ -448,7 +521,13 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   -1.7158,    //Block 14
 							   0.6904,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   -0.6904,        //Block16 (top block2--one of the slightly enlarged blocks)
-							   0.0        //Block17 (top block3)
+							   0.0,        //Block17 (top block3)
+			       0.0,        // Block 18 (bottom gnumi block)
+			       0.6373,  // Block 19 ( side 1 gnumi block)
+			       -0.6373, // Block 20 (Side 2 gnumi block)
+			       0.0, // Block 21 (top gnumi block bf Horn2)
+			       0.0,//
+			       0.0//
   };
 
   G4double THBlockY0_[]    = { -2.03895,      //Block 0
@@ -468,7 +547,13 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   1.62105,      //Block 14
 							   1.98395,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   1.98395,        //Block16 (top block2--one of the slightly enlarged blocks)
-							   1.29355        //Block17 (top block3)
+							   1.29355,        //Block17 (top block3)
+			       -0.993215, //Block 18 (bottom gnumi block)
+                               -0.0377, //Block 19 (side 1 gnumi block)
+                               -0.0377, //Block 20 (side 2 gnumi block)
+                               0.657075,//Block 21 (top gnumi block)
+			       0.657075, // Block 22 (top gnumi block after h2)
+                               0.672075 //Block 23 above Horn2
   };
 
   
@@ -498,7 +583,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   20.64,         //Block 14
 							   20.64,        //Block15 (top block1--one of the slightly enlarged blocks)
 							   20.64,        //Block16 (top block2--one of the slightly enlarged blocks)
-							   20.64        //Block17 (top block3)
+							   20.64,        //Block17 (top block3)
+							   19.499,//Block 18 bottom
+							   19.499,//Block 19 side
+							   19.499,//Block 20 side	
+							   19.499,//Block 21 top
+							   19.499,//Block 22 top
+							   19.499,//Block 23 top
+
   };
 
 	  
@@ -570,7 +662,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 			      "BLK14",
 			      "BLK15",
 			      "BLK16",
-			      "BLK17"
+			      "BLK17",
+			      "BLK18",
+			      "BLK19",
+			      "BLK20",
+			      "BLK21",
+			      "BLK22",
+			      "BLK23"
+
                               };
 
   //This next block puts all the block coordinates into vectors and assigns the unit "meters" to the values.
@@ -578,7 +677,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   for (G4int ii=0;ii<THBlockNblock;ii++){
     THBlockX0.push_back(THBlockX0_[ii]*m);
     THBlockY0.push_back(THBlockY0_[ii]*m);
-    THBlockZ0.push_back(THBlockZ0_[0]*m);
+    if(ii==21){
+      THBlockZ0.push_back(1.15*m);
+    }
+    else if(ii==22) THBlockZ0.push_back(30.34*m);
+    else if(ii==23) THBlockZ0.push_back(12*m);
+    else    THBlockZ0.push_back(THBlockZ0_[0]*m);
     THBlockDxdz.push_back(THBlockDxdz_[0]*m);
     THBlockDydz.push_back(THBlockDydz_[0]*m);
     THBlockLength.push_back(THBlockLength_[0]*m);
@@ -599,13 +703,32 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   
   HornCurrent=182100.*ampere; 
+  if (useFile) {
+    HornCurrent = hornCurrentFile*ampere;
+    if (HornCurrent < 250*ampere) HornCurrent *= 1000.; // Convert to kA
+  }
   
+  if (runPeriod == 4) {
+      HornCurrent *= -1;
+  }
+  
+  G4cout << "Running with: " << G4endl
+       << "  Run Period = " << runPeriod << G4endl
+       << "  Target Z = " << TargetConfigZ/cm << " cm" << G4endl
+       << "  Horn Current = " << HornCurrent/ampere/1000. << " kA" << G4endl;
+
   NPHorn2EndN=3;
+  
   G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
+  if (jCompare) {
+	PHorn2EndZ0_[0] = 118.11;
+	PHorn2EndZ0_[1] = 119.86;
+	PHorn2EndZ0_[2] = 122.048;	
+  }
   G4double PHorn2EndLength_[] ={1.75           ,2.188       ,.625};
   G4double PHorn2EndRin_[]    ={12.719         ,12.532      ,11.};
   G4double PHorn2EndRout_[]   ={14.405         ,14.469      ,12.532};
-  G4int PHorn2EndGeantMat_[]  ={31             ,  9         ,  9   };
+  G4int PHorn2EndGeantMat_[]  ={31             ,  9         ,  9 };  
   G4String PHorn2EndVolName_[]={"PHorn2InsRing","PHorn2CPB1","PHorn2CPB2"};
 
   for (G4int ii=0;ii<NPHorn2EndN;ii++){
@@ -614,7 +737,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     PHorn2EndRin.push_back(PHorn2EndRin_[ii]*in);
     PHorn2EndRout.push_back(PHorn2EndRout_[ii]*in);
     if(airhrn){
-      PHorn2EndGeantMat.push_back(PHorn2EndGeantMat_[ii]);
+      PHorn2EndGeantMat.push_back(15);
     }
     else{
     PHorn2EndGeantMat.push_back(PHorn2EndGeantMat_[ii]);
@@ -624,6 +747,11 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   NPHorn1EndN=3;
   G4double PHorn1EndZ0_[]     ={126.092        ,127.842     ,129.718};
+  if (jCompare) {
+	PHorn1EndZ0_[0] = 118.11;
+	PHorn1EndZ0_[1] = 119.86;
+	PHorn1EndZ0_[2] = 122.048;	
+  }
   G4double PHorn1EndLength_[] ={1.75           ,2.188       ,.624};
   G4double PHorn1EndRin_[]    ={6.00           ,5.815       ,4.25};
   G4double PHorn1EndRout_[]   ={7.687          ,7.75        ,5.815};
@@ -741,14 +869,18 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     zdet_far.push_back(zdetFar[ii]*m);
   }
 }
-//----------------------------------------------------------------------
+
 NumiDataInput::~NumiDataInput()
 {
 }
-//----------------------------------------------------------------------
+
 void NumiDataInput::ApplyStepLimits(G4LogicalVolume *vol) {
   if (StepLimit == 0.0) return;
   vol->SetUserLimits(new G4UserLimits(StepLimit));
+}
+void NumiDataInput::ApplyTimeLimits(G4LogicalVolume *vol) {
+  if (TimeLimit == 0.0) return;
+  vol->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,TimeLimit));
 }
 
 //----------------------------------------------------------------------
@@ -855,5 +987,44 @@ G4double NumiDataInput::GetAbsorberMonDist(G4int mon)
       return 1.0*m;
    }
 
+}
+//--------------------------------------------------------------------------------
+void NumiDataInput::SetjCompare(G4bool _jc) {
+    jCompare = _jc;
+    G4double PHorn1EndZ0_[]     ={126.092        ,127.842     ,129.718};
+    if (jCompare) {
+        PHorn1EndZ0_[0] = 118.11;
+        PHorn1EndZ0_[1] = 119.86;
+        PHorn1EndZ0_[2] = 122.048;	
+    }
+    PHorn1EndZ0.clear();
+    for (G4int ii=0;ii<NPHorn1EndN;ii++){
+        PHorn1EndZ0.push_back(PHorn1EndZ0_[ii]*in);
+    }
+    
+    
+    G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
+    if (jCompare) {
+        PHorn2EndZ0_[0] = 118.11;
+        PHorn2EndZ0_[1] = 119.86;
+        PHorn2EndZ0_[2] = 122.048;	
+    }
+    PHorn2EndZ0.clear();
+    for (G4int ii=0;ii<NPHorn2EndN;ii++){
+        PHorn2EndZ0.push_back(PHorn2EndZ0_[ii]*in);
+    }
+}
+
+
+void NumiDataInput::Setg3Chase(G4bool _gc) {
+    g3Chase = _gc;
+    
+    if(g3Chase){
+        THBlockNblock = 24;
+    }
+    else{
+        THBlockNblock=18;
+    }       
+    
 }
 

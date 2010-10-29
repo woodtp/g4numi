@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.2 2010/10/29 16:32:52 mjerkins Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -20,8 +20,6 @@ void NumiDetectorConstruction::DefineMaterials()
 
   G4double rock_density_offset     = 0.04*g/cm3 * NumiData->GetMaterialSigma();
   G4double BluBlock_density_offset = 0.16*g/cm3 * NumiData->GetMaterialSigma();
-
-  G4cout << "mat sig = " << NumiData->GetMaterialSigma() << G4endl;
 
   // Air and Vacuum
   A = 1.01*g/mole;
@@ -371,7 +369,6 @@ G4Material* NumiDetectorConstruction::GetMaterial(G4int matcode)
   if (matcode==33) return HeGas;
   if (matcode==34) return Drywall;
   if (matcode==35) return Paraffin;
-  
 
   G4cout << G4endl << " **** Wrong material code **** " << matcode << G4endl << G4endl;
   return Vacuum;
@@ -382,7 +379,7 @@ G4VisAttributes* NumiDetectorConstruction::GetMaterialVisAttrib(G4int matCode)
   G4VisAttributes* visAttrib=new G4VisAttributes(G4Color(1., 0., 0.));
   if (matCode==5) visAttrib=new G4VisAttributes(G4Color(0.1, 0.2, 0.95));//Be 
   if (matCode==6) visAttrib=new G4VisAttributes(G4Color(0.7, 0.7, 0.7)); //C
-  if (matCode==9) visAttrib=new G4VisAttributes(G4Color(0.2, 0.8, 1.));//Al
+  if (matCode==9 || matCode==20) visAttrib=new G4VisAttributes(G4Color(0.2, 0.8, 1.));//Al
   if (matCode==10 || matCode==11) visAttrib=new G4VisAttributes(G4Color(0.5, 0.3, 0.0));//Fe
   if (matCode==12) visAttrib=new G4VisAttributes(G4Color(0.0, 0.4, .9));//BluBlocks
   if (matCode==15) visAttrib=new G4VisAttributes(false); //Air
