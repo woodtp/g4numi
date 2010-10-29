@@ -33,8 +33,6 @@
 #include "NumiRunAction.hh"
 #include "NumiRunManager.hh"
 
-#include "NumieIonisation.hh"
-#include "NumiMuIonisation.hh"
 
 
 #ifdef G4VIS_USE
