@@ -1,0 +1,262 @@
+#-----------------------------------------------------------------------------------
+#
+# An example script for running the Neutrino Beam simulation in G4NuMI. -L.Loiacono
+#
+
+#
+#I don't know what this does
+#
+/control/suppressAbortion 2
+
+#
+#Tell G4NuMI that you want to run the Neutrino beam simulation, default is false
+#
+/NuMI/run/useNuBeam true
+
+#
+#Set the Run Period, default is -999 which is no run period at all. MUST SET IT.
+#Run Period 0 is like a "default" run period, everything is aligned, it is not
+#specific to any ACTUAL NuMI beam running period.
+#
+/NuMI/det/RunPeriod 0
+
+#
+#Use the Calibration corrected horn current value for the
+#horn current configuration defined by BeamConfig (see next), default is true
+#Note:This must be set BEFORE setting BeamConfig
+#
+/NuMI/det/UseCorrHornCurrent true
+
+#
+#Configure the neutirno beam. 
+#This sets the TargetZ0 and Baffle Z0 and HornCurrent.
+#Must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. 
+#Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
+#Note: cannot handle ME config right now.
+#
+/NuMI/det/BeamConfig LE010z185i
+
+#
+#Use the Detailed Proton beam, true/false, default is false
+#NOTE: Right now I don't know if the code for this and the parameter values are right.
+#THIS NEEDS TO BE CHECKED!
+#
+#/NuMI/run/useDetailedProtonBeam true
+
+#
+#Kill tracking, true/false, default is true
+#Set the energy at which to kill the particle
+#default is 0.05 GeV. Note: This cut is specific for MINOS
+#
+#/NuMI/run/KillTracking true
+#/NuMI/run/KillTrackingThreshold 0.05 GeV
+
+#
+#Use importance weighting, default is true
+#
+#/NuMI/run/useNImpWeight true
+
+#
+#Read in fluka hadrons file, true/false, default is false
+#Set the fluka hadrons file path and name
+#
+#/NuMI/run/useFlukaInput true
+#/NuMI/run/extNtupleFileName /minos/data/users/jyuko/fluka05root/fluka05_005.root
+
+#
+#If using external hadron file for input don't need to 
+#and probably don't want to construct the target, default is true
+#
+#/NuMI/det/constructTarget false
+
+#############################################
+##Visualization with HepRep
+##
+## create empty scene
+##
+#/vis/open HepRepFile 600
+#/vis/scene/create
+#/vis/scene/add/trajectories
+#/vis/sceneHandler/attach
+## for drawing the tracks
+## (if too many tracks cause core dump => storeTrajectory 0)
+#/tracking/storeTrajectory 1
+#/vis/scene/endOfEventAction accumulate
+##NOTE set /run/beamOn 1
+#
+#############################################
+
+#
+#Update the geometry. ALWAYS do this HERE, never before this point. 
+#The geometery is constructed BEFORE
+#the macro is read. Need to reconstruct the geometry after reading in the macro.
+#
+/NuMI/det/update
+
+
+#
+# Allows the beginning seed to be set manually. This allows 
+# rerunning simulations with the exact same initial conditions 
+# to check for possible errors.
+#
+/NuMI/rndm/setRndmSeed 30
+
+#
+# Allows the RunID, which is included in the
+# output file name(s), to be set at runtime.
+#
+/NuMI/run/setRunID 8000
+
+#
+# If NOT using an external hadron file then this establishes how 
+# many particles(protons) to use during the simulation. To be consistent 
+# with past neutrino ntuples each run uses 500000 protons
+#
+/run/beamOn 20
+
+
+
+#
+#NOTE: To debug problems grep for "PROBLEM" in the output of the simulation
+# "PROBLEM" statements are printed when there is a problem.
+#
+
+
+
+#-----------------------------------------------------------------------------------
+#
+# An example script for running the Water in the Target neutrino beam "sub-simulation" in G4NuMI. -L.Loiacono
+#
+
+#
+#I don't know what this does
+#
+/control/suppressAbortion 2
+
+#
+#Tell G4NuMI that you want to run the Neutrino beam simulation, default is false
+#
+/NuMI/run/useNuBeam true
+
+#
+#Tell G4NuMI that you want to run the simulation of water in the target. 
+#This is a "sub-simulation" of the Neutrino beam simulation, default is false
+#
+/NuMI/run/useWaterInTgt true
+
+#
+#Set the amount (length) of water that fills the target starting from the downstream end.
+#Can't have less than 3 cm of water right now. 
+#default and minimum is 3 cm
+#
+/NuMI/det/LengthOfWaterInTgt 27.8 cm
+
+#
+#Set the Run Period, default is -999 which is no run period at all. MUST SET IT.
+#Run Period 0 is like a "default" run period, everything is aligned, it is not
+#specific to any ACTUAL NuMI beam running period.
+#
+/NuMI/det/RunPeriod 0
+
+#
+#Use the Calibration corrected horn current value for the
+#horn current configuration defined by BeamConfig (see next), default is true
+#Note:This must be set BEFORE setting BeamConfig
+#
+/NuMI/det/UseCorrHornCurrent true
+
+#
+#Configure the neutirno beam. 
+#This sets the TargetZ0 and Baffle Z0 and HornCurrent.
+#Must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. 
+#Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
+#Note: cannot handle ME config right now.
+#
+/NuMI/det/BeamConfig LE250z200i
+
+#
+#Use the Detailed Proton beam, true/false, default is false
+#NOTE: Right now I don't know if the code for this and the parameter values are right.
+#THIS NEEDS TO BE CHECKED!
+#
+#/NuMI/run/useDetailedProtonBeam true
+
+
+#
+#Kill tracking, true/false, default is true
+#Set the energy at which to kill the particle
+#default is 0.05 GeV. Note: This cut is specific for MINOS
+#
+#/NuMI/run/KillTracking true
+#/NuMI/run/KillTrackingThreshold 0.05 GeV
+
+#
+#Use importance weighting, default is true
+#
+#/NuMI/run/useNImpWeight true
+
+#
+#Read in fluka hadrons file, true/false, default is false
+#Set the fluka hadrons file path and name
+#
+#/NuMI/run/useFlukaInput true
+#/NuMI/run/extNtupleFileName /minos/data/users/jyuko/fluka05root/fluka05_005.root
+
+#
+#If using external hadron file for input don't need to 
+#and probably don't want to construct the target, default is true
+#
+#/NuMI/det/constructTarget false
+
+
+
+#############################################
+##Visualization with HepRep
+#
+### create empty scene
+#
+#/vis/open HepRepFile 600
+#/vis/scene/create
+#/vis/scene/add/trajectories
+#/vis/sceneHandler/attach
+## for drawing the tracks
+## (if too many tracks cause core dump => storeTrajectory 0)
+#/tracking/storeTrajectory 1
+#/vis/scene/endOfEventAction accumulate
+##NOTE set /run/beamOn 1
+#
+#############################################
+
+
+#
+#Update the geometry. ALWAYS do this HERE, never before this point. 
+#The geometery is constructed BEFORE
+#the macro is read. Need to reconstruct the geometry after reading in the macro.
+#
+/NuMI/det/update
+
+
+#
+# Allows the beginning seed to be set manually. This allows 
+# rerunning simulations with the exact same initial conditions 
+# to check for possible errors.
+#
+/NuMI/rndm/setRndmSeed 30
+
+#
+# Allows the RunID, which is included in the
+# output file name(s), to be set at runtime.
+#
+/NuMI/run/setRunID 8000
+
+#
+# If NOT using an external hadron file then this establishes how 
+# many particles(protons) to use during the simulation. To be consistent 
+# with past neutrino ntuples each run uses 500000 protons
+#
+/run/beamOn 1
+
+#
+#NOTE: To debug problems grep for "PROBLEM" in the output of the simulation
+# "PROBLEM" statements are printed when there is a problem.
+#
