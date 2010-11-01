@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11.4.2 2010/10/29 16:32:52 mjerkins Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.3 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -90,8 +90,8 @@ void NumiDetectorConstruction::DefineMaterials()
   A = 63.546*g/mole;
   G4Element* elCu = new G4Element(name="Copper"    ,symbol="Cu", Z=29, A);
 
-  A = 69.72*g/mole; 
-  G4Element* elGa  = new G4Element(name="Gallium"  ,symbol="Ga" , Z=31 , A);
+  //A = 69.72*g/mole; 
+  //G4Element* elGa  = new G4Element(name="Gallium"  ,symbol="Ga" , Z=31 , A);
 
   A = 200.59*g/mole; 
   G4Element* elHg  = new G4Element(name="Mercury"  ,symbol="Hg" , Z=80, A);

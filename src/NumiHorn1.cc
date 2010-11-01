@@ -147,8 +147,8 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvMHorn1->SetVisAttributes(invisible);
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
-  G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn1",lvMHorn1,TGAR,false,0);
-
+  G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother",lvMHorn1,TGAR,false,0);
+  pvMHorn1 -> CheckOverlaps();
 
   /**
    * FLUGG - 
@@ -251,7 +251,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
-    }  
+    }
+
+
+  G4cout << "Horn 1 Constructed" << G4endl;
 }
 
 void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS,G4double angle,G4double zPos,G4double rIn,G4double rOut,G4VPhysicalVolume *motherVolume, G4int copyNo)

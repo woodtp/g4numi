@@ -13,7 +13,6 @@ ClassImp(zptuple_t)
   zptuple_t::zptuple_t():
   run(-1),
   evtno(-10),
-  pidtype(-10),
   xposatz(-10000),
   yposatz(-10000),
   zposatz(-10000),
@@ -24,6 +23,7 @@ ClassImp(zptuple_t)
   field(-1000),
   pathlength(-10000),
   ptypeatz(-10),
+  pidtype(-10),
   zpoint(-10)
 {
   /*

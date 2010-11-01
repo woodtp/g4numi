@@ -23,6 +23,12 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   static bool first = true;
   
   G4double current = NumiData->HornCurrent/ampere/1000.;
+
+  //G4cout << "NumiData->HornCurrent = " << NumiData->HornCurrent/ampere << " A" << G4endl;
+  //G4cout << "current = " << current << G4endl;
+
+
+  
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);    
   G4double B = current / (5.*radius/cm)/10*tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
   Bfield[0] = -B*Point[1]/radius;
@@ -34,7 +40,7 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
     G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
     numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
     G4ThreeVector Position=G4ThreeVector(Point[0],Point[1],Point[2]);
-    G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
+    //G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
     G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
     G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
     

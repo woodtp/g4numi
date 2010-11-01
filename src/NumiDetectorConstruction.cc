@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.2 2010/10/29 16:32:52 mjerkins Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.3 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -52,18 +52,39 @@ NumiDetectorConstruction::NumiDetectorConstruction()
 
 NumiDetectorConstruction::~NumiDetectorConstruction()
 {
-  delete numiMagField; 
-  delete numiMagFieldIC;
-  delete numiMagFieldOC; 
-  delete NumiData;
-  DestroyMaterials();
+
+   if(NumiData->IsDebugOn()) G4cout << "NumiDetectorConstruction Destructor Called." << G4endl;
+      
+   delete numiMagField; 
+   delete numiMagFieldIC;
+   delete numiMagFieldOC; 
+   delete NumiData;
+   DestroyMaterials();
 #ifndef FLUGG
-  delete detectorMessenger;
+   delete detectorMessenger;
 #endif
 }
 
 G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 {
+   G4cout << G4endl;
+   G4cout << G4endl;
+   G4cout << "********************************************************************" << G4endl;
+   G4cout << "********************************************************************" << G4endl;
+   G4cout << "NumiDetectorConstruction::Construct Called. Constructing Detector..." << G4endl;
+   G4cout << "********************************************************************" << G4endl;
+   
+   if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn() )
+   {
+      G4cout << G4endl;
+      G4cout << G4endl;
+      NumiData -> Print();
+      G4cout << G4endl;
+      G4cout << G4endl;
+   }
+   
+   
+      
   if (!NumiData) {
       /** FLUGG
        * Constructor is not called in flugg, only Construct
@@ -96,24 +117,28 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ConstructBaffle();
   // insertion point for horn 1 is @3cm
   // drawings have z=0 at insertion point
-  G4ThreeVector horn1pos(0.,0.,3.*cm);
+  G4ThreeVector horn1pos(NumiData->Horn1X0, NumiData->Horn1Y0, NumiData->Horn1Z0);
   G4RotationMatrix horn1rot(0.,0.,0.);
   ConstructHorn1(horn1pos,horn1rot);
   // Okay this is confusing. move horn 1 back by 3cm to match position in gnumi (and in drawings)
   // but horn 2 stays i the same place. If you want to make a 'gnumi-like' horn1 you need to go (in horn1 coordinates)
   // from -3*cm to 2.97m  (the -3 cm probably doesnt matter since not many particles will make it through there anyway)
 
-  G4ThreeVector horn2pos(0.,0.,10*m); 
+  G4ThreeVector horn2pos(NumiData->Horn2X0, NumiData->Horn2Y0, NumiData->Horn2Z0);
   G4RotationMatrix horn2rot(0.,0.,0.);
-  if (NumiData->jCompare) {
-    G4ThreeVector horn2pos(0.,0.,10.03*m);        
-    ConstructHorn2(horn2pos,horn2rot);
+  if (NumiData->jCompare)
+  {
+     horn2pos[0] = 0.0;
+     horn2pos[1] = 0.0;
+     horn2pos[2] = 10.03*m;
+
   }
-  else {
-    G4ThreeVector horn2pos(0.,0.,10.*m);
-    ConstructHorn2(horn2pos,horn2rot);  
-  }
-  if (NumiData->constructTarget){
+
+  ConstructHorn2(horn2pos,horn2rot);
+
+  
+  if (NumiData->constructTarget)
+  {
     ConstructTarget();
   }
     ConstructHadronAbsorber(); 
@@ -130,6 +155,16 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
     }
   }
 #endif
+
+
+  G4cout << "********************************************************************" << G4endl;
+  G4cout << "...Detector Construction Completed." << G4endl;
+  G4cout << "********************************************************************" << G4endl;
+  G4cout << "********************************************************************" << G4endl;
+  G4cout << G4endl;
+  G4cout << G4endl;
+  
+  
 
   return ROCK;
 }
@@ -150,6 +185,7 @@ void NumiDetectorConstruction::SetTargetGas(G4String gasChoice) {
 	if (pttoMaterial)
 */
 
+/*
 void NumiDetectorConstruction::SetTargetZ0(G4double val) {
 
 	NumiData->SetTargetZ0(val);
@@ -164,6 +200,7 @@ void NumiDetectorConstruction::SetHornCurrent(G4double val) {
 	G4cout << " Geometry changed: Horn current = " << NumiData->HornCurrent/ampere<<" A"<< G4endl;
 
 }
+*/
 
 //----------------------------------------------------------------------------------------  
 void NumiDetectorConstruction::SetAbsorberConfig(G4String config)
@@ -200,8 +237,8 @@ void NumiDetectorConstruction::SetAbsorberDistFromMon(G4double val, G4int mon)
 }
 
 #ifndef FLUGG
-void NumiDetectorConstruction::UpdateGeometry() {
-
+void NumiDetectorConstruction::UpdateGeometry()
+{
 
   // Clean old geometry
   //
@@ -212,5 +249,6 @@ void NumiDetectorConstruction::UpdateGeometry() {
   G4SolidStore::GetInstance()->Clean();
   DefineMaterials();
   G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
+
 }
 #endif

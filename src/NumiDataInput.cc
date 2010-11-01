@@ -1,38 +1,103 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.2 2010/10/29 16:32:52 mjerkins Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.3 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
+
+//C++
+#include <string>
+#include <math.h>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <stdio.h>
 
 #include "NumiDataInput.hh"
 #include "G4ThreeVector.hh"
 #include "NumiHornSpiderSupport.hh"
 #include "G4UserLimits.hh"
 //#include "globals.hh"
-#include <math.h>
-#include <fstream>
 #include "G4Material.hh"
+#include "G4UnitsTable.hh"
 
-static const G4double in=2.54*cm;
+
+
+static const G4double in = 2.54*cm;
+static const G4double fTargetZ0_ref   = -0.35*m; //LE000 position
+static const G4double fHPBaffleZ0_ref = -2.53*m; //LE000 position
+static const G4double fBeamZ0_ref     = -4.0*m; //this is arbitrary right now
+//Note: The baffle LE000 position was -3.04m. This doesn't make sense. if the baffle
+//is at -3.04 then the distance between the DS edge of the
+//baffle and the US edge of the first Vertical target fin is 1.19m. The Documentation,
+//http://www-numi.fnal.gov/numwork/tdh/TDH_V2_4.2.2-baffle.pdf, says it should be 68cm
 
 NumiDataInput* NumiDataInput::fNumiDataInput = 0;
 
-NumiDataInput* NumiDataInput::GetNumiDataInput(){
+//---------------------------------------------------------------------------------
+NumiDataInput* NumiDataInput::GetNumiDataInput()
+{
   //G4cout << "Requesting NumiDataInput " << G4endl;
     if (!fNumiDataInput) {
-        G4cout << "Constructing NumiDataInput " << G4endl;
         fNumiDataInput = new NumiDataInput();    
     }
     return fNumiDataInput;
 }
 
+//---------------------------------------------------------------------------------
 NumiDataInput::NumiDataInput()
+   :debugOn(false),
+    fPrintGeometry(false),
+    fOkToRun(false),
+    fUseNuBeam(false),
+    fUseCorrHornCurrent(true),
+    fUseDetailedProtonBeam(false),
+    fUseWaterInTgt(false),
+    
+    fBeamConfig(""),
+    fTargetConfig(""),
+    fIHornConfig(""),
+    fHornConfig(""),
+    fSimulation(""),
+    fSubSimulation(""),
+
+    fRunPeriod(-999),
+
+    fProton_outR(-999.0),
+    fProton_inR(-999.0), 
+    fProtonDiv(-999.0),
+    fProtonSpread(-999.0),
+    fProton_cosx(-999.0),
+    fProton_cosy(-999.0),
+
+    fLengthOfWaterInTgt(4.0*cm),
+
+    fPrintInfo(1)
+    
+
 {
-  G4cout << "NumiDataInput Constructor Called" << G4endl;
-  if (fNumiDataInput)
+
+   if(fPrintInfo > 0 || debugOn) G4cout << "NumiDataInput Constructor Called" << G4endl;
+
+   if (fNumiDataInput)
     { G4Exception("NumiDataInput constructed twice.");}
 //  fNumiDataInput = this;
 
+
+   if(fPrintInfo > 0 || debugOn)
+   {
+      G4cout << G4endl;
+      G4cout << G4endl;
+      G4cout << "********************************************************************" << G4endl;
+      G4cout << "********************************************************************" << G4endl;
+      G4cout << "NumiDataInput - Initializing..." << G4endl;
+      G4cout << "********************************************************************" << G4endl;
+
+   }
+
+   /*
+  //
+  //this is flugg stuff
+  //
   bool useFile = false;
   int runPeriodFile = -999;
   double targetZFile = -999.;
@@ -59,9 +124,12 @@ NumiDataInput::NumiDataInput()
         G4cout << "Unrecognized horn current " << hornCurrentFile << ", bailing." << G4endl;
         assert(false);
     }
-  }  
+  }
+  //
+  */
+  
       
-  debugOn = false;
+  
   NImpWeightOn = true; 
   createNuNtuple=false;  createHadmmNtuple=false;
   createASCII=false;     createBXDRAW = false;
@@ -221,7 +289,10 @@ if(!vacuumworld && !airhrn){
  Zpoint.push_back(45.7*m);//48
  createZpNtuple=false;
  zpNtupleName="zpNtuple";
- //==============================================================
+
+/*
+  This is flugg stuff
+//==============================================================
   //Target Configuration (LE010 = -10.0, LE100 = -100.0, etc.)
   // runPeriod corresponds to Runs I, II, III, IV
   //=======================================================================
@@ -231,7 +302,8 @@ if(!vacuumworld && !airhrn){
   if (useFile) {
       runPeriod = runPeriodFile;
       TargetConfigZ = -1*targetZFile*cm;
-  }   
+  }
+*/
 
   G4float beam_x_dir = 0;
   G4float beam_y_dir = 0;
@@ -239,10 +311,19 @@ if(!vacuumworld && !airhrn){
   //actual dm is 5/13e-4 radians 
   G4float beam_x_pos = 0;
   G4float beam_y_pos = 0;
-  G4float beam_z_pos = -4.0*m+ TargetConfigZ;
+  G4float beam_z_pos = fBeamZ0_ref;
+
+/*
+  G4float beam_z_pos = -4.0*m;
+  This is wrong somehow. If running G4NuMI with a proton beam
+  need the beam to start before the baffle to get the effect of protons
+  interacting with the baffle. - Laura
+  
+//G4float beam_z_pos = -4.0*m+ TargetConfigZ;
   // the reason for the beam_z_pos change was to move the beam to start
   // immediately before the target so that the beam spot interaction point
   // would remain constant, but the angle would change.
+  */
 
   protonMomentum = 120.*GeV;  
   beamSigmaY     = 1.1*mm;//1.25*mm;
@@ -279,8 +360,9 @@ if(!vacuumworld && !airhrn){
   // Target   1
   //=======================================================================
   TargetX0           = 0.0;
-  TargetY0           = -1.1*mm;
-  TargetZ0           = -0.35*m + TargetConfigZ;
+  TargetY0           = 0.0;
+//  TargetZ0           = -0.35*m + TargetConfigZ;
+  TargetZ0           = fTargetZ0_ref; // this is LE000 position
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
   TargetSLength      = 20.*mm;
@@ -298,12 +380,17 @@ if(!vacuumworld && !airhrn){
   TargetGEANTmat     = 18;
 
   //Budal Monitor
+  //this is with respect to the target -Laura
+  //
   BudalX0 = 0.0;
-  //BudalY0 = 2.26*mm;
   BudalY0 = 0.0;
   BudalZ0 = -16.72*cm;
   BudalDxdz = 0.0;
   BudalDydz = 0.0;
+
+  /*
+
+  this is flugg stuff. Note if the target moves 1.1cm so does the baffle!
 
   if (runPeriod == 1) {
     TargetY0 = -1.1*mm;
@@ -321,16 +408,22 @@ if(!vacuumworld && !airhrn){
         TargetZ0 += 1.1*cm;
     }
   }
+  */
   
   //HPBaffle           1 // Only the length and position can be changed currently
   //=======================================================================
   HPBaffleGEANTMat   =  18;
   HPBaffleX0         =  0.00;
   HPBaffleY0         =  0.00;
-  HPBaffleZ0         = -3.04*m + TargetConfigZ;
+//HPBaffleZ0         = -3.04*m + TargetConfigZ; //for flugg
+  //This doesn't make sense. if the baffle is at -3.04 then the distance between the DS edge of the
+  //baffle and the US edge of the first Vertical target fin is 1.19m. The Documentation,
+  //http://www-numi.fnal.gov/numwork/tdh/TDH_V2_4.2.2-baffle.pdf, says it should be 68cm
+  HPBaffleZ0         = fHPBaffleZ0_ref; //This is LE000 position
   HPBaffleDXDZ       =  0.0;
   HPBaffleDYDZ       =  0.0;
-  HPBaffleLength     =  1.20*m;
+//  HPBaffleLength     =  1.20*m;
+  HPBaffleLength     =  1.50*m; //Why was this 1.2m?!
   HPBaffleRin        =  5.5*mm;
   HPBaffleRout       =  3.*cm;
  
@@ -701,6 +794,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   HadrBox_height = 6.6294*m;
   HadrBox_length = 55.75*12*in-(4*12*in+2.24*in+9*12*in+9*in);
 
+  /*
+    //
+    //this stuff is for FLUGG
+    //
+    //it is horrible!
+    //
   
   HornCurrent=182100.*ampere; 
   if (useFile) {
@@ -711,11 +810,28 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   if (runPeriod == 4) {
       HornCurrent *= -1;
   }
+
   
   G4cout << "Running with: " << G4endl
        << "  Run Period = " << runPeriod << G4endl
        << "  Target Z = " << TargetConfigZ/cm << " cm" << G4endl
        << "  Horn Current = " << HornCurrent/ampere/1000. << " kA" << G4endl;
+  */
+
+
+  //
+  //Horns
+  //
+  Horn1X0 = 0.0*cm;
+  Horn1Y0 = 0.0*cm;
+  Horn1Z0 = 3.0*cm;
+
+  Horn2X0 = 0.0*cm;
+  Horn2Y0 = 0.0*cm;
+  Horn2Z0 = 10.0*m;
+  
+
+  
 
   NPHorn2EndN=3;
   
@@ -862,28 +978,476 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     xdet_near.push_back(xdetNear[ii]*m);
     ydet_near.push_back(ydetNear[ii]*m);
     zdet_near.push_back(zdetNear[ii]*m);
+    det_near_name.push_back(detNameNear[ii]);
   }
   for(G4int ii=0;ii<nFar;ii++){
     xdet_far.push_back(xdetFar[ii]*m);
     ydet_far.push_back(ydetFar[ii]*m);
     zdet_far.push_back(zdetFar[ii]*m);
+    det_far_name.push_back(detNameFar[ii]);
+  }
+
+
+
+  NumiDataInput::Print();
+
+
+
+  if(fPrintInfo > 0 || debugOn)
+  {
+     G4cout << "********************************************************************" << G4endl;
+     G4cout << "...NumiDataInput Initialization Complete." << G4endl;
+     G4cout << "********************************************************************" << G4endl;
+     G4cout << "********************************************************************" << G4endl;
+     G4cout << G4endl;
+     G4cout << G4endl;
+
   }
 }
-
+//---------------------------------------------------------------------------------
 NumiDataInput::~NumiDataInput()
 {
 }
 
-void NumiDataInput::ApplyStepLimits(G4LogicalVolume *vol) {
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::Print()
+{
+   G4cout << "NumiDataInput::Print() - Printing Parameters..." << G4endl;
+   G4cout << " SIMULATION                                  = " << fSimulation << G4endl;
+   if(fUseNuBeam || fSimulation.empty())
+   {
+      if(fUseWaterInTgt)
+      {
+         G4cout << " SUBSIMULATION                               = " << fSubSimulation << G4endl;
+         G4cout << "    Simulating " << fLengthOfWaterInTgt/cm << " cm of water filling the "
+                << "target starting from the downstream tip." << G4endl;
+
+      }
+      G4cout << " Run Period                                  = " << fRunPeriod << G4endl
+             << " Beam Configuration                          = " << fBeamConfig << G4endl
+             << " Horn Configuration                          = " << fHornConfig << G4endl
+             << " Target Configuration                        = " << fTargetConfig << G4endl
+             << " Horn Current Configuration                  = " << fIHornConfig << G4endl
+             << " Target               (X0, Y0, Z0) m         = (" << TargetX0/m << ", " << TargetY0/m << ", " << TargetZ0/m << ") m" << G4endl
+             << " Baffle               (X0, Y0, Z0) m         = (" << HPBaffleX0/m << ", " << HPBaffleY0/m << ", " << HPBaffleZ0/m << ") m" << G4endl
+             << " Horizontal Fin w.r.t. Target (X0, Y0, Z0) m = (" << BudalX0/m << ", " << BudalY0/m << ", " << BudalZ0/m << ") m" << G4endl
+             << " Horn Current                                = " << HornCurrent/ampere << " A" << G4endl
+             << " Horn 1               (X0, Y0, Z0) m         = (" << Horn1X0/m << ", " << Horn1Y0/m << ", " << Horn1Z0/m << ") m" << G4endl
+             << " Horn 2               (X0, Y0, Z0) m         = (" << Horn2X0/m << ", " << Horn2Y0/m << ", " << Horn2Z0/m << ") m" << G4endl
+             << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/m << ", " << beamPosition[1]/m << ", " << beamPosition[2]/m << ") m" << G4endl
+             << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
+             << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
+             << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl;
+      if(fUseDetailedProtonBeam)
+      {
+         G4cout << " Using Detailed Proton Beam with parameters..." << G4endl
+                << "    Proton Beam Mean Momentum = " << protonMomentum/GeV << " GeV/c" << G4endl
+                << "    Proton out_R              = " << fProton_outR << " probably mm " << G4endl
+                << "    Proton in_R               = " << fProton_inR << " probably mm " << G4endl
+                << "    Proton Divergence         = " << fProtonDiv << " probably rad " << G4endl
+                << "    Proton Spread             = " << fProtonSpread  << " probably GeV/c " << G4endl
+                << "    Proton cosx               = " << fProton_cosx  << G4endl
+                << "    Proton cosy               = " << fProton_cosy  << G4endl;
+      }
+      
+
+
+   }
+   if(useMuonBeam || fSimulation.empty())
+   {
+   }
+   if(simAbsBkg || fSimulation.empty())
+   {
+   }
+}
+
+//---------------------------------------------------------------------------------
+bool NumiDataInput::SetBeamConfig(G4String config)
+{
+
+   if(fRunPeriod == -999)
+   {
+      G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM: Run Period not set. MUST SET RUN PERIOD BEFORE SETTING BEAM CONFIGURATION. " << G4endl;
+      return false;
+   }
+   
+   std::string::size_type beg_loc_tgt = std::string::npos;
+   std::string::size_type size_horn;
+
+   vstring_t tgtvec;
+   tgtvec.push_back("LE"); tgtvec.push_back("le");
+
+   for(vstring_t::const_iterator git = tgtvec.begin(); git != tgtvec.end(); ++git)
+   {
+      beg_loc_tgt = config.find(*git, 0);
+      if(beg_loc_tgt != std::string::npos){ size_horn = (*git).size(); break;}
+   }
+
+   if(beg_loc_tgt == std::string::npos)
+   {
+      G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM. Can't get beam configuration. "
+             << "Beam configuration must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. "
+             << "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc." 
+             << "Note that I don't know how to simulate \"ME\" beam configurations right now." << G4endl;
+      return false;
+   }
+
+   //
+   //set the horn config
+   //
+
+   if(!NumiDataInput::SetHornConfig(config.substr(0,2))) return false;
+
+   //
+   //get the target config
+   //
+   
+   std::string::size_type end_loc_tgt = config.find("z", 0);
+
+   if(end_loc_tgt == std::string::npos)
+   {
+      G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM. Can't find \"z\". Can't get beam configuration. "
+             << "Beam configuration must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. "
+             << "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc." << G4endl;
+      return false;
+   }
+
+   
+   std::string::size_type size_tgt = end_loc_tgt-(beg_loc_tgt+size_horn) +1;
+   std::string tgtzstr = config.substr(beg_loc_tgt+size_horn, size_tgt);
+
+   //
+   //set the target config and location
+   //
+
+   if(!NumiDataInput::SetTargetConfig(tgtzstr)) return false;
+
+
+   //
+   //get horn current
+   //
+
+   std::string::size_type end_loc_ihorn = config.find("i", 0);
+
+   if(end_loc_ihorn == std::string::npos)
+   {
+      G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM. Can't find \"i\". Can't get beam configuration. "
+             << "Beam configuration must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. "
+             << "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc." << G4endl;
+      return false;
+   }
+
+   std::string ihornstr = config.substr(end_loc_tgt+1, end_loc_ihorn-end_loc_tgt);
+
+   
+   if(!NumiDataInput::SetHornCurrentConfig(ihornstr)) return false;
+
+
+   if(!NumiDataInput::ConfigureRunPeriod(config)) return false;
+   
+   
+   fBeamConfig = config;
+   
+   
+   
+   return true;
+      
+}
+
+//---------------------------------------------------------------------------------
+G4bool NumiDataInput::SetTargetConfig(G4String config)
+{
+   const std::string::size_type loc_z = config.find("z", 0);
+
+   const std::string::size_type size_config = config.size();
+
+   if(loc_z != size_config-1)
+   {
+      G4cout << "NumiDataInput::SetTargetConfig() - PROBLEM. Target Configuration, " << config << " is not "
+             << " in the form \"#z\", where # is a number. Can't get target configuration. " << G4endl;
+      return false;
+   }
+
+   const std::string tgtzstr = config.substr(0,size_config-1);
+   
+   const std::string number = "0123456789.";
+
+   for(unsigned int i = 0; i < tgtzstr.size(); ++i)
+   {
+      bool isnumber = false;
+      for(unsigned int j = 0; j < number.size(); ++j)
+      {
+         if(tgtzstr[i] == number[j])
+         {
+            isnumber = true;
+            break;
+         }
+      }
+      if(isnumber == false)
+      {
+         G4cout << "NumiDataInput::SetTargetConfig() - PROBLEM. Target Z positon, " << tgtzstr << " is not a number. "
+                << " Can't get target configuration. "
+                << "Target configuration must be in the form \"#z\", where # is any number. "
+                << "Examples are 010z, 100z, 025.3z, 250.5z....etc." << G4endl;
+         return false;  
+      }
+   }
+
+
+   G4double tgtz;
+   std::istringstream tgtzstrm(tgtzstr);
+   tgtzstrm >> tgtz;
+
+   NumiDataInput::SetTargetZ0(fTargetZ0_ref   - tgtz*cm);
+   NumiDataInput::SetBaffleZ0(fHPBaffleZ0_ref - tgtz*cm);
+   NumiDataInput::SetBeamZ0  (fBeamZ0_ref     - tgtz*cm);
+
+   fTargetConfig = config;
+
+   
+   return true;
+}
+
+//---------------------------------------------------------------------------------
+G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
+{
+   const std::string::size_type loc_i = config.find("i", 0);
+
+   const std::string::size_type size_config = config.size();
+
+   if(loc_i != size_config-1)
+   {
+      G4cout << "NumiDataInput::SetHornCurrentConfig() - PROBLEM. Horn Current Configuration, " << config << " is not "
+             << " in the form \"#i\", where # is a number. Can't get horn current configuration. " << G4endl;
+      return false;
+   }
+
+   std::string ihornstr = config.substr(0,size_config-1);
+
+   const std::string number = "-0123456789.";
+
+   for(unsigned int i = 0; i < ihornstr.size(); ++i)
+   {
+      bool isnumber = false;
+      for(unsigned int j = 0; j < number.size(); ++j)
+      {
+         if(ihornstr[i] == number[j])
+         {
+            isnumber = true;
+            break;
+         }
+      }
+      if(isnumber == false)
+      {
+         G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM. Horn Current, " << ihornstr << " is not a number. "
+                << "Can't get horn current configuration. "
+                << "Horn current configuration must be in the form \"#i\", where # is any number. "
+                << "Examples are 185i, -059i, -200i, 20.6i....etc." << G4endl;
+         return false;  
+      }
+   }
+  
+
+   if(fUseCorrHornCurrent)
+   {
+      //
+      //calibration corrections from MINOS-doc-1303
+      //
+           if (ihornstr == "200")   ihornstr = "196.8";
+      else if (ihornstr == "-200")  ihornstr = "-196.8";
+      else if (ihornstr == "185")   ihornstr = "182.1";
+      else if (ihornstr == "-185")  ihornstr = "-182.1";
+      else if (ihornstr == "170")   ihornstr = "167.3";
+      else if (ihornstr == "-170")  ihornstr = "-167.3";
+      else if (ihornstr == "0"   ||
+               ihornstr == "000" ||
+               ihornstr == "0.0" ||
+               ihornstr == "000.0")  ihornstr = "0";
+      else
+      {
+         G4cout << "NumiDataInput::SetHornConfig() - PROBLEM. Requesting to use the Corrected Horn Current but I do not know "
+                << "the correction for a horn current of " << ihornstr << ". I only know the corrections for horn currents of "
+                << "+/- 200kA, +/- 185kA, and +/- 170kA (and 0kA). Can't get horn current configuration. " << G4endl;
+         return false;
+      }
+   }
+
+   G4double ihorn;
+   std::istringstream ihornstrm(ihornstr);
+   ihornstrm >> ihorn;
+
+   
+   //
+   //note the horn current must be stored in amps
+   //
+
+   NumiDataInput::SetHornCurrent(ihorn*1000.*ampere);
+
+   fIHornConfig = ihornstr + "i";
+   
+   return true;
+}
+
+//---------------------------------------------------------------------------------
+G4bool NumiDataInput::SetHornConfig(G4String config)
+{
+   if(config != "LE" && config != "le")
+   {
+      G4cout << "NumiDataInput::SetHornConfig() - PROBLEM. Can't set horn configuration. "
+             << "Valid horn configs are \"LE\" or \"le\"." 
+             << "Note that I don't know how to simulate \"ME\" beam configurations right now." << G4endl;
+      
+      return false;
+   }
+   
+   fHornConfig = config;
+
+   return true;
+}
+
+//---------------------------------------------------------------------------------
+G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
+{
+   if(fRunPeriod == 0)
+   {
+      return true;
+   }
+   else if(fRunPeriod == 1)
+   {
+      if(beamconfig != "LE010z000i" && beamconfig != "le010z000i" &&
+         beamconfig != "LE010z170i" && beamconfig != "le010z170i" &&
+         beamconfig != "LE010z185i" && beamconfig != "le010z185i" &&
+         beamconfig != "LE010z200i" && beamconfig != "le010z200i" &&
+         beamconfig != "LE100z200i" && beamconfig != "le100z200i" &&
+         beamconfig != "LE250z200i" && beamconfig != "le250z200i")
+      {
+         G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: No beam configuration " << beamconfig
+                << " during run period " << fRunPeriod << G4endl;
+         return false;
+      }
+      
+      TargetY0 = -1.1*mm;
+      BudalY0  = 2.26*mm;
+
+      return true;
+   }
+   else if (fRunPeriod == 2)
+   {
+      if(beamconfig != "LE010z000i" && beamconfig != "le010z000i" &&
+         beamconfig != "LE010z185i" && beamconfig != "le010z185i" &&
+         beamconfig != "LE150z200i" && beamconfig != "le150z200i" &&
+         beamconfig != "LE250z200i" && beamconfig != "le250z200i")
+      {
+         G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: No beam configuration " << beamconfig
+                << " during run period " << fRunPeriod << G4endl;
+         return false;
+      }
+         
+      // Change LE010 to LE008.9
+      if (beamconfig.find("LE010") != std::string::npos ||
+          beamconfig.find("le010") != std::string::npos )
+      {
+         if(!NumiDataInput::SetTargetConfig("008.9z")) return false;
+      }
+
+      return true;
+   }
+   else if(fRunPeriod == 3)
+   {
+      if(beamconfig != "LE010z000i" && beamconfig != "le010z000i" &&
+         beamconfig != "LE010z185i" && beamconfig != "le010z185i" )
+      {
+         G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: No beam configuration " << beamconfig
+                << " during run period " << fRunPeriod << G4endl;
+         return false;
+      }
+         
+      // Change LE010 to LE008.9
+      if (beamconfig.find("LE010") != std::string::npos ||
+          beamconfig.find("le010") != std::string::npos )
+      {
+         if(!NumiDataInput::SetTargetConfig("008.9z")) return false;
+      }
+
+      return true;
+   }
+   else if(fRunPeriod == 4)
+   {
+      if(beamconfig != "LE010z-185i" && beamconfig != "le010z-185i" )
+      {
+         G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: No beam configuration " << beamconfig
+                << " during run period " << fRunPeriod << G4endl;
+         return false;
+      }
+
+      return true;
+   }
+   else
+   {
+      
+      G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: Don't know about Run Period " << fRunPeriod << G4endl;
+      return false;
+   }
+
+
+   
+}
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetDetailedProtonBeam(G4bool val)
+{
+   if(val)
+   {
+      //
+      //These values are in g4numi_flugg/scripts/g4numi_fluka.sh
+      //      
+      //protonMomentum = 120.0*GeV;
+      fProton_outR  = -0.26350;  //this is probably mm
+      fProton_inR   = -0.26139; //this is probably mm
+      fProtonDiv    = -0.02355; //this is probably rads
+      fProtonSpread = -0.000001; //this is probably GeV?
+
+      //
+      //these values are in NumiPrimaryMessenger.cc 
+      //
+      fProton_cosx = 0.0; 
+      fProton_cosy = 0.0;
+   }
+
+   fUseDetailedProtonBeam = val;
+}
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetLengthOfWaterInTgt(G4double val)
+{
+   if(val < 3.0*cm)
+   {
+      G4cout << " NumiDataInput::SetLengthOfWaterInTgt() - PROBLEM: Can't have less than "
+             << "3 cm of water filling the end of the target. Setting water length to 3 cm" << G4endl;
+      fLengthOfWaterInTgt = 3.0*cm;
+   }
+   else
+      fLengthOfWaterInTgt = val;
+}
+
+
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::ApplyStepLimits(G4LogicalVolume *vol)
+{
   if (StepLimit == 0.0) return;
   vol->SetUserLimits(new G4UserLimits(StepLimit));
 }
-void NumiDataInput::ApplyTimeLimits(G4LogicalVolume *vol) {
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::ApplyTimeLimits(G4LogicalVolume *vol)
+{
   if (TimeLimit == 0.0) return;
   vol->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,TimeLimit));
 }
 
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 void NumiDataInput::SetAbsorberMaterial(G4Material* mat, G4int mon)
 {
    if(mon == 0)
@@ -903,7 +1467,7 @@ void NumiDataInput::SetAbsorberMaterial(G4Material* mat, G4int mon)
       
 }
 
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 void NumiDataInput::SetAbsorberThickness(G4double val, G4int mon)
 {
    if(mon == 0)
@@ -1015,8 +1579,9 @@ void NumiDataInput::SetjCompare(G4bool _jc) {
     }
 }
 
-
-void NumiDataInput::Setg3Chase(G4bool _gc) {
+//---------------------------------------------------------------------------------
+void NumiDataInput::Setg3Chase(G4bool _gc)
+{
     g3Chase = _gc;
     
     if(g3Chase){
