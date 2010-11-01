@@ -31,23 +31,44 @@ private:
    G4UIcmdWithoutParameter*    showRndmCmd;
    G4UIcmdWithAnInteger*       setRndmSeedCmd;
    G4UIdirectory*              NumiRunDir;
+
+   //---------------------------------------
+   //Commands for defining the simulation
+   //
+   G4UIcmdWithABool*           useDetailedProtonBeam;
+   G4UIcmdWithABool*           useNuBeam;
+   G4UIcmdWithABool*           useMuonBeam;
+   G4UIcmdWithABool*           simAbsBkg;
+   G4UIcmdWithABool*           simDRays;
+   //---------------------------------------
+
+   //---------------------------------------
+   //Commands for defining the sub-simulation
+   //
+   G4UIcmdWithABool*           useWaterInTgt;
+   //---------------------------------------
+
+   //---------------------------------------
+   //Commands for defining the Beam
+   //
+   G4UIcmdWithABool*           useTestBeam;
+   G4UIcmdWithABool*           useFlukaInput;
+   G4UIcmdWithABool*           useMarsInput;
+   G4UIcmdWithABool*           useMuonInput;
+   //---------------------------------------
+   
    G4UIcmdWithABool*           debugOn;
    G4UIcmdWithAnInteger*       setRunID;
    G4UIcmdWithADouble*         setMaterialSigma;
    G4UIcmdWithABool*           useNImpWeight;
-   G4UIcmdWithABool*           useTestBeam;
-   G4UIcmdWithABool*           useFlukaInput;
-   G4UIcmdWithABool*           useMarsInput;
-   G4UIcmdWithABool*           useMuonBeam;
-   G4UIcmdWithABool*           simAbsBkg;
-   G4UIcmdWithABool*           simDRays;
+   
+   
    G4UIcmdWithABool*           useZPosCut;
    G4UIcmdWithAString*         muonBeamShape;
    G4UIcmdWithADoubleAndUnit*  muonBeamMomentum;
    G4UIcmdWithADoubleAndUnit*  muonBeamZPos;
    G4UIcmdWithADoubleAndUnit*  muonBeamGaussXsig;
    G4UIcmdWithADoubleAndUnit*  muonBeamGaussYsig;
-   G4UIcmdWithABool*           useMuonInput;
    G4UIcmdWithAnInteger*       NInputParts;
    G4UIcmdWithAnInteger*       NInputPart;
    G4UIcmdWithABool*           reWeightDeltas;

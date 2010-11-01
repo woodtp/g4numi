@@ -27,10 +27,13 @@ private:
    G4UIdirectory*              NumiDir;
    G4UIdirectory*              detDir;
    G4UIcmdWithAString*         TargetGasCmd;
-   G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
-   G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
+   //G4UIcmdWithADoubleAndUnit*  TargetZ0Cmd;
+   //G4UIcmdWithADoubleAndUnit*  HornCurrentCmd;
    G4UIcmdWithABool*           ConstructTarget;
    G4UIcmdWithABool*           ConstructSolidMuMons;
+   G4UIcmdWithAnInteger*       RunPeriod;
+   G4UIcmdWithAString*         BeamConfig;
+   G4UIcmdWithABool*           UseCorrHornCurrent;
    G4UIcmdWithAString*         AbsorberConfig;
    G4UIcmdWithAString*         Mon0AbsMatCmd;
    G4UIcmdWithAString*         Mon1AbsMatCmd;
@@ -41,6 +44,7 @@ private:
    G4UIcmdWithADoubleAndUnit*  Mon0AbsDistCmd;
    G4UIcmdWithADoubleAndUnit*  Mon1AbsDistCmd;
    G4UIcmdWithADoubleAndUnit*  Mon2AbsDistCmd;
+   G4UIcmdWithADoubleAndUnit*  LengthOfWaterInTgt;
    
    //G4UIcmdWithAnInteger*     NbLayersCmd;    
    G4UIcmdWithoutParameter*    UpdateCmd;
