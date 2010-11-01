@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.2 2010/10/29 16:32:52 mjerkins Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.3 2010/11/01 21:52:30 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -23,163 +23,119 @@ typedef std::vector<NumiHornSpiderSupport> vNumiHornSpiderSupport_t;
 class NumiDataInput
 {
 public:
-  NumiDataInput();
-  ~NumiDataInput();
+   NumiDataInput();
+   ~NumiDataInput();
 
-  static NumiDataInput* GetNumiDataInput();
-private:
-  static NumiDataInput* fNumiDataInput;
-
-public:
-  void SetTargetZ0(G4double val) {
-    TargetZ0 = val;
-    HPBaffleZ0 += (val + 0.45*m);
-  }
-   void SetHornCurrent(G4double val) {
-      HornCurrent = val;
-   }
-  void SetDebugOn(G4bool val) {
-     debugOn = val;
-  }
-  G4bool IsDebugOn(){
-     return debugOn;
-  }
-   void SetNImpWeight(G4bool val) {
-    NImpWeightOn = val;
-   }
-   void SetTestTheta(G4float t){
-      testTheta = t*M_PI/180.;
-   }
-   void SetTestBeam(G4bool val) {
-      useTestBeam = val;
-   }
-   void SetFlukaInput(G4bool val) {
-      useFlukaInput = val;
-   }
-   void SetMarsInput(G4bool val) {
-      useMarsInput = val;
-   }
-   void SetMuonBeam(G4bool val) {
-      useMuonBeam = val;
-   }
-   void SetSolidMuMons(G4bool val) {
-      solidMuMons = val;
-   }
-   void SetMuonInput(G4bool val) {
-      useMuonInput = val;
-   }
-   void SetRunNumber(G4String runNum){
-      RunNumber=runNum;
-   }
-   G4String GetRunNumber(){
-      return RunNumber;
-   }
-   void SetGeometryTag(G4String geoName){
-      geometry = geoName;
-   }
-   G4String GetGeometryTag(){
-      return geometry;
-   }
-   G4double GetMaterialSigma(){
-      return materialSigma;
-   }
-   void SetExtNtupleFileName(G4String fileName){
-      extNtupleFileName=fileName;
-   }
-   G4String GetExtNtupleFileName(){
-      return extNtupleFileName;
-   }
-   void SetNuNtupleName(G4String fileName){
-      nuNtupleName=fileName;
-   }
-   void SetHadmmNtupleName(G4String fileName){
-    hadmmNtupleName=fileName;
-   }
-   G4String GetHadmmNtupleName(){
-      return hadmmNtupleName;
-   }
-   void SetHadmmNtupleDir(G4String fileDir){
-      hadmmNtupleDir=fileDir;
-   }
-   G4String GetHadmmNtupleDir(){
-      return hadmmNtupleDir;
-   }
-   void SetNEvents(G4int events){
-      fNEvents=events;
-   }
-   G4int GetNEvents(){
-      return fNEvents;
-   }
+   void Print();
    
-   void SetASCIIName(G4String fileName){
-      asciiName=fileName;
-   }
-   void SetBXDRAWName(G4String fileName){
-      bxdrawName=fileName;
-   }
-   void OutputNuNtuple(G4bool output){
-      createNuNtuple=output;
-   }
-   void OutputHadmmNtuple(G4bool output){
-      createHadmmNtuple=output;
-   }
-   void OutputASCII(G4bool output){
-      createASCII=output;
-   }
-   void OutputBXDRAW(G4bool output) {
-      createBXDRAW = output;
-   }
-   void SetDecayPipeSelect(G4bool val) {
-      useDecayPipeSelect = val;
-   }
-   void SetStepLimit(G4double l){
-      StepLimit = l;
-   }
+   
+   static NumiDataInput* GetNumiDataInput();
+private:
+   static NumiDataInput* fNumiDataInput;
+
+   G4bool ConfigureRunPeriod(G4String &beamconfig);
+   G4bool SetTargetConfig(G4String config);
+   G4bool SetHornCurrentConfig(G4String config);
+   G4bool SetHornConfig(G4String config);
+
+   void SetTargetZ0(G4double val)       { TargetZ0 = val;}
+   void SetBaffleZ0(G4double val)       { HPBaffleZ0 = val;}
+   void SetBeamZ0(G4double val)         { beamPosition[2] = val;}
+   void SetHornCurrent(G4double val)    { HornCurrent = val;}
+   
+public:
+
+   
+   
+   G4bool SetBeamConfig(G4String config);
+   
+   void SetDetailedProtonBeam(G4bool val);
+
+   void SetLengthOfWaterInTgt(G4double val);
+   
    void ApplyStepLimits(G4LogicalVolume *);
    void ApplyTimeLimits(G4LogicalVolume *);
-   
-   G4bool GetKillTracking(){
-      return KillTracking;
-   }
-   G4double GetKillTrackingThreshold(){
-    return KillTrackingThreshold;
-   }
-   void  SetMacroBeam(G4bool val){
-    useMacro=val;
-   }
-   G4bool GetMacroBeam(){
-      return useMacro;
-   }
-   void SetZpNtupleName(G4String fileName){
-      zpNtupleName=fileName;
-   }
-   void OutputZpNtuple(G4bool val){
-    createZpNtuple=val;
-   }
-   G4bool GetMuonBeam(){
-      return useMuonBeam;
-   }
-   G4bool GetSolidMuMons(){
-      return solidMuMons;
-   }
-   void SetKillTracking(G4bool val){
-      KillTracking = val;
-   }
-   void SetKillTrackingThreshold(G4double th ){
-      KillTrackingThreshold=th;
-   }
-   
-  void SetjCompare(G4bool _jc);
-  void Setg3Chase(G4bool _gc);
 
-  //void SetMuonBeam(G4bool val)                {useMuonBeam = val;}
+   void SetNuBeam(G4bool val)
+      {
+         fUseNuBeam = val;
+         fSimulation = "Neutrino Beam Simulation";
+      }
+   void SetWaterInTgt(G4bool val)
+      {
+         fUseWaterInTgt = val;
+         fSubSimulation = "Water in the Target";
+      }
+   void SetRunPeriod(G4int val)                 {fRunPeriod = val;}
+   void SetOkToRun(G4bool val)                  {fOkToRun = val;}
+   void SetUseCorrHornCurrent(G4bool val)       {fUseCorrHornCurrent = val;}   
+   void SetDebugOn(G4bool val)                  { debugOn = val; }
+   void SetNImpWeight(G4bool val)               { NImpWeightOn = val;}
+   void SetTestTheta(G4float t)                 { testTheta = t*M_PI/180.;}
+   void SetTestBeam(G4bool val)                 { useTestBeam = val; }
+   void SetFlukaInput(G4bool val)               { useFlukaInput = val; }
+   void SetMarsInput(G4bool val)                { useMarsInput = val; }
+   void SetRunNumber(G4String runNum)           { RunNumber=runNum; }
+   void SetGeometryTag(G4String geoName)        { geometry = geoName; }
+   void SetExtNtupleFileName(G4String fileName) { extNtupleFileName=fileName; }
+   void SetNuNtupleName(G4String fileName)      { nuNtupleName=fileName;}
+   void SetASCIIName(G4String fileName)         { asciiName=fileName; }
+   void SetBXDRAWName(G4String fileName)        { bxdrawName=fileName; }
+   void OutputNuNtuple(G4bool output)           { createNuNtuple=output;}
+   void OutputASCII(G4bool output)              { createASCII=output; }
+   void OutputBXDRAW(G4bool output)             { createBXDRAW = output; }
+   void SetDecayPipeSelect(G4bool val)          { useDecayPipeSelect = val;}
+   void SetStepLimit(G4double l)                { StepLimit = l; }
+   void SetMacroBeam(G4bool val)                { useMacro=val;}
+   void SetZpNtupleName(G4String fileName)      { zpNtupleName=fileName; }
+   void OutputZpNtuple(G4bool val)              { createZpNtuple=val;}
+   void SetKillTracking(G4bool val)             { KillTracking = val;}
+   void SetKillTrackingThreshold(G4double th )  { KillTrackingThreshold=th;}
+   void SetjCompare(G4bool _jc);
+   void Setg3Chase(G4bool _gc);
+
+
+   G4int    GetRunPeriod()                    { return fRunPeriod;}
+
+   G4bool   IsDebugOn()                       { return debugOn; }
+   G4bool   GetOkToRun()                      { return fOkToRun;}
+   G4bool   GetPrintGeometry()                { return fPrintGeometry;}
+   G4bool   GetKillTracking()                 { return KillTracking;}
+   G4bool   GetMacroBeam()                    { return useMacro;}
+   G4bool   GetNuBeam()                       { return fUseNuBeam;}
+   G4bool   GetWaterInTgt()                   { return fUseWaterInTgt;}
+   G4bool   GetDetailedProtonBeam()           { return fUseDetailedProtonBeam;}
+   
+   G4String GetBeamConfig()                   { return fBeamConfig;}
+   G4String GetSimulation()                   { return fSimulation;}
+   G4String GetRunNumber()                    { return RunNumber; }
+   G4String GetGeometryTag()                  { return geometry; }
+   G4String GetExtNtupleFileName()            { return extNtupleFileName;}
+
+   G4double GetKillTrackingThreshold()        { return KillTrackingThreshold;}
+   G4double GetProtonMomentum()               { return protonMomentum;}
+   G4double GetProton_outR()                  { return fProton_outR;}
+   G4double GetProton_inR()                   { return fProton_inR;}  
+   G4double GetProtonDivergence()             { return fProtonDiv;}
+   G4double GetProtonSpread()                 { return fProtonSpread;} 
+   G4double GetProton_cosx()                  { return fProton_cosx;} 
+   G4double GetProton_cosy()                  { return fProton_cosy;}
+   G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;} 
+
+  
+   
+   //--------------------------------------------------------------
+   //Specifically for Muon Monitor simulation and Absorber background simulation
+   //
+   //
+   void SetMuonBeam(G4bool val)                {useMuonBeam = val; fSimulation = "Muon Monitor Simulation";}
    void SetNInputParts(G4int val)              {NInputParts = val;}
    void SetNInputPart(G4int val)               {NInputPart = val;}
    void SetReWeightDeltas(G4bool val)          {reWeightDeltas = val;}
    void SetNSplitDeltas(G4int val)             {nSplitDeltas = val;}
-  //void SetSolidMuMons(G4bool val)             {solidMuMons = val;}
+   void SetSolidMuMons(G4bool val)             {solidMuMons = val;}
    void SetAbsorberConfig(G4String val)        {absorberConfig = val;}
-   void SetSimAbsBkg(G4bool val)               {simAbsBkg = val;}
+   void SetSimAbsBkg(G4bool val)               {simAbsBkg = val; fSimulation = "Muon Monitor Absorber Background Simulation";}
    void SetSimDRays(G4bool val)                {simDRays = val;}
    void SetUseZPosCut(G4bool val)              {useZPosCut = val;}
    void SetMuonBeamShape(G4String val)         {muonBeamShape = val;}
@@ -187,22 +143,22 @@ public:
    void SetMuonBeamZPos(G4double val)          {muonBeamZPos = val;}
    void SetGaussBeamXSig(G4double val)         {muonBeamGaussXsig = val;}
    void SetGaussBeamYSig(G4double val)         {muonBeamGaussYsig = val;}
-  //void SetMuonInput(G4bool val)               {useMuonInput = val;}
-  //void SetNEvents(G4int events)               {fNEvents=events;}
+   void SetMuonInput(G4bool val)               {useMuonInput = val;}
+   void SetNEvents(G4int events)               {fNEvents=events;}
    void SetDefaultMaterial(G4Material* mat)    {DefaultMaterial = mat;}
-  //void OutputHadmmNtuple(G4bool output)       {createHadmmNtuple=output;}
-  //void SetHadmmNtupleName(G4String fileName)  {hadmmNtupleName=fileName;}
-  //void SetHadmmNtupleDir(G4String fileDir)    {hadmmNtupleDir=fileDir;}
+   void OutputHadmmNtuple(G4bool output)       {createHadmmNtuple=output;}
+   void SetHadmmNtupleName(G4String fileName)  {hadmmNtupleName=fileName;}
+   void SetHadmmNtupleDir(G4String fileDir)    {hadmmNtupleDir=fileDir;}
    void OutputAbsBkgNtuple(G4bool output)      {createAbsBkgNtuple=output;}
    void SetAbsBkgNtupleName(G4String fileName) {absbkgNtupleName=fileName;}
    void SetAbsBkgNtupleDir(G4String fileDir)   {absbkgNtupleDir=fileDir;}
    
-  //G4bool   GetMuonBeam()            {return useMuonBeam;}
+   G4bool   GetMuonBeam()            {return useMuonBeam;}
    G4int    GetNInputParts()         {return NInputParts;}
    G4int    GetNInputPart()          {return NInputPart;}
    G4bool   GetReWeightDeltas()      {return reWeightDeltas;}
    G4int    GetNSplitDeltas()        {return nSplitDeltas;}
-  //G4bool   GetSolidMuMons()         {return solidMuMons;}
+   G4bool   GetSolidMuMons()         {return solidMuMons;}
    G4String GetAbsorberConfig()      {return absorberConfig;}
    G4bool   GetSimAbsBkg()           {return simAbsBkg;}
    G4bool   GetSimDRays()            {return simDRays;}
@@ -212,11 +168,11 @@ public:
    G4double GetMuonBeamZPos()        {return muonBeamZPos;}
    G4double GetGaussBeamXSig()       {return muonBeamGaussXsig;}
    G4double GetGaussBeamYSig()       {return muonBeamGaussYsig;}
-  //G4int    GetNEvents()             {return fNEvents;}
+   G4int    GetNEvents()             {return fNEvents;}
    G4Material* GetDefaultMaterial()  {return DefaultMaterial;}
-  //G4double GetMaterialSigma()       {return materialSigma;}
-  //G4String GetHadmmNtupleName()     {return hadmmNtupleName;}
-  //G4String GetHadmmNtupleDir()      {return hadmmNtupleDir;}
+   G4double GetMaterialSigma()       {return materialSigma;}
+   G4String GetHadmmNtupleName()     {return hadmmNtupleName;}
+   G4String GetHadmmNtupleDir()      {return hadmmNtupleDir;}
    G4bool   GetCreateAbsBkgNtuple()  {return createAbsBkgNtuple;}
    G4String GetAbsBkgNtupleName()    {return absbkgNtupleName;}
    G4String GetAbsBkgNtupleDir()     {return absbkgNtupleDir;}
@@ -229,11 +185,55 @@ public:
    G4double GetAbsorberThickness(G4int);
    G4double GetAbsorberMonDist(G4int);
 
+   //
+   //
+   //-------------------------------------------------------
+
  private:
-  G4bool debugOn;
-  G4String extNtupleFileName;
+   
+   G4bool debugOn;
+   G4bool fPrintGeometry;
+   G4bool fOkToRun;
+   G4bool fUseNuBeam;
+   G4bool fUseCorrHornCurrent;
+   G4bool fUseDetailedProtonBeam;
+   G4bool fUseWaterInTgt;
+
+   G4String extNtupleFileName;
+   G4String fBeamConfig;
+   G4String fTargetConfig;
+   G4String fIHornConfig;
+   G4String fHornConfig;
+   G4String fSimulation;
+   G4String fSubSimulation;
+
+   G4int fRunPeriod;
+
+   G4double fProton_outR;
+   G4double fProton_inR;  
+   G4double fProtonDiv;
+   G4double fProtonSpread; 
+   G4double fProton_cosx; 
+   G4double fProton_cosy;
+
+   G4double fLengthOfWaterInTgt;
 
  public:
+
+
+   
+
+
+   G4int fPrintInfo;
+
+   
+
+
+
+
+
+
+   
    G4bool NImpWeightOn, createNuNtuple, createHadmmNtuple, createASCII;
    G4bool useFlukaInput, useMarsInput;
 
@@ -368,26 +368,39 @@ public:
   G4double HadrBox_width, HadrBox_height, HadrBox_length;
 
   // Horn 1 & 2
-  G4int PhornNphorn;
 
-  vdouble_t PhornZ1, PhornZ2;  
-  vint_t  PhornNpoint;  
-  vdouble_t PhornAin, PhornBin, PhornCin, PhornAout, PhornBout, PhornCout;
-  vdouble_t  PhornROCin, PhornROCout;
-  vdouble_t PhornThickFront, PhornThickEnd;  
-  vdouble_t PhornX0, PhornY0, PhornZ0, PhornDXDZ, PhornDYDZ, PhornCurrent;
-  vint_t PhornGEANTmat; 
-  vstring_t PhornName;
+   //-----------------
+   //do these variables get used?!
+   //
+   G4int PhornNphorn;
+   
+   vdouble_t PhornZ1, PhornZ2;  
+   vint_t  PhornNpoint;  
+   vdouble_t PhornAin, PhornBin, PhornCin, PhornAout, PhornBout, PhornCout;
+   vdouble_t  PhornROCin, PhornROCout;
+   vdouble_t PhornThickFront, PhornThickEnd;  
+   vdouble_t PhornX0, PhornY0, PhornZ0, PhornDXDZ, PhornDYDZ, PhornCurrent;
+   vint_t PhornGEANTmat; 
+   vstring_t PhornName;
+   //-----------------
   
   // Flux Area
-  G4int nNear,nFar;
-  vdouble_t xdet_near,ydet_near,zdet_near;
-  vdouble_t xdet_far,ydet_far,zdet_far;
+   G4int nNear,nFar;
+   vdouble_t xdet_near,ydet_near,zdet_near;
+   vdouble_t xdet_far,ydet_far,zdet_far;
+   vstring_t det_near_name, det_far_name;
 
-  G4double HornCurrent; //old
+   G4double HornCurrent; //old
 	
- // Horn 1
-  G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
+   // Horn 1
+
+   //----------------
+   //these variables are very important (Laura)
+   //
+   G4double Horn1X0, Horn1Y0, Horn1Z0;
+   //----------------
+   
+   G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
   
   vdouble_t PHorn1OCRout,PHorn1OCRin,PHorn1OCZ0;
   vdouble_t PHorn1ICZ0;
@@ -401,7 +414,14 @@ public:
   vdouble_t Horn1SpiderSupportZ0;
   vNumiHornSpiderSupport_t Horn1SS;
   
-  // Horn 2
+   // Horn 2
+
+   //----------------
+   //these variables are very important (Laura)
+   //
+   G4double Horn2X0, Horn2Y0, Horn2Z0;
+   //----------------
+   
   G4int NPHorn2OCN,NPHorn2ICN,NPHorn2EndN;
   
   vdouble_t PHorn2OCRout,PHorn2OCRin,PHorn2OCZ0;
