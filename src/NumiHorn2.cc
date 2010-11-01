@@ -151,7 +151,8 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   }
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
-  G4VPhysicalVolume* pvMHorn2 = new G4PVPlacement(G4Transform3D(rotation,translation),"MHorn2",lvMHorn2,TGAR,false,0);
+  G4VPhysicalVolume* pvMHorn2 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn2Mother",lvMHorn2,TGAR,false,0);
+  pvMHorn2 -> CheckOverlaps();
       
   //Front part
   G4VSolid* sHorn2Front;
@@ -225,7 +226,9 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
       translation=G4ThreeVector(0.,0.,ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii]/2.)-MHorn2Origin;
       new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn2End,pvMHorn2,false,0);
     }
-     
+
+
+  G4cout << "Horn 2 Constructed" << G4endl;
 }
 G4double NumiDetectorConstruction::PHorn2OCRout(G4double z)
 {

@@ -7,7 +7,7 @@
 // volumes are rotated. In the G4NuMI world, the beam is horizontal,
 // while all the MC elements are rotated. 
 //
-// $Id: NumiHadronAbsorber.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiHadronAbsorber.cc,v 1.8.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -36,7 +36,7 @@ void NumiDetectorConstruction::ConstructHadronAbsorber()
   G4cout << "Starting Hadron Absorber construction... ";
   G4ThreeVector tunnelPos = G4ThreeVector(0,0,NumiData->TunnelLength/2.+NumiData->TunnelZ0);
   G4double in = .0254*m;
-  G4double ft = 12.*in;
+  //G4double ft = 12.*in;
   G4double CShld_length = 72*in;
 
   // Blue block dimensions, all lengths in Geant4 are half-lengths

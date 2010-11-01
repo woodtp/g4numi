@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiTarget.cc,v 1.10.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiTarget.cc,v 1.10.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -52,6 +52,82 @@ void NumiDetectorConstruction::ConstructTarget()
   G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,He,"lvTargetMother",0,0,0);
   //TargetRegion->AddRootLogicalVolume(lvTargetMotherVol);
   G4VPhysicalVolume* pvTargetMotherVol=new G4PVPlacement(0,TargetMotherVolPosition,"pvTargetMother",lvTargetMotherVol,TGAR,false,0);
+  pvTargetMotherVol -> CheckOverlaps();
+
+  if(NumiData->GetPrintGeometry())
+  {
+     G4cout << "Z Position of target mother volume = " << TargetMotherVolPosition.z()/m << " m " << G4endl;
+  }
+
+  //*****************************************************************
+  //*****************************************************************
+  //This is for Simulating water in the Target
+  //creates 2 water volues. One fills the downstream most end of the target
+  //between the last fin and the Be window.
+  //the other volume starts from the downsream most fin and travels upward
+  //until the full length of water defined by the user in the macro is filled.
+  //create a water volumes starting from target downstream end
+  //Note: if NumiData -> GetWaterInTgt() = false, these volumes will never be
+  //placed in the simulation.
+  //Note: the totalWaterLength will never be < 4*cm. This is set in NuMIDataInput.cc
+  //
+
+  G4double totalWaterLength = NumiData->GetLengthOfWaterInTgt();
+
+  //
+  //the distance between the downstream Be window and the end of the last target segment is....
+  //
+  G4ThreeVector target_fin_translation = G4ThreeVector(-(sin(atan(NumiData->TargetDxdz)))*cos(atan(NumiData->TargetDydz))*NumiData->TargetSLength/2.,(sin(atan(NumiData->TargetDydz)))*NumiData->TargetSLength/2.,(1-cos(atan(NumiData->TargetDxdz))*cos(atan(NumiData->TargetDydz)))*NumiData->TargetSLength/2.);
+  G4ThreeVector lastTargetSegmentPosition = G4ThreeVector(0.,0.,NumiData->TargetSLength/2.+(NumiData->TargetSegmentPitch+NumiData->TargetSLength)*46)-TargetMVOrigin-target_fin_translation;
+  G4double lastTargetSegmentEndPosition  = lastTargetSegmentPosition.z()+NumiData->TargetSLength/2.;
+  //G4cout << "Last Target Segment End Position = " << lastTargetSegmentEndPosition << G4endl;
+  
+  
+  G4ThreeVector DSBeWindowPosition = G4ThreeVector(0.,0.,NumiData->CTubeZ0[19]+NumiData->CTubeLength[19]/2.)-TargetMVOrigin;
+  G4double DSBeWindowBeginPosition = DSBeWindowPosition.z()-NumiData->CTubeLength[19]/2.;
+  //G4cout << "Downstream Be Window Begin Position = " << DSBeWindowBeginPosition << G4endl;
+  
+  G4double tgtendWaterSolidZ          = (DSBeWindowBeginPosition + lastTargetSegmentEndPosition)/2.0;
+  G4double tgtendWaterSolidLength     = DSBeWindowBeginPosition - lastTargetSegmentEndPosition;
+  G4double tgtendWaterSolidHalflength = tgtendWaterSolidLength/2.0;
+  G4double tgtendWaterSolidZBegin     = tgtendWaterSolidZ - tgtendWaterSolidHalflength;
+
+  if( NumiData->GetWaterInTgt() )
+  {
+     
+     G4VSolid * tgtend_water_solid             = new G4Tubs("tgtend_water_solid",0., NumiData->CPipeY0[9]-NumiData->CPipeRadiusOut[9], tgtendWaterSolidHalflength, 0.*deg, 360.*deg);
+     G4ThreeVector tgtend_water_solid_position = G4ThreeVector(0.0, 0.0, tgtendWaterSolidZ);  
+     G4LogicalVolume* lv_tgtend_water_solid    = new G4LogicalVolume(tgtend_water_solid,Water,"lv_tgtend_water_solid",0,0,0);
+     G4VPhysicalVolume* pv_tgtend_water_solid  = new G4PVPlacement(0, tgtend_water_solid_position, "pv_tgtend_water_vol", lv_tgtend_water_solid, pvTargetMotherVol,false,0);
+     pv_tgtend_water_solid -> CheckOverlaps();
+  }
+  
+  //
+  //determine remaining water length
+  //
+  G4double waterlength = totalWaterLength - tgtendWaterSolidLength;
+  
+  G4double waterhalflength = waterlength/2.0;
+  G4double wateroutrad     = NumiData->CTubeRin[16];
+  
+  G4VSolid* water_solid              = new G4Tubs("water_solid",0.,wateroutrad, waterhalflength,0.*deg,360.*deg);
+  G4ThreeVector water_solid_position = G4ThreeVector(0.0, 0.0, tgtendWaterSolidZBegin-waterhalflength);
+  
+  
+  
+  
+  G4double waterSolidZ      = water_solid_position.z();
+  G4double waterSolidZBegin = water_solid_position.z()-waterhalflength;
+  
+  G4SubtractionSolid* water_vol = 0;
+  
+  G4bool subFirstFinVol = true;
+  //
+  //
+  //*****************************************************************
+  //*****************************************************************
+
+  
   
   //------------------------------------------------------------------------------------------------
   //Target
@@ -65,7 +141,8 @@ void NumiDetectorConstruction::ConstructTarget()
   
   G4VSolid* TGT1_solid;
   G4Tubs* CPG_solid;
-  if (NumiData->TargetEndRounded) {
+  if (NumiData->TargetEndRounded)
+  {
     TGT_l=TGT_l-NumiData->TargetSWidth/2.;
     G4Box* TGT2_solid=new G4Box("TGT2_solid",TGT_w,TGT_h,TGT_l);
     G4Tubs* TGTRE_solid=new G4Tubs("TGTRE_solid",0.,TGT_w,TGT_h,0.,360.*deg); 
@@ -75,9 +152,11 @@ void NumiDetectorConstruction::ConstructTarget()
     translation=G4ThreeVector(0,0,TGT_l);
     TGT1_solid=new G4UnionSolid("TGT1_solid",TGT1_solid,TGTRE_solid,G4Transform3D(rotation,translation));
   }
-  else{ 
+  else
+  { 
     TGT1_solid=new G4Box("TGT1_solid",TGT_w,TGT_h,TGT_l);
   }
+  
   CPG_solid=new G4Tubs("CPG_solid",0.,NumiData->TargetCPGRadius,2.*TGT_l,0.,360.*deg);
   rotation=G4RotationMatrix(0,0,0);
   translation=G4ThreeVector(0,NumiData->TargetCPGPosition,0);
@@ -86,7 +165,8 @@ void NumiDetectorConstruction::ConstructTarget()
   TGT_solid=new G4SubtractionSolid("TGT_solid",TGT_solid,CPG_solid,G4Transform3D(rotation,translation));
   G4LogicalVolume* LVTargetFin=new G4LogicalVolume(TGT_solid,Target,"LVTargetFin",0,0,0);
   //Now create TargetSegmentNo of target fins and place them
-  for (G4int ii=0;ii<NumiData->TargetSegmentNo;ii++){
+  for (G4int ii=0;ii<NumiData->TargetSegmentNo;ii++)
+  {
     rotation=G4RotationMatrix(0,0,0);
     rotation.rotateX(atan(NumiData->TargetDydz));
     rotation.rotateY(atan(NumiData->TargetDxdz));
@@ -94,7 +174,53 @@ void NumiDetectorConstruction::ConstructTarget()
     translation=G4ThreeVector(-(sin(atan(NumiData->TargetDxdz)))*cos(atan(NumiData->TargetDydz))*NumiData->TargetSLength/2.,(sin(atan(NumiData->TargetDydz)))*NumiData->TargetSLength/2.,(1-cos(atan(NumiData->TargetDxdz))*cos(atan(NumiData->TargetDydz)))*NumiData->TargetSLength/2.);
     G4ThreeVector targetSegmentPosition=G4ThreeVector(0.,0.,NumiData->TargetSLength/2.+(NumiData->TargetSegmentPitch+NumiData->TargetSLength)*ii)-TargetMVOrigin-translation;
     new G4PVPlacement(G4Transform3D(rotation,targetSegmentPosition),"TGT1",LVTargetFin,pvTargetMotherVol,false,0);
+
+    if(NumiData->GetPrintGeometry())
+    {
+       if(ii==0) G4cout << "Z0   Position of first target fin = " << (TargetMotherVolPosition.z() + (targetSegmentPosition.z()-NumiData->TargetSLength/2.))/m << " m " << G4endl;
+       if(ii==46)G4cout << "ZEnd Position of last target fin  = " << (TargetMotherVolPosition.z() + (targetSegmentPosition.z()+NumiData->TargetSLength/2.) )/m << " m " << G4endl;
+    }
+
+    //*****************************************************************
+    //*****************************************************************
+    //This is for Simulating water in the Target
+    //creates 2 water volues. One fills the downstream most end of the target
+    //between the last fin and the Be window.
+    //the other volume starts from the downsream most fin and travels upward
+    //until the full length of water defined by the user in the macro is filled.
+    //create a water volumes starting from target downstream end
+    //Note: if NumiData -> GetWaterInTgt() = false, these volumes will never be
+    //placed in the simulation.
+    //
+    if (NumiData -> GetWaterInTgt())
+    {
+       //
+       //subtract fin volume from water volume
+       //
+       G4double finZEnd = targetSegmentPosition.z()+NumiData->TargetSLength/2.;
+       if(finZEnd >= waterSolidZBegin)
+       {
+          G4double finZ = targetSegmentPosition.z();
+          G4RotationMatrix finwater_rotation=G4RotationMatrix(0,0,0);
+          G4ThreeVector finwater_translation=G4ThreeVector(0.0, 0.0, finZ-waterSolidZ);
+          if(subFirstFinVol)
+          {
+             water_vol = new G4SubtractionSolid("water_vol",water_solid,TGT_solid,G4Transform3D(finwater_rotation,finwater_translation));
+             subFirstFinVol = false;
+          }
+          else
+          {
+             water_vol = new G4SubtractionSolid("water_vol",water_vol,TGT_solid,G4Transform3D(finwater_rotation,finwater_translation));
+          }
+       }
+    }
+    //
+    //
+    //*******************************************************************
+    //*******************************************************************
   }
+
+
   
   // Budal Monitor
   rotation=G4RotationMatrix(0,0,0);
@@ -217,5 +343,95 @@ void NumiDetectorConstruction::ConstructTarget()
       }
     }
   }
+
+
+  //*****************************************************************
+  //*****************************************************************
+  //This is for Simulating water in the Target
+  //creates 2 water volues. One fills the downstream most end of the target
+  //between the last fin and the Be window.
+  //the other volume starts from the downsream most fin and travels upward
+  //until the full length of water defined by the user in the macro is filled.
+  //create a water volumes starting from target downstream end
+  //Note: if NumiData -> GetWaterInTgt() = false, these volumes will never be
+  //placed in the simulation.
+  //
+  if(NumiData -> GetWaterInTgt())
+  {
+     //
+     //Subtract 2, upper (Pipe1)  and lower (Pipe2), pipes from water volume
+     //
+     G4VSolid* pipe1_solid = new G4Tubs("pipe1_solid", 0., NumiData->CPipeRadiusOut[0], waterhalflength+1.0*mm, 0.*deg, 360.*deg);
+     G4RotationMatrix pipe1_rotation=G4RotationMatrix(0,0,0);
+     G4ThreeVector    pipe1_translation=G4ThreeVector(0, NumiData->CPipeY0[0], 0);
+     if(subFirstFinVol) { water_vol = new G4SubtractionSolid("water_vol", water_solid, pipe1_solid, G4Transform3D(pipe1_rotation, pipe1_translation)); subFirstFinVol=false; }
+     else               { water_vol = new G4SubtractionSolid("water_vol", water_vol, pipe1_solid, G4Transform3D(pipe1_rotation, pipe1_translation)); }
+     
+     G4VSolid* pipe2_solid = new G4Tubs("pipe2_solid", 0., NumiData->CPipeRadiusOut[1], waterhalflength+1.0*mm, 0.*deg, 360.*deg);
+     G4RotationMatrix pipe2_rotation=G4RotationMatrix(0,0,0);
+     G4ThreeVector    pipe2_translation=G4ThreeVector(0, NumiData->CPipeY0[1], 0);
+     if(subFirstFinVol) { water_vol = new G4SubtractionSolid("water_vol", water_solid, pipe2_solid, G4Transform3D(pipe2_rotation, pipe2_translation)); subFirstFinVol=false; }
+     else               { water_vol = new G4SubtractionSolid("water_vol", water_vol, pipe2_solid, G4Transform3D(pipe2_rotation, pipe2_translation)); }      
+
+   
+     //
+     //Subtract ring(s) that hold target and cooling pipes from water volume
+     //
+     
+     //figure out how many rings are affected
+     G4int iring = 20;
+     for (G4int ii=0;ii<NumiData->NTgtRingN;ii++)
+     {
+        G4ThreeVector tgtRingPosition = G4ThreeVector(0.,0.,NumiData->TgtRingZ0[ii]+NumiData->TgtRingLength[ii]/2.)-TargetMVOrigin;
+        G4double tgtRingZ    = tgtRingPosition.z();
+        G4double tgtRingZEnd = tgtRingZ + NumiData->TgtRingLength[ii]/2.;
+        
+        if(tgtRingZEnd >= waterSolidZBegin) { iring = ii; break;}
+     }
+     
+     //G4cout << "Subtracting ring " << iring+1 << " to " << NumiData->NTgtRingN << G4endl;
+     
+     //now subtract rings
+     for (G4int ii=iring;ii<NumiData->NTgtRingN;ii++)
+     {
+        
+        G4ThreeVector tgtRingPosition = G4ThreeVector(0.,0.,NumiData->TgtRingZ0[ii]+NumiData->TgtRingLength[ii]/2.)-TargetMVOrigin;
+        G4double tgtRingZ    = tgtRingPosition.z();
+        
+        
+        G4VSolid* STgtRing = new G4Tubs("STgtRing",NumiData->TgtRingRin[ii],NumiData->TgtRingRout[ii],NumiData->TgtRingLength[ii]/2.,0.,360.*deg);    
+
+        G4RotationMatrix ring_rotation=G4RotationMatrix(0, 0, 0);
+        G4ThreeVector    ring_translation=G4ThreeVector(0, 0, tgtRingZ-waterSolidZ);
+
+        if(subFirstFinVol) { water_vol = new G4SubtractionSolid("water_vol", water_solid, STgtRing, G4Transform3D(ring_rotation, ring_translation)); subFirstFinVol = false; }
+        else               { water_vol = new G4SubtractionSolid("water_vol", water_vol, STgtRing, G4Transform3D(ring_rotation, ring_translation)); }
+        
+        
+     }
+     
+     
+     //
+     //place water volume
+     //
+     
+     G4LogicalVolume* lv_water_vol   = new G4LogicalVolume(water_vol,Water,"lv_water_vol",0,0,0);
+     G4VPhysicalVolume* pv_water_vol = new G4PVPlacement(0, water_solid_position, "pv_tgt_water_vol", lv_water_vol, pvTargetMotherVol,false,0);
+     pv_water_vol -> CheckOverlaps();
+  }
+  //
+  //
+  //*******************************************************************
+  //*******************************************************************
+  
+
+
+
+
+
+
+
+
+  
   G4cout << "Target Constructed" << G4endl;  
 }

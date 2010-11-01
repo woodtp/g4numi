@@ -23,6 +23,11 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
 {
   NumiData=NumiDataInput::GetNumiDataInput();
 
+  if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn())
+  {
+     G4cout << "NumiRunActionMessenger Constructor Called." << G4endl;
+  }
+
   RndmDir = new G4UIdirectory("/NuMI/rndm/");
   RndmDir->SetGuidance("Rndm status control.");
   
@@ -44,6 +49,82 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
 
   NumiRunDir = new G4UIdirectory("/NuMI/run/");
   NumiRunDir->SetGuidance("NuMI run management");
+
+  //---------------------------------------
+  //Commands for defining the simulation
+  //
+
+  useNuBeam = new G4UIcmdWithABool("/NuMI/run/useNuBeam",this);
+  useNuBeam->SetGuidance("run the neutrino beam simulation");
+  useNuBeam->SetParameterName("useNuBeam",true);
+  useNuBeam->SetDefaultValue (NumiData->GetNuBeam());
+  useNuBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  useMuonBeam = new G4UIcmdWithABool("/NuMI/run/useMuonBeam",this);
+  useMuonBeam->SetGuidance("run the muon monitor simulation");
+  useMuonBeam->SetParameterName("useMuonBeam",true);
+  useMuonBeam->SetDefaultValue (NumiData->GetMuonBeam());
+  useMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  simAbsBkg = new G4UIcmdWithABool("/NuMI/run/simAbsBkg",this);
+  simAbsBkg->SetGuidance("run the Absorber Backgrounds simulation");
+  simAbsBkg->SetParameterName("simAbsBkg",true);
+  simAbsBkg->SetDefaultValue (NumiData->GetSimAbsBkg());
+  simAbsBkg->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  simDRays = new G4UIcmdWithABool("/NuMI/run/simDRays",this);
+  simDRays->SetGuidance("run the Delta Ray simulation");
+  simDRays->SetParameterName("simDRays",true);
+  simDRays->SetDefaultValue (NumiData->GetSimDRays());
+  simDRays->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //---------------------------------------
+
+  //---------------------------------------
+  //Commands for defining the sub-simulation
+  //
+  useWaterInTgt = new G4UIcmdWithABool("/NuMI/run/useWaterInTgt",this);
+  useWaterInTgt->SetGuidance("Simulate Water in the Target");
+  useWaterInTgt->SetParameterName("useWaterInTgt",true);
+  useWaterInTgt->SetDefaultValue (NumiData->GetWaterInTgt());
+  useWaterInTgt->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //---------------------------------------
+
+
+  
+  //---------------------------------------
+  //Commands for defining the Beam
+  //
+  useDetailedProtonBeam = new G4UIcmdWithABool("/NuMI/run/useDetailedProtonBeam",this);
+  useDetailedProtonBeam -> SetGuidance("Use a detailed proton beam. (For running the full simulation with the beam starting upstream of the baffle");
+  useDetailedProtonBeam -> SetParameterName("useDetailedProtonBeam",true);
+  useDetailedProtonBeam -> SetDefaultValue (NumiData->GetDetailedProtonBeam());
+  useDetailedProtonBeam -> AvailableForStates(G4State_PreInit,G4State_Idle);
+  
+  useTestBeam = new G4UIcmdWithABool("/NuMI/run/useTestBeam",this);
+  useTestBeam->SetGuidance("use test beam source");
+  useTestBeam->SetParameterName("useTestBeam",true);
+  useTestBeam->SetDefaultValue (NumiData->useTestBeam);
+  useTestBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useFlukaInput = new G4UIcmdWithABool("/NuMI/run/useFlukaInput",this);
+  useFlukaInput->SetGuidance("use fluka input ntuple");
+  useFlukaInput->SetParameterName("useFlukaInput",true);
+  useFlukaInput->SetDefaultValue (NumiData->useFlukaInput);
+  useFlukaInput->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useMarsInput = new G4UIcmdWithABool("/NuMI/run/useMarsInput",this);
+  useMarsInput->SetGuidance("use mars input ntuple");
+  useMarsInput->SetParameterName("useMarsInput",true);
+  useMarsInput->SetDefaultValue (NumiData->useMarsInput);
+  useMarsInput->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  useMuonInput = new G4UIcmdWithABool("/NuMI/run/useMuonInput",this);
+  useMuonInput->SetGuidance("use muon input ntuple");
+  useMuonInput->SetParameterName("useMuonInput",true);
+  useMuonInput->SetDefaultValue (NumiData->useMuonInput);
+  useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //---------------------------------------
+  
 
   debugOn = new G4UIcmdWithABool("/NuMI/run/debugOn",this);
   debugOn->SetGuidance("Output some debugging info");
@@ -69,30 +150,7 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useNImpWeight->SetDefaultValue (NumiData->NImpWeightOn);
   useNImpWeight->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  useTestBeam = new G4UIcmdWithABool("/NuMI/run/useTestBeam",this);
-  useTestBeam->SetGuidance("use test beam source");
-  useTestBeam->SetParameterName("useTestBeam",true);
-  useTestBeam->SetDefaultValue (NumiData->useTestBeam);
-  useTestBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  useFlukaInput = new G4UIcmdWithABool("/NuMI/run/useFlukaInput",this);
-  useFlukaInput->SetGuidance("use fluka input ntuple");
-  useFlukaInput->SetParameterName("useFlukaInput",true);
-  useFlukaInput->SetDefaultValue (NumiData->useFlukaInput);
-  useFlukaInput->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  useMarsInput = new G4UIcmdWithABool("/NuMI/run/useMarsInput",this);
-  useMarsInput->SetGuidance("use mars input ntuple");
-  useMarsInput->SetParameterName("useMarsInput",true);
-  useMarsInput->SetDefaultValue (NumiData->useMarsInput);
-  useMarsInput->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  useMuonInput = new G4UIcmdWithABool("/NuMI/run/useMuonInput",this);
-  useMuonInput->SetGuidance("use muon input ntuple");
-  useMuonInput->SetParameterName("useMuonInput",true);
-  useMuonInput->SetDefaultValue (NumiData->useMuonInput);
-  useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);
-
+  
   NInputParts = new G4UIcmdWithAnInteger("/NuMI/run/NInputParts",this);
   NInputParts->SetGuidance("Number of parts to divide the muon input file into");
   NInputParts->SetParameterName("Number of parts to divide the muon input file into",true);
@@ -117,23 +175,7 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   nSplitDeltas->SetDefaultValue (NumiData->GetNSplitDeltas());
   nSplitDeltas->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  useMuonBeam = new G4UIcmdWithABool("/NuMI/run/useMuonBeam",this);
-  useMuonBeam->SetGuidance("run the muon MC");
-  useMuonBeam->SetParameterName("useMuonBeam",true);
-  useMuonBeam->SetDefaultValue (NumiData->useMuonBeam);
-  useMuonBeam->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  simAbsBkg = new G4UIcmdWithABool("/NuMI/run/simAbsBkg",this);
-  simAbsBkg->SetGuidance("run the Absorber Backgrounds simulation");
-  simAbsBkg->SetParameterName("simAbsBkg",true);
-  simAbsBkg->SetDefaultValue (NumiData->GetSimAbsBkg());
-  simAbsBkg->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  simDRays = new G4UIcmdWithABool("/NuMI/run/simDRays",this);
-  simDRays->SetGuidance("run the Delta Ray simulation");
-  simDRays->SetParameterName("simDRays",true);
-  simDRays->SetDefaultValue (NumiData->GetSimDRays());
-  simDRays->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   useZPosCut = new G4UIcmdWithABool("/NuMI/run/useZPosCut",this);
   useZPosCut->SetGuidance("Use/Not Use the Z Position cut for delta rays");
@@ -317,28 +359,34 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setRndmSeedCmd;
   delete RndmDir;
 
+  delete useNuBeam;
+  delete useMuonBeam;
+  delete simAbsBkg;
+  delete simDRays;
+
+  delete useWaterInTgt;
+
+  delete useMuonInput;
+  delete useTestBeam;
+  delete useFlukaInput;
+  delete useMarsInput;
+
+  delete debugOn;
   delete setRunID;
   delete setMaterialSigma;
   delete useNImpWeight;
   delete NumiRunDir;
-  delete useTestBeam;
-  delete useFlukaInput;
-  delete useMarsInput;
-  delete useMuonBeam;
-  delete simAbsBkg;
-  delete simDRays;
   delete useZPosCut;
   delete muonBeamShape;
   delete muonBeamMomentum;
   delete muonBeamZPos;
   delete muonBeamGaussXsig;
   delete muonBeamGaussYsig;
-  delete useMuonInput;
+  
   delete NInputParts;
   delete NInputPart;
   delete reWeightDeltas;
   delete nSplitDeltas;
-
   delete setAbsBkgNtupleDir;
   delete setAbsBkgNtupleFile;
   delete outputAbsBkgNtuple;
@@ -366,6 +414,15 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
 
 void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
 {
+
+   
+   NumiDataInput *NumiData = NumiDataInput::GetNumiDataInput();
+
+   if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn())
+   {
+      G4cout << "NumiRunActionMessenger::SetNewValue - Setting Parameter values from input macro." << G4endl;
+   }
+   
   if (command == readRndmCmd)
     { 
       G4cout << "\n---> rndm status restored from file: " << newValues << G4endl;
@@ -382,7 +439,34 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == setRndmSeedCmd)
     { 
       CLHEP::HepRandom::setTheSeed(setRndmSeedCmd->GetNewIntValue(newValues));
-    }  
+    }
+
+
+
+  //---------------------------------------
+  //Commands for defining the simulation
+  //
+  if (command == useNuBeam)   { NumiData->SetNuBeam(useNuBeam->GetNewBoolValue(newValues));     }
+  if (command == useMuonBeam) { NumiData->SetMuonBeam(useMuonBeam->GetNewBoolValue(newValues)); }
+  if (command == simAbsBkg)   { NumiData->SetSimAbsBkg(simAbsBkg->GetNewBoolValue(newValues));  }
+  if (command == simDRays)    { NumiData->SetSimDRays(simDRays->GetNewBoolValue(newValues));    }
+  //---------------------------------------
+
+  //---------------------------------------
+  //Commands for defining the sub-simulation
+  //
+  if (command == useWaterInTgt) { NumiData->SetWaterInTgt(useWaterInTgt->GetNewBoolValue(newValues)); }
+  //---------------------------------------
+     
+  //---------------------------------------
+  //Commands for defining the Beam
+  //
+  if (command == useDetailedProtonBeam) { NumiData->SetDetailedProtonBeam(useDetailedProtonBeam->GetNewBoolValue(newValues));}
+  if (command == useTestBeam)           { NumiData->SetTestBeam(useTestBeam->GetNewBoolValue(newValues));}
+  if (command == useFlukaInput)         { NumiData->SetFlukaInput(useFlukaInput->GetNewBoolValue(newValues));}
+  if (command == useMarsInput)          { NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues)); }
+  if (command == useMuonInput)          { NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues)); }
+  //---------------------------------------
 
   if (command == setRunID){
     G4RunManager* runManager = G4RunManager::GetRunManager();
@@ -401,24 +485,8 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
     NumiData->SetNImpWeight(useNImpWeight->GetNewBoolValue(newValues));
   }
 
-  if (command == useTestBeam){
-     NumiData->SetTestBeam(useTestBeam->GetNewBoolValue(newValues));
-  }
-  if (command == useFlukaInput){
-    NumiData->SetFlukaInput(useFlukaInput->GetNewBoolValue(newValues));
-  }
-  if (command == useMarsInput){
-    NumiData->SetMarsInput(useMarsInput->GetNewBoolValue(newValues));
-  }
-  if (command == useMuonBeam){
-    NumiData->SetMuonBeam(useMuonBeam->GetNewBoolValue(newValues));
-  }
-  if (command == simAbsBkg){
-    NumiData->SetSimAbsBkg(simAbsBkg->GetNewBoolValue(newValues));
-  }
-  if (command == simDRays){
-    NumiData->SetSimDRays(simDRays->GetNewBoolValue(newValues));
-  }
+  
+  
   if (command == useZPosCut){
     NumiData->SetUseZPosCut(useZPosCut->GetNewBoolValue(newValues));
   }
@@ -437,9 +505,7 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == muonBeamGaussYsig){
      NumiData->SetGaussBeamYSig(muonBeamGaussYsig->GetNewDoubleValue(newValues));
   }  
-  if (command == useMuonInput){
-    NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues));
-  }
+  
   if (command == NInputParts){
     NumiData->SetNInputParts(NInputParts->GetNewIntValue(newValues));
   }

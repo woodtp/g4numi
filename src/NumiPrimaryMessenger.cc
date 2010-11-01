@@ -1,4 +1,5 @@
 #include "NumiPrimaryMessenger.hh"
+#include "NumiDataInput.hh"
 
 #include "NumiPrimaryGeneratorAction.hh"
 #include "G4UIdirectory.hh"
@@ -16,6 +17,13 @@
 NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   :PrimaryAction (RA)
 {
+   NumiDataInput *NumiData = NumiDataInput::GetNumiDataInput();
+   
+   if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn())
+   {
+      G4cout << "NumiPrimaryMessenger Constructor Called." << G4endl;
+   }
+   
   particleTable = G4ParticleTable::GetParticleTable();
 
   BeamDir = new G4UIdirectory("/NuMI/Beam/");
@@ -113,7 +121,14 @@ NumiPrimaryMessenger::~NumiPrimaryMessenger()
 
 void NumiPrimaryMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
 {
-  G4cout << "NumiPrimaryMessenger: " << newValues << G4endl;
+   NumiDataInput *NumiData = NumiDataInput::GetNumiDataInput();
+
+   if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn())
+   {
+      G4cout << "NumiPrimaryMessenger::SetNewValue - Setting Parameter values from input macro." << G4endl;
+   }
+   
+   
   if ( command==setCosX ) {
 	PrimaryAction->PG_CosX(setCosX->GetNewDoubleValue(newValues));
   }

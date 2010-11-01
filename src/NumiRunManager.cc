@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiRunManager.cc
-// $Id: NumiRunManager.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiRunManager.cc,v 1.8.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
@@ -27,34 +27,52 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
        NumiDataInput *ND = NumiDataInput::GetNumiDataInput();
        //       ND->SetRunNumber(macroFile);
        primaryGeneratorAction = (NumiPrimaryGeneratorAction*)(this)->userPrimaryGeneratorAction;
-       if(ND->useFlukaInput || ND->useMarsInput){
+       if(ND->useFlukaInput || ND->useMarsInput)
+       {
 	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
   	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
-       else if(ND->useMuonBeam && !(ND->useMuonInput)){   
+       else if(ND->useMuonBeam && !(ND->useMuonInput))
+       {   
 	 G4cout << "Generating Muon Beam" << G4endl;  	 
 	 primaryGeneratorAction->SetMuonBeam();
        }
-       else if(ND->useMuonBeam && ND->useMuonInput){
+       else if(ND->useMuonBeam && ND->useMuonInput)
+       {
           G4cout << "Generating Muon Beam from input file" << G4endl;  	 
 	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
   	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
-       else if(ND->useTestBeam) {
+       else if(ND->useTestBeam)
+       {
 	 G4cout << "Test Beam is set" << G4endl;  	 
        }
-       else if(ND->useMacro) {
+       else if(ND->useMacro)
+       {
 	 G4cout << "using macro parameters" << G4endl;  	 
        }
-       else{
+       else if(ND->GetDetailedProtonBeam())
+       {
+	 G4cout << "Using the Detailed Proton Beam." << G4endl;
+       }
+       else
+       {
      	 primaryGeneratorAction->SetProtonBeam();
        }
-       if (runOn){
+
+             
+       if (runOn)
+       {
 	 TStopwatch *sWatch=new TStopwatch();
 	 sWatch->Start(true);
 	 numberOfEventToBeProcessed = n_event;
 	 RunInitialization();
-	 if(n_event>0) DoEventLoop(n_event,macroFile,n_select);
+
+         if(ND->GetOkToRun())
+         {
+            if(n_event>0) DoEventLoop(n_event,macroFile,n_select);
+         }
+	 
 	 RunTermination();
 	 
 	 if(ND->useFlukaInput){

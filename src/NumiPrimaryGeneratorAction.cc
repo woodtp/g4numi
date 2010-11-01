@@ -196,6 +196,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //  std::cout<<"*************** anEvent: "<<anEvent->get_eventID()<<" *******************"<<std::endl;
   //G4UImanager* UI=G4UImanager::GetUIpointer();
 
+   
   G4int totNoPrim=fRunManager->GetNumberOfEvents();
   if (totNoPrim>20)
   {
@@ -379,7 +380,8 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
   }
-  else if (fND->useTestBeam) { 
+  else if (fND->useTestBeam)
+  { 
     // Test Beam for comparison with FLUGG
     // Fluka-analagous paramaters defined in input file
     
@@ -422,10 +424,12 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
-  else if (fND->useMacro){
+  else if (fND->useMacro)
+  {
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
-  else if (fND->useFlukaInput || fND->useMarsInput) {
+  else if (fND->useFlukaInput || fND->useMarsInput)
+  {
     /*
      Fluka and Mars input variables:
      FLUKA                           MARS                   
@@ -497,26 +501,111 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
   }
-  else {
-    // If nothing else is set, use a proton beam
-    G4double x0;
-    G4double y0; 
-    G4double z0;
-    G4double sigmax=fND->beamSigmaX;
-    G4double sigmay=fND->beamSigmaY;
+  else if (fND->GetDetailedProtonBeam())
+  {
+
+     //
+     //Need to create a new Gun each time
+     //so Geant v4.9 doesn't complain
+     //about momentum not match KE
+     //
+     if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
+     fParticleGun = new G4ParticleGun(1);
+     fParticleGun->SetParticleEnergy(0.0*GeV);
+
+     //
+     // THIS NEEDS TO BE CHECKED!
+     // This is supposed to simulate the detailed proton beam used by NuMI
+     // Evidence for the use of this code is in g4numi_flugg/scripts/g4numi_fluka.sh
+     // and in fluka_NuMI/target_2_baffle.inp. I don't fully understand what this is doing.
+     //The code for this must be in the FLUKA code from their website
+     // -Laura
+     //
     
-    x0 = G4RandGauss::shoot(fND->beamPosition[0],sigmax);
-    y0 = G4RandGauss::shoot(fND->beamPosition[1],sigmay);
-    z0 = fND->beamPosition[2];
+     G4double x0, y0;
+     G4double z0 = fND->beamPosition[2];
+     G4double px, py, pz;
+
+     G4double p      = fND->GetProtonMomentum();
+     G4double outR   = fND->GetProton_outR();
+     G4double inR    = fND->GetProton_inR();
+     G4double div    = fND->GetProtonDivergence();
+     G4double spread = fND->GetProtonSpread();
+     G4double cosx   = fND->GetProton_cosx();
+     G4double cosy   = fND->GetProton_cosy();
     
-    fProtonOrigin   = G4ThreeVector(x0, y0, z0);
-    fProtonMomentum = G4ThreeVector(0, 0, fND->protonMomentum);
-    fProtonIntVertex = G4ThreeVector(-9999.,-9999.,-9999.);
-    fWeight=1.; //for primary protons set weight and tgen
-    fTgen=0;
+    if (outR > 0)
+    {
+      G4double r0   = G4UniformRand()*(outR - inR) + inR;
+      G4double phi0 = G4UniformRand()*2*M_PI;
+      
+      x0 = cos(phi0) * r0;
+      y0 = sin(phi0) * r0;
+    }
+    else
+    {
+       //
+       //I changed this. It doesn't make sense to ever have x=y=0 -Laura
+       //
+       //x0 = 0;
+       //y0 = 0;
+
+       G4double sigmax=fND->beamSigmaX;
+       G4double sigmay=fND->beamSigmaY;
+       
+       x0 = G4RandGauss::shoot(fND->beamPosition[0],sigmax);
+       y0 = G4RandGauss::shoot(fND->beamPosition[1],sigmay);
+    }
     
+    if (spread > 0)
+    {
+      p += DoubleRand()*spread/2.;
+    }
+    
+    if (cosx + cosy == 0)
+    {
+      G4double ptheta  = sqrt(G4UniformRand())*div/2.;
+      G4double pphi    = G4UniformRand()*2*M_PI; 
+      px = p * sin(ptheta)*cos(pphi);
+      py = p * sin(ptheta)*sin(pphi);
+      pz = p * cos(ptheta);
+    }
+    else
+    {
+      px = p * cosx;
+      py = p * cosy;
+      pz = p * sqrt(1 - cosx*cosx - cosy*cosy);
+    }
+
+    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+    
+    fParticleGun->SetParticleDefinition(particleTable->FindParticle("proton"));
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+    fParticleGun->SetParticleMomentum(G4ThreeVector(px, py, pz));
+    
     fParticleGun->GeneratePrimaryVertex(anEvent);
+  }
+  else
+  {
+     // If nothing else is set, use a basic proton beam
+     G4double x0;
+     G4double y0; 
+     G4double z0;
+     G4double sigmax=fND->beamSigmaX;
+     G4double sigmay=fND->beamSigmaY;
+     
+     x0 = G4RandGauss::shoot(fND->beamPosition[0],sigmax);
+     y0 = G4RandGauss::shoot(fND->beamPosition[1],sigmay);
+     z0 = fND->beamPosition[2];
+    
+     fProtonOrigin   = G4ThreeVector(x0, y0, z0);
+     fProtonMomentum = G4ThreeVector(0, 0, fND->protonMomentum);
+     fProtonIntVertex = G4ThreeVector(-9999.,-9999.,-9999.);
+     fWeight=1.; //for primary protons set weight and tgen
+     fTgen=0;
+     
+     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
   
   fCurrentPrimaryNo++;

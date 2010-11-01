@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -466,7 +466,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
 
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleDefinition,
-                            const G4int alc, const G4int IntExt, const G4double zpos, Int_t cellNum,
+                            const G4int alc, const G4int IntExt, const G4double /*zpos*/, Int_t cellNum,
                             const Int_t trackID, const G4double weight)
 {
 

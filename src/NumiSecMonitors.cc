@@ -7,7 +7,7 @@
 // pixels in the muon monitors is modelled and acts as the active
 // elements of the monitors.
 //
-// $Id: NumiSecMonitors.cc,v 1.7.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiSecMonitors.cc,v 1.7.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -95,7 +95,7 @@ void NumiDetectorConstruction::ConstructSecMonitors()
 
   xp = NumiData->HadrBox_length - 6.0625*ft + MuAlcv0_length/2.0 - Backfill_depth;
   yp = MuAlcv0_height/2.0 - NumiData->HadrBox_height/2.0;
-  G4double z_MuAlcv0_mon = xp*cos(beam_angle) - yp*sin(beam_angle) + xo;
+//  G4double z_MuAlcv0_mon = xp*cos(beam_angle) - yp*sin(beam_angle) + xo;
   G4double y_MuAlcv0_mon = xp*sin(beam_angle) + yp*cos(beam_angle) + yo;
 
   xp = NumiData->HadrBox_length - 6.0625*ft + MuAlcv0_length - Backfill_depth + MM01RockLength - Shotcrete_depth + MuAlcv1_length/2.0;
@@ -195,11 +195,6 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      G4double ChamberLength  = 3.0*mm;
      G4double ChamberSpacing = 25.4*cm;
 
-     //
-     //Chamber Layer 
-     //
-     //G4double LayerWidth = 0.001*mm;
-     G4double LayerWidth = 0.0001*mm;
 
      //
      //Ion chamber plate spacing
@@ -243,7 +238,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      G4ThreeVector MuMon_pos1 = G4ThreeVector(0., -y_MuAlcv1/cos(beam_angle), 0.);
      G4ThreeVector MuMon_pos2 = G4ThreeVector(0., -y_MuAlcv2/cos(beam_angle), 0.);
      
-     G4PVPlacement *MuMon0 = new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
+     //G4PVPlacement *MuMon0 = new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
+     new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
      new G4PVPlacement(0, MuMon_pos1, "MuMon_1", LVMuMon, MuMonAlcv_1, false, 0);
      new G4PVPlacement(0, MuMon_pos2, "MuMon_2", LVMuMon, MuMonAlcv_2, false, 0);
 
@@ -810,7 +806,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      G4ThreeVector MuMon_pos1 = G4ThreeVector(0., -y_MuAlcv1/cos(beam_angle), 0.);
      G4ThreeVector MuMon_pos2 = G4ThreeVector(0., -y_MuAlcv2/cos(beam_angle), 0.);
      
-     G4PVPlacement *MuMon0 = new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
+     //G4PVPlacement *MuMon0 = new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
+     new G4PVPlacement(0, MuMon_pos0, "MuMon_0", LVMuMon, MuMonAlcv_0, false, 0);
      new G4PVPlacement(0, MuMon_pos1, "MuMon_1", LVMuMon, MuMonAlcv_1, false, 0);
      new G4PVPlacement(0, MuMon_pos2, "MuMon_2", LVMuMon, MuMonAlcv_2, false, 0);
 

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//$Id: NumiBaffle.cc,v 1.3.4.1 2010/08/19 19:50:54 minervacvs Exp $
+//$Id: NumiBaffle.cc,v 1.3.4.2 2010/11/01 21:51:36 minervacvs Exp $
 //----------------------------------------------------------------------
 
 
@@ -28,5 +28,13 @@ void NumiDetectorConstruction::ConstructBaffle()
   G4Tubs* sBaffle=new G4Tubs("sBaffle",HPBRin,HPBRout,HPBlength/2.,0.,360.*deg);
   G4LogicalVolume* lvBaffle=new G4LogicalVolume(sBaffle,Target,"lvBaffle",0,0,0);
   G4ThreeVector bafflePos=G4ThreeVector(NumiData->HPBaffleX0,NumiData->HPBaffleY0,NumiData->HPBaffleZ0+HPBlength/2.)-targetHallPosition;
-  new G4PVPlacement(0,bafflePos,"Baffle",lvBaffle,TGAR,false,0);
+  G4PVPlacement* pvbaffle = new G4PVPlacement(0,bafflePos,"pvBaffleMother",lvBaffle,TGAR,false,0);
+  pvbaffle -> CheckOverlaps();
+
+  if(NumiData->GetPrintGeometry())
+  {
+     G4cout << "Z0   Position of baffle = " << (bafflePos.z() - (HPBlength/2.) )/m << " m " << G4endl;
+     G4cout << "Z    Position of baffle = " << (bafflePos.z())/m << " m " << G4endl;
+     G4cout << "ZEnd Position of baffle = " << (bafflePos.z() + (HPBlength/2.) )/m << " m " << G4endl;
+  }
 }

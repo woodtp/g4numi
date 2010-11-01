@@ -148,7 +148,7 @@ void NumiTrajectory::ShowTrajectory(std::ostream& o) const
     G4VTrajectory::ShowTrajectory(o);
 }
 
-void NumiTrajectory::DrawTrajectory(G4int i_mode) const
+void NumiTrajectory::DrawTrajectory(G4int /*i_mode*/) const
 {
 
 
