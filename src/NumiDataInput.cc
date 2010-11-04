@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.3 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.4 2010/11/04 19:44:29 mjerkins Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -134,6 +134,7 @@ NumiDataInput::NumiDataInput()
   createNuNtuple=false;  createHadmmNtuple=false;
   createASCII=false;     createBXDRAW = false;
   useFlukaInput = false; useMarsInput=false;
+  createTarNtuple=false;
 
   //
   //can set useMuonInupt and useMuonBeam from macro
@@ -177,6 +178,7 @@ NumiDataInput::NumiDataInput()
 
    //base name for output files:
    nuNtupleName    = "nuNtuple";
+   tarNtupleName    = "tarNtuple";
    //
    //can set hadmmNtupleDir and hadmmNtupleName from macro
    //

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.3 2010/11/01 21:52:30 minervacvs Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.4 2010/11/04 19:44:29 mjerkins Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -82,12 +82,14 @@ public:
    void SetASCIIName(G4String fileName)         { asciiName=fileName; }
    void SetBXDRAWName(G4String fileName)        { bxdrawName=fileName; }
    void OutputNuNtuple(G4bool output)           { createNuNtuple=output;}
+   void OutputTarNtuple(G4bool output)           { createTarNtuple=output;}
    void OutputASCII(G4bool output)              { createASCII=output; }
    void OutputBXDRAW(G4bool output)             { createBXDRAW = output; }
    void SetDecayPipeSelect(G4bool val)          { useDecayPipeSelect = val;}
    void SetStepLimit(G4double l)                { StepLimit = l; }
    void SetMacroBeam(G4bool val)                { useMacro=val;}
    void SetZpNtupleName(G4String fileName)      { zpNtupleName=fileName; }
+   void SetTarNtupleName(G4String fileName)      { tarNtupleName=fileName; }
    void OutputZpNtuple(G4bool val)              { createZpNtuple=val;}
    void SetKillTracking(G4bool val)             { KillTracking = val;}
    void SetKillTrackingThreshold(G4double th )  { KillTrackingThreshold=th;}
@@ -234,7 +236,7 @@ public:
 
 
    
-   G4bool NImpWeightOn, createNuNtuple, createHadmmNtuple, createASCII;
+   G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;
    G4bool useFlukaInput, useMarsInput;
 
    G4bool useMuonBeam, useMuonInput, solidMuMons, simAbsBkg, reWeightDeltas;
@@ -246,7 +248,7 @@ public:
    G4String hadmmNtupleName, hadmmNtupleDir, absbkgNtupleName, absbkgNtupleDir;
    G4int fNEvents;
    G4bool KillTracking;
-   G4String nuNtupleName, asciiName, RunNumber, geometry;
+   G4String nuNtupleName, tarNtupleName, asciiName, RunNumber, geometry;
    G4Material* DefaultMaterial;
    G4Material* Mon1AbsorberMaterial;
    G4Material* Mon2AbsorberMaterial;
