@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.2 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.3 2010/11/04 19:44:29 mjerkins Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -37,6 +37,7 @@
 #include "draytupleSPB_t.hh"
 #include "absbkgtuple_t.hh"
 #include "zptuple_t.hh" // for raytracing
+#include "target_exit_t.hh"// for hadron production studies
 #include "NumiParticleCode.hh"
 #include "NumiAnalysis.hh"
 #include "NumiTrackInformation.hh"
@@ -64,6 +65,7 @@ NumiAnalysis::NumiAnalysis()
 
   g4data = new data_t();
   g4zpdata = new zptuple_t();
+  g4tardata = new target_exit_t();
   
 
   fcount = 0;
@@ -116,6 +118,21 @@ void NumiAnalysis::book()
     G4cout << "Creating neutrino ntuple: "<<nuNtupleFileName<<G4endl;
     tree = new TTree("nudata","g4numi Neutrino ntuple");
     tree->Branch("data","data_t",&g4data,32000,1);
+  }
+
+  if (NumiData->createTarNtuple){
+      sprintf(tarNtupleFileName,"%s_%04d%s.root",(NumiData->tarNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
+      tarNtuple = new TFile(tarNtupleFileName,"RECREATE","root ntuple");
+    if(tarNtuple){
+      G4cout << "Creating target ntuple: "<<tarNtupleFileName<<G4endl;
+      tarNtuple->cd();
+      tartree = new TTree("tardata","g4numi Neutrino ntuple");
+      //tartree->BranchOld("exit_tar","exit_tar_t",&g4tardata,32000,1);
+      tartree->Branch("target_exit","target_exit_t",&g4tardata,32000,99);
+    }
+    else{
+      G4Exception("Something went wrong with tarNtuple");
+    }
   }
 
   if(NumiData->GetSimAbsBkg() && NumiData->GetCreateAbsBkgNtuple())
@@ -363,6 +380,13 @@ void NumiAnalysis::finish()
     zptree->Write();
     zpNtuple->Close();
     delete zpNtuple;
+  }
+
+  if (NumiData->createTarNtuple){
+    tarNtuple->cd();
+    tartree->Write();
+    tarNtuple->Close();
+    delete tarNtuple;
   }
 }
 
@@ -1308,4 +1332,43 @@ void NumiAnalysis::WriteZpNtuple(){//Jasmine added
     g4zpdata->pidtype=-10;
     g4zpdata->run=-100;
     g4zpdata->evtno=-100;  
+}
+
+void NumiAnalysis::FillTarNtuple(const G4Track& track)
+{//---Melissa added
+  if(!NumiData->createTarNtuple) return ;
+
+  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+ 
+    G4ParticleDefinition* particleDefinition = track.GetDefinition();
+
+    NumiTrackInformation* info = (NumiTrackInformation*)(track.GetUserInformation());
+    g4tardata->impwt = info->GetNImpWt();  // Importance weight
+
+    g4tardata->tvx= track.GetPosition()[0]/cm;
+    g4tardata->tvy= track.GetPosition()[1]/cm;
+    g4tardata->tvz= track.GetPosition()[2]/cm;
+    g4tardata->tpx= track.GetMomentum()[0]/GeV;
+    g4tardata->tpy= track.GetMomentum()[1]/GeV;
+    g4tardata->tpz= track.GetMomentum()[2]/GeV;
+
+    g4tardata->tptype= NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleDefinition->GetParticleName()));
+
+    g4tardata->run=pRunManager->GetCurrentRun()->GetRunID();
+    g4tardata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
+    WriteTarNtuple();//store info and initialize
+}
+void NumiAnalysis::WriteTarNtuple(){//Melissa added
+
+  tartree->Fill();
+    g4tardata->impwt=-10000;
+    g4tardata->tvx=-10000;
+    g4tardata->tvy=-10000;
+    g4tardata->tvz=-10000;
+    g4tardata->tpx=-10000;
+    g4tardata->tpy=-10000;
+    g4tardata->tpz=-10000;
+    g4tardata->tptype=-10;
+    g4tardata->run=-100;
+    g4tardata->evtno=-100;  
 }

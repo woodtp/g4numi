@@ -38,6 +38,7 @@ private:
    G4UIcmdWithABool*           useDetailedProtonBeam;
    G4UIcmdWithABool*           useNuBeam;
    G4UIcmdWithABool*           useMuonBeam;
+   G4UIcmdWithABool*           createTarNtuple;
    G4UIcmdWithABool*           simAbsBkg;
    G4UIcmdWithABool*           simDRays;
    //---------------------------------------
@@ -96,6 +97,8 @@ private:
    G4UIcmdWithABool*           UseMacro;
    G4UIcmdWithABool*           outputZpNtuple;
    G4UIcmdWithAString*         setZpNtupleFile;
+   G4UIcmdWithABool*           outputTarNtuple;
+   G4UIcmdWithAString*         setTarNtupleFile;
    G4UIcmdWithABool*           KillTracking;
    G4UIcmdWithADoubleAndUnit*  KillTrackingThreshold;
    
