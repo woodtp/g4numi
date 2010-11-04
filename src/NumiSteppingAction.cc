@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.2 2010/11/04 19:44:29 mjerkins Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -96,9 +96,20 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
       }
    }
    
-
-
-
+   
+   if(NDI->createTarNtuple){
+     if( (theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL) && (theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)){
+       G4String testNamePre = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+       G4String testNamePost = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+       if( (testNamePre.contains("TGTExit")) && (testNamePost.contains("TargetMother"))){
+         NumiAnalysis* analysis=NumiAnalysis::getInstance();
+         analysis->FillTarNtuple(*theTrack);
+         theTrack->SetTrackStatus(fStopAndKill);
+       }
+         
+     }
+   }
+   
 
 
 

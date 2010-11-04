@@ -30,6 +30,7 @@ class draytupleMIB_t;
 class draytupleSPB_t;
 class absbkgtuple_t;
 class zptuple_t;
+class target_exit_t;
 
 
 class NumiAnalysis
@@ -56,6 +57,10 @@ public:
    void FillZpNtuple(const G4Track& track, Int_t zpnum);
    void WriteZpNtuple();
    
+   void FillTarNtuple();
+   void FillTarNtuple(const G4Track& track);
+   void WriteTarNtuple();
+
    NumiTrajectory* GetParentTrajectory(G4int parentID);
    static NumiAnalysis* getInstance();
    
@@ -78,7 +83,7 @@ private:
    G4double z;
 
    G4double noProtons;
-   char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50];
+   char asciiFileName[50], nuNtupleFileName[50], hadmmNtupleFileName[50], tarNtupleFileName[50];
    char zpNtupleFileName[50], bxdrawFileName[50];
    map<int, int> code;
    
@@ -88,11 +93,13 @@ private:
    TFile* absbkgNtuple;
    TFile* nuNtuple;
    TFile* zpNtuple;
+   TFile* tarNtuple;
    
    TTree* tree;
    TTree* hadmmtree;
    TTree* absbkgtree;
    TTree* zptree;
+   TTree* tartree;
    
    data_t *g4data;
    hadmmtuple_t *g4hmmdata;
@@ -100,6 +107,7 @@ private:
    draytupleSPB_t *g4draydataSPB;
    absbkgtuple_t *g4absbkgdata;
    zptuple_t* g4zpdata; 
+   target_exit_t *g4tardata;
    
    G4int fcount;
    G4int fentry;

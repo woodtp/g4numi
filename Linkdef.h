@@ -11,5 +11,6 @@
 #pragma link C++ class draytupleSPB_t+;
 #pragma link C++ class absbkgtuple_t+;
 #pragma link C++ class zptuple_t+;
+#pragma link C++ class target_exit_t+;
 
 #endif
