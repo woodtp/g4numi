@@ -57,6 +57,18 @@
 #/NuMI/run/useNImpWeight true
 
 #
+#Whether or not to create output ntuple with data_t
+#default is false
+#
+#/NuMI/output/outputNuNtuple true
+
+#
+#Directory and filename (with out the .root) to write output ntuple
+#the RunID which gets set below gets appended to the filename
+#
+#/NuMI/output/setNuNtupleFile ./output-ntuple
+
+#
 #Read in fluka hadrons file, true/false, default is false
 #Set the fluka hadrons file path and name
 #
@@ -194,6 +206,18 @@
 #Use importance weighting, default is true
 #
 #/NuMI/run/useNImpWeight true
+
+#
+#Whether or not to create output ntuple with data_t
+#default is false
+#
+#/NuMI/output/outputNuNtuple true
+
+#
+#Directory and filename (with out the .root) to write output ntuple
+#the RunID which gets set below gets appended to the filename
+#
+#/NuMI/output/setNuNtupleFile ./output-ntuple
 
 #
 #Read in fluka hadrons file, true/false, default is false
