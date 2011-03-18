@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.4 2010/11/04 19:44:29 mjerkins Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.5 2011/03/18 18:33:20 loiacono Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -66,6 +66,7 @@ public:
          fUseWaterInTgt = val;
          fSubSimulation = "Water in the Target";
       }
+   void SetDebugLevel(G4int val)                {fDebugLevel = val;}
    void SetRunPeriod(G4int val)                 {fRunPeriod = val;}
    void SetOkToRun(G4bool val)                  {fOkToRun = val;}
    void SetUseCorrHornCurrent(G4bool val)       {fUseCorrHornCurrent = val;}   
@@ -98,6 +99,7 @@ public:
 
 
    G4int    GetRunPeriod()                    { return fRunPeriod;}
+   G4int    GetDebugLevel()                   { return fDebugLevel;}
 
    G4bool   IsDebugOn()                       { return debugOn; }
    G4bool   GetOkToRun()                      { return fOkToRun;}
@@ -210,6 +212,7 @@ public:
    G4String fSubSimulation;
 
    G4int fRunPeriod;
+   G4int fDebugLevel;
 
    G4double fProton_outR;
    G4double fProton_inR;  
@@ -222,19 +225,10 @@ public:
 
  public:
 
-
-   
-
-
    G4int fPrintInfo;
 
    
-
-
-
-
-
-
+   //////////////////////////////
    
    G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;
    G4bool useFlukaInput, useMarsInput;
