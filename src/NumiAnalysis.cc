@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.3 2010/11/04 19:44:29 mjerkins Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.4 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -57,6 +57,12 @@ NumiAnalysis::NumiAnalysis()
     g4absbkgdata(0)
 {
   NumiData = NumiDataInput::GetNumiDataInput();
+
+  if(NumiData->GetDebugLevel() > 0)
+  {
+     std::cout << "NumiAnalysis Constructor Called." << std::endl;
+  }
+
 #ifdef G4ANALYSIS_USE
 #endif
 
@@ -96,6 +102,11 @@ NumiAnalysis::NumiAnalysis()
 //------------------------------------------------------------------------------------
 NumiAnalysis::~NumiAnalysis()
 { 
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiAnalysis Destructor Called." << std::endl;
+   }
+
 #ifdef G4ANALYSIS_USE
   // delete things
 #endif
@@ -109,7 +120,7 @@ NumiAnalysis* NumiAnalysis::getInstance()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::book()
 {
-
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::book() called." << G4endl;}
 
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
   if (NumiData->createNuNtuple){
@@ -353,7 +364,9 @@ std::string NumiAnalysis::GetOFileName(std::string ifilename)
 
 //------------------------------------------------------------------------------------
 void NumiAnalysis::finish()
-{  
+{
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::finish() called." << G4endl;}
+   
   if (NumiData->createNuNtuple){
     nuNtuple->cd();
     tree->Write();
@@ -393,6 +406,8 @@ void NumiAnalysis::finish()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t cellNum)
 {
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillHadmmNtuple() called." << G4endl;}
+   
    if (!NumiData->createHadmmNtuple) return;
          
    G4ParticleDefinition* particleDefinition = track.GetDefinition();
@@ -494,6 +509,8 @@ void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleD
                             const Int_t trackID, const G4double weight)
 {
 
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillEdep() called." << G4endl;}
+   
    edep = edep/eV;
 
    if(g4draydataMIB)
@@ -560,6 +577,8 @@ void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleD
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
 {
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillAlcEdepInfo() called." << G4endl;}
+   
   if(fAlcEdep_called[alc] == true) return;
 
   //G4cout << "fentry = " << fentry
@@ -584,6 +603,7 @@ void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillHadmmNtuple() 
 {
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillHadmmNtuple() (with no args) called." << G4endl;}
 
   if (!NumiData->createHadmmNtuple) return;  
 
@@ -713,15 +733,17 @@ void NumiAnalysis::FillHadmmNtuple()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillAbsorberBkgrdNtuple(const G4Track& track)
 {
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillAbsorberBkgrdNtuple() called." << G4endl;}
+   
    G4ParticleDefinition * particleType = track.GetDefinition();
    G4String partType = particleType->GetParticleType();
    g4absbkgdata -> ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleType->GetParticleName()));
 
-   g4absbkgdata->x = track.GetPosition()[0]/cm;
+   g4absbkgdata->x    = track.GetPosition()[0]/cm;
    g4absbkgdata->px   = track.GetMomentum()[0]/GeV;
-   g4absbkgdata->y = track.GetPosition()[1]/cm;
+   g4absbkgdata->y    = track.GetPosition()[1]/cm;
    g4absbkgdata->py   = track.GetMomentum()[1]/GeV;
-   g4absbkgdata->z = track.GetPosition()[2]/cm;
+   g4absbkgdata->z    = track.GetPosition()[2]/cm;
    g4absbkgdata->pz   = track.GetMomentum()[2]/GeV; 
 
    g4absbkgdata->KE = track.GetKineticEnergy()/GeV;
@@ -792,6 +814,8 @@ G4int NumiAnalysis::GetEntry()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::WriteHadmmNtuple()
 {
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::WriteHadmmNtuple() called." << G4endl;}
+      
    if (!(NumiData->createHadmmNtuple)) return;
 
    if(g4draydataMIB) g4draydataMIB->ClearTrackIDVectors();
@@ -808,6 +832,8 @@ void NumiAnalysis::WriteHadmmNtuple()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 {
+
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillNeutrinoNtuple() called." << G4endl;}
  
   if (!NumiData->createNuNtuple) return;
     
@@ -959,7 +985,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	G4int numberOfPoints = PParentTrack->GetPointEntries();
 	for (G4int ii=0;ii<numberOfPoints-1; ++ii){
 	  G4String lastVolName = PParentTrack->GetPreStepVolumeName(ii);
-	  G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1);      
+	  G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1); 
 	  if (lastVolName.contains("TGTExit") && nextVolName.contains("TargetMother"))
 	    {
 	      ParticleMomentum = PParentTrack->GetMomentum(ii);              // tv_ and tp_ are equal to position and  
@@ -1165,6 +1191,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 
 }
 
+//------------------------------------------------------------------------------------
 void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
 
   if (!NumiData->createBXDRAW) return;
@@ -1258,9 +1285,12 @@ void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
   }
 }
 
-
+//------------------------------------------------------------------------------------
 NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
 {
+
+   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::GetParentTrajectory() called." << G4endl;}
+      
   G4TrajectoryContainer* container = 
     G4RunManager::GetRunManager()->GetCurrentEvent()->GetTrajectoryContainer();
   if(container==0) return 0;
@@ -1334,6 +1364,7 @@ void NumiAnalysis::WriteZpNtuple(){//Jasmine added
     g4zpdata->evtno=-100;  
 }
 
+//------------------------------------------------------------------------------------
 void NumiAnalysis::FillTarNtuple(const G4Track& track)
 {//---Melissa added
   if(!NumiData->createTarNtuple) return ;
@@ -1358,6 +1389,8 @@ void NumiAnalysis::FillTarNtuple(const G4Track& track)
     g4tardata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
     WriteTarNtuple();//store info and initialize
 }
+
+//------------------------------------------------------------------------------------
 void NumiAnalysis::WriteTarNtuple(){//Melissa added
 
   tartree->Fill();

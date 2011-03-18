@@ -124,7 +124,13 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   useMuonInput->SetDefaultValue (NumiData->useMuonInput);
   useMuonInput->AvailableForStates(G4State_PreInit,G4State_Idle);
   //---------------------------------------
-  
+
+
+  DebugLevel = new G4UIcmdWithAnInteger("/NuMI/run/DebugLevel",this);
+  DebugLevel ->SetGuidance("Set the debuging level. 0 = debug off");
+  DebugLevel ->SetParameterName("DebugLevel",true);
+  DebugLevel ->SetDefaultValue (NumiData->GetDebugLevel());
+  DebugLevel ->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   debugOn = new G4UIcmdWithABool("/NuMI/run/debugOn",this);
   debugOn->SetGuidance("Output some debugging info");
@@ -383,6 +389,7 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete useFlukaInput;
   delete useMarsInput;
 
+  delete DebugLevel;
   delete debugOn;
   delete setRunID;
   delete setMaterialSigma;
@@ -482,22 +489,18 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   if (command == useMuonInput)          { NumiData->SetMuonInput(useMuonInput->GetNewBoolValue(newValues)); }
   //---------------------------------------
 
-  if (command == setRunID){
+  if (command == DebugLevel)       { NumiData->SetDebugLevel(DebugLevel->GetNewIntValue(newValues)); }
+  if (command == debugOn)          { NumiData->SetDebugOn(debugOn->GetNewBoolValue(newValues)); }
+
+  if (command == setRunID)
+  {
     G4RunManager* runManager = G4RunManager::GetRunManager();
     runManager->SetRunIDCounter(setRunID->GetNewIntValue(newValues));
   }
 
-  if (command == setMaterialSigma){
-    NumiData->materialSigma = setMaterialSigma->GetNewDoubleValue(newValues);
-  }
+  if (command == setMaterialSigma) { NumiData->materialSigma = setMaterialSigma->GetNewDoubleValue(newValues); }
+  if (command == useNImpWeight)    { NumiData->SetNImpWeight(useNImpWeight->GetNewBoolValue(newValues)); }
 
-  if (command == debugOn){
-    NumiData->SetDebugOn(debugOn->GetNewBoolValue(newValues));
-  }
-
-  if (command == useNImpWeight){
-    NumiData->SetNImpWeight(useNImpWeight->GetNewBoolValue(newValues));
-  }
 
   
   

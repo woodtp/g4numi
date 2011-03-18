@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11.4.3 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.4 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -11,6 +11,12 @@
 
 void NumiDetectorConstruction::DefineMaterials()
 {  
+
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiDetectorConstruction::DefineMaterials() Called." << std::endl;
+   }
+
   //------------------------------------------------------ materials
 
   G4double A;  // atomic mass

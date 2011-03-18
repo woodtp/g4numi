@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.3 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.4 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -38,6 +38,11 @@ NumiDetectorConstruction::NumiDetectorConstruction()
   //Scan the input file     
   NumiData = NumiDataInput::GetNumiDataInput();
 
+  if(NumiData->GetDebugLevel() > 0)
+  {
+     std::cout << "NumiDetectorConstruction Constructor Called." << std::endl;
+  }
+
   // Pointers for magnetic fields ***    
   numiMagField = new NumiMagneticField(); 
   numiMagFieldIC = new NumiMagneticFieldIC();
@@ -53,8 +58,11 @@ NumiDetectorConstruction::NumiDetectorConstruction()
 NumiDetectorConstruction::~NumiDetectorConstruction()
 {
 
-   if(NumiData->IsDebugOn()) G4cout << "NumiDetectorConstruction Destructor Called." << G4endl;
-      
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiDetectorConstruction Destructor Called." << std::endl;
+   }
+
    delete numiMagField; 
    delete numiMagFieldIC;
    delete numiMagFieldOC; 
@@ -74,7 +82,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
    G4cout << "NumiDetectorConstruction::Construct Called. Constructing Detector..." << G4endl;
    G4cout << "********************************************************************" << G4endl;
    
-   if(NumiData->fPrintInfo > 0 || NumiData->IsDebugOn() )
+   if(NumiData->GetDebugLevel() > 0)
    {
       G4cout << G4endl;
       G4cout << G4endl;
