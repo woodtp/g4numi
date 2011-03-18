@@ -59,6 +59,7 @@ private:
    //---------------------------------------
    
    G4UIcmdWithABool*           debugOn;
+   G4UIcmdWithAnInteger*       DebugLevel;
    G4UIcmdWithAnInteger*       setRunID;
    G4UIcmdWithADouble*         setMaterialSigma;
    G4UIcmdWithABool*           useNImpWeight;
