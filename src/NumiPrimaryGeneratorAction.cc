@@ -45,16 +45,28 @@ NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
   cosx=0;
   cosy=0;
 
+  if(fND->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiPrimaryGeneratorAction Constructor Called." << std::endl;
+   }
+
 }
 
 NumiPrimaryGeneratorAction::~NumiPrimaryGeneratorAction()
 {
+   if(fND->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiPrimaryGeneratorAction Destructor Called." << std::endl;
+   }
+
   delete beamMessenger;
   delete fParticleGun;
 }
 
 void NumiPrimaryGeneratorAction::SetProtonBeam()
 {
+   if(fND->GetDebugLevel() > 1) { G4cout << "NumiRunManager::SetProtonBeam() called." << G4endl;}
+   
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
  
   fParticleGun->SetParticleDefinition(particleTable->FindParticle("proton"));
@@ -71,6 +83,8 @@ void NumiPrimaryGeneratorAction::SetProtonBeam()
 
 void NumiPrimaryGeneratorAction::SetMuonBeam()
 {
+   if(fND->GetDebugLevel() > 1) { G4cout << "NumiRunManager::SetMuonBeam() called." << G4endl;}
+   
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu+"));
   fptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum("mu+"));
@@ -103,6 +117,9 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
 
 G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 {
+
+   if(fND->GetDebugLevel() > 0) { G4cout << "NumiRunManager::OpenNtuple() called." << G4endl;}
+   
    fCurrentPrimaryNo=0;
    
    G4bool fIsOpen=false;
@@ -187,12 +204,18 @@ G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
 
 void NumiPrimaryGeneratorAction::CloseNtuple()
 {
+   if(fND->GetDebugLevel() > 0) { G4cout << "NumiRunManager::CloseNtuple() called." << G4endl;}
+      
     fRootFile->Close();
     fCurrentPrimaryNo=0;
 }
 
 void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+   
+   
+   if(fND->GetDebugLevel() > 1) { G4cout << " NumiPrimaryGeneratorAction::GeneratePrimaries() called." << G4endl;}
+   
   //  std::cout<<"*************** anEvent: "<<anEvent->get_eventID()<<" *******************"<<std::endl;
   //G4UImanager* UI=G4UImanager::GetUIpointer();
 

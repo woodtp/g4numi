@@ -33,6 +33,7 @@ NumiTrajectory::NumiTrajectory()
    fDecayCode=0;
    fTgen=0;
    fPreStepVolume=0;
+   fStepLength = 0;
 
    fND=NumiDataInput::GetNumiDataInput();
 
@@ -52,6 +53,8 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
    fMomentumRecord->push_back(aTrack->GetMomentum());
    fPreStepVolume = new NumiTrajectoryVolumeName();  
    fPreStepVolume->push_back(aTrack->GetVolume()->GetName());
+   fStepLength = new DVec();  
+   fStepLength->push_back(aTrack->GetStepLength());
    fMomentum = aTrack->GetMomentum();
    fVertexPosition = aTrack->GetPosition();
    fParticleMass = aTrack->GetDefinition()->GetPDGMass();
@@ -80,6 +83,10 @@ NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
   fTrackID = right.fTrackID;
   fParentID = right.fParentID;
   fPositionRecord = new NumiTrajectoryPointContainer();
+  fMomentumRecord = new NumiTrajectoryMomentumContainer();
+  fPreStepVolume  = new NumiTrajectoryVolumeName();  
+  fStepLength     = new DVec();  
+
   for(size_t i=0;i<right.fPositionRecord->size();i++)
     {
       G4TrajectoryPoint* rightPoint = (G4TrajectoryPoint*)((*(right.fPositionRecord))[i]);
@@ -94,6 +101,11 @@ NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
    {
      G4String rightPreStepVolume=(G4String)((*(right.fPreStepVolume))[i]);
      fPreStepVolume->push_back(rightPreStepVolume);
+   }
+  for(size_t i=0;i<right.fStepLength->size();i++)
+   {
+      G4double rightsteplength =(G4double)((*(right.fStepLength))[i]);
+      fStepLength->push_back(rightsteplength);
    }
   fMomentum = right.fMomentum;
   fVertexPosition = right.fVertexPosition;
@@ -120,6 +132,9 @@ NumiTrajectory::~NumiTrajectory()
   delete fMomentumRecord;
   fPreStepVolume->clear();
   delete fPreStepVolume;
+
+  fStepLength->clear();
+  delete fStepLength;
  
 }
 
@@ -259,6 +274,7 @@ void NumiTrajectory::AppendStep(const G4Step* aStep)
    G4StepPoint * steppoint=aStep->GetPreStepPoint(); 
    G4String PreVolumeName=steppoint->GetPhysicalVolume()->GetName(); 
    fPreStepVolume->push_back(PreVolumeName); 
+   fStepLength->push_back(aStep->GetStepLength());
 }
   
 G4ParticleDefinition* NumiTrajectory::GetParticleDefinition()

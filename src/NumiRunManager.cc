@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiRunManager.cc
-// $Id: NumiRunManager.cc,v 1.8.4.2 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiRunManager.cc,v 1.8.4.3 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
@@ -12,46 +12,66 @@
 
 NumiRunManager::NumiRunManager()
   :primaryGeneratorAction(0)
-{;}
+{
+   NumiData = NumiDataInput::GetNumiDataInput();
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiRunManager Constructor Called." << std::endl;
+   }
+}
 
 NumiRunManager::~NumiRunManager()
-{;}
+{
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiRunManager Destructor Called." << std::endl;
+   }
+
+}
 void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 {
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      G4cout << "NumiRunManager::BeamOn() Called." << G4endl;
+   }
+   
+   
+   
+   
   nEvents = n_event;
   G4bool runOn(true);
   G4bool cond = ConfirmBeamOnCondition();
    if(cond)
      {
        G4cout << "Beam condition on." << G4endl;
-       NumiDataInput *ND = NumiDataInput::GetNumiDataInput();
-       //       ND->SetRunNumber(macroFile);
+       
+       //       NumiData->SetRunNumber(macroFile);
        primaryGeneratorAction = (NumiPrimaryGeneratorAction*)(this)->userPrimaryGeneratorAction;
-       if(ND->useFlukaInput || ND->useMarsInput)
+       if(NumiData->useFlukaInput || NumiData->useMarsInput)
        {
-	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
+	 runOn=primaryGeneratorAction->OpenNtuple(NumiData->GetExtNtupleFileName());
   	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
-       else if(ND->useMuonBeam && !(ND->useMuonInput))
+       else if(NumiData->useMuonBeam && !(NumiData->useMuonInput))
        {   
 	 G4cout << "Generating Muon Beam" << G4endl;  	 
 	 primaryGeneratorAction->SetMuonBeam();
        }
-       else if(ND->useMuonBeam && ND->useMuonInput)
+       else if(NumiData->useMuonBeam && NumiData->useMuonInput)
        {
           G4cout << "Generating Muon Beam from input file" << G4endl;  	 
-	 runOn=primaryGeneratorAction->OpenNtuple(ND->GetExtNtupleFileName());
+	 runOn=primaryGeneratorAction->OpenNtuple(NumiData->GetExtNtupleFileName());
   	 n_event = primaryGeneratorAction->GetNoOfPrimaries();
        }
-       else if(ND->useTestBeam)
+       else if(NumiData->useTestBeam)
        {
 	 G4cout << "Test Beam is set" << G4endl;  	 
        }
-       else if(ND->useMacro)
+       else if(NumiData->useMacro)
        {
 	 G4cout << "using macro parameters" << G4endl;  	 
        }
-       else if(ND->GetDetailedProtonBeam())
+       else if(NumiData->GetDetailedProtonBeam())
        {
 	 G4cout << "Using the Detailed Proton Beam." << G4endl;
        }
@@ -68,17 +88,17 @@ void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 	 numberOfEventToBeProcessed = n_event;
 	 RunInitialization();
 
-         if(ND->GetOkToRun())
+         if(NumiData->GetOkToRun())
          {
             if(n_event>0) DoEventLoop(n_event,macroFile,n_select);
          }
 	 
 	 RunTermination();
 	 
-	 if(ND->useFlukaInput){
+	 if(NumiData->useFlukaInput){
 	   primaryGeneratorAction->CloseNtuple();
 	 }
-	 if(ND->useMuonInput){
+	 if(NumiData->useMuonInput){
 	   primaryGeneratorAction->CloseNtuple();
 	 }
 	 

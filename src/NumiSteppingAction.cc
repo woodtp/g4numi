@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.2 2010/11/04 19:44:29 mjerkins Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.3 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -26,6 +26,7 @@
 #include "G4TouchableHistory.hh"
 #include "G4EventManager.hh"
 #include "NumiEventAction.hh"
+#include "NumiRunManager.hh"
 
 NumiSteppingAction::NumiSteppingAction()
    :fPrintAllSteps(false),
@@ -40,6 +41,7 @@ NumiSteppingAction::NumiSteppingAction()
     fPrintTouchableHistory(false)
 {
   NDI = NumiDataInput::GetNumiDataInput();
+  pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
 
   
 }
@@ -51,7 +53,13 @@ NumiSteppingAction::~NumiSteppingAction()
 
 void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 {
-   
+
+   if(NDI->GetDebugLevel() > 3)
+   {
+      G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      std::cout << "Event " << evtno << ": NumiSteppingAction::UserSteppingAction() Called." << std::endl;
+   }
+
    
    NumiAnalysis* analysis = NumiAnalysis::getInstance();
    analysis->FillBXDRAW(theStep);
@@ -81,35 +89,26 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
    
    
    
-   if(fPrintAllSteps)
-   {
-      if(analysis->GetEntry() == 107 &&
-         (theTrack -> GetTrackID() == 1828)
-         )
-      {
-         G4cout << "   Parent muon entry # = " << analysis->GetEntry()
-                << "   track ID = " << theTrack->GetTrackID()
-                << "   track weight = " << theTrack->GetWeight()
-                << "   post vol = " << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
-                << "   pre vol = " << theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
-         
+   //*****************************************************************
+   //*****************************************************************
+   //This is for hadron production simulation
+   //
+   //
+   if(NDI->createTarNtuple){
+      if( (theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL) && (theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)){
+         G4String testNamePre = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+         G4String testNamePost = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+         if( (testNamePre.contains("TGTExit")) && (testNamePost.contains("TargetMother"))){
+            NumiAnalysis* analysis=NumiAnalysis::getInstance();
+            analysis->FillTarNtuple(*theTrack);
+            theTrack->SetTrackStatus(fStopAndKill);
+         }      
       }
    }
-   
-   
-   if(NDI->createTarNtuple){
-     if( (theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL) && (theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)){
-       G4String testNamePre = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-       G4String testNamePost = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-       if( (testNamePre.contains("TGTExit")) && (testNamePost.contains("TargetMother"))){
-         NumiAnalysis* analysis=NumiAnalysis::getInstance();
-         analysis->FillTarNtuple(*theTrack);
-         theTrack->SetTrackStatus(fStopAndKill);
-       }
-         
-     }
-   }
-   
+   //
+   //
+   //*****************************************************************
+   //*****************************************************************
 
 
 
@@ -128,73 +127,94 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
     }
 
   
-  if(NDI->useMuonBeam)
-  {
-     
-     G4double newWeight = 1.0;
+  //*****************************************************************
+  //*****************************************************************
+  //This is for muon monitor stuff 
+  //
+  //
 
-     G4bool reWeightedDelta = false;
-
-     G4EventManager* eventManager    = G4EventManager::GetEventManager();
-     G4StackManager* stackManager    = eventManager -> GetStackManager();
-     G4TrackingManager* trackManager = eventManager -> GetTrackingManager();
-     G4SteppingManager* stepManager  = trackManager -> GetSteppingManager();
-     
-     NumiEvtAct = (NumiEventAction*)(eventManager -> GetUserEventAction());
-     
-     if(NDI->GetSimDRays() && NDI->GetReWeightDeltas())
-     {
-        
-        
-        G4int nSplitDeltas = NDI->GetNSplitDeltas();
-
-        if(nSplitDeltas < 2)
-           G4cout << "NumiSteppingAction::UserSteppingAction - PROBLEM: requesting to split deltas but number of spilts is < 2" << G4endl;
-
-        if(theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL &&
-           theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)
-        {
-                
-           std::string preStepPointName  = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-           std::string postStepPointName = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-           if((particleDefinition == G4Electron::ElectronDefinition() || 
-               particleDefinition == G4Positron::PositronDefinition() ||
-               particleDefinition == G4Gamma::Gamma()) &&
-              preStepPointName.find("MuCell") == std::string::npos &&
-              (postStepPointName.find("MuMonAlcvShot_") != std::string::npos ||
-               postStepPointName.find("MuMonAlcv_") != std::string::npos ||
-               postStepPointName.find("MuMon_") != std::string::npos) &&
-              theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL &&
-              theStep->GetPostStepPoint()->GetProcessDefinedStep() -> GetProcessName() == "Transportation" &&
-              !(theTrack->GetWeight() < 1.0))
-           {
-              if(fPrintSplitting)
-              {
-                 G4cout << "Spilling " << particleDefinition -> GetParticleName() << " : " 
-                        << " parent muon entry # = " << analysis->GetEntry()
-                        << " track id = " << theTrack ->GetTrackID()
-                        << " parent id = " << theTrack ->GetParentID() 
-                        << " post step point = " << postStepPointName << G4endl;
-              }
-              
-              const G4Track * theTempTrack = theStep->GetTrack();
-              
-              newWeight = newWeight/(double)nSplitDeltas;
-              
-              reWeightedDelta = true;
-              
-              for(G4int isplit = 1; isplit < nSplitDeltas; ++isplit)
-              {
-                 //
-                 //create a copy of the dynamic particle
+   if(fPrintAllSteps)
+   {
+      if(analysis->GetEntry() == 107 &&
+         (theTrack -> GetTrackID() == 1828)
+         )
+      {
+         G4cout << "   Parent muon entry # = " << analysis->GetEntry()
+                << "   track ID = " << theTrack->GetTrackID()
+                << "   track weight = " << theTrack->GetWeight()
+                << "   post vol = " << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
+                << "   pre vol = " << theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+         
+      }
+   }
+  
+   if(NDI->useMuonBeam)
+   {
+      
+      G4double newWeight = 1.0;
+      
+      G4bool reWeightedDelta = false;
+      
+      G4EventManager* eventManager    = G4EventManager::GetEventManager();
+      G4StackManager* stackManager    = eventManager -> GetStackManager();
+      G4TrackingManager* trackManager = eventManager -> GetTrackingManager();
+      G4SteppingManager* stepManager  = trackManager -> GetSteppingManager();
+      
+      NumiEvtAct = (NumiEventAction*)(eventManager -> GetUserEventAction());
+      
+      if(NDI->GetSimDRays() && NDI->GetReWeightDeltas())
+      {
+         
+         
+         G4int nSplitDeltas = NDI->GetNSplitDeltas();
+         
+         if(nSplitDeltas < 2)
+            G4cout << "NumiSteppingAction::UserSteppingAction - PROBLEM: requesting to split deltas but number of spilts is < 2" << G4endl;
+         
+         if(theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL &&
+            theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)
+         {
+            
+            std::string preStepPointName  = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+            std::string postStepPointName = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+            if((particleDefinition == G4Electron::ElectronDefinition() || 
+                particleDefinition == G4Positron::PositronDefinition() ||
+                particleDefinition == G4Gamma::Gamma()) &&
+               preStepPointName.find("MuCell") == std::string::npos &&
+               (postStepPointName.find("MuMonAlcvShot_") != std::string::npos ||
+                postStepPointName.find("MuMonAlcv_") != std::string::npos ||
+                postStepPointName.find("MuMon_") != std::string::npos) &&
+               theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL &&
+               theStep->GetPostStepPoint()->GetProcessDefinedStep() -> GetProcessName() == "Transportation" &&
+               !(theTrack->GetWeight() < 1.0))
+            {
+               if(fPrintSplitting)
+               {
+                  G4cout << "Spilling " << particleDefinition -> GetParticleName() << " : " 
+                         << " parent muon entry # = " << analysis->GetEntry()
+                         << " track id = " << theTrack ->GetTrackID()
+                         << " parent id = " << theTrack ->GetParentID() 
+                         << " post step point = " << postStepPointName << G4endl;
+               }
+               
+               const G4Track * theTempTrack = theStep->GetTrack();
+               
+               newWeight = newWeight/(double)nSplitDeltas;
+               
+               reWeightedDelta = true;
+               
+               for(G4int isplit = 1; isplit < nSplitDeltas; ++isplit)
+               {
+                  //
+                  //create a copy of the dynamic particle
                  //
                  //G4DynamicParticle* newDP = new G4DynamicParticle(theTrack->GetDynamicParticle());
-              
+                  
                  //
                  //create new track
                  //
                  //G4Track* newTrack = new G4Track(newDP, theTrack->GetGlobalTime(), theTrack->GetPosition());   
-                 G4Track* newTrack = new G4Track(*theTempTrack);
+                  G4Track* newTrack = new G4Track(*theTempTrack);
                  //
                  //   Touchable handle is copied to keep the pointer
                  //
@@ -244,12 +264,10 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
                  stackManager -> PushOneTrack(newTrack);
               }
            }
-        }
-     }//end if sim drays and reweight deltas
-     
-     
-     
-     
+         }
+      }//end if sim drays and reweight deltas
+      
+           
      
      if ( (NDI->GetKillTracking() && theTrack->GetKineticEnergy() < NDI->GetKillTrackingThreshold()) )
      {
@@ -329,9 +347,8 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      }
      
 
-//////////////////////////////////////////////////
-        //if( (NDI->GetSimDRays()) )
-//////////////////////////////////////////////////
+
+     
      if( !(NDI->GetSimDRays()) &&  (!(NDI->GetMaterialSigma() < 0) && !(NDI->GetMaterialSigma() > 0)) )
      {
         if(particleDefinition == G4MuonPlus::MuonPlusDefinition()
@@ -771,7 +788,16 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      if(reWeightedDelta) (stepManager -> GetfPostStepPoint()) -> SetWeight(newWeight);
      
   }//end if(NDI->useMuonBeam)
+   //
+  //
+  //*****************************************************************
+  //*****************************************************************
 
+  
+  //*****************************************************************
+  //*****************************************************************
+  //This is for the muon monitor Absorber background simulation
+  //
   if(NDI->GetSimAbsBkg())
   {
      if (theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)
@@ -788,6 +814,10 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
         }
      }
   }
+  //
+  //
+  //*****************************************************************
+  //*****************************************************************
 
   //================================
   //=======for Raytracing===========
@@ -803,6 +833,8 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
         }
      }
   }
+  //================================
+  //--------------------------------
 
   if (theStep->GetPostStepPoint()->GetProcessDefinedStep() != NULL)
   {
