@@ -37,9 +37,12 @@ G4TrajectoryContainer* NumiEventAction::GetTrajectoryContainer()
 }
 
 //-------------------------------------------------------------------------------------
-void NumiEventAction::BeginOfEventAction(const G4Event*)
+void NumiEventAction::BeginOfEventAction(const G4Event* evt)
 {
-//   G4cout << "Begin Event " << evt-> GetEventID() << G4endl;
+  if(NumiData->GetDebugLevel() > 1) 
+    { 
+      G4cout << "NumiEventAction::BeginOfEventAction called...Beginning Event #" << evt-> GetEventID() << G4endl;
+    }
 
    if (NumiData->useMuonBeam && NumiData->GetSimDRays())
    {
@@ -258,9 +261,13 @@ G4double NumiEventAction::GetZPos(const G4Track* aTrack)
 }
 
 //-------------------------------------------------------------------------------------
-void NumiEventAction::EndOfEventAction(const G4Event*)
+void NumiEventAction::EndOfEventAction(const G4Event* evt)
 {
-   //G4cout << "End Event " << G4endl;
+  if(NumiData->GetDebugLevel() > 1) 
+    { 
+      G4cout << "NumiEventAction::EndOfEventAction called...Ending Event # " << evt-> GetEventID() << G4endl;
+    }
+
    
    if(NumiData->createHadmmNtuple)
    {

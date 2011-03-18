@@ -4,7 +4,7 @@
 //  ADM, July 2005
 //  This is a class that defines the target_exit_t object that is used to 
 //  store the g4numi output in a root tree.
-// $Id: target_exit_t.cc,v 1.1.2.1 2010/11/04 19:44:29 mjerkins Exp $
+// $Id: target_exit_t.cc,v 1.1.2.2 2011/03/18 18:31:12 loiacono Exp $
 //------------------
 
 #include "target_exit_t.hh"
@@ -59,8 +59,8 @@ target_exit_t::target_exit_t():
      ypoint(-1.e4),
      zpoint(-1.e4),
   */
-     impwt(-1.e4),
      Nimpwt(-1.e4),
+     impwt(-1.e4),
      tvx(-1.e4),
      tvy(-1.e4),
      tvz(-1.e4),

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.2 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -23,14 +23,37 @@ NumiTrackingAction::NumiTrackingAction()
   pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
   NPGA=(NumiPrimaryGeneratorAction*)pRunManager->GetUserPrimaryGeneratorAction();
   ND=NumiDataInput::GetNumiDataInput();
+
+  if(ND->GetDebugLevel() > 0)
+  {
+     std::cout << "NumiTrackingAction Constructor Called." << std::endl;
+  }
 }
 
 NumiTrackingAction::~NumiTrackingAction()
-{;}
+{
+   if(ND->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiTrackingAction Destructor Called." << std::endl;
+   }
+}
 
 void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
-   
+   if(ND->GetDebugLevel() > 1)
+   {
+      G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      std::cout << "Event " << evtno << ": NumiTrackingAction::PreUserTrackingAction() Called." << std::endl;
+      if(ND->GetDebugLevel() > 2)
+      {
+	 NumiTrackInformation* trackinfo=new NumiTrackInformation(); 
+	 trackinfo -> Print(aTrack);
+	 delete trackinfo;
+      }
+   }
+      
+
+
   //set tgen (and weight for fluka nad mars input) 
   if (aTrack->GetTrackID()==1) 
     {   
@@ -79,6 +102,18 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
+   if(ND->GetDebugLevel() > 1)
+   {
+      G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      std::cout << "Event " << evtno << ": NumiTrackingAction::PostUserTrackingAction() Called." << std::endl;
+      if(ND->GetDebugLevel() > 2)
+      {
+	 NumiTrackInformation* trackinfo=new NumiTrackInformation(); 
+	 trackinfo -> Print(aTrack);
+	 delete trackinfo;
+      }
+   }
+
    
   // set tgen(secondary) = tgen(parent)+1
   NumiTrackInformation* info = (NumiTrackInformation*)(aTrack->GetUserInformation());

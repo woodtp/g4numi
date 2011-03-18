@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiStackingAction.cc
-// $Id: NumiStackingAction.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiStackingAction.cc,v 1.8.4.2 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiStackingAction.hh"
@@ -18,23 +18,42 @@
 #include "NumiDataInput.hh"
 #include "NumiTrajectory.hh"
 #include "NumiAnalysis.hh"
+#include "NumiRunManager.hh"
 
 NumiStackingAction::NumiStackingAction()
 { 
   NumiData = NumiDataInput::GetNumiDataInput();
+  pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
+
+  if(NumiData->GetDebugLevel() > 0)
+  {
+     std::cout << "NumiStackingAction Constructor Called." << std::endl;
+  }
 }
 
 NumiStackingAction::~NumiStackingAction()
 {
+
+   if(NumiData->GetDebugLevel() > 0)
+   {
+      std::cout << "NumiStackingAction Destructor Called." << std::endl;
+   }
 }
 
-G4ClassificationOfNewTrack 
-NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
+G4ClassificationOfNewTrack NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
 {
    
   G4ClassificationOfNewTrack classification = fUrgent;
   G4ParticleDefinition * particleType = aTrack->GetDefinition();
 
+  if(NumiData->GetDebugLevel() > 2)
+  {
+     G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+     std::cout << "Event " << evtno << ": NumiStackingAction::ClassifyNewTrack for Particle " 
+	       << "\"" << particleType->GetParticleName() << "\"" << " Called." << std::endl;
+  }
+
+  
   if( NumiData->useMuonBeam &&
       particleType != G4MuonPlus::MuonPlusDefinition() &&
       particleType != G4MuonMinus::MuonMinusDefinition() &&
@@ -140,12 +159,25 @@ NumiStackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
 void NumiStackingAction::NewStage() 
 {
+   if(NumiData->GetDebugLevel() > 1)
+   {
+      G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      std::cout << "Event " << evtno << ": NumiStackingAction::NewStage Called." << std::endl;
+   }
+
+
   // stackManager->ReClassify();
   //  return;
 }
   
 void NumiStackingAction::PrepareNewEvent()
-{ 
+{
+   if(NumiData->GetDebugLevel() > 1)
+   {
+      G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
+      std::cout << "Event " << evtno << ": NumiStackingAction::PrepareNewEvent Called." << std::endl;
+   } 
+
 }
 
 

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDecayPipe.cc,v 1.8.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiDecayPipe.cc,v 1.8.4.2 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -50,6 +50,19 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   G4LogicalVolume* lvSC01 = new G4LogicalVolume(sSC01,GetMaterial(NumiData->ShieldGEANTmat),"SC01_log",0,0,0); 
   new G4PVPlacement(0,sc01Position,"SC01",lvSC01,pvTUNE,false,0);
 
+  //****************************************************
+  //outer DP tracking volume
+  G4Tubs* sDPOuterTrackerTube = new G4Tubs("sDPOuterTrackerTube",rOut,rOut+(0.001*mm),l+(0.001*mm),0,360.*deg);
+  G4LogicalVolume* lvDPOuterTrackerTube = new G4LogicalVolume(sDPOuterTrackerTube,DecayPipeVacuum,"lvDPOuterTrackerTube",0,0,0); 
+
+  G4Tubs* sDPOuterTrackerEnd = new G4Tubs("sDPOuterTrackerEnd",0.0,rOut,(0.001*mm),0,360.*deg);
+  G4LogicalVolume* lvDPOuterTrackerEnd = new G4LogicalVolume(sDPOuterTrackerEnd,DecayPipeVacuum,"lvDPOuterTrackerEnd",0,0,0); 
+  G4ThreeVector DPOuterTrackerEndPosition=G4ThreeVector(NumiData->ShieldX0,NumiData->ShieldY0,NumiData->ShieldZ0+(l*2.0)+(0.001*mm/2.0)*2.0)-tunnelPosition;
+
+    
+  //****************************************************
+
+
   // Decay Pipe
   l=NumiData->DecayPipeLength/2.;
   r=NumiData->DecayPipeRadius+NumiData->DecayPipeWallThick;
@@ -68,6 +81,17 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   G4Tubs* sDVOL = new G4Tubs("DVOL_solid",0.,r,l,0,360.*deg);
   G4LogicalVolume* lvDVOL = new G4LogicalVolume(sDVOL,DecayPipeVacuum,"DVOL_log",0,0,0); 
   G4VPhysicalVolume* pvDVOL=new G4PVPlacement(0,decayVolumePosition,"DVOL",lvDVOL,pvDPIP,false,0);
+
+  //****************************************************
+  //inner DP tracking volume
+  G4Tubs* sDPInnerTrackerTube = new G4Tubs("sDPInnerTrackerTube",r-(0.001*mm),r,l-(0.001*mm*2.0),0,360.*deg);
+  G4LogicalVolume* lvDPInnerTrackerTube = new G4LogicalVolume(sDPInnerTrackerTube,DecayPipeVacuum,"lvDPInnerTrackerTube",0,0,0); 
+
+  G4Tubs* sDPInnerTrackerEnd = new G4Tubs("sDPInnerTrackerEnd",0.0,r-(0.001*mm),(0.001*mm),0,360.*deg);
+  G4LogicalVolume* lvDPInnerTrackerEnd = new G4LogicalVolume(sDPInnerTrackerEnd,DecayPipeVacuum,"lvDPInnerTrackerEnd",0,0,0); 
+  G4ThreeVector DPInnerTrackerEndPosition=decayVolumePosition + G4ThreeVector(0,0,l+(0.001*mm/2.0));
+  
+  //****************************************************
 
   // Upstream window
   //couple of tubes and spheres and a polycone
@@ -151,6 +175,24 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   G4Tubs* sDNWN = new G4Tubs("sDNWN",0.,r,l,0,360.*deg);
   G4LogicalVolume* lvDNWN = new G4LogicalVolume(sDNWN,GetMaterial(NumiData->DecayPipeEWinmat),"lvDNWN",0,0,0); 
   new G4PVPlacement(0,dnwnPos,"DNWN",lvDNWN,pvDPIP,false,0);
+
+
+  //************************************
+  //place decay pipe tracking volumes
+  G4VPhysicalVolume* pvDPInnerTrackerTube=new G4PVPlacement(0,decayVolumePosition,"pvDPInnerTrackerTube",lvDPInnerTrackerTube,pvDVOL,false,0);
+  pvDPInnerTrackerTube->CheckOverlaps();
+  
+  G4VPhysicalVolume* pvDPInnerTrackerEnd=new G4PVPlacement(0,DPInnerTrackerEndPosition,"pvDPInnerTrackerEnd",lvDPInnerTrackerEnd,pvDVOL,false,0);
+  pvDPInnerTrackerEnd->CheckOverlaps();
+ 
+  G4VPhysicalVolume* pvDPOuterTrackerTube = new G4PVPlacement(0,sc01Position,"pvDPOuterTrackerTube",lvDPOuterTrackerTube,pvTUNE,false,0);
+  pvDPOuterTrackerTube->CheckOverlaps();
+  
+  G4VPhysicalVolume* pvDPOuterTrackerEnd = new G4PVPlacement(0,DPOuterTrackerEndPosition,"pvDPOuterTrackerEnd",lvDPOuterTrackerEnd,pvTUNE,false,0);
+  pvDPOuterTrackerEnd->CheckOverlaps();
+  //
+  //************************************
+
 
   G4cout << "Decay Pipe Constructed" <<G4endl;
 }
