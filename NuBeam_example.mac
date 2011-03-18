@@ -4,9 +4,15 @@
 #
 
 #
-#I don't know what this does
+#I don't know what this does. But it was in the previous example macro.
 #
 /control/suppressAbortion 2
+
+#
+#Set the Debug Level for debugging messages.
+#0 = debug off. Default is 0.
+#
+/NuMI/run/DebugLevel 0 
 
 #
 #Tell G4NuMI that you want to run the Neutrino beam simulation, default is false
@@ -59,14 +65,13 @@
 #
 #Whether or not to create output ntuple with data_t
 #default is false
-#
-#/NuMI/output/outputNuNtuple true
+/NuMI/output/outputNuNtuple true
 
 #
 #Directory and filename (with out the .root) to write output ntuple
-#the RunID which gets set below gets appended to the filename
 #
-#/NuMI/output/setNuNtupleFile ./output-ntuple
+/NuMI/output/setNuNtupleFile ./g4numi_testing
+
 
 #
 #Read in fluka hadrons file, true/false, default is false
@@ -141,9 +146,15 @@
 #
 
 #
-#I don't know what this does
+#I don't know what this does. But it was in the previous example macro.
 #
 /control/suppressAbortion 2
+
+#
+#Set the Debug Level for debugging messages.
+#0 = debug off. Default is 0.
+#
+/NuMI/run/DebugLevel 0 
 
 #
 #Tell G4NuMI that you want to run the Neutrino beam simulation, default is false
