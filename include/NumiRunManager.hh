@@ -7,6 +7,7 @@
 
 #include "G4RunManager.hh"
 
+class NumiDataInput;
 class NumiPrimaryGeneratorAction;
 
 class NumiRunManager : public G4RunManager
@@ -23,7 +24,9 @@ class NumiRunManager : public G4RunManager
   G4int nEvents;
 
  protected:
-  NumiPrimaryGeneratorAction * primaryGeneratorAction;
+   NumiDataInput* NumiData;
+   
+   NumiPrimaryGeneratorAction * primaryGeneratorAction;
 
 };
 

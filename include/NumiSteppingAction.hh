@@ -11,6 +11,7 @@
 
 class G4EventManager;
 class NumiEventAction;
+class NumiRunManager;
 
 class NumiSteppingAction : public G4UserSteppingAction
 {
@@ -23,7 +24,8 @@ class NumiSteppingAction : public G4UserSteppingAction
 
 private:
    
-  NumiDataInput *NDI;
+   NumiDataInput *NDI;
+   NumiRunManager *pRunManager;
    G4EventManager *EvtManager;
    NumiEventAction *NumiEvtAct;
 

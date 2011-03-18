@@ -40,6 +40,8 @@ class NumiTrackInformation : public G4VUserTrackInformation
     
     void Print() const;
 
+  void Print(const G4Track *aTrack) const;
+
   private:
     G4int              decay_code;
     G4int              tgen;

@@ -11,6 +11,7 @@
 
 class G4Track;
 class NumiDataInput;
+class NumiRunManager;
 
 class NumiStackingAction : public G4UserStackingAction
 {
@@ -24,6 +25,7 @@ class NumiStackingAction : public G4UserStackingAction
 
   private:
   NumiDataInput * NumiData;
+   NumiRunManager * pRunManager; 
 };
 
 #endif

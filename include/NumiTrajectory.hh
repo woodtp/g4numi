@@ -27,6 +27,7 @@ class NumiDataInput;
 typedef std::vector<G4VTrajectoryPoint*> NumiTrajectoryPointContainer;
 typedef std::vector<G4ThreeVector> NumiTrajectoryMomentumContainer;
 typedef std::vector<G4String> NumiTrajectoryVolumeName;
+typedef std::vector<G4double> DVec;
 
 class NumiTrajectory : public G4VTrajectory
 {
@@ -71,6 +72,8 @@ class NumiTrajectory : public G4VTrajectory
    { return fDecayCode;}
    virtual G4double GetNImpWt() const
    { return fNImpWt;}
+   virtual G4double GetStepLength(G4int i) const
+      {return (*fStepLength)[i];}
   
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
@@ -97,6 +100,7 @@ class NumiTrajectory : public G4VTrajectory
    G4ThreeVector                    fVertexPosition;
    G4double                         fParticleMass;
    NumiTrajectoryVolumeName*        fPreStepVolume;
+   DVec*                            fStepLength;
 
    NumiDataInput* fND;
 };

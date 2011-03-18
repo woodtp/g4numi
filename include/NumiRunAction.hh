@@ -10,6 +10,7 @@
 #include "NumiTrajectory.hh"
 
 class G4Run;
+class NumiDataInput;
 class NumiRunActionMessenger;
 
 class NumiRunAction : public G4UserRunAction
@@ -23,7 +24,9 @@ public:
 
   
 private:
-  NumiRunActionMessenger* runMessenger;
+
+   NumiDataInput* fNDI;
+   NumiRunActionMessenger* runMessenger;
 };
 
 #endif
