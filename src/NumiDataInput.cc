@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.4 2010/11/04 19:44:29 mjerkins Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.5 2011/03/18 18:31:12 loiacono Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -61,6 +61,7 @@ NumiDataInput::NumiDataInput()
     fSubSimulation(""),
 
     fRunPeriod(-999),
+    fDebugLevel(0),
 
     fProton_outR(-999.0),
     fProton_inR(-999.0), 
