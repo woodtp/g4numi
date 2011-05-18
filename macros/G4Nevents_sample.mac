@@ -1,0 +1,115 @@
+#------------------------------------------------------------------------------
+#
+# An example script for running the Neutrino Beam simulation in G4NuMI. -L.Loiacono
+#
+
+#
+#I don't know what this does
+#
+/control/suppressAbortion 2
+
+#
+#Tell G4NuMI that you want to run the Neutrino beam simulation, default is false
+#
+/NuMI/run/useNuBeam true
+
+
+#
+#Set the Run Period, default is -999 which is no run period at all. MUST SET IT.
+#Run Period 0 is like a "default" run period, everything is aligned, it is not
+#specific to any ACTUAL NuMI beam running period.
+#
+/NuMI/det/RunPeriod 0
+#
+#Use the Calibration corrected horn current value for the
+#horn current configuration defined by BeamConfig (see next), default is true
+#Note:This must be set BEFORE setting BeamConfig
+#
+/NuMI/det/UseCorrHornCurrent true
+
+#
+#Configure the neutirno beam. 
+#This sets the TargetZ0 and Baffle Z0 and HornCurrent.
+#Must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. 
+#Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
+#Note: cannot handle ME config right now.
+#
+/NuMI/det/BeamConfig LE010z000i
+
+#Set filename
+#NuNtuple is standard; TarNtuple is for info on hadrons leaving target
+/NuMI/output/setNuNtupleFile /minerva/app/users/condor-tmp/mjerkins/g4numi_vacuum_le010z000i
+#/NuMI/output/setTarNtupleFile /minerva/app/users/condor-tmp/mjerkins/kill_after_target/g4numi_vacuum_le010z000i
+
+/NuMI/output/outputNuNtuple true
+#/NuMI/output/outputTarNtuple true
+
+#
+#Use the Detailed Proton beam, true/false, default is false
+#NOTE: Right now I don't know if the code for this and the parameter values are right.
+#THIS NEEDS TO BE CHECKED!
+#
+#/NuMI/run/useDetailedProtonBeam true
+
+#
+#Kill tracking, true/false, default is true
+#Set the energy at which to kill the particle
+#default is 0.05 GeV. Note: This cut is specific for MINOS
+#
+/NuMI/run/KillTracking true
+/NuMI/run/KillTrackingThreshold 0.0001 GeV
+
+#
+#Use importance weighting, default is true
+#
+#/NuMI/run/useNImpWeight true
+#
+#Read in fluka hadrons file, true/false, default is false
+#Set the fluka hadrons file path and name
+#
+#/NuMI/run/useFlukaInput true
+
+#/NuMI/run/extNtupleFileName /minerva/app/users/mjerkins/fluka05_inputfiles/fluka05_000.root
+
+#
+#If using external hadron file for input don't need to 
+#and probably don't want to construct the target, default is true
+#
+#/NuMI/det/constructTarget false
+
+#
+#Update the geometry. ALWAYS do this HERE, never before this point. 
+#The geometery is constructed BEFORE
+#the macro is read. Need to reconstruct the geometry after reading in the macro.
+#
+/NuMI/det/update
+
+
+#
+# Allows the beginning seed to be set manually. This allows 
+# rerunning simulations with the exact same initial conditions 
+# to check for possible errors.
+#
+/NuMI/rndm/setRndmSeed 999
+
+#
+# Allows the RunID, which is included in the
+# output file name(s), to be set at runtime.
+#
+/NuMI/run/setRunID 999
+
+#
+# If NOT using an external hadron file then this establishes how 
+# many particles(protons) to use during the simulation. To be consistent 
+# with past neutrino ntuples each run uses 500000 protons
+#
+/run/beamOn 999
+
+
+
+#
+#NOTE: To debug problems grep for "PROBLEM" in the output of the simulation
+# "PROBLEM" statements are printed when there is a problem.
+#
+
+
