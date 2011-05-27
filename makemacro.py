@@ -36,7 +36,7 @@ DESCRIPTION
     -L, --watercm [default=3]
           cm of water in the target 
 
-"""%(os.environ['BEAMSIM']+"/template.mac")
+"""%(os.environ['BEAMSIM']+"/macros/template.mac")
 
 def main(argv=None):
     if argv is None:
@@ -49,7 +49,7 @@ def main(argv=None):
     seed=''
     run='1'
     pot='500000'    
-    templatefile=os.environ['BEAMSIM']+"/template.mac"
+    templatefile=os.environ['BEAMSIM']+"/macros/template.mac"
 
     try:
         opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:", 
