@@ -83,8 +83,11 @@
 #
 #If using external hadron file for input don't need to 
 #and probably don't want to construct the target, default is true
-#
-#/NuMI/det/constructTarget false
+# /NuMI/det/constructTarget false
+
+# should we put some helium in the decay pipe?
+# T=300K, P=0.9atm, rho=0.145*kg/m3 ... default is true
+# /NuMI/det/heInDecayPipe false
 
 #############################################
 ##Visualization with HepRep
@@ -289,7 +292,7 @@
 # many particles(protons) to use during the simulation. To be consistent 
 # with past neutrino ntuples each run uses 500000 protons
 #
-/run/beamOn 1
+/run/beamOn 1000
 
 #
 #NOTE: To debug problems grep for "PROBLEM" in the output of the simulation
