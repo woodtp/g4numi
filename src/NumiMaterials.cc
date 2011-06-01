@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11.4.4 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.5 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -31,8 +31,8 @@ void NumiDetectorConstruction::DefineMaterials()
   A = 1.01*g/mole;
   G4Element* elH  = new G4Element(name="Hydrogen",symbol="H" , Z= 1, A);
 
-  //A = 4.003*g/mole; 
-  //G4Element* elHe  = new G4Element(name="Helium",symbol="He" , Z= 2, A);
+  A = 4.003*g/mole; 
+  G4Element* elHe  = new G4Element(name="Helium",symbol="He" , Z= 2, A);
 
   A = 12.01*g/mole;
   G4Element* elC  = new G4Element(name="Carbon"  ,symbol="C" , Z = 6, A);
@@ -161,7 +161,13 @@ void NumiDetectorConstruction::DefineMaterials()
   DecayPipeVacuum-> AddMaterial(Air, 1.);
 
   //other materials  
-  He = new G4Material("Helium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
+  SecMonitorHelium = new G4Material("SecMonitorHelium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
+  TargetHelium = new G4Material("TargetHelium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
+
+  DecayPipeHelium = new G4Material("DecayPipeHelium", 0.145*kg/m3, 1, 
+				   kStateGas,300*kelvin,0.9*atmosphere);
+  DecayPipeHelium->AddElement(elHe,1.0);
+  
 
 #ifdef FLUGG
   Be = new G4Material("Berylliu", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.4 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.5 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -121,7 +121,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
   
   ConstructTargetHall();
-  ConstructDecayPipe();
+  ConstructDecayPipe(NumiData->HeInDecayPipe);
   ConstructBaffle();
   // insertion point for horn 1 is @3cm
   // drawings have z=0 at insertion point
