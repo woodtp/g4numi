@@ -57,7 +57,7 @@ private:
    void ConstructTargetHall();
    void ConstructTarget();
    void ConstructBaffle();
-   void ConstructDecayPipe();
+   void ConstructDecayPipe(G4bool=true);
    void ConstructHadronAbsorber();  
    void ConstructHorns();  
    void ConstructHorn1(G4ThreeVector pos, G4RotationMatrix rot);
@@ -95,9 +95,12 @@ private:
    // Materials
    G4Material* Vacuum;
    G4Material* DecayPipeVacuum;
+   G4Material* DecayPipeHelium;
+   G4Material* SecMonitorHelium;
+   G4Material* TargetHelium;
    G4Material* Air;
    G4Material* Water;
-   G4Material* He;
+
    G4Material* Be;
    G4Material* C;
    G4Material* Al;
