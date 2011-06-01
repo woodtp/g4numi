@@ -46,7 +46,7 @@ CPPFLAGS += $(shell $(ROOTSYS)/bin/root-config --cflags)
 
 ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --glibs) -lMinuit -lHtml
 ROOTLIBS      := $(filter-out -lNew,$(ROOTLIBS))
-ROOTLIBS      := $(filter-out -lThread,$(ROOTLIBS))
+#ROOTLIBS      := $(filter-out -lThread,$(ROOTLIBS))
 ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
 INTYLIBS      += $(ROOTLIBS)
 
@@ -69,4 +69,4 @@ g4numiCint: include/data_t.hh include/hadmmtuple_t.hh include/draytupleSPB_t.hh 
 	rootcint -f ./src/g4numiCint.cc -c -I./include ../include/data_t.hh ../include/hadmmtuple_t.hh ../include/draytupleSPB_t.hh ../include/Edep_t.hh ../include/draytupleMIB_t.hh ../include/absbkgtuple_t.hh ../include/zptuple_t.hh ../include/target_exit_t.hh ../Linkdef.h
 
 libg4numiDict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/target_exit_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
-	gcc -g -shared -o libg4numiDict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/target_exit_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
+	gcc -m32 -g -shared -o libg4numiDict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/target_exit_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiTarget.cc,v 1.10.4.2 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiTarget.cc,v 1.10.4.3 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -49,7 +49,7 @@ void NumiDetectorConstruction::ConstructTarget()
     sTargetMotherVol=new G4UnionSolid("sTargetMotherVol",sTargetMotherVol,dummySolid,G4Transform3D(rotation,translation));
   }    
   G4ThreeVector TargetMotherVolPosition=TargetMVOrigin-target_hall_position+targetPosition;
-  G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,He,"lvTargetMother",0,0,0);
+  G4LogicalVolume* lvTargetMotherVol=new G4LogicalVolume(sTargetMotherVol,TargetHelium,"lvTargetMother",0,0,0);
   //TargetRegion->AddRootLogicalVolume(lvTargetMotherVol);
   G4VPhysicalVolume* pvTargetMotherVol=new G4PVPlacement(0,TargetMotherVolPosition,"pvTargetMother",lvTargetMotherVol,TGAR,false,0);
   pvTargetMotherVol -> CheckOverlaps();

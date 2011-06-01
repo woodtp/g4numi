@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDecayPipe.cc,v 1.8.4.2 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiDecayPipe.cc,v 1.8.4.3 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -25,7 +25,7 @@
 
 static G4double in=2.54*cm;
 
-void NumiDetectorConstruction::ConstructDecayPipe()
+void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe)
 {
   G4ThreeVector translation=G4ThreeVector(0.,0.,0.);
   G4RotationMatrix rotation=G4RotationMatrix(0.,0.,0.);
@@ -79,16 +79,18 @@ void NumiDetectorConstruction::ConstructDecayPipe()
   decayVolumePosition=G4ThreeVector(0,0,(-NumiData->DecayPipeEWinThick)/2.);//for non flat window
 
   G4Tubs* sDVOL = new G4Tubs("DVOL_solid",0.,r,l,0,360.*deg);
-  G4LogicalVolume* lvDVOL = new G4LogicalVolume(sDVOL,DecayPipeVacuum,"DVOL_log",0,0,0); 
+  G4Material* decayVolMaterial=DecayPipeVacuum;
+  if(heInDecayPipe) decayVolMaterial=DecayPipeHelium;
+  G4LogicalVolume* lvDVOL = new G4LogicalVolume(sDVOL,decayVolMaterial,"DVOL_log",0,0,0); 
   G4VPhysicalVolume* pvDVOL=new G4PVPlacement(0,decayVolumePosition,"DVOL",lvDVOL,pvDPIP,false,0);
 
   //****************************************************
   //inner DP tracking volume
   G4Tubs* sDPInnerTrackerTube = new G4Tubs("sDPInnerTrackerTube",r-(0.001*mm),r,l-(0.001*mm*2.0),0,360.*deg);
-  G4LogicalVolume* lvDPInnerTrackerTube = new G4LogicalVolume(sDPInnerTrackerTube,DecayPipeVacuum,"lvDPInnerTrackerTube",0,0,0); 
+  G4LogicalVolume* lvDPInnerTrackerTube = new G4LogicalVolume(sDPInnerTrackerTube,decayVolMaterial,"lvDPInnerTrackerTube",0,0,0); 
 
   G4Tubs* sDPInnerTrackerEnd = new G4Tubs("sDPInnerTrackerEnd",0.0,r-(0.001*mm),(0.001*mm),0,360.*deg);
-  G4LogicalVolume* lvDPInnerTrackerEnd = new G4LogicalVolume(sDPInnerTrackerEnd,DecayPipeVacuum,"lvDPInnerTrackerEnd",0,0,0); 
+  G4LogicalVolume* lvDPInnerTrackerEnd = new G4LogicalVolume(sDPInnerTrackerEnd,decayVolMaterial,"lvDPInnerTrackerEnd",0,0,0); 
   G4ThreeVector DPInnerTrackerEndPosition=decayVolumePosition + G4ThreeVector(0,0,l+(0.001*mm/2.0));
   
   //****************************************************

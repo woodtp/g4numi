@@ -21,7 +21,7 @@ DESCRIPTION
           This sets the TargetZ0 and Baffle Z0 and HornCurrent.
           Must be in the form 'LE#z#i' or 'le#z#i', where # is any number. 
           Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
-    -o, --outfile [default=g4numi_output]
+    -o, --outfile [default=g4numi$G4NUMIVER_<beamconfig>]
           Directory and filename (without the .root) to write output ntuple
           the run number will be appended to the filename 
     -r, --run [default=1]
@@ -31,6 +31,10 @@ DESCRIPTION
     -s, --seed [default=run]
           The random seed used in the g4numi run. By default this will
           be set equal to the run number
+    -n, --nametag [default='']
+          If not '', '_<nametag>' will be appended to the filename
+          g4numi$G4NUMIVER_<beamconfig>_<nametag>
+          useful for recording a sort of 'subrun'
     -w, --dowater [default=false]
           simulate water in the target  
     -L, --watercm [default=3]
@@ -45,16 +49,17 @@ def main(argv=None):
     dowater='false'    
     watercm='3'
     beamconfig='le010z185i'
-    outfile='g4numi_output'
+    outfile=''
     seed=''
+    nametag=''
     run='1'
     pot='500000'    
     templatefile=os.environ['BEAMSIM']+"/macros/template.mac"
 
     try:
-        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:", 
+        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:", 
                                    ["help","dowater","watercm",
-                                    "beamconfig","outfile","seed","run","pot","template"])
+                                    "beamconfig","outfile","seed","run","pot","template","nametag"])
     except getopt.error, msg:
         raise Usage(msg)
     # more code, unchanged
@@ -79,10 +84,17 @@ def main(argv=None):
             pot=a
         if o in ("-t","--template"):
             templatefile=a
+        if o in ("-n","--nametag"):
+            nametag=a
 
 # set seed to run if still null
     if len(seed)==0: 
         seed=run    
+    if len(outfile)==0:
+        outfile='g4numi%s_%s'%(os.environ['G4NUMIVER'],beamconfig)
+        if len(nametag)>0:
+            outfile=outfile+'_'+nametag
+    
     filestring=open(templatefile,'r').read()
     t=string.Template(filestring)
     print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot})

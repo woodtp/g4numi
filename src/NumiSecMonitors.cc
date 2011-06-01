@@ -7,7 +7,7 @@
 // pixels in the muon monitors is modelled and acts as the active
 // elements of the monitors.
 //
-// $Id: NumiSecMonitors.cc,v 1.7.4.2 2010/11/01 21:51:36 minervacvs Exp $
+// $Id: NumiSecMonitors.cc,v 1.7.4.3 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -120,7 +120,7 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   G4PVPlacement *HadMon = new G4PVPlacement(0, hadmon_pos, "PVHadMon", LVhadmon, ShldBox, false, 0);
   
   G4Box *SHadCell = new G4Box( "SHadCell", 3*in/2.0, 3*in/2.0, 1*mm/2.0 );
-  G4LogicalVolume *LVHadCell = new G4LogicalVolume(SHadCell, He, "LVHadCell", 0, 0, 0);
+  G4LogicalVolume *LVHadCell = new G4LogicalVolume(SHadCell, SecMonitorHelium, "LVHadCell", 0, 0, 0);
   G4ThreeVector cellPos;
   G4String volName = "HadCell";
 
