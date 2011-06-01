@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.5 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.6 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -549,7 +549,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   DecayPipeGEANTmat  = 10;
   DecayPipeFWinmat   = 9;
   DecayPipeEWinmat   = 10;
-
+  HeInDecayPipe = true;
   // New Target Hall by Zach Barnett 
   
   //==========================================================================
@@ -1041,7 +1041,9 @@ void NumiDataInput::Print()
              << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/m << ", " << beamPosition[1]/m << ", " << beamPosition[2]/m << ") m" << G4endl
              << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
              << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
-             << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl;
+             << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl
+	     << " Decay Pipe Helium                           = " << HeInDecayPipe<<G4endl;
+      
       if(fUseDetailedProtonBeam)
       {
          G4cout << " Using Detailed Proton Beam with parameters..." << G4endl

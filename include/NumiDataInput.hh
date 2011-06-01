@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.5 2011/03/18 18:33:20 loiacono Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.6 2011/06/01 04:25:03 kordosky Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -348,7 +348,7 @@ public:
   G4double DecayPipeZ0,DecayPipeRadius,DecayPipeLength,DecayPipeFWinThick,DecayPipeEWinThick,DecayPipeWallThick;
   G4double DecayPipeA,DecayPipeZ;
   G4int DecayPipeGEANTmat,DecayPipeFWinmat, DecayPipeEWinmat;
-  
+  G4bool HeInDecayPipe;
   // Decay Pipe Shield
   G4double ShieldX0,ShieldY0,ShieldZ0,ShieldDxdz, ShieldDydz,ShieldLength,ShieldRout,ShieldRin;
   G4int ShieldGEANTmat;
