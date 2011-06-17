@@ -12,6 +12,7 @@
 #include "G4VisAttributes.hh"
 #include "G4VVisManager.hh"
 #include "G4UnitsTable.hh"
+#include "G4VProcess.hh"
 #include "NumiTrackInformation.hh"
 #include "NumiDataInput.hh"
 
@@ -34,6 +35,7 @@ NumiTrajectory::NumiTrajectory()
    fTgen=0;
    fPreStepVolume=0;
    fStepLength = 0;
+   fProcessName = "";
 
    fND=NumiDataInput::GetNumiDataInput();
 
@@ -58,6 +60,19 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
    fMomentum = aTrack->GetMomentum();
    fVertexPosition = aTrack->GetPosition();
    fParticleMass = aTrack->GetDefinition()->GetPDGMass();
+
+   const G4VProcess* pCreatorProcess = aTrack->GetCreatorProcess();
+   if (pCreatorProcess) {
+       fProcessName = pCreatorProcess->GetProcessName();
+       fProcessSubType = pCreatorProcess->GetProcessSubType();
+
+       G4ProcessType procType = pCreatorProcess->GetProcessType();
+       fProcessTypeName = G4VProcess::GetProcessTypeName(procType);
+   } else {
+       fProcessName = "Primary";
+       fProcessSubType = -999;
+       fProcessTypeName = "Primary";
+   }
 
    NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
    if (info!=0) {
