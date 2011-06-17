@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8.4.2 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.3 2011/06/17 15:59:59 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -55,20 +55,20 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 
   //set tgen (and weight for fluka nad mars input) 
-  if (aTrack->GetTrackID()==1) 
-    {   
-      NumiTrackInformation* info = new NumiTrackInformation();
-      if (ND->useFlukaInput||ND->useMarsInput){
-	info->SetTgen(NPGA->GetTgen());
-	info->SetNImpWt(NPGA->GetWeight());
-      }
-      else{
-	info->SetTgen(1);
-	info->SetNImpWt(1.);
-      }
-      G4Track* theTrack = (G4Track*)aTrack;
-      theTrack->SetUserInformation(info);
-    }
+   if (aTrack->GetTrackID()==1) 
+   {   
+       NumiTrackInformation* info = new NumiTrackInformation();
+       if (ND->useFlukaInput||ND->useMarsInput){
+           info->SetTgen(NPGA->GetTgen());
+           info->SetNImpWt(NPGA->GetWeight());
+       }
+       else{
+           info->SetTgen(1);
+           info->SetNImpWt(1.);
+       }
+       G4Track* theTrack = (G4Track*)aTrack;
+       theTrack->SetUserInformation(info);
+   }
   
   
   //Store tracks in trajectory container
@@ -84,6 +84,40 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       (particleDefinition == G4AntiNeutrinoMu::AntiNeutrinoMuDefinition()) ||
       (particleDefinition == G4AntiNeutrinoTau::AntiNeutrinoTauDefinition()))
     {
+        
+        const G4Event* event = pRunManager->GetCurrentEvent();
+        G4TrajectoryContainer* trajectories = event->GetTrajectoryContainer();
+        std::map<int,G4VTrajectory*> trajectoryMap;
+        for (G4int i = 0; i < trajectories->size(); ++i) {
+            G4VTrajectory* traj = (*trajectories)[i];
+            trajectoryMap[traj->GetTrackID()] = traj;
+        }
+
+        std::vector<G4VTrajectory*> nuHistory;
+        G4VTrajectory* neutrino = fpTrackingManager->GimmeTrajectory();
+        nuHistory.push_back(neutrino);
+        int trackId = aTrack->GetTrackID();
+        int parentId = aTrack->GetParentID();
+        G4cout << "\tTrackId: " << trackId << "  " << particleDefinition->GetParticleName() << G4endl;
+        while (parentId  != 0) {
+            G4VTrajectory* parentTraj = trajectoryMap[parentId];
+            if (!parentTraj) {
+                G4cerr << "Invalid trajectory object" << G4endl;
+                continue;
+            }
+            nuHistory.push_back(parentTraj);
+            NumiTrajectory* numiTrajectory = dynamic_cast<NumiTrajectory*>(parentTraj);
+            if (!numiTrajectory) continue;
+            G4cout << "\t    ParentId " << parentId << "  " << parentTraj->GetParticleName() << " "
+                   << numiTrajectory->GetProcessName() << " "
+                   << numiTrajectory->GetProcessTypeName() << " "
+                   << numiTrajectory->GetProcessSubType()
+                   << G4endl;
+            parentId = parentTraj->GetParentID();
+        }
+        G4cout << "History: " << nuHistory.size() << G4endl;
+        
+        
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
       analysis->FillNeutrinoNtuple(*aTrack);
     }
