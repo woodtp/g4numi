@@ -74,7 +74,16 @@ class NumiTrajectory : public G4VTrajectory
    { return fNImpWt;}
    virtual G4double GetStepLength(G4int i) const
       {return (*fStepLength)[i];}
-  
+
+    const G4String& GetProcessName() const { return fProcessName;}
+    void SetProcessName(const G4String& name) { fProcessName = name;}
+
+    const G4String& GetProcessTypeName() const { return fProcessTypeName;}
+    void SetProcessTypeName(const G4String& name) { fProcessTypeName = name;}
+
+    G4int GetProcessSubType() const { return fProcessSubType;}
+    void SetProcessSubType(G4int type) { fProcessSubType = type;}
+    
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
    virtual void DrawTrajectory(G4int i_mode=0) const;
@@ -101,6 +110,9 @@ class NumiTrajectory : public G4VTrajectory
    G4double                         fParticleMass;
    NumiTrajectoryVolumeName*        fPreStepVolume;
    DVec*                            fStepLength;
+    G4String                        fProcessName;
+    G4String                        fProcessTypeName;
+    G4int                           fProcessSubType;
 
    NumiDataInput* fND;
 };
