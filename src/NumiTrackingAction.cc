@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8.4.3 2011/06/17 15:59:59 ltrung Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.4 2011/06/18 02:00:02 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -9,6 +9,7 @@
 #include "G4Track.hh"
 #include "G4Trajectory.hh"
 #include "NumiRunManager.hh"
+#include "NumiRunAction.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
 #include "NumiAnalysis.hh"
@@ -108,10 +109,14 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
             nuHistory.push_back(parentTraj);
             NumiTrajectory* numiTrajectory = dynamic_cast<NumiTrajectory*>(parentTraj);
             if (!numiTrajectory) continue;
+            G4String startVol = numiTrajectory->GetPreStepVolumeName(0);
+            G4String stopVol = numiTrajectory->GetPreStepVolumeName(numiTrajectory->GetPointEntries()-1);
             G4cout << "\t    ParentId " << parentId << "  " << parentTraj->GetParticleName() << " "
                    << numiTrajectory->GetProcessName() << " "
                    << numiTrajectory->GetProcessTypeName() << " "
-                   << numiTrajectory->GetProcessSubType()
+                   << numiTrajectory->GetProcessSubType() << " start volume: "
+                   << startVol << " stop volume: "
+                   << stopVol
                    << G4endl;
             parentId = parentTraj->GetParentID();
         }
