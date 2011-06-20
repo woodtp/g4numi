@@ -18,12 +18,15 @@
 #include "G4TrajectoryContainer.hh"
 
 #include <map.h>
+#include <map>
+#include <vector>
 
 class G4ParticleDefinition;
 class G4Step;
 class TFile;
 class TTree;
 class G4Track;
+class G4VTrajectory;
 class data_t;
 class hadmmtuple_t;
 class draytupleMIB_t;
@@ -42,7 +45,8 @@ public:
    
    void book();
    void finish();
-   void FillNeutrinoNtuple(const G4Track& track);
+   void FillNeutrinoNtuple(const G4Track& track,
+                           const std::vector<G4VTrajectory*>& nuHistory);
    void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
    void FillHadmmNtuple();
    void FillBXDRAW(const G4Step* aStep);
