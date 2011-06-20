@@ -4,7 +4,7 @@
 //  ADM, July 2005
 //  This is a class that defines the data_t object that is used to 
 //  store the g4numi output in a root tree.
-// $Id: data_t.cc,v 1.3.4.2 2011/06/18 02:00:02 ltrung Exp $
+// $Id: data_t.cc,v 1.3.4.3 2011/06/20 03:22:38 ltrung Exp $
 //------------------
 
 #include "data_t.hh"
@@ -82,10 +82,31 @@ void data_t::Clear(const std::string &)
    tptype      = -1;
    tgen        = -1;
 
-   for (Int_t index = 0; index < 10; ++index) {
-           startVol[index] = "NotDefined";
-           stopVol[index] = "NotDefined";
-           proc[index] = "NotDefined";
+   for (UInt_t index = 0; index < maxGen; ++index) {
+       pdg[index] = 0;
+       trackId[index] = -1;
+       parentId[index] = -1;
+       startx[index]  = 999.9;
+       starty[index]  = 999.9;
+       startz[index]  = 999.9;
+       startpx[index] = 999.9;
+       startpy[index] = 999.9;
+       startpz[index] = 999.9;
+
+       stopx[index]  = 999.9;
+       stopy[index]  = 999.9;
+       stopz[index]  = 999.9;
+       stoppx[index] = 999.9;
+       stoppy[index] = 999.9;
+       stoppz[index] = 999.9;
+       
+       pprodpx[index] = 999.9;
+       pprodpy[index] = 999.9;
+       pprodpz[index] = 999.9;
+       
+       ivol[index] = "NotDefined";
+       fvol[index] = "NotDefined";
+       proc[index] = "NotDefined";
    }
    //
    //the size of these arrays are arbitray
