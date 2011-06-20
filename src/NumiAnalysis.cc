@@ -1,12 +1,13 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.4 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.5 2011/06/20 03:21:57 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
 #include <stdlib.h>
 #include <map.h>
 
@@ -44,6 +45,7 @@
 #include "NumiPrimaryGeneratorAction.hh"
 #include "NumiDataInput.hh"
 #include "NumiNuWeight.hh"
+#include "NumiTrajectory.hh"
 
 using namespace std;
 
@@ -830,7 +832,7 @@ void NumiAnalysis::WriteHadmmNtuple()
 }
 
 //------------------------------------------------------------------------------------
-void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
+void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4VTrajectory*>& history)
 {
 
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillNeutrinoNtuple() called." << G4endl;}
@@ -970,43 +972,46 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
 	tgen=1, any particle produced by a p-C interaction would have tgen=2,
 	particles produced from interactions of those products have tgen=3 etc.
 	etc. until the cascade exiting the target core.
-  */ 
+  */
   
-  if(!NumiData->useFlukaInput && !NumiData->useMarsInput) //if not using external ntuple then need to find the particle that exited the target
+  //if not using external ntuple then need to find the particle that exited the target
+  if(!NumiData->useFlukaInput && !NumiData->useMarsInput) 
     {
-      G4bool findTarget = false;
-      G4ThreeVector ParticleMomentum = G4ThreeVector(-999999,-999999,-999999);
-      G4ThreeVector ParticlePosition = G4ThreeVector(-999999,-999999,-999999);
-      NumiTrajectory* PParentTrack = GetParentTrajectory(track.GetParentID());
-      G4int tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
-      particleID = PParentTrack->GetTrackID();
-      
-      while (!findTarget && particleID!=1){
-	G4int numberOfPoints = PParentTrack->GetPointEntries();
-	for (G4int ii=0;ii<numberOfPoints-1; ++ii){
-	  G4String lastVolName = PParentTrack->GetPreStepVolumeName(ii);
-	  G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1); 
-	  if (lastVolName.contains("TGTExit") && nextVolName.contains("TargetMother"))
-	    {
-	      ParticleMomentum = PParentTrack->GetMomentum(ii);              // tv_ and tp_ are equal to position and  
-	      ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();  // momentum of the particle exiting the target (actually shell around target)
-	      tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
-	      findTarget = true;
-	    }
-	}
-	PParentTrack = GetParentTrajectory(PParentTrack->GetParentID());
-	particleID = PParentTrack->GetTrackID();
-      }
-      g4data->tvx = ParticlePosition[0]/cm;
-      g4data->tvy = ParticlePosition[1]/cm;
-      g4data->tvz = ParticlePosition[2]/cm;
-      g4data->tpx = ParticleMomentum[0]/GeV;
-      g4data->tpy = ParticleMomentum[1]/GeV;
-      g4data->tpz = ParticleMomentum[2]/GeV;
-      g4data->tptype = tptype;
+        G4bool findTarget = false;
+        G4ThreeVector ParticleMomentum = G4ThreeVector(-999999,-999999,-999999);
+        G4ThreeVector ParticlePosition = G4ThreeVector(-999999,-999999,-999999);
+        NumiTrajectory* PParentTrack = GetParentTrajectory(track.GetParentID());
+        G4int tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
+        particleID = PParentTrack->GetTrackID();
+        
+        while (!findTarget && particleID!=1){
+            G4int numberOfPoints = PParentTrack->GetPointEntries();
+            for (G4int ii=0;ii<numberOfPoints-1; ++ii){
+                G4String lastVolName = PParentTrack->GetPreStepVolumeName(ii);
+                G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1); 
+                if (lastVolName.contains("TGTExit") && nextVolName.contains("TargetMother"))
+                {
+                    // tv_ and tp_ are equal to position and
+                    // momentum of the particle exiting the target (actually shell around target)
+                    ParticleMomentum = PParentTrack->GetMomentum(ii);              
+                    ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();  
+                    tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
+                    findTarget = true;
+                }
+            }
+            PParentTrack = GetParentTrajectory(PParentTrack->GetParentID());
+            particleID = PParentTrack->GetTrackID();
+        }
+        g4data->tvx = ParticlePosition[0]/cm;
+        g4data->tvy = ParticlePosition[1]/cm;
+        g4data->tvz = ParticlePosition[2]/cm;
+        g4data->tpx = ParticleMomentum[0]/GeV;
+        g4data->tpy = ParticleMomentum[1]/GeV;
+        g4data->tpz = ParticleMomentum[2]/GeV;
+        g4data->tptype = tptype;
     }
   else          // using external ntuple, so set these to whatever comes from that ntuple
-    {
+  {
       G4ThreeVector ParticlePosition = NPGA->GetParticlePosition();
       g4data->tvx = ParticlePosition[0]/cm;
       g4data->tvy = ParticlePosition[1]/cm;
@@ -1016,153 +1021,153 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
       g4data->tpy = ParticleMomentum[1]/GeV;
       g4data->tpz = ParticleMomentum[2]/GeV;
       g4data->tptype = NPGA->GetParticleType();
-    }   
+  }   
   
-  //set all trk_ & trkp_ to -999999  
+      //set all trk_ & trkp_ to -999999  
   for (G4int ii=0; ii<10; ++ii){
-    g4data->trkx[ii] = -999999.;
-    g4data->trky[ii] = -999999.;
-    g4data->trkz[ii] = -999999.;
-    g4data->trkpx[ii] = -999999.;
-    g4data->trkpy[ii] = -999999.;
-    g4data->trkpz[ii] = -999999.;
+      g4data->trkx[ii] = -999999.;
+      g4data->trky[ii] = -999999.;
+      g4data->trkz[ii] = -999999.;
+      g4data->trkpx[ii] = -999999.;
+      g4data->trkpy[ii] = -999999.;
+      g4data->trkpz[ii] = -999999.;
   }
-  // Neutrino data at different points
-  // need neutrino parent info to be filled in g4data by this point
+      // Neutrino data at different points
+      // need neutrino parent info to be filled in g4data by this point
 
   for (G4int ii=0; ii<NumiData->nNear; ++ii){          // near detector 
-    g4data->NdxdzNear[ii] = (x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
-    g4data->NdydzNear[ii] = (y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
-    
-    NumiNuWeight nuwgh;
-    G4double nu_wght;
-    G4double nu_energy;
-    std::vector<double> r_det;
-    r_det.push_back(NumiData->xdet_near[ii]/cm);
-    r_det.push_back(NumiData->ydet_near[ii]/cm);
-    r_det.push_back(NumiData->zdet_near[ii]/cm);
-    nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
-    g4data->NenergyN[ii] = nu_energy; //in GeV
-    g4data->NWtNear[ii]  = nu_wght;
+      g4data->NdxdzNear[ii] = (x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
+      g4data->NdydzNear[ii] = (y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
+      
+      NumiNuWeight nuwgh;
+      G4double nu_wght;
+      G4double nu_energy;
+      std::vector<double> r_det;
+      r_det.push_back(NumiData->xdet_near[ii]/cm);
+      r_det.push_back(NumiData->ydet_near[ii]/cm);
+      r_det.push_back(NumiData->zdet_near[ii]/cm);
+      nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+      g4data->NenergyN[ii] = nu_energy; //in GeV
+      g4data->NWtNear[ii]  = nu_wght;
   }
-
+  
   for (G4int ii=0; ii<NumiData->nFar; ++ii){         // far detector
-    g4data->NdxdzFar[ii] = (x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
-    g4data->NdydzFar[ii] = (y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
-    
-    NumiNuWeight nuwgh;
-    G4double nu_wght;
-    G4double nu_energy;
-    std::vector<double> r_det;
-    r_det.push_back(NumiData->xdet_far[ii]/cm);
-    r_det.push_back(NumiData->ydet_far[ii]/cm);
-    r_det.push_back(NumiData->zdet_far[ii]/cm);
-    nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
-    g4data->NenergyF[ii] = nu_energy; //in GeV
-    g4data->NWtFar[ii]   = nu_wght;
-   
+      g4data->NdxdzFar[ii] = (x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
+      g4data->NdydzFar[ii] = (y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
+      
+      NumiNuWeight nuwgh;
+      G4double nu_wght;
+      G4double nu_energy;
+      std::vector<double> r_det;
+      r_det.push_back(NumiData->xdet_far[ii]/cm);
+      r_det.push_back(NumiData->ydet_far[ii]/cm);
+      r_det.push_back(NumiData->zdet_far[ii]/cm);
+      nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+      g4data->NenergyF[ii] = nu_energy; //in GeV
+      g4data->NWtFar[ii]   = nu_wght;
+      
   }
-
-  //if(parentID!=0){
+  
+      //if(parentID!=0){
   G4ThreeVector ParentMomentum;
   G4ThreeVector ParentPosition;
-    
+  
   G4bool wasInHorn1 = false;
   G4bool wasInHorn2 = false;  
   for (G4int ii=0; ii<point_no-1; ++ii){ 
-    ParentMomentum = NuParentTrack->GetMomentum(ii);
-    ParentPosition = (NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
-    
-    G4String postvolname = "";
-    G4String prevolname = NuParentTrack->GetPreStepVolumeName(ii);
-    if (ii<point_no-2) postvolname = NuParentTrack->GetPreStepVolumeName(ii+1);
+      ParentMomentum = NuParentTrack->GetMomentum(ii);
+      ParentPosition = (NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
       
-    // parent created inside target
-    if ((prevolname.contains("TGT")||prevolname.contains("Budal")) && ii==0){
-      g4data->trkx[0] = ParentPosition[0]/cm;
-      g4data->trky[0] = ParentPosition[1]/cm;
-      g4data->trkz[0] = ParentPosition[2]/cm;
-      g4data->trkpx[0] = ParentMomentum[0]/GeV;
-      g4data->trkpy[0] = ParentMomentum[1]/GeV;
-      g4data->trkpz[0] = ParentMomentum[2]/GeV;}
-    //parent at exits target
-    if ((prevolname.contains("TGTExit")) && postvolname.contains("TargetMother")){
-      g4data->trkx[1] = ParentPosition[0]/cm;
-      g4data->trky[1] = ParentPosition[1]/cm;
-      g4data->trkz[1] = ParentPosition[2]/cm;
-      g4data->trkpx[1] = ParentMomentum[0]/GeV;
-      g4data->trkpy[1] = ParentMomentum[1]/GeV;
-      g4data->trkpz[1] = ParentMomentum[2]/GeV;}
-    //enter horn1
-    if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
-      g4data->trkx[2] = ParentPosition[0]/cm;
-      g4data->trky[2] = ParentPosition[1]/cm;
-      g4data->trkz[2] = ParentPosition[2]/cm;
-      g4data->trkpx[2] = ParentMomentum[0]/GeV;
-      g4data->trkpy[2] = ParentMomentum[1]/GeV;
-      g4data->trkpz[2] = ParentMomentum[2]/GeV;
-      wasInHorn1 = true;
-    }
-    //exit horn1
-    if (prevolname.contains("Horn1") && postvolname.contains("TGAR")){
-      g4data->trkx[3] = ParentPosition[0]/cm;
-      g4data->trky[3] = ParentPosition[1]/cm;
-      g4data->trkz[3] = ParentPosition[2]/cm;
-      g4data->trkpx[3] = ParentMomentum[0]/GeV;
-      g4data->trkpy[3] = ParentMomentum[1]/GeV;
-      g4data->trkpz[3] = ParentMomentum[2]/GeV;
-    }
-    //enter horn2
-    if (prevolname.contains("TGAR") && postvolname.contains("Horn2")){
-      g4data->trkx[4] = ParentPosition[0]/cm;
-      g4data->trky[4] = ParentPosition[1]/cm;
-      g4data->trkz[4] = ParentPosition[2]/cm;
-      g4data->trkpx[4] = ParentMomentum[0]/GeV;
-      g4data->trkpy[4] = ParentMomentum[1]/GeV;
-      g4data->trkpz[4] = ParentMomentum[2]/GeV;
-      wasInHorn2 = true;
-    }
-    //exit horn2
+      G4String postvolname = "";
+      G4String prevolname = NuParentTrack->GetPreStepVolumeName(ii);
+      if (ii<point_no-2) postvolname = NuParentTrack->GetPreStepVolumeName(ii+1);
+      
+          // parent created inside target
+      if ((prevolname.contains("TGT")||prevolname.contains("Budal")) && ii==0){
+          g4data->trkx[0] = ParentPosition[0]/cm;
+          g4data->trky[0] = ParentPosition[1]/cm;
+          g4data->trkz[0] = ParentPosition[2]/cm;
+          g4data->trkpx[0] = ParentMomentum[0]/GeV;
+          g4data->trkpy[0] = ParentMomentum[1]/GeV;
+          g4data->trkpz[0] = ParentMomentum[2]/GeV;}
+          //parent at exits target
+      if ((prevolname.contains("TGTExit")) && postvolname.contains("TargetMother")){
+          g4data->trkx[1] = ParentPosition[0]/cm;
+          g4data->trky[1] = ParentPosition[1]/cm;
+          g4data->trkz[1] = ParentPosition[2]/cm;
+          g4data->trkpx[1] = ParentMomentum[0]/GeV;
+          g4data->trkpy[1] = ParentMomentum[1]/GeV;
+          g4data->trkpz[1] = ParentMomentum[2]/GeV;}
+          //enter horn1
+      if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
+          g4data->trkx[2] = ParentPosition[0]/cm;
+          g4data->trky[2] = ParentPosition[1]/cm;
+          g4data->trkz[2] = ParentPosition[2]/cm;
+          g4data->trkpx[2] = ParentMomentum[0]/GeV;
+          g4data->trkpy[2] = ParentMomentum[1]/GeV;
+          g4data->trkpz[2] = ParentMomentum[2]/GeV;
+          wasInHorn1 = true;
+      }
+          //exit horn1
+      if (prevolname.contains("Horn1") && postvolname.contains("TGAR")){
+          g4data->trkx[3] = ParentPosition[0]/cm;
+          g4data->trky[3] = ParentPosition[1]/cm;
+          g4data->trkz[3] = ParentPosition[2]/cm;
+          g4data->trkpx[3] = ParentMomentum[0]/GeV;
+          g4data->trkpy[3] = ParentMomentum[1]/GeV;
+          g4data->trkpz[3] = ParentMomentum[2]/GeV;
+      }
+          //enter horn2
+      if (prevolname.contains("TGAR") && postvolname.contains("Horn2")){
+          g4data->trkx[4] = ParentPosition[0]/cm;
+          g4data->trky[4] = ParentPosition[1]/cm;
+          g4data->trkz[4] = ParentPosition[2]/cm;
+          g4data->trkpx[4] = ParentMomentum[0]/GeV;
+          g4data->trkpy[4] = ParentMomentum[1]/GeV;
+          g4data->trkpz[4] = ParentMomentum[2]/GeV;
+          wasInHorn2 = true;
+      }
+          //exit horn2
     if (prevolname.contains("Horn2") && postvolname.contains("TGAR")){
-      g4data->trkx[5] = ParentPosition[0]/cm;
-      g4data->trky[5] = ParentPosition[1]/cm;
-      g4data->trkz[5] = ParentPosition[2]/cm;
-      g4data->trkpx[5] = ParentMomentum[0]/GeV;
-      g4data->trkpy[5] = ParentMomentum[1]/GeV;
-      g4data->trkpz[5] = ParentMomentum[2]/GeV;
+        g4data->trkx[5] = ParentPosition[0]/cm;
+        g4data->trky[5] = ParentPosition[1]/cm;
+        g4data->trkz[5] = ParentPosition[2]/cm;
+        g4data->trkpx[5] = ParentMomentum[0]/GeV;
+        g4data->trkpy[5] = ParentMomentum[1]/GeV;
+        g4data->trkpz[5] = ParentMomentum[2]/GeV;
     }
-    //enter decay pipe
+        //enter decay pipe
     if (prevolname.contains("DVOL") && (postvolname.contains("UpWn"))){
-      g4data->trkx[6] = ParentPosition[0]/cm;
-      g4data->trky[6] = ParentPosition[1]/cm;
-      g4data->trkz[6] = ParentPosition[2]/cm;
-      g4data->trkpx[6] = ParentMomentum[0]/GeV;
-      g4data->trkpy[6] = ParentMomentum[1]/GeV;
-      g4data->trkpz[6] = ParentMomentum[2]/GeV;}
-
-
-      
+        g4data->trkx[6] = ParentPosition[0]/cm;
+        g4data->trky[6] = ParentPosition[1]/cm;
+        g4data->trkz[6] = ParentPosition[2]/cm;
+        g4data->trkpx[6] = ParentMomentum[0]/GeV;
+        g4data->trkpy[6] = ParentMomentum[1]/GeV;
+        g4data->trkpz[6] = ParentMomentum[2]/GeV;}
+    
+    
+    
     // check if the particle passes through the neck of the horn
     // if yes then set the trk_ to +999999
     // need to make this work for arbitrary horn position!!
     if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
 	(sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
 	(g4data->trkx[2]==-999999. || g4data->trkx[2]==999999.))
-      {
+    {
 	g4data->trkx[2] = 999999.;
 	g4data->trky[2] = 999999.;
 	g4data->trkz[2] = 999999.;  
-      }
+    }
     if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
 	(sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
 	(g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
-      {
+    {
 	g4data->trkx[4] = 999999.;
 	g4data->trky[4] = 999999.;
 	g4data->trkz[4] = 999999.;  
-      }
+    }
   }
-    
+  
   ParentMomentum = NuParentTrack->GetMomentum(point_no-1);
   ParentPosition = (NuParentTrack->GetPoint(point_no-1)->GetPosition()/m)*m;
   g4data->trkx[7] = ParentPosition[0]/cm;
@@ -1171,23 +1176,62 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track)
   g4data->trkpx[7] = ParentMomentum[0]/GeV;
   g4data->trkpy[7] = ParentMomentum[1]/GeV;
   g4data->trkpz[7] = ParentMomentum[2]/GeV;
-  // }
+      // }
+
   
-  tree->Fill();  
+  g4data->ntrajectory = history.size();
+  
+      // Save neutrino history to the ntuple. If the depth of the history is larger than the
+      // allocated memory in the arrays, then only part of the history will be saved. In this
+      // case the earlier history will be truncated first (primary proton and so on). If this
+      // happen frequently, you should increase the maxGen variable in data_t.hh
+  for (std::size_t index = 0; index < std::min(maxGen,history.size()); ++index) {
+      NumiTrajectory* traj = dynamic_cast<NumiTrajectory*>(history.at(index));
+      g4data->pdg[index] = traj->GetPDGEncoding();
+      g4data->trackId[index] = traj->GetTrackID();
+      g4data->parentId[index] = traj->GetParentID();
+      g4data->startx[index]  = traj->GetPoint(0)->GetPosition().x();
+      g4data->starty[index]  = traj->GetPoint(0)->GetPosition().y();
+      g4data->startz[index]  = traj->GetPoint(0)->GetPosition().z();
+      g4data->startpx[index] = traj->GetMomentum(0).x();
+      g4data->startpy[index] = traj->GetMomentum(0).y();
+      g4data->startpz[index] = traj->GetMomentum(0).z();
 
+      const int lastPoint = traj->GetPointEntries()-1;
+      g4data->stopx[index]  = traj->GetPoint(lastPoint)->GetPosition().x();
+      g4data->stopy[index]  = traj->GetPoint(lastPoint)->GetPosition().y();
+      g4data->stopz[index]  = traj->GetPoint(lastPoint)->GetPosition().z();
+      g4data->stoppx[index] = traj->GetMomentum(lastPoint).x();
+      g4data->stoppy[index] = traj->GetMomentum(lastPoint).y();
+      g4data->stoppz[index] = traj->GetMomentum(lastPoint).z();
 
-  // Write to file
-  if (NumiData->createASCII)
-  {
-    std::ofstream asciiFile(asciiFileName, std::ios::app);
-    if(asciiFile.is_open())
-    {
-      asciiFile << g4data->Ntype<< " " << g4data->Nenergy << " " << g4data->NenergyN[0] << " " << g4data->NWtNear[0];
-      asciiFile << " " << g4data->NenergyF[0] << " " << g4data->NWtFar[0] <<" "<<g4data->Nimpwt<< G4endl; 
-      asciiFile.close();
-    }
+      g4data->pprodpx[index] = traj->GetParentMomentumAtThisProduction().x();
+      g4data->pprodpy[index] = traj->GetParentMomentumAtThisProduction().y();
+      g4data->pprodpz[index] = traj->GetParentMomentumAtThisProduction().z();
+
+      g4data->proc[index] = traj->GetProcessName();
+      g4data->ivol[index] = traj->GetPreStepVolumeName(0);
+      g4data->fvol[index] = traj->GetPreStepVolumeName(lastPoint);
+
   }
 
+
+  
+  tree->Fill();  
+  
+  
+      // Write to file
+  if (NumiData->createASCII)
+  {
+      std::ofstream asciiFile(asciiFileName, std::ios::app);
+      if(asciiFile.is_open())
+      {
+          asciiFile << g4data->Ntype<< " " << g4data->Nenergy << " " << g4data->NenergyN[0] << " " << g4data->NWtNear[0];
+          asciiFile << " " << g4data->NenergyF[0] << " " << g4data->NWtFar[0] <<" "<<g4data->Nimpwt<< G4endl; 
+          asciiFile.close();
+      }
+  }
+  
 
 }
 
