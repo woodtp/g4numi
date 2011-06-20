@@ -78,12 +78,14 @@ class NumiTrajectory : public G4VTrajectory
     const G4String& GetProcessName() const { return fProcessName;}
     void SetProcessName(const G4String& name) { fProcessName = name;}
 
-    const G4String& GetProcessTypeName() const { return fProcessTypeName;}
-    void SetProcessTypeName(const G4String& name) { fProcessTypeName = name;}
+    inline const G4ThreeVector& GetParentMomentumAtThisProduction() const {
+        return fParentMomentumAtThisProduction;
+    }
 
-    G4int GetProcessSubType() const { return fProcessSubType;}
-    void SetProcessSubType(G4int type) { fProcessSubType = type;}
-    
+    inline void SetParentMomentumAtThisProduction(const G4ThreeVector& mom) {
+        fParentMomentumAtThisProduction = mom;
+    }
+
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
    virtual void DrawTrajectory(G4int i_mode=0) const;
@@ -110,9 +112,10 @@ class NumiTrajectory : public G4VTrajectory
    G4double                         fParticleMass;
    NumiTrajectoryVolumeName*        fPreStepVolume;
    DVec*                            fStepLength;
-    G4String                        fProcessName;
-    G4String                        fProcessTypeName;
-    G4int                           fProcessSubType;
+   G4String                         fProcessName;
+        /// Momentum of the parent particle when producing this particle
+   G4ThreeVector      fParentMomentumAtThisProduction; 
+    
 
    NumiDataInput* fND;
 };
