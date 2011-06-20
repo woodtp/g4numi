@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.3 2011/03/18 18:31:12 loiacono Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.4 2011/06/20 03:27:21 ltrung Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -12,6 +12,7 @@
 #include "G4Track.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
+#include "G4UnitsTable.hh"
 #include "NumiTrajectory.hh"
 #include "G4TrajectoryContainer.hh"
 #include "G4RunManager.hh"
@@ -929,6 +930,36 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 	  theTrack->SetUserInformation(newinfo); 
 	}
      }
+  }
+
+      // Find the secondaries produced by the current step and store
+      // the particle momentum when producing these secondaries.
+  G4int nSecAtRest = fpSteppingManager->GetfN2ndariesAtRestDoIt();
+  G4int nSecAlong  = fpSteppingManager->GetfN2ndariesAlongStepDoIt();
+  G4int nSecPost   = fpSteppingManager->GetfN2ndariesPostStepDoIt();
+  G4int nSecTotal  = nSecAtRest+nSecAlong+nSecPost;
+  G4TrackVector* secVec = fpSteppingManager->GetfSecondary();
+
+  if(nSecTotal>0) {
+      for(size_t lp1=(*secVec).size()-nSecTotal; lp1<(*secVec).size(); ++lp1) {
+          G4Track* secTrack = (*secVec)[lp1];
+          G4ParticleDefinition* def = secTrack->GetDefinition();
+              // Showering particles (e+/-,gamma) are not interesting for neutrino production,
+              // skip them
+          if (def == G4Electron::Electron() || def == G4Positron::Positron() ||
+              def == G4Gamma::Gamma()) continue;
+          G4ThreeVector mom = theStep->GetPreStepPoint()->GetMomentum();
+          if (!secTrack->GetUserInformation()) {
+              NumiTrackInformation* trackInformation = new NumiTrackInformation;
+              trackInformation->SetParentMomentumAtThisProduction(mom);
+              secTrack->SetUserInformation(trackInformation);
+          } else {
+              NumiTrackInformation* trackInformation
+                  = dynamic_cast<NumiTrackInformation*>(secTrack->GetUserInformation());
+              trackInformation->SetParentMomentumAtThisProduction(mom);
+          }
+          
+      }
   }
 
 }
