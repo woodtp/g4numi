@@ -64,21 +64,17 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
    const G4VProcess* pCreatorProcess = aTrack->GetCreatorProcess();
    if (pCreatorProcess) {
        fProcessName = pCreatorProcess->GetProcessName();
-       fProcessSubType = pCreatorProcess->GetProcessSubType();
-
-       G4ProcessType procType = pCreatorProcess->GetProcessType();
-       fProcessTypeName = G4VProcess::GetProcessTypeName(procType);
    } else {
        fProcessName = "Primary";
-       fProcessSubType = -999;
-       fProcessTypeName = "Primary";
    }
 
    NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
    if (info!=0) {
      fDecayCode = info->GetDecayCode();
      fTgen = info->GetTgen();
-     fNImpWt = info->GetNImpWt();}
+     fNImpWt = info->GetNImpWt();
+     fParentMomentumAtThisProduction = info->GetParentMomentumAtThisProduction();
+   }
    else { 
      fDecayCode = 0;
      fTgen = 0; 
@@ -290,6 +286,7 @@ void NumiTrajectory::AppendStep(const G4Step* aStep)
    G4String PreVolumeName=steppoint->GetPhysicalVolume()->GetName(); 
    fPreStepVolume->push_back(PreVolumeName); 
    fStepLength->push_back(aStep->GetStepLength());
+
 }
   
 G4ParticleDefinition* NumiTrajectory::GetParticleDefinition()
