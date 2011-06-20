@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8.4.4 2011/06/18 02:00:02 ltrung Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.5 2011/06/20 03:38:00 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -41,6 +41,11 @@ NumiTrackingAction::~NumiTrackingAction()
 
 void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
+        //Store tracks in trajectory container
+    fpTrackingManager->SetStoreTrajectory(true);
+    fpTrackingManager->SetTrajectory(new NumiTrajectory(aTrack));
+  
+    
    if(ND->GetDebugLevel() > 1)
    {
       G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
@@ -72,10 +77,6 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
    }
   
   
-  //Store tracks in trajectory container
-  fpTrackingManager->SetStoreTrajectory(true);
-  fpTrackingManager->SetTrajectory(new NumiTrajectory(aTrack));
-   
   //if a particle is a neutrino then analyse and store in ntuple
   G4ParticleDefinition * particleDefinition = aTrack->GetDefinition();
   if ((particleDefinition == G4NeutrinoE::NeutrinoEDefinition())||
@@ -88,8 +89,9 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
         
         const G4Event* event = pRunManager->GetCurrentEvent();
         G4TrajectoryContainer* trajectories = event->GetTrajectoryContainer();
+            // Make a temporary map to make it easier to go up the trajectory stack
         std::map<int,G4VTrajectory*> trajectoryMap;
-        for (G4int i = 0; i < trajectories->size(); ++i) {
+        for (std::size_t i = 0; i < trajectories->size(); ++i) {
             G4VTrajectory* traj = (*trajectories)[i];
             trajectoryMap[traj->GetTrackID()] = traj;
         }
@@ -97,9 +99,7 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
         std::vector<G4VTrajectory*> nuHistory;
         G4VTrajectory* neutrino = fpTrackingManager->GimmeTrajectory();
         nuHistory.push_back(neutrino);
-        int trackId = aTrack->GetTrackID();
         int parentId = aTrack->GetParentID();
-        G4cout << "\tTrackId: " << trackId << "  " << particleDefinition->GetParticleName() << G4endl;
         while (parentId  != 0) {
             G4VTrajectory* parentTraj = trajectoryMap[parentId];
             if (!parentTraj) {
@@ -111,20 +111,11 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
             if (!numiTrajectory) continue;
             G4String startVol = numiTrajectory->GetPreStepVolumeName(0);
             G4String stopVol = numiTrajectory->GetPreStepVolumeName(numiTrajectory->GetPointEntries()-1);
-            G4cout << "\t    ParentId " << parentId << "  " << parentTraj->GetParticleName() << " "
-                   << numiTrajectory->GetProcessName() << " "
-                   << numiTrajectory->GetProcessTypeName() << " "
-                   << numiTrajectory->GetProcessSubType() << " start volume: "
-                   << startVol << " stop volume: "
-                   << stopVol
-                   << G4endl;
             parentId = parentTraj->GetParentID();
         }
-        G4cout << "History: " << nuHistory.size() << G4endl;
-        
         
       NumiAnalysis* analysis = NumiAnalysis::getInstance();
-      analysis->FillNeutrinoNtuple(*aTrack);
+      analysis->FillNeutrinoNtuple(*aTrack,nuHistory);
     }
 
 
@@ -161,13 +152,26 @@ void NumiTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
        G4double nimpwt = info->GetNImpWt();
        G4TrackVector* SecVector=fpTrackingManager->GimmeSecondaries();
        for (size_t ii=0;ii<(*SecVector).size();ii++){
-	 NumiTrackInformation* newinfo = new NumiTrackInformation();
-	 newinfo->SetTgen(tgen+1); // set generation of daughter particles
-	 newinfo->SetNImpWt(nimpwt); // set weight of the new track equal to parent weight
-	 (*SecVector)[ii]->SetUserInformation(newinfo);
+           G4Track* secTrack  = (*SecVector)[ii];
+               // Check if the track information object already exists. Remember that
+               // track information objects are also created for secondaries at the end
+               // of UserSteppingAction() method. If yes, access the existing info object,
+               // then set the data members. Otherwise, create new track information object.
+           if (!secTrack->GetUserInformation()) {
+               NumiTrackInformation* newinfo = new NumiTrackInformation();
+               newinfo->SetTgen(tgen+1); // set generation of daughter particles
+               newinfo->SetNImpWt(nimpwt); // set weight of the new track equal to parent weight
+               (*SecVector)[ii]->SetUserInformation(newinfo);
+           } else {
+               NumiTrackInformation* trackInformation
+                   = dynamic_cast<NumiTrackInformation*>(secTrack->GetUserInformation());
+               trackInformation->SetTgen(tgen+1); // set generation of daughter particles
+               trackInformation->SetNImpWt(nimpwt); // set weight of the new track equal to parent weight
+           }
+           
        }
-    }
 
+    }
 
 }
 
