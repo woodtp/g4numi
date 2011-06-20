@@ -40,12 +40,21 @@ class NumiTrackInformation : public G4VUserTrackInformation
     
     void Print() const;
 
-  void Print(const G4Track *aTrack) const;
+    void Print(const G4Track *aTrack) const;
 
-  private:
+    inline const G4ThreeVector& GetParentMomentumAtThisProduction() const {
+        return fParentMomentumAtThisProduction;
+    }
+
+    inline void SetParentMomentumAtThisProduction(const G4ThreeVector& mom) {
+        fParentMomentumAtThisProduction = mom;
+    }
+
+private:
     G4int              decay_code;
     G4int              tgen;
     G4double           Nimpwt;
+    G4ThreeVector      fParentMomentumAtThisProduction;
 
 };
 
