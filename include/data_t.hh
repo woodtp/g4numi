@@ -98,7 +98,7 @@ class data_t
         /// number of trajectories between (and including) the neutrino and the primary proton.
         /// By definition, ntrajectory = tgen + 1
     Int_t ntrajectory;
-
+    Bool_t overflow;
         /// Assuming the maximum number of generations is 10, can increase if needed
     Int_t pdg[maxGen];         // particle pdg code
     Int_t trackId[maxGen];     // particle trackId 
