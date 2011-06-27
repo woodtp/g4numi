@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.5 2011/06/20 03:21:57 ltrung Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.6 2011/06/27 02:08:05 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1178,15 +1178,50 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   g4data->trkpz[7] = ParentMomentum[2]/GeV;
       // }
 
+      // Reset the neutrino history ntuple variables
+  g4data->ntrajectory = -1;
+  g4data->overflow = false;
+  for (std::size_t index = 0; index < maxGen; ++index) {
+      g4data->pdg[index] = 0;
+      g4data->trackId[index] = -1;
+      g4data->parentId[index] = -1;
+      g4data->startx[index]  = 999.999;
+      g4data->starty[index]  = 999.999;
+      g4data->startz[index]  = 999.999;
+      g4data->startpx[index] = 999.999;
+      g4data->startpy[index] = 999.999;
+      g4data->startpz[index] = 999.999;
+
+      g4data->stopx[index]  = 999.999;
+      g4data->stopy[index]  = 999.999;
+      g4data->stopz[index]  = 999.999;
+      g4data->stoppx[index] = 999.999;
+      g4data->stoppy[index] = 999.999;
+      g4data->stoppz[index] = 999.999;
+
+      g4data->pprodpx[index] = 999.999;
+      g4data->pprodpy[index] = 999.999;
+      g4data->pprodpz[index] = 999.999;
+
+      g4data->proc[index] = "NotDefined";
+      g4data->ivol[index] = "NotDefined";
+      g4data->fvol[index] = "NotDefined";
+  }
+
   
+      // Save neutrino history to the ntuple. If the depth of the history is more than the
+      // allocated memory in the arrays, then the variable 'overflow' will be set to 'TRUE'.
+      // Entries with overflow set to true should be excluded from analysis. Currently at
+      // maxGen = 12, this happens approximately every 10,000 neutrinos. If this is unacceptable,
+      // the maxGen value should be increased to 13 or higher.
   g4data->ntrajectory = history.size();
-  
-      // Save neutrino history to the ntuple. If the depth of the history is larger than the
-      // allocated memory in the arrays, then only part of the history will be saved. In this
-      // case the earlier history will be truncated first (primary proton and so on). If this
-      // happen frequently, you should increase the maxGen variable in data_t.hh
+  if (history.size()>maxGen) g4data->overflow = true;
+
+      // Create a temporary vector so that it can be reversed.
+  std::vector<G4VTrajectory*> tmpHistory(history);
+  std::reverse(tmpHistory.begin(),tmpHistory.end());
   for (std::size_t index = 0; index < std::min(maxGen,history.size()); ++index) {
-      NumiTrajectory* traj = dynamic_cast<NumiTrajectory*>(history.at(index));
+      NumiTrajectory* traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(index));
       g4data->pdg[index] = traj->GetPDGEncoding();
       g4data->trackId[index] = traj->GetTrackID();
       g4data->parentId[index] = traj->GetParentID();
