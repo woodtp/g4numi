@@ -4,7 +4,7 @@
 //  ADM, July 2005
 //  This is a class that defines the data_t object that is used to 
 //  store the g4numi output in a root tree.
-// $Id: data_t.cc,v 1.3.4.3 2011/06/20 03:22:38 ltrung Exp $
+// $Id: data_t.cc,v 1.3.4.4 2011/06/27 02:05:30 ltrung Exp $
 //------------------
 
 #include "data_t.hh"
@@ -82,6 +82,8 @@ void data_t::Clear(const std::string &)
    tptype      = -1;
    tgen        = -1;
 
+   ntrajectory = -1;
+   overflow = false;
    for (UInt_t index = 0; index < maxGen; ++index) {
        pdg[index] = 0;
        trackId[index] = -1;
