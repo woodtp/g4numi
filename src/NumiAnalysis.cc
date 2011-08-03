@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.6 2011/06/27 02:08:05 ltrung Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.7 2011/08/03 00:43:55 mjerkins Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -925,7 +925,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   G4double parentp = sqrt(ParentMomentumProduction*ParentMomentumProduction);
 
-  g4data->ppenergy = sqrt((parentp*parentp-Parent_mass*Parent_mass))/GeV;
+  g4data->ppenergy = sqrt((parentp*parentp+Parent_mass*Parent_mass))/GeV;
 
   g4data->ppmedium = 0.; //this is still empty
 
