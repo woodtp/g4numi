@@ -62,6 +62,7 @@ all: g4numiCint lib  libg4numiDict bin
 
 include $(G4INSTALL)/config/binmake.gmk
 
+
 CXXFLAGS_WITHOUT_O := $(filter-out -O% , $(CXXFLAGS))
 CXXFLAGS_WITHOUT_O := $(filter-out +O% , $(CXXFLAGS_WITHOUT_O))
 
