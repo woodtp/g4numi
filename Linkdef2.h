@@ -5,5 +5,6 @@
 
 
 #pragma link C++ class ProdTuple_t+;
+#pragma link C++ class TrackInfo_t+;
 
 #endif

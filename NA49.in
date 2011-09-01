@@ -4,13 +4,8 @@
 /run/verbose 0
 /tracking/verbose 0
 
-#/testhadr/NumberDivZ       100
-#/testhadr/PrintModulo      100
-#
-#/testhadr/CutsAll          1 mm
-
-#/testhadr/Physics           QGSP
-/testhadr/Physics          FTFP_BERT
+/testhadr/Physics           QGSP
+#/testhadr/Physics          FTFP_BERT
 /testhadr/Update
 
 /run/initialize
