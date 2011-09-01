@@ -5,10 +5,11 @@
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 #include <vector>
-
+#include "TrackInfo_t.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 class G4Event;
+class G4Track;
 class NA49EventActionMessenger;
 class G4UImanager;
 
@@ -26,6 +27,8 @@ public: // Without description
   void SetDrawFlag(G4String val)   {drawFlag = val;};
   void AddEventToDebug(G4int val)  {selectedEvents.push_back(val);
                                     nSelected++;};
+  void AddTrack(const G4Track* aTrack);
+
 
 private:
 
@@ -39,6 +42,8 @@ private:
   // drawFlags = all, charged, neutral, charged+n
   G4String     drawFlag;
   G4bool       debugStarted;
+  std::vector<const G4Track*> TrackVec;
+  std::vector<TrackInfo_t> TrackInfoVec;
 
 };
 

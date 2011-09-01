@@ -9,6 +9,8 @@
 
 class NA49StackingMessenger;
 class G4Track;
+class G4EventManager;
+class NA49EventAction;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -33,6 +35,8 @@ private:
   const G4ParticleDefinition* primaryDef;
   G4double                    primaryTotalEnergy;
   G4Element*                  elm;
+  G4EventManager *EvtManager;
+  NA49EventAction *NA49EvtAct;
 
 };
 

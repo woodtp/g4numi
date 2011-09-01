@@ -17,6 +17,9 @@
 #include <map>
 #include <vector>
 
+#include "ProdTuple_t.hh"
+#include "TrackInfo_t.hh"
+
 class G4ParticleDefinition;
 class G4Step;
 class TFile;
@@ -24,7 +27,7 @@ class TTree;
 class G4Track;
 class G4VTrajectory;
 
-class ProdTuple_t;
+//class ProdTuple_t;
 
 class NA49Analysis
 {
@@ -34,7 +37,9 @@ public:
    ~NA49Analysis();
 
    void book();
-   void FillNtuple(const G4Track& track);
+  //   void FillNtuple(const G4Track& track);
+  //   void FillNtuple(std::vector<const G4Track*>);
+   void FillNtuple(std::vector<TrackInfo_t>);
    void WriteNtuple();
    static NA49Analysis* getInstance();
    void finish();
@@ -47,7 +52,7 @@ private:
   char NtupleFileName[50];
    TFile* FileNtuple;  
    TTree* ProdTree;
-   ProdTuple_t* g4Proddata; 
+   ProdTuple_t g4Proddata; 
 
 };
 

@@ -2,8 +2,16 @@
 #ifndef PRODTUPLE_T_HH
 #define PRODTUPLE_T_HH
 
-#include "TROOT.h"          // Top level (or root) structure for all classes
+#include "TROOT.h"        
 #include "TObject.h"
+#include "Rtypes.h"
+
+const Int_t maxPart = 50;
+//Particle types:
+// 0: pi+    1: pi-   2: pi0
+// 3: K+     4: K-    5: K0S   6: K0L
+// 7: p      8: antip 9: n    10: antin
+//11: lambda, sigma, omega, eta, xi //are these all particles for here?
 
 class ProdTuple_t 
 {
@@ -13,17 +21,16 @@ class ProdTuple_t
   ProdTuple_t();
   virtual ~ProdTuple_t();
   
-  
   // the following variables are placed in the root tree
-  Double_t xpos;
-  Double_t ypos;
-  Double_t zpos;
-  Double_t xmom;
-  Double_t ymom;
-  Double_t zmom;
-  Double_t ener;
-  Int_t    pdgcode;
-
+  Int_t PDG[maxPart];
+  Double_t X[maxPart][3];//Initial position of the track
+  Double_t P[maxPart][4];//4-momentum. P[maxPart][3] is the energy
+  Double_t XF[maxPart];
+  Double_t PT[maxPart];
+ 
+  Int_t NPart;
+  Int_t PartTypes[12];
+ 
  private:
   ClassDef(ProdTuple_t , 1)
     
