@@ -169,11 +169,11 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
    g4Proddata.PartTypes[10]=NANeutrons;
    g4Proddata.PartTypes[11]=NOthers;
 
- if (g4Proddata.NPart>0)WriteNtuple();
+ if ((g4Proddata.NPart>0) && (g4Proddata.NPart<80))WriteNtuple();
 }
 
 void NA49Analysis::WriteNtuple(){
-
+    
     ProdTree->Fill();
     
 }

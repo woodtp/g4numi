@@ -30,14 +30,14 @@ NA49StackingAction::~NA49StackingAction()
 G4ClassificationOfNewTrack
 NA49StackingAction::ClassifyNewTrack(const G4Track* aTrack)
 {
-
+  
  G4ClassificationOfNewTrack status = fUrgent;
  EvtManager = G4EventManager::GetEventManager();
  NA49EvtAct = (NA49EventAction*)(EvtManager -> GetUserEventAction());
  const G4ParticleDefinition* pd = aTrack->GetDefinition();
  if (aTrack->GetTrackStatus() == fAlive) 
    if( (1 == aTrack->GetParentID()) && (aTrack->GetCreatorProcess()->GetProcessName()=="ProtonInelastic") )
-      if((pd->GetPDGEncoding())<10000)NA49EvtAct->AddTrack(aTrack); 
+    { if((pd->GetPDGEncoding())<10000)NA49EvtAct->AddTrack(aTrack);}
 
  //if(aTrack->GetTrackID() == 1) return status;
 
