@@ -2,10 +2,12 @@
 #include "NA49EventAction.hh"
 #include "G4Event.hh"
 #include "NA49EventActionMessenger.hh"
+#include "NA49Analysis.hh"
 
 #include "G4UImanager.hh"
 #include "G4ios.hh"
-
+#include "G4Track.hh"
+#include "TrackInfo_t.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 NA49EventAction::NA49EventAction():
@@ -48,12 +50,34 @@ void NA49EventAction::BeginOfEventAction(const G4Event* evt)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
+void NA49EventAction::AddTrack(const G4Track* aTrack)
+{
+  TrackInfo_t aTrackInfo;
+  aTrackInfo.PDGcode = (aTrack->GetDefinition())->GetPDGEncoding();
+  aTrackInfo.massPart= (aTrack->GetDefinition())->GetPDGMass();
+  aTrackInfo.Pos.SetX(aTrack->GetPosition().x());
+  aTrackInfo.Pos.SetY(aTrack->GetPosition().y());
+  aTrackInfo.Pos.SetZ(aTrack->GetPosition().z());
+  aTrackInfo.Mom.SetPx(aTrack->GetMomentum().x());
+  aTrackInfo.Mom.SetPy(aTrack->GetMomentum().y());
+  aTrackInfo.Mom.SetPz(aTrack->GetMomentum().z());
+  aTrackInfo.Mom.SetE(aTrack->GetTotalEnergy());
+  
+  TrackInfoVec.push_back(aTrackInfo);
+
+}
+
+
 void NA49EventAction::EndOfEventAction(const G4Event*)
 {
   if(debugStarted) {
     UI->ApplyCommand("/tracking/verbose  0");
     debugStarted = false;
   }
+
+  NA49Analysis* analysis = NA49Analysis::getInstance();
+  analysis->FillNtuple(TrackInfoVec); 
+  TrackInfoVec.clear();
 
 }
 
