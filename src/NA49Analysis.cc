@@ -65,13 +65,13 @@ void NA49Analysis::book()
     FileNtuple->cd();
     
     ProdTree = new TTree("pCinfo","g4NA49 info from p+C");
-    ProdTree->Branch("NPart", &g4Proddata.NPart,"NPart/I");
-    ProdTree->Branch("PDG", g4Proddata.PDG,"PDG[NPart]/I");
-    ProdTree->Branch("PartTypes", g4Proddata.PartTypes,"PartTypes[12]/I");
-    ProdTree->Branch("X", &g4Proddata.X,"X[NPart][3]/D");
-    ProdTree->Branch("P", &g4Proddata.P,"P[NPart][4]/D");
-    ProdTree->Branch("XF", g4Proddata.XF,"XF[NPart]/D");
-    ProdTree->Branch("PT", g4Proddata.PT,"PT[NPart]/D");
+    ProdTree->Branch("npart", &g4Proddata.NPart,"NPart/I");
+    ProdTree->Branch("pdg", g4Proddata.PDG,"PDG[NPart]/I");
+    ProdTree->Branch("part_types", g4Proddata.PartTypes,"PartTypes[12]/I");
+    ProdTree->Branch("x", &g4Proddata.X,"X[NPart][3]/D");
+    ProdTree->Branch("p", &g4Proddata.P,"P[NPart][4]/D");
+    ProdTree->Branch("xf", g4Proddata.XF,"XF[NPart]/D");
+    ProdTree->Branch("pt", g4Proddata.PT,"PT[NPart]/D");
 }
 
 
