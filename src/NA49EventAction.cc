@@ -1,4 +1,3 @@
-
 #include "NA49EventAction.hh"
 #include "G4Event.hh"
 #include "NA49EventActionMessenger.hh"
@@ -34,7 +33,7 @@ void NA49EventAction::BeginOfEventAction(const G4Event* evt)
 {
   // New event
   G4int nEvt = evt->GetEventID();
-   if(nEvt%1000 == 0)G4cout<<"EventID " <<nEvt<<G4endl;
+  if(nEvt%1000 == 0)G4cout<<"EventID " <<nEvt<<G4endl;
  if(nSelected>0) {
     for(G4int i=0; i<nSelected; i++) {
       if(nEvt == selectedEvents[i]) {
