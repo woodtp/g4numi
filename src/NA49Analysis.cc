@@ -28,7 +28,7 @@
 #include "G4Proton.hh"
 
 //g4na49
-#include "ProdTuple_t.hh"
+//#include "ProdTuple_t.hh"
 #include "NA49Analysis.hh"
 
 using namespace std;
@@ -59,7 +59,7 @@ NA49Analysis* NA49Analysis::getInstance()
 void NA49Analysis::book()
 {
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
-    sprintf(NtupleFileName,"NA49_%04d.root",pRunManager->GetCurrentRun()->GetRunID());
+    sprintf(NtupleFileName,"TEST_NA49_%04d.root",pRunManager->GetCurrentRun()->GetRunID());
     FileNtuple = new TFile(NtupleFileName, "RECREATE","pion from p+C ntuple");
    
     FileNtuple->cd();
@@ -110,7 +110,8 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
  //Variables for PT, XF;
  Double_t XF,PT,Ecm,PL,beta,gamma,massPart,Pxx,Pyy,Pzz,PartE;
  Double_t BeamEnergy = 158.003*1000.;//Mev
- Double_t massProton = 0.938242046*1000.;//MeV
+ //Double_t massProton = 0.938242046*1000.;//MeV
+ Double_t massProton = 0.938*1000.;//MeV
  Double_t massCarbon = 11.17802*1000.;//MeV
 
    std::vector<TrackInfo_t>::iterator iteTrackInfo = trackInfoVec.begin();
@@ -123,12 +124,15 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
      Pzz   = (*iteTrackInfo).Mom.Z();
      PartE = (*iteTrackInfo).Mom.E();
      PT    = sqrt(Pxx*Pxx+Pyy*Pyy+Pzz*Pzz);
-     Ecm   = sqrt(massProton*massProton+massPart*massPart+2.*BeamEnergy*massPart);
-     beta  = Pzz/(BeamEnergy+massCarbon);
+     Ecm  = sqrt(massProton*massProton+massCarbon*massCarbon+2.*BeamEnergy*massCarbon);
+     //Double Ecm2   = sqrt(massProton*massProton+massProton*massProton+2.*BeamEnergy*massProton);
+     G4cout<<"Ecm p+C "<<Ecm<<G4endl; 
+     //     beta  = Pzz/(BeamEnergy+massCarbon);
+     beta  = sqrt(BeamEnergy*BeamEnergy-massProton*massProton)/(BeamEnergy+massCarbon);
      gamma = sqrt(1.-beta*beta);
      PL    = gamma*(Pzz-beta*PartE);    
      XF    = 2.*PL/Ecm;
-
+     //  if(XF>0.5)G4cout<<"big XF "<<XF<<G4endl; 
      g4Proddata.PDG[partNum] = pdg_t;
      g4Proddata.X[partNum][0]= (*iteTrackInfo).Pos.X();
      g4Proddata.X[partNum][1]= (*iteTrackInfo).Pos.Y();
