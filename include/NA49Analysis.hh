@@ -37,14 +37,12 @@ public:
    ~NA49Analysis();
 
    void book();
-  //   void FillNtuple(const G4Track& track);
-  //   void FillNtuple(std::vector<const G4Track*>);
    void FillNtuple(std::vector<TrackInfo_t>);
+
    void WriteNtuple();
    static NA49Analysis* getInstance();
    void finish();
    
-private:
    
 private:
    static NA49Analysis* instance;

@@ -6,7 +6,7 @@
 #include "TObject.h"
 #include "Rtypes.h"
 
-const Int_t maxPart = 50;
+const Int_t maxPart = 100;
 //Particle types:
 // 0: pi+    1: pi-   2: pi0
 // 3: K+     4: K-    5: K0S   6: K0L
@@ -22,17 +22,16 @@ class ProdTuple_t
   virtual ~ProdTuple_t();
   
   // the following variables are placed in the root tree
+  Int_t NPart;
   Int_t PDG[maxPart];
   Double_t X[maxPart][3];//Initial position of the track
   Double_t P[maxPart][4];//4-momentum. P[maxPart][3] is the energy
   Double_t XF[maxPart];
   Double_t PT[maxPart];
- 
-  Int_t NPart;
   Int_t PartTypes[12];
  
  private:
-  ClassDef(ProdTuple_t , 1)
+   ClassDef(ProdTuple_t , 1)
     
     };
 #endif 

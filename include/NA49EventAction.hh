@@ -42,9 +42,8 @@ private:
   // drawFlags = all, charged, neutral, charged+n
   G4String     drawFlag;
   G4bool       debugStarted;
-  std::vector<const G4Track*> TrackVec;
   std::vector<TrackInfo_t> TrackInfoVec;
-
+  
 };
 
 #endif
