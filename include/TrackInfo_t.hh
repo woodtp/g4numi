@@ -20,7 +20,7 @@ class TrackInfo_t
   Int_t PDGcode;
   Double_t massPart;
  private:
-  ClassDef(TrackInfo_t , 1)
+  ClassDef(TrackInfo_t ,1)
 };
 #endif 
 
