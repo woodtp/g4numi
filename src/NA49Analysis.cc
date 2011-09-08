@@ -28,8 +28,8 @@
 #include "G4Proton.hh"
 
 //g4na49
-//#include "ProdTuple_t.hh"
 #include "NA49Analysis.hh"
+//#include "ProdTuple_t.hh"
 
 using namespace std;
 
@@ -59,19 +59,20 @@ NA49Analysis* NA49Analysis::getInstance()
 void NA49Analysis::book()
 {
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
-    sprintf(NtupleFileName,"TEST_NA49_%04d.root",pRunManager->GetCurrentRun()->GetRunID());
+    sprintf(NtupleFileName,"QGSP_NA49_%04d.root",pRunManager->GetCurrentRun()->GetRunID());
     FileNtuple = new TFile(NtupleFileName, "RECREATE","pion from p+C ntuple");
    
-    FileNtuple->cd();
+    //   FileNtuple->cd();
     
     ProdTree = new TTree("pCinfo","g4NA49 info from p+C");
-    ProdTree->Branch("npart", &g4Proddata.NPart,"NPart/I");
-    ProdTree->Branch("pdg", g4Proddata.PDG,"PDG[NPart]/I");
-    ProdTree->Branch("part_types", g4Proddata.PartTypes,"PartTypes[12]/I");
-    ProdTree->Branch("x", &g4Proddata.X,"X[NPart][3]/D");
-    ProdTree->Branch("p", &g4Proddata.P,"P[NPart][4]/D");
-    ProdTree->Branch("xf", g4Proddata.XF,"XF[NPart]/D");
-    ProdTree->Branch("pt", g4Proddata.PT,"PT[NPart]/D");
+    ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
+    ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
+    ProdTree->Branch("part_types", &g4Proddata.PartTypes,"PartTypes[12]/I");
+    ProdTree->Branch("x",  &g4Proddata.X,"X[NPart][3]/D");
+    ProdTree->Branch("p",  &g4Proddata.P,"P[NPart][4]/D");
+    ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
+    ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
+   
 }
 
 
@@ -112,27 +113,27 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
  Double_t BeamEnergy = 158.003*1000.;//Mev
  //Double_t massProton = 0.938242046*1000.;//MeV
  Double_t massProton = 0.938*1000.;//MeV
- Double_t massCarbon = 11.17802*1000.;//MeV
+ // Double_t massCarbon = 11.17802*1000.;//MeV
 
-   std::vector<TrackInfo_t>::iterator iteTrackInfo = trackInfoVec.begin();
+  std::vector<TrackInfo_t>::iterator iteTrackInfo = trackInfoVec.begin();
    for(;iteTrackInfo != trackInfoVec.end();iteTrackInfo++){  
 
      massPart = (*iteTrackInfo).massPart;
-     pdg_t = (*iteTrackInfo).PDGcode;     
+     pdg_t = (*iteTrackInfo).PDGcode; 
      Pxx   = (*iteTrackInfo).Mom.X();
      Pyy   = (*iteTrackInfo).Mom.Y();
      Pzz   = (*iteTrackInfo).Mom.Z();
      PartE = (*iteTrackInfo).Mom.E();
-     PT    = sqrt(Pxx*Pxx+Pyy*Pyy+Pzz*Pzz);
-     Ecm  = sqrt(massProton*massProton+massCarbon*massCarbon+2.*BeamEnergy*massCarbon);
-     //Double Ecm2   = sqrt(massProton*massProton+massProton*massProton+2.*BeamEnergy*massProton);
-     G4cout<<"Ecm p+C "<<Ecm<<G4endl; 
-     //     beta  = Pzz/(BeamEnergy+massCarbon);
-     beta  = sqrt(BeamEnergy*BeamEnergy-massProton*massProton)/(BeamEnergy+massCarbon);
+
+     PT    = sqrt(Pxx*Pxx+Pyy*Pyy);
+
+     Ecm   = sqrt(massProton*massProton+massProton*massProton+2.*BeamEnergy*massProton);
+
+     beta  = sqrt(BeamEnergy*BeamEnergy-massProton*massProton)/(BeamEnergy+massProton);
      gamma = sqrt(1.-beta*beta);
      PL    = gamma*(Pzz-beta*PartE);    
      XF    = 2.*PL/Ecm;
-     //  if(XF>0.5)G4cout<<"big XF "<<XF<<G4endl; 
+     
      g4Proddata.PDG[partNum] = pdg_t;
      g4Proddata.X[partNum][0]= (*iteTrackInfo).Pos.X();
      g4Proddata.X[partNum][1]= (*iteTrackInfo).Pos.Y();
@@ -143,6 +144,7 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
      g4Proddata.P[partNum][3]= PartE;
      g4Proddata.PT[partNum]  = PT;
      g4Proddata.XF[partNum]  = XF;
+     
 
      //Types of particles counter:
      if(pdg_t ==  211)NPiPlus++;
@@ -173,7 +175,7 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
    g4Proddata.PartTypes[10]=NANeutrons;
    g4Proddata.PartTypes[11]=NOthers;
 
- if ((g4Proddata.NPart>0) && (g4Proddata.NPart<80))WriteNtuple();
+ if (g4Proddata.NPart>0)WriteNtuple();
 }
 
 void NA49Analysis::WriteNtuple(){
