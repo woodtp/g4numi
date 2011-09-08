@@ -6,7 +6,6 @@
 #include "G4UImanager.hh"
 #include "G4ios.hh"
 #include "G4Track.hh"
-#include "TrackInfo_t.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 NA49EventAction::NA49EventAction():
@@ -33,7 +32,7 @@ void NA49EventAction::BeginOfEventAction(const G4Event* evt)
 {
   // New event
   G4int nEvt = evt->GetEventID();
-  if(nEvt%1000 == 0)G4cout<<"EventID " <<nEvt<<G4endl;
+  if(nEvt%1000==0)G4cout<<"EventID " <<nEvt<<G4endl;
  if(nSelected>0) {
     for(G4int i=0; i<nSelected; i++) {
       if(nEvt == selectedEvents[i]) {
@@ -51,6 +50,7 @@ void NA49EventAction::BeginOfEventAction(const G4Event* evt)
 
 void NA49EventAction::AddTrack(const G4Track* aTrack)
 {
+  
   TrackInfo_t aTrackInfo;
   aTrackInfo.PDGcode = (aTrack->GetDefinition())->GetPDGEncoding();
   aTrackInfo.massPart= (aTrack->GetDefinition())->GetPDGMass();
@@ -63,6 +63,7 @@ void NA49EventAction::AddTrack(const G4Track* aTrack)
   aTrackInfo.Mom.SetE(aTrack->GetTotalEnergy());
 
   TrackInfoVec.push_back(aTrackInfo);
+ 
 }
 
 
@@ -75,7 +76,7 @@ void NA49EventAction::EndOfEventAction(const G4Event* evt)
   }
 
   NA49Analysis* analysis = NA49Analysis::getInstance();
-  analysis->FillNtuple(TrackInfoVec);
+  if(TrackInfoVec.size()<100)analysis->FillNtuple(TrackInfoVec);
   TrackInfoVec.clear();
 }
 
