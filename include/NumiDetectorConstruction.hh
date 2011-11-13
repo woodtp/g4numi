@@ -47,7 +47,23 @@ public:
 #ifndef FLUGG
    void UpdateGeometry();
 #endif
-   
+
+    void SetBeamType(const G4String& name);
+    void SetDuratekShift(G4double shift);
+    void SetBlockShift(G4double shift);
+    void SetDeltaOuterThickness(G4double delta);
+
+    void SetBafflePosition(const G4ThreeVector& pos);
+    void SetTargetPosition(const G4ThreeVector& pos);
+    void SetHorn1Position(const G4ThreeVector& pos);
+    void SetHorn2Position(const G4ThreeVector& pos);
+
+    void SetBaffleOuterRadius(G4double Rout);
+    void SetBaffleInnerRadius(G4double Rin);
+    void SetBaffleLength(G4double length);
+    
+    void SetForcedOldTarget(G4bool forced);
+    
 private:
    NumiDataInput* NumiData;
    NumiMagneticField* numiMagField;
@@ -56,6 +72,7 @@ private:
    
    void ConstructTargetHall();
    void ConstructTarget();
+   void ConstructNOvATarget();
    void ConstructBaffle();
    void ConstructDecayPipe(G4bool=true);
    void ConstructHadronAbsorber();  
@@ -164,6 +181,27 @@ private:
   G4VSolid* BLK_solid[100];
   G4VSolid* CShld_solid[15];
   G4VSolid* Horn_PM[8];
+
+    G4String fBeamType;
+    G4double fDuratekShift;
+    G4double fTHBlockShift;
+    G4double fDeltaOuterThickness;
+
+    G4ThreeVector fBafflePosition;
+    G4ThreeVector fTargetPosition;
+    G4ThreeVector fHorn1Position;
+    G4ThreeVector fHorn2Position;
+    
+    G4RotationMatrix fHorn1Rotation;
+    G4RotationMatrix fHorn2Rotation;
+
+        /// Baffle dimensions which can be modified through messenger class
+    G4double fBaffleOuterRadius;
+    G4double fBaffleInnerRadius;
+    G4double fBaffleLength;
+
+        /// Allow to run ME beam simulation with the old target
+    G4bool fForcedOldTarget;
 };
 
 #endif
