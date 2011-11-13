@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.6 2011/06/01 04:25:03 kordosky Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.7 2011/11/13 22:13:29 ltrung Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -431,5 +431,97 @@ public:
   G4int NHorn2SpiderSupportPlanesN,NHorn2SpidersPerPlaneN;
   vdouble_t Horn2SpiderSupportZ0;
   vNumiHornSpiderSupport_t Horn2SS;
+
+        /// NOvA target
+   G4bool pSurfChk;
+   G4double TargetSegLength;
+   G4double TargetSegWidth;
+   G4double TargetSegHeight;
+   G4double TargetSegPitch;
+   G4double TargetGraphiteHeight;	
+
+   G4double BudalVFHSLength;
+   G4double BudalVFHSWidth;
+   G4double BudalVFHSHeight;
+   G4double BudalVFHSPitch;
+   G4bool   BudalVFHSEndRounded;
+
+   G4double BudalHFVSLength;
+   G4double BudalHFVSWidth;
+   G4double BudalHFVSHeight;
+   G4double BudalHFVSPitch;
+   G4bool   BudalHFVSEndRounded;
+
+   G4double TotalTargetLength;
+
+   G4double TargetEndtoDnFlange;
+   G4double TargetCanisterCenterOffset;
+
+   G4double TargetDnFlangeLength;
+   G4double TargetDnFlangeOutRad;
+   G4double TargetDnFlangeX0;
+   G4double TargetDnFlangeY0;
+   G4double TargetDnFlangeZ0;
+
+   G4double TargetDnFlangeCutoutLength;
+   G4double TargetDnBeWindowRadius;
+   G4double TargetDnBeWindowLength;
+
+   G4double TargetOutsideCasingOutRad;
+   G4double TargetOutsideCasingInRad;
+   G4double TargetCasingWaterOutRad;
+   G4double TargetCasingWaterInRad;
+   G4double TargetInsideCasingOutRad;
+   G4double TargetInsideCasingInRad;
+
+   G4double TargetCasingLength;
+   G4double TargetCasingX0;
+   G4double TargetCasingY0;
+   G4double TargetCasingZ0;
+
+   G4double TargetUpFlangeLength;
+   G4double TargetUpFlangeOutRad;
+   G4double TargetUpFlangeX0;
+   G4double TargetUpFlangeY0;
+   G4double TargetUpFlangeZ0;
+
+   G4double TargetUpBeFlangeLength;
+   G4double TargetUpBeFlangeOutRad;
+   G4double TargetUpBeFlangeX0;
+   G4double TargetUpBeFlangeY0;
+   G4double TargetUpBeFlangeZ0;
+
+   G4double TargetUpBeFlangeCutoutLength;
+   G4double TargetUpBeFlangeCutoutRadius;
+
+   G4double TargetUpBeWindowRadius;
+   G4double TargetUpBeWindowLength;
+
+   G4double PressingPlateLength;
+   G4double PressingPlateHeight;
+   G4double PressingPlateWidth;
+   G4double PressingPlateX0;
+   G4double PressingPlateY0;
+   G4double PressingPlateZ0;
+
+   G4double PressingPlateCutoutWidth;
+   G4double PressingPlateCutoutHeight;
+
+   G4double CoolingPlateLength;
+   G4double CoolingPlateHeight;
+   G4double CoolingPlateWidth;
+   G4double CoolingPlateX0;
+   G4double CoolingPlateY0;
+   G4double CoolingPlateZ0;
+
+   G4double CoolingWaterPipeOutRad;
+   G4double CoolingWaterPipeX0;
+   G4double CoolingWaterPipeY0;
+
+   G4double CoolingPlateCutoutWidth;
+   G4double CoolingPlateCutoutHeight;
+
+
+   
 };
 #endif
