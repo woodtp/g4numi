@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.5 2011/06/01 04:25:03 kordosky Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.6 2011/11/13 22:31:45 ltrung Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -25,6 +25,7 @@
 #include "G4Transform3D.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
+#include "G4UnitsTable.hh"
 
 #include "G4RegionStore.hh"
 #include "G4SolidStore.hh"
@@ -34,6 +35,14 @@
 #endif
 
 NumiDetectorConstruction::NumiDetectorConstruction()
+    : fBeamType("Unknown"),
+      fDuratekShift(0.0),
+      fTHBlockShift(0.0),
+      fDeltaOuterThickness(0.0),
+      fBaffleOuterRadius(3.0*cm),
+      fBaffleInnerRadius(5.5*mm),
+      fBaffleLength(1.5*m),
+      fForcedOldTarget(false)
 {
   //Scan the input file     
   NumiData = NumiDataInput::GetNumiDataInput();
@@ -147,10 +156,13 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   
   if (NumiData->constructTarget)
   {
-    ConstructTarget();
+      if (fBeamType.find("me") != std::string::npos &&
+          !fForcedOldTarget) ConstructNOvATarget();
+      else ConstructTarget();
   }
-    ConstructHadronAbsorber(); 
-   ConstructSecMonitors();
+
+  ConstructHadronAbsorber(); 
+  ConstructSecMonitors();
 
 #ifndef FLUGG
   //Set Vis Attributes according to solid material (only for volumes not explicitly set)
@@ -260,3 +272,77 @@ void NumiDetectorConstruction::UpdateGeometry()
 
 }
 #endif
+
+
+void NumiDetectorConstruction::SetBeamType(const G4String& beamType) {
+    fBeamType = beamType;
+}
+
+
+void NumiDetectorConstruction::SetDuratekShift(G4double shift) {
+    fDuratekShift = shift;
+}
+
+void NumiDetectorConstruction::SetBlockShift(G4double shift) {
+    fTHBlockShift = shift;
+}
+
+void NumiDetectorConstruction::SetDeltaOuterThickness(G4double delta) {
+    fDeltaOuterThickness = delta;
+}
+
+
+void NumiDetectorConstruction::SetBafflePosition(const G4ThreeVector& pos) {
+    NumiData->HPBaffleX0 = pos.x();
+    NumiData->HPBaffleY0 = pos.y();
+    NumiData->HPBaffleZ0 = pos.z();
+    
+    fBafflePosition = pos;
+}
+
+void NumiDetectorConstruction::SetTargetPosition(const G4ThreeVector& pos) {
+    NumiData->TargetX0 = pos.x();
+    NumiData->TargetY0 = pos.y();
+    NumiData->TargetZ0 = pos.z();
+
+    fTargetPosition = pos;
+}
+
+
+void NumiDetectorConstruction::SetHorn1Position(const G4ThreeVector& pos) {
+    NumiData->Horn1X0 = pos.x();
+    NumiData->Horn1Y0 = pos.y();
+    NumiData->Horn1Z0 = pos.z();
+        
+    fHorn1Position = pos;
+}
+
+void NumiDetectorConstruction::SetHorn2Position(const G4ThreeVector& pos) {
+    NumiData->Horn2X0 = pos.x();
+    NumiData->Horn2Y0 = pos.y();
+    NumiData->Horn2Z0 = pos.z();
+    
+    fHorn2Position = pos;
+}
+
+void NumiDetectorConstruction::SetBaffleOuterRadius(G4double Rout) {
+    NumiData->HPBaffleRout = Rout;
+
+    fBaffleOuterRadius = Rout;
+}
+
+void NumiDetectorConstruction::SetBaffleInnerRadius(G4double Rin) {
+    NumiData->HPBaffleRin = Rin;
+
+    fBaffleInnerRadius = Rin;
+}
+
+void NumiDetectorConstruction::SetBaffleLength(G4double length) {
+    NumiData->HPBaffleLength = length;
+    
+    fBaffleLength = length;
+}
+
+void NumiDetectorConstruction::SetForcedOldTarget(G4bool forced) {
+    fForcedOldTarget = forced;
+}
