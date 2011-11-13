@@ -308,7 +308,12 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
 }
 
 G4double NumiDetectorConstruction::PHorn1OCRout(G4double z)
-{
+{ // Martens 3/26/10
+  // The Horn 1 outer conductor is thinner for NOvA than for MINOS.
+  // For MINOS the Horn 1 outer conductor is 1 inch thick.
+  // For NOvA the Horn 1 outer conductor is 5/8 inch thick.
+  // Thus subtract 3/8 inch from the Horn 1 outer conductor outer radius
+  // but don't subract the 3/8 inch from the end flanges.
   G4double r=0;
   if (z<0.*in){
     r=3.763*in+2.436*in; // for mother vol.
@@ -326,12 +331,15 @@ G4double NumiDetectorConstruction::PHorn1OCRout(G4double z)
   }
   else if ((z>=2.756*in)&&(z<115.971*in)){
     r=13.750/2.*in;
+    r -= fDeltaOuterThickness;
   }
   else if (z>=115.971*in&&z<117.341*in){
     r=(6.875+(z/in-115.971)/(117.341-115.971)*(8.25-6.875))*in;
+    r -= fDeltaOuterThickness;
   }
   else if ((z>=117.341*in)&&(z<123.311*in)){
     r=16.5/2.*in;
+    r -= fDeltaOuterThickness;
   }
   else if ((z>=123.311*in)&&(z<124.811*in)){
     r=23.5/2.*in;
