@@ -1,6 +1,9 @@
 //----------------------------------------------------------------------
 // $Id
 //----------------------------------------------------------------------
+#include <cctype>     
+#include <functional> 
+#include <algorithm>  
 
 #include "NumiDetectorMessenger.hh"
 #include "NumiDetectorConstruction.hh"
@@ -12,6 +15,7 @@
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UnitsTable.hh"
 
 NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet):NumiDetector(NumiDet)
@@ -166,6 +170,69 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	UpdateCmd->SetGuidance("if you changed geometrical value(s).");
 	UpdateCmd->AvailableForStates(G4State_Idle);
 
+
+        
+        
+        fBeamConfigDirectory = new G4UIdirectory("/NuMI/det/set");
+        fBeamConfigDirectory->SetGuidance("UI commands for changing geometry for the Nova/ME target");
+        
+        fDuratekShiftCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/duratekShift",this);
+        fDuratekShiftCmd->SetParameterName("DuratekShift",false);
+        fDuratekShiftCmd->SetGuidance("Set the change to the Duratek block for ME target");
+        fDuratekShiftCmd->SetDefaultValue(0.0*m);
+        
+        fTHBlockShiftCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/thblockShift",this);
+        fTHBlockShiftCmd->SetParameterName("THBlockShift",false);
+        fTHBlockShiftCmd->SetGuidance("Set the change to the z positions of T.H blocks for ME target");
+        fTHBlockShiftCmd->SetDefaultValue(0.0*m);
+
+        fDeltaOuterThicknessCmd
+            = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/deltaOuterThickness",this);
+        fDeltaOuterThicknessCmd->SetParameterName("DeltaOuterThickness",false);
+        fDeltaOuterThicknessCmd->SetGuidance("Change in the horn1 outer conductor thickness");
+        fDeltaOuterThicknessCmd->SetDefaultValue(0.0);
+
+        
+        fBafflePositionCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/bafflePosition", this);
+        fBafflePositionCmd->SetParameterName("BafflePositionX", "BafflePositionY", "BafflePositionZ",  false);
+        fBafflePositionCmd->SetGuidance("Set the baffle position");
+        
+        fTargetPositionCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/targetPosition", this);
+        fTargetPositionCmd->SetParameterName("targetPositionX", "targetPositionY", "targetPositionZ",  false);
+        fTargetPositionCmd->SetGuidance("Set the target position");
+        
+        fHorn1PositionCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn1Position", this);
+        fHorn1PositionCmd->SetParameterName("Horn1PositionX", "Horn1PositionY", "Horn1PositionZ", false);
+        fHorn1PositionCmd->SetGuidance("Set the horn1 position");
+        
+        fHorn2PositionCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn2Position", this);
+        fHorn2PositionCmd->SetParameterName("Horn2PositionX", "Horn2PositionY", "Horn2PositionZ", false);
+        fHorn2PositionCmd->SetGuidance("Set the horn2 position");
+        
+
+        fBaffleOuterRadiusCmd
+            = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleOuterRadius",this);
+        fBaffleOuterRadiusCmd->SetParameterName("BaffleOuterRadius",false);
+        fBaffleOuterRadiusCmd->SetGuidance("Set baffle outer radius");
+        fBaffleOuterRadiusCmd->SetDefaultValue(3.0*cm);
+        
+        fBaffleInnerRadiusCmd
+            = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleInnerRadius",this);
+        fBaffleInnerRadiusCmd->SetParameterName("BaffleInnerRadius",false);
+        fBaffleInnerRadiusCmd->SetGuidance("Set baffle inner radius");
+        fBaffleInnerRadiusCmd->SetDefaultValue(5.5*mm);
+        
+        fBaffleLengthCmd
+            = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleLength",this);
+        fBaffleLengthCmd->SetParameterName("BaffleLength",false);
+        fBaffleLengthCmd->SetGuidance("Set baffle length");
+        fBaffleLengthCmd->SetDefaultValue(1.5*m);
+        
+	fForcedOldTargetCmd = new G4UIcmdWithABool("/NuMI/det/set/forceOldTarget",this); 
+	fForcedOldTargetCmd->SetGuidance("Force to use the old target"); 
+	fForcedOldTargetCmd->SetParameterName("forceOldTarget",true); 
+	fForcedOldTargetCmd->SetDefaultValue(false); 
+        
 }
 
 NumiDetectorMessenger::~NumiDetectorMessenger() {
@@ -206,7 +273,13 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 
    
    if( command == RunPeriod )          { NumiData->SetRunPeriod(RunPeriod->GetNewIntValue(newValue)); }
-   if( command == BeamConfig )         { NumiData->SetBeamConfig(newValue); }
+   if( command == BeamConfig )         {
+       std::transform(newValue.begin(), newValue.end(), newValue.begin(),
+                      std::ptr_fun<int,int>(std::tolower));
+       
+       NumiData->SetBeamConfig(newValue);
+       NumiDetector->SetBeamType(newValue);
+   }
    if( command == UseCorrHornCurrent)  { NumiData->SetUseCorrHornCurrent(UseCorrHornCurrent->GetNewBoolValue(newValue)); }
    if( command == LengthOfWaterInTgt)  { NumiData->SetLengthOfWaterInTgt(LengthOfWaterInTgt->GetNewDoubleValue(newValue));}
 
@@ -278,8 +351,68 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 #ifndef FLUGG
       NumiDetector->UpdateGeometry();
 #endif
-      return;
    }
+
+   if (command == fDuratekShiftCmd) {
+       G4double shift = fDuratekShiftCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetDuratekShift(shift);
+       std::cout << __FILE__ << " " << fDuratekShiftCmd->GetCommandName() << " " << newValue
+                 << " " << shift
+                 << std::endl;
+   } else if (command == fTHBlockShiftCmd) {
+       G4double delta = fTHBlockShiftCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetBlockShift(delta);
+       std::cout << __FILE__ << " " << fTHBlockShiftCmd->GetCommandName() << " " << newValue
+                 << " " << delta
+                 << std::endl;
+   } else if (command == fDeltaOuterThicknessCmd) {
+       double delta = fDeltaOuterThicknessCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetDeltaOuterThickness(delta);
+
+   } else if (command == fBafflePositionCmd) {
+       G4ThreeVector bafflePos = fBafflePositionCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetBafflePosition(bafflePos);
+       std::cout << __FILE__ << " " << fBafflePositionCmd->GetCommandName() << " " << newValue
+                 << " " << bafflePos
+                 << std::endl;
+   } else if (command == fTargetPositionCmd) {
+       G4ThreeVector targetPos = fTargetPositionCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetTargetPosition(targetPos);
+       std::cout << __FILE__ << " " << fTargetPositionCmd->GetCommandName() << " " << newValue
+                 << " " << targetPos
+                 << std::endl;
+   } else if (command == fHorn1PositionCmd) {
+       G4ThreeVector horn1Pos = fHorn1PositionCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetHorn1Position(horn1Pos);
+       std::cout << __FILE__ << " " << fHorn1PositionCmd->GetCommandName() << " " << newValue
+                 << " " << horn1Pos
+                 << std::endl;
+   } else if (command == fHorn2PositionCmd) {
+       G4ThreeVector horn2Pos = fHorn2PositionCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetHorn2Position(horn2Pos);
+       std::cout << __FILE__ << " " << fHorn2PositionCmd->GetCommandName() << " " << newValue
+                 << " " << horn2Pos
+                 << std::endl;
+   } else if (command == fBaffleOuterRadiusCmd) {
+       double Rout = fBaffleOuterRadiusCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetBaffleOuterRadius(Rout);
+    
+   } else if (command == fBaffleInnerRadiusCmd) {
+       double Rin = fBaffleInnerRadiusCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetBaffleInnerRadius(Rin);
+    
+   } else if (command == fBaffleLengthCmd) {
+       double length = fBaffleLengthCmd->GetNewDoubleValue(newValue);
+       NumiDetector->SetBaffleLength(length);
+       
+   } else if (command == fForcedOldTargetCmd) {
+       G4bool forced = fForcedOldTargetCmd->GetNewBoolValue(newValue);
+       NumiDetector->SetForcedOldTarget(forced);
+   } else {}
+      
+   
+   return;
+
    
 }
 	
