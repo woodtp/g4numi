@@ -12,6 +12,7 @@ class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithADouble;
 class G4UIcmdWithoutParameter;
 class G4UIcmdWithABool;
+class G4UIcmdWith3VectorAndUnit;
 
 class NumiDetectorMessenger: public G4UImessenger {
 
@@ -49,6 +50,24 @@ private:
 
    //G4UIcmdWithAnInteger*     NbLayersCmd;    
    G4UIcmdWithoutParameter*    UpdateCmd;
+
+    G4UIdirectory* fBeamConfigDirectory;
+    G4UIcmdWithAString* fBeamType;
+    G4UIcmdWithADoubleAndUnit* fDuratekShiftCmd;
+    G4UIcmdWithADoubleAndUnit* fTHBlockShiftCmd;
+    G4UIcmdWithADoubleAndUnit* fDeltaOuterThicknessCmd;
+
+    
+    G4UIcmdWith3VectorAndUnit* fBafflePositionCmd;
+    G4UIcmdWith3VectorAndUnit* fTargetPositionCmd;
+    G4UIcmdWith3VectorAndUnit* fHorn1PositionCmd;
+    G4UIcmdWith3VectorAndUnit* fHorn2PositionCmd;
+
+    G4UIcmdWithADoubleAndUnit* fBaffleOuterRadiusCmd;
+    G4UIcmdWithADoubleAndUnit* fBaffleInnerRadiusCmd;
+    G4UIcmdWithADoubleAndUnit* fBaffleLengthCmd;
+    
+    G4UIcmdWithABool* fForcedOldTargetCmd;
 };
 
 #endif
