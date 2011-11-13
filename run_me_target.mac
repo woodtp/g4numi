@@ -1,0 +1,54 @@
+# Don't terminate the program if G4 throws exceptions
+/control/suppressAbortion 2
+
+/NuMI/run/DebugLevel 0 
+
+/NuMI/run/useNuBeam true
+
+# Currently run period is defined only for LE beam
+/NuMI/det/RunPeriod 0 
+
+/NuMI/det/UseCorrHornCurrent false
+
+# Commands needed by the ME simulation are between the lines
+#-------------------------------------------------------------
+# For ME simulation, don't change 000z. It will not do anything, please
+# change the target position explicitly by using the 'targetPosition' command
+/NuMI/det/BeamConfig ME000z200i
+/NuMI/det/set/horn1Position 0 0 3 cm
+/NuMI/det/set/horn2Position 0 0 1900 cm
+/NuMI/det/set/bafflePosition 0 0 -380 cm
+/NuMI/det/set/targetPosition 0 0 -143.3 cm
+
+/NuMI/det/set/deltaOuterThickness 0.9525 cm
+/NuMI/det/set/duratekShift 4.5 m
+/NuMI/det/set/thblockShift 4.5 m
+
+/NuMI/det/set/baffleInnerRadius 6.5 mm
+
+# Set this parameter to 'true' if want to use the old NuMI target in the
+# ME configuration
+#/NuMI/det/set/forceOldTarget true
+
+#-------------------------------------------------------------
+
+/NuMI/output/outputNuNtuple true
+
+/NuMI/output/setNuNtupleFile numi-ntuple-newtarget
+
+
+
+
+
+/NuMI/det/update
+
+
+/NuMI/rndm/setRndmSeed 1234567
+
+/NuMI/run/setRunID 8000
+
+/run/beamOn 100
+
+
+
+
