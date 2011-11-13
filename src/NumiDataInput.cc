@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.6 2011/06/01 04:25:03 kordosky Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.7 2011/11/13 22:31:45 ltrung Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -990,6 +990,155 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     det_far_name.push_back(detNameFar[ii]);
   }
 
+     // =================================================
+  // Nova Medium Energy Target
+  // =================================================
+
+  //  48 Target segments 
+  // + 1 Budal VFHS (Vertical Fin for Horizontal Scan)
+  // + 1 Budal HFVS (Horizontal Fin for Vertical Scan)
+
+  // Martens 3/26/10
+  // Change the target width to 7.4 mm
+  pSurfChk = true;
+  // TargetDxdz           = 0.0; // doesn't
+  // TargetDydz           = 0.0; // work properly yet
+  TargetSegLength      = 24.0*mm;
+  TargetSegWidth       = 7.4*mm;
+  TargetSegHeight      = 63.0*mm;
+  TargetSegPitch       = 0.5*mm;
+  TargetGraphiteHeight = 150.0*mm;
+  // TargetEndRounded     = true;
+  // TargetSegmentNo      = 48;
+
+  BudalVFHSLength      = TargetSegLength;
+  BudalVFHSWidth       = TargetSegWidth;
+  BudalVFHSHeight      = TargetSegHeight;
+  BudalVFHSPitch       = 4.5*mm;
+  BudalVFHSEndRounded  = TargetEndRounded;
+
+  BudalHFVSLength      = TargetSegLength;
+  BudalHFVSWidth       = TargetSegWidth;
+  BudalHFVSHeight      = TargetSegHeight;
+  BudalHFVSPitch       = 5.0*mm;
+  BudalHFVSEndRounded  = TargetEndRounded;
+
+  // The material "Target" is defined in NumiMaterials.cc
+  // using these properties
+  // TargetA              = 12.01*g/mole;
+  // TargetZ              = 6.0;
+  // TargetDensity        = 1.78*g/cm3;
+
+  //  Z=4.,A=9.01*g/mole, density=1.848*g/cm3
+  //Be Target 
+  //TargetA              = 9.01*g/mole;
+  //TargetZ              = 4.0;
+  //TargetDensity        = 1.848*g/cm3;
+
+  // Default location of the Target wrt the MCZERO location
+  // Downstream end of target is fixed at -20 cm with respect to MCZERO
+  // MCZERO is at location (0,0,0) in the ROCK volume.
+  // Work upstream from there to find the upstream end of the Target
+  TotalTargetLength =   
+    TargetSegmentNo*TargetSegLength 
+    + (TargetSegmentNo-1)*TargetSegPitch 
+    + BudalVFHSLength + BudalVFHSPitch 
+    + BudalHFVSLength + BudalHFVSPitch;
+  // TargetX0           = 0.0;
+  // TargetY0           = 0.0;
+  // TargetZ0           = (-20*cm - TotalTargetLength) + TargetConfigZ;
+  // Allows TARGETZ to shift position of the target
+
+  G4cout << "TargetZ0 = " << TargetZ0/cm << " cm. (Should be equal to -143.3 cm for the NOvA design.)" << G4endl;;
+
+
+  // The distance between the downstream end of the target and the
+  // downstream canister flange is 8 cm.
+  // The centerline of the target canister is 4.15 cm below the beamline 
+  TargetEndtoDnFlange = 8.0*cm;
+  TargetCanisterCenterOffset = -4.15*cm;
+
+  // The X0, YO, and Z0 for the flanges and cansiter are with respect to the
+  // the canister center for X0 and Y0 and the start of the target material for Z0 
+  // X0 and Y0 are the locations of the center of the volume, and Z0 is the location of the upstream end.
+  TargetDnFlangeLength = 2.5*cm;
+  TargetDnFlangeOutRad = 15.0*cm;
+  TargetDnFlangeX0     = 0.0;
+  TargetDnFlangeY0     = TargetCanisterCenterOffset;
+  TargetDnFlangeZ0     = TotalTargetLength + TargetEndtoDnFlange;
+
+  // Part of downstream flange is cutout to remove material
+  // Part of downstream flange is cutout for the Be window
+  TargetDnFlangeCutoutLength = 1.75*cm;
+  TargetDnBeWindowRadius     = 60*mm;
+  TargetDnBeWindowLength     = 1*mm;
+
+
+  // The body of the target canister is modeled with three layers 
+  // to approximate the actual geometry given in nova-doc 3681-v3 :
+  //   The outer shell is 3mm thick aluminum
+  TargetOutsideCasingOutRad = 15.0*cm;
+  TargetOutsideCasingInRad  = 14.7*cm;
+  TargetCasingWaterOutRad   = TargetOutsideCasingInRad;
+  TargetCasingWaterInRad    = 13.37*cm;
+  TargetInsideCasingOutRad  = TargetCasingWaterInRad;
+  TargetInsideCasingInRad   = 12.3*cm;
+
+  TargetCasingLength = 145*cm;
+  TargetCasingX0     = 0.0;
+  TargetCasingY0     = TargetCanisterCenterOffset;
+  TargetCasingZ0     = TargetDnFlangeZ0 - TargetCasingLength;
+
+
+  // Upstream flange
+  TargetUpFlangeLength = 2.5 * cm;
+  TargetUpFlangeOutRad = 15.0 * cm;
+  TargetUpFlangeX0     = 0.0;
+  TargetUpFlangeY0     = TargetCanisterCenterOffset;
+  TargetUpFlangeZ0     = TargetCasingZ0 - TargetUpFlangeLength;
+
+
+  // Upstream Be window flange
+  TargetUpBeFlangeLength = 0.5*in ;
+  TargetUpBeFlangeOutRad = 2.73*in / 2.0;
+  TargetUpBeFlangeX0 = 0.0;
+  TargetUpBeFlangeY0 = 0.0; 
+  TargetUpBeFlangeZ0 =  TargetUpFlangeZ0 - TargetUpBeFlangeLength;
+
+  TargetUpBeFlangeCutoutLength = 0.25*in;
+  TargetUpBeFlangeCutoutRadius = 1.75/2.0*in;
+
+  TargetUpBeWindowRadius = 0.5*in;
+  TargetUpBeWindowLength = 0.01*in;
+
+  // The target graphite material is clamped between the pressing plate and cooling plate 
+  // Pressing plate 
+  PressingPlateLength = TotalTargetLength;
+  PressingPlateHeight = TargetGraphiteHeight - TargetSegHeight;
+  PressingPlateWidth  = 20.0*mm;
+  PressingPlateX0     = -PressingPlateWidth/2.0 - TargetSegWidth/2.0;
+  PressingPlateY0     = -PressingPlateHeight/2.0 -TargetSegHeight + TargetSegWidth/2.0;
+  PressingPlateZ0     = 0.0;
+
+  PressingPlateCutoutWidth  = 5.0*mm;
+  PressingPlateCutoutHeight = 60.0*mm;
+
+  // Cooling plate
+  CoolingPlateLength = TotalTargetLength;
+  CoolingPlateHeight = PressingPlateHeight;
+  CoolingPlateWidth  = 20.0*mm;
+  CoolingPlateX0     = CoolingPlateWidth/2.0 + TargetSegWidth/2.0;
+  CoolingPlateY0     = -CoolingPlateHeight/2.0 - TargetSegHeight + TargetSegWidth/2.0;
+  CoolingPlateZ0     = 0.0;
+
+  CoolingPlateCutoutWidth  = PressingPlateCutoutWidth;
+  CoolingPlateCutoutHeight = PressingPlateCutoutHeight;
+
+  // The water cooling runs through the cooling plate
+  CoolingWaterPipeOutRad = 5.0*mm;
+  CoolingWaterPipeX0     = 0.0*mm;
+  CoolingWaterPipeY0     = CoolingPlateCutoutHeight/2.0 + (CoolingPlateHeight - CoolingPlateCutoutHeight)/4.0;
+
 
 
   NumiDataInput::Print();
@@ -1042,7 +1191,7 @@ void NumiDataInput::Print()
              << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
              << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
              << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl
-	     << " Decay Pipe Helium                           = " << HeInDecayPipe<<G4endl;
+	     << " Decay Pipe Helium                           = " << std::boolalpha << HeInDecayPipe<<G4endl;
       
       if(fUseDetailedProtonBeam)
       {
@@ -1081,7 +1230,8 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    std::string::size_type size_horn;
 
    vstring_t tgtvec;
-   tgtvec.push_back("LE"); tgtvec.push_back("le");
+   tgtvec.push_back("le");
+   tgtvec.push_back("me");
 
    for(vstring_t::const_iterator git = tgtvec.begin(); git != tgtvec.end(); ++git)
    {
@@ -1254,7 +1404,7 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
    }
   
 
-   if(fUseCorrHornCurrent)
+   if(fUseCorrHornCurrent && fHornConfig == "le")
    {
       //
       //calibration corrections from MINOS-doc-1303
@@ -1297,7 +1447,7 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
 //---------------------------------------------------------------------------------
 G4bool NumiDataInput::SetHornConfig(G4String config)
 {
-   if(config != "LE" && config != "le")
+   if(config != "le" && config != "me")
    {
       G4cout << "NumiDataInput::SetHornConfig() - PROBLEM. Can't set horn configuration. "
              << "Valid horn configs are \"LE\" or \"le\"." 
