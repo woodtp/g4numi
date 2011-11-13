@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // Target hall chase and duratek blocks modifications by Zachary Barnett.
-// $Id: NumiTargetHall.cc,v 1.11.4.2 2010/10/29 16:32:52 mjerkins Exp $
+// $Id: NumiTargetHall.cc,v 1.11.4.3 2011/11/13 22:34:22 ltrung Exp $
 //----------------------------------------------------------------------
 #include "NumiDetectorConstruction.hh"
 
@@ -18,6 +18,16 @@
 void NumiDetectorConstruction::ConstructTargetHall()
 {
 
+        // Trung, 2011/20/21: Copy comment from NumiDataInput.cc.me_target
+        // Need to change the block positions for the Nova/ME target. Must be here,
+        // not in the constructor, to make sure /det/update work properly
+        // Mike Martens (Need to move Horn 2 by 9 meters downstream)
+    if (NumiData->THBlockNblock >=23) {
+        NumiData->THBlockZ0.at(21) =  1.15*m + fTHBlockShift;
+        NumiData->THBlockZ0.at(22) = 30.34*m + fTHBlockShift;
+        NumiData->THBlockZ0.at(23) = 12.00*m + fTHBlockShift*2;
+    }
+    
 //TGAR
   G4double TGAR_width=NumiData->TargetAreaWidth/2.;
   G4double TGAR_height=NumiData->TargetAreaHeight/2.;
@@ -113,11 +123,12 @@ void NumiDetectorConstruction::ConstructTargetHall()
     tempgnumiBC = new G4Box("sDuratekgnumiBC", 0.0531*m ,0.99625*m, NumiData->THBlockLength[0]/2);
     G4LogicalVolume *lvDuratekBlockgnumiBC = new G4LogicalVolume(tempgnumiBC, Fe, "lvDuratekBlockgnumiBC", 0, 0, 0);
 
-    tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*m,0.301475*m, 7.85*m);
+      // Mike Martens (Need to move Horn 2 by 9 meters downstream)
+    tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*m,0.301475*m, 7.85*m + fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD = new G4LogicalVolume(tempgnumiD, Fe, "lvDuratekBlockgnumiD", 0, 0,0);
     tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*m, 0.286475*m, (6/2)*m);
     G4LogicalVolume *lvDuratekBlockgnumiD3 = new G4LogicalVolume(tempgnumiD3, Fe, "lvDuratekBlockgnumiD3",0,0,0);
-    tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*m, 0.301475*m,15.349*m);
+    tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*m, 0.301475*m,15.349*m - fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD2 = new G4LogicalVolume(tempgnumiD2, Fe, "lvDuratekBlockgnumiD2",0,0,0);
 
 
