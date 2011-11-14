@@ -19,6 +19,7 @@
 // Interaction Physics Lists
 
 #include "QGSP.hh"
+#include "QGSP_BERT.hh"
 //#include "QGSC.hh"
 //#include "QBBC.hh"
 //#include "FTFC.hh"
@@ -50,8 +51,8 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(new NumiDetectorConstruction);
 
   // Initialize Physics Lists
-  QGSP * theQGSP = new QGSP;
-  runManager->SetUserInitialization(theQGSP);
+  QGSP_BERT* physicsList = new QGSP_BERT;
+  runManager->SetUserInitialization(physicsList);
 
 #ifdef G4VIS_USE
   // Visualization, if you choose to have it!
