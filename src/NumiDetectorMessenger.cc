@@ -173,7 +173,7 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 
         
         
-        fBeamConfigDirectory = new G4UIdirectory("/NuMI/det/set");
+        fBeamConfigDirectory = new G4UIdirectory("/NuMI/det/set/");
         fBeamConfigDirectory->SetGuidance("UI commands for changing geometry for the Nova/ME target");
         
         fDuratekShiftCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/duratekShift",this);
@@ -258,6 +258,20 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
 
 	delete detDir;
 	delete NumiDir;
+
+        delete fBeamConfigDirectory;
+        delete fDuratekShiftCmd;
+        delete fTHBlockShiftCmd;
+        delete fDeltaOuterThicknessCmd;
+        delete fBafflePositionCmd;
+        delete fTargetPositionCmd;
+        delete fHorn1PositionCmd;
+        delete fHorn2PositionCmd;
+        delete fBaffleOuterRadiusCmd;
+        delete fBaffleInnerRadiusCmd;
+        delete fBaffleLengthCmd;
+        delete fForcedOldTargetCmd;
+        
 }
 
 
@@ -356,15 +370,11 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    if (command == fDuratekShiftCmd) {
        G4double shift = fDuratekShiftCmd->GetNewDoubleValue(newValue);
        NumiDetector->SetDuratekShift(shift);
-       std::cout << __FILE__ << " " << fDuratekShiftCmd->GetCommandName() << " " << newValue
-                 << " " << shift
-                 << std::endl;
+
    } else if (command == fTHBlockShiftCmd) {
        G4double delta = fTHBlockShiftCmd->GetNewDoubleValue(newValue);
        NumiDetector->SetBlockShift(delta);
-       std::cout << __FILE__ << " " << fTHBlockShiftCmd->GetCommandName() << " " << newValue
-                 << " " << delta
-                 << std::endl;
+
    } else if (command == fDeltaOuterThicknessCmd) {
        double delta = fDeltaOuterThicknessCmd->GetNewDoubleValue(newValue);
        NumiDetector->SetDeltaOuterThickness(delta);
@@ -372,27 +382,19 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    } else if (command == fBafflePositionCmd) {
        G4ThreeVector bafflePos = fBafflePositionCmd->GetNew3VectorValue(newValue);
        NumiDetector->SetBafflePosition(bafflePos);
-       std::cout << __FILE__ << " " << fBafflePositionCmd->GetCommandName() << " " << newValue
-                 << " " << bafflePos
-                 << std::endl;
+
    } else if (command == fTargetPositionCmd) {
        G4ThreeVector targetPos = fTargetPositionCmd->GetNew3VectorValue(newValue);
        NumiDetector->SetTargetPosition(targetPos);
-       std::cout << __FILE__ << " " << fTargetPositionCmd->GetCommandName() << " " << newValue
-                 << " " << targetPos
-                 << std::endl;
+
    } else if (command == fHorn1PositionCmd) {
        G4ThreeVector horn1Pos = fHorn1PositionCmd->GetNew3VectorValue(newValue);
        NumiDetector->SetHorn1Position(horn1Pos);
-       std::cout << __FILE__ << " " << fHorn1PositionCmd->GetCommandName() << " " << newValue
-                 << " " << horn1Pos
-                 << std::endl;
+
    } else if (command == fHorn2PositionCmd) {
        G4ThreeVector horn2Pos = fHorn2PositionCmd->GetNew3VectorValue(newValue);
        NumiDetector->SetHorn2Position(horn2Pos);
-       std::cout << __FILE__ << " " << fHorn2PositionCmd->GetCommandName() << " " << newValue
-                 << " " << horn2Pos
-                 << std::endl;
+
    } else if (command == fBaffleOuterRadiusCmd) {
        double Rout = fBaffleOuterRadiusCmd->GetNewDoubleValue(newValue);
        NumiDetector->SetBaffleOuterRadius(Rout);
