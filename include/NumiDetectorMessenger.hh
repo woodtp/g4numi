@@ -52,7 +52,6 @@ private:
    G4UIcmdWithoutParameter*    UpdateCmd;
 
     G4UIdirectory* fBeamConfigDirectory;
-    G4UIcmdWithAString* fBeamType;
     G4UIcmdWithADoubleAndUnit* fDuratekShiftCmd;
     G4UIcmdWithADoubleAndUnit* fTHBlockShiftCmd;
     G4UIcmdWithADoubleAndUnit* fDeltaOuterThicknessCmd;
