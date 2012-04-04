@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.7 2011/08/03 00:43:55 mjerkins Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.8 2012/04/04 19:12:36 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -9,7 +9,6 @@
 #include <iomanip>
 #include <algorithm>
 #include <stdlib.h>
-#include <map.h>
 
 //Root 
 #include <TSystem.h>        // ROOT head file for a generic interface to the OS
