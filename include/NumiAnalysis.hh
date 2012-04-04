@@ -17,7 +17,6 @@
 #include "G4ios.hh"
 #include "G4TrajectoryContainer.hh"
 
-#include <map.h>
 #include <map>
 #include <vector>
 

@@ -13,7 +13,6 @@
 #include "G4ParticleDefinition.hh"
 #include "G4Element.hh"
 
-#include <map.h>
 #include <map>
 #include <vector>
 
