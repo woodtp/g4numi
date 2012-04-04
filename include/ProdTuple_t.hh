@@ -29,6 +29,7 @@ class ProdTuple_t
   Double_t XF[maxPart];
   Double_t PT[maxPart];
   Int_t PartTypes[12];
+  Int_t InterType[maxPart]; //1: Hadronic Inelastic,   2: Hadronic Elastic
  
  private:
    ClassDef(ProdTuple_t , 1)
