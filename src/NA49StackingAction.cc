@@ -35,12 +35,13 @@ NA49StackingAction::ClassifyNewTrack(const G4Track* aTrack)
  EvtManager = G4EventManager::GetEventManager();
  NA49EvtAct = (NA49EventAction*)(EvtManager -> GetUserEventAction());
  const G4ParticleDefinition* pd = aTrack->GetDefinition();
- if (aTrack->GetTrackStatus() == fAlive) 
-   if( (1 == aTrack->GetParentID()) && (aTrack->GetCreatorProcess()->GetProcessName()=="ProtonInelastic") )
-    { if((pd->GetPDGEncoding())<10000)NA49EvtAct->AddTrack(aTrack);}
+ Int_t proc = 0;
 
- //if(aTrack->GetTrackID() == 1) return status;
+ if ((aTrack->GetTrackStatus() == fAlive) && (1 == aTrack->GetParentID())){
 
+   if(proc = (aTrack->GetCreatorProcess()->GetProcessName()=="ProtonInelastic") || (aTrack->GetCreatorProcess()->GetProcessName()=="NeutronInelastic"))NA49EvtAct->AddTrack(aTrack,1);
+   if(aTrack->GetCreatorProcess()->GetProcessName()=="hElastic")NA49EvtAct->AddTrack(aTrack,2);
+}
   //stack or delete secondaries
  if (killSecondary)      status = fKill;
 
