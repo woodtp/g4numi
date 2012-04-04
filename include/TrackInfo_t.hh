@@ -19,6 +19,8 @@ class TrackInfo_t
 
   Int_t PDGcode;
   Double_t massPart;
+  Int_t interType;
+ 
  private:
   ClassDef(TrackInfo_t ,1)
 };
