@@ -23,9 +23,10 @@ setup_beamsim(){
     fi
 	setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
 	setup -f Linux+2.6 -q GCC_3_4_6 root v5_22_00j
- 	setup python # sets up the local version....
+# 	setup python # sets up the local version....
 	setup g4photon
 	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++"
+        export LD_LIBRARY_PATH="${PWD}/tmpSolution:${LD_LIBRARY_PATH}"
 
 # people who just want to run g4numi probably do not 
 # need to set G4WORKDIR
