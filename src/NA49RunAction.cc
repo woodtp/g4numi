@@ -2,9 +2,9 @@
 #include "NA49RunAction.hh"
 #include "G4UImanager.hh"
 #include "G4VVisManager.hh"
-#include "G4NistManager.hh"
 #include "G4Element.hh"
 #include "NA49Analysis.hh"
+#include "Randomize.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -22,6 +22,12 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
 {
   G4int id = aRun->GetRunID();
   G4cout << "### Run " << id << " start" << G4endl;
+  nEvts = aRun->GetNumberOfEventToBeProcessed();
+
+  const G4long* table_entry;
+  table_entry = CLHEP::HepRandom::getTheSeeds();
+  G4long id0 = table_entry[0];
+  G4long id1 = table_entry[1];
 
 #ifdef G4VIS_USE
   G4UImanager* UI = G4UImanager::GetUIpointer();
@@ -34,8 +40,10 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
   }
 #endif
 
-NA49Analysis* analysis = NA49Analysis::getInstance();
-  analysis->book();
+  
+ NA49Analysis* analysis = NA49Analysis::getInstance();
+  
+  analysis->book(id0,id1);
 
 }
 
@@ -51,6 +59,8 @@ void NA49RunAction::EndOfRunAction(const G4Run*)
 #endif
 
 NA49Analysis* analysis = NA49Analysis::getInstance();
+ analysis->GetRunActInfo(nEvts);
+
   analysis->finish();
 
 }
