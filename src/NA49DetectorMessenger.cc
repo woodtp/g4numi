@@ -100,6 +100,8 @@ void NA49DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
    Detector->SetWorldMaterial(newValue);
   else if( command == rCmd ) 
     Detector->SetTargetRadius(rCmd->GetNewDoubleValue(newValue));
+  else if( command == lCmd ) 
+    Detector->SetTargetLenght(rCmd->GetNewDoubleValue(newValue));
   else if( command == updateCmd )
     Detector->UpdateGeometry();
 }
