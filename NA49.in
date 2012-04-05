@@ -1,15 +1,19 @@
 
-
-/control/verbose 0
-/run/verbose 0
+/control/verbose  0
+/run/verbose      0
 /tracking/verbose 0
 
-/testhadr/Physics           QGSP
-#/testhadr/Physics          FTFP_BERT
+/testhadr/Physics   QGSP
+/testhadr/TargetMat G4_C
+/testhadr/TargetRadius 3 cm
+/testhadr/TargetLength 1.8 cm 
+
 /testhadr/Update
-
 /run/initialize
+/random/setSeeds 17 31
 
-/gun/particle proton
-/gun/energy 158.003 GeV
+#/testhadr/DebugEvent 34
+
+/gun/particle neutron
+/gun/energy 55 MeV
 /run/beamOn 10000
