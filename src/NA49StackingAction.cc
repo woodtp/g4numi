@@ -34,7 +34,6 @@ NA49StackingAction::ClassifyNewTrack(const G4Track* aTrack)
  G4ClassificationOfNewTrack status = fUrgent;
  EvtManager = G4EventManager::GetEventManager();
  NA49EvtAct = (NA49EventAction*)(EvtManager -> GetUserEventAction());
- const G4ParticleDefinition* pd = aTrack->GetDefinition();
  Int_t proc = 0;
 
  if ((aTrack->GetTrackStatus() == fAlive) && (1 == aTrack->GetParentID())){
