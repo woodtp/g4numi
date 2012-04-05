@@ -13,6 +13,8 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4SolidStore.hh"
 
+#include "G4HadronicProcessStore.hh"
+
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -21,9 +23,10 @@
 
 #include "NA49TargetSD.hh"
 #include "NA49CheckVolumeSD.hh"
+#include "NA49Analysis.hh"
 #include "G4SDManager.hh"
 #include "G4NistManager.hh"
-
+#include "G4ParticleTable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -35,8 +38,10 @@ NA49DetectorConstruction::NA49DetectorConstruction()
   detectorMessenger = new NA49DetectorMessenger(this);
 
   radius = 0.3*cm;
+  targetZ = 4.0*0.5*cm; 
 
-  targetMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_GRAPHITE");
+  //  targetMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_GRAPHITE");
+  targetMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_C");
   worldMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
 
   // Prepare sensitive detectors
@@ -65,13 +70,14 @@ G4VPhysicalVolume* NA49DetectorConstruction::Construct()
   // Sizes
   G4double checkR  = radius + mm;
   G4double worldR  = radius + cm;
-  G4double targetZ = 0.7*cm*0.5 ; 
   G4double checkZ  = targetZ + mm;
   G4double worldZ  = targetZ + cm;
 
   G4int nSlices    = 30;
   G4double sliceZ  = targetZ/G4double(nSlices);
 
+
+  
   //
   // World
   //
@@ -115,6 +121,17 @@ G4VPhysicalVolume* NA49DetectorConstruction::Construct()
 
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 
+  //for ntuple:
+  NA49Analysis* analysis = NA49Analysis::getInstance();
+  std::vector<Double_t> vDCinfo;
+  vDCinfo.push_back(2.*targetZ);
+  vDCinfo.push_back(radius);
+  G4double dens  =  targetMaterial->GetDensity()/(g/cm3);
+  G4String nameM =  targetMaterial->GetName();
+ 
+ 
+  vDCinfo.push_back(dens);
+  analysis->GetDetConstInfo(vDCinfo,targetMaterial);
   return world;
 }
 
@@ -124,7 +141,7 @@ void NA49DetectorConstruction::SetTargetMaterial(const G4String& mat)
 {
   // search the material by its name
   G4Material* material = G4NistManager::Instance()->FindOrBuildMaterial(mat);
-
+ 
   if (material && material != targetMaterial) {
     targetMaterial = material;
     if(logicTarget) logicTarget->SetMaterial(targetMaterial);
@@ -163,4 +180,12 @@ void NA49DetectorConstruction::SetTargetRadius(G4double val)
   } 
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void NA49DetectorConstruction::SetTargetLenght(G4double val)  
+{
+  if(val > 0.0) {
+    targetZ = val*0.5;
+    G4RunManager::GetRunManager()->GeometryHasBeenModified();
+  } 
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
