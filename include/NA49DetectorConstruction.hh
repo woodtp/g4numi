@@ -30,6 +30,7 @@ public:
   void SetTargetMaterial(const G4String&);
 
   void SetTargetRadius(G4double val);
+  void SetTargetLenght(G4double val);
 
   void UpdateGeometry();
 
@@ -39,6 +40,7 @@ private:
   NA49DetectorConstruction(const NA49DetectorConstruction&);
 
   G4double radius;
+  G4double targetZ;
 
   G4Material*  targetMaterial;
   G4Material*  worldMaterial;
