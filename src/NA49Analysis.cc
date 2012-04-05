@@ -25,7 +25,8 @@
 #include "G4TransportationManager.hh"
 #include "G4Run.hh"
 #include "G4Proton.hh"
-
+#include "G4HadronicProcessStore.hh"
+#include "G4NistManager.hh"
 //g4na49
 #include "NA49Analysis.hh"
 //#include "ProdTuple_t.hh"
@@ -55,15 +56,14 @@ NA49Analysis* NA49Analysis::getInstance()
   return instance;
 }
 //------------------------------------------------------------------------------------
-void NA49Analysis::book()
+void NA49Analysis::book(G4long id0,G4long id1)
 {
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
-    sprintf(NtupleFileName,"QGSP_NA49_%04d.root",pRunManager->GetCurrentRun()->GetRunID());
-    FileNtuple = new TFile(NtupleFileName, "RECREATE","pion from p+C ntuple");
+    sprintf(NtupleFileName,"QGSP_nTarget_%04d.root",int(id0));
+
+    FileNtuple = new TFile(NtupleFileName, "RECREATE","hadronic interactions hadron-Target");
    
-    //   FileNtuple->cd();
-    
-    ProdTree = new TTree("pCinfo","g4NA49 info from p+C");
+    ProdTree = new TTree("nTarget","neutron_Target info");
     ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
     ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
     ProdTree->Branch("intType", &g4Proddata.InterType,"IntType[NPart]/I");
@@ -72,7 +72,18 @@ void NA49Analysis::book()
     ProdTree->Branch("p",  &g4Proddata.P,"P[NPart][4]/D");
     ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
     ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
-   
+    
+    //Get and store general information about this run: 
+    HeaderTree = new TTree("RunInfo","Run Info");
+    HeaderTree->Branch("inelasticXS",&inelasticXS,"inelXS/D");
+    HeaderTree->Branch("elasticXS",&elasticXS,"elXS/D");
+    HeaderTree->Branch("tickness",&tickness,"tickness/D");
+    HeaderTree->Branch("radius",&radius,"radius/D");
+    HeaderTree->Branch("density",&rho,"density/D");
+    HeaderTree->Branch("material",&material);
+    HeaderTree->Branch("enerPrimGen",&enerPrimGen,"enerPrimGen/D");
+    HeaderTree->Branch("PartName",&PartName);
+    HeaderTree->Branch("numberEvts",&numberEvts,"numberEvts/I");
 }
 
 
@@ -82,6 +93,7 @@ void NA49Analysis::finish()
     FileNtuple->cd();
      
     ProdTree->Write();
+    WriteHeader();
     FileNtuple->Close();
     delete FileNtuple;
 }
@@ -111,9 +123,7 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
  //Variables for PT, XF;
  Double_t XF,PT,Ecm,PL,beta,gamma,massPart,Pxx,Pyy,Pzz,PartE;
  Double_t BeamEnergy = 158.003*1000.;//Mev
- //Double_t massProton = 0.938242046*1000.;//MeV
  Double_t massProton = 0.938*1000.;//MeV
- // Double_t massCarbon = 11.17802*1000.;//MeV
 
   std::vector<TrackInfo_t>::iterator iteTrackInfo = trackInfoVec.begin();
    for(;iteTrackInfo != trackInfoVec.end();iteTrackInfo++){  
@@ -182,5 +192,39 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
 void NA49Analysis::WriteNtuple(){
     
     ProdTree->Fill();
+    
+}
+
+void NA49Analysis::GetDetConstInfo(std::vector<Double_t> DCinfo,G4Material* mat){
+  tickness = DCinfo[0];
+  radius   = DCinfo[1];
+  rho      = DCinfo[2];
+  mate = mat;
+  material = mate->GetName();
+}
+
+void NA49Analysis::GetPrimGenInfo(Double_t enerPrim,G4ParticleDefinition* Part){
+  enerPrimGen = enerPrim; 
+  particle    = Part;
+  PartName    = particle->GetParticleName();
+}
+
+void NA49Analysis::GetRunActInfo(Int_t nevt){
+  numberEvts = nevt;
+}
+
+void NA49Analysis::WriteHeader(){
+
+  //XS:
+  G4HadronicProcessStore* store = G4HadronicProcessStore::Instance();
+  int pos = material.find("_");
+  std::string elemName = material.substr(pos+1);
+  const G4Element* elm  = G4NistManager::Instance()->FindOrBuildElement(elemName);
+  inelasticXS = 1.e25*(store->GetInelasticCrossSectionPerAtom(particle,enerPrimGen,elm)); 
+  elasticXS   = 1.e25*(store->GetElasticCrossSectionPerAtom(particle,enerPrimGen,elm));
+  
+  HeaderTree->Fill();
+  HeaderTree->Write();
+
     
 }
