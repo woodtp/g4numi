@@ -25,6 +25,8 @@ setup_beamsim(){
 	setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
 	setup -f Linux+2.6 -q GCC_3_4_6 root v5_22_00j
 	setup -f Linux+2.6-2.5 clhep v2_0_4_5
+	export BEAMSIM="${TOP}"
+	export G4NUMIVER="v4"
 # 	setup python # sets up the local version....
 	setup g4photon
 	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++"
