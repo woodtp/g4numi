@@ -25,11 +25,9 @@
 #include "G4TransportationManager.hh"
 #include "G4Run.hh"
 #include "G4Proton.hh"
-#include "G4HadronicProcessStore.hh"
-#include "G4NistManager.hh"
+
 //g4na49
 #include "NA49Analysis.hh"
-//#include "ProdTuple_t.hh"
 
 using namespace std;
 
@@ -58,32 +56,23 @@ NA49Analysis* NA49Analysis::getInstance()
 //------------------------------------------------------------------------------------
 void NA49Analysis::book(G4long id0,G4long id1)
 {
-  G4RunManager* pRunManager = G4RunManager::GetRunManager();
-    sprintf(NtupleFileName,"QGSP_nTarget_%04d.root",int(id0));
+  sprintf(NtupleFileName,"p_%dGeV_C_%04d.root",int(id0),int(id1));
 
-    FileNtuple = new TFile(NtupleFileName, "RECREATE","hadronic interactions hadron-Target");
+  //Uncomment, omplete the path for tuples and recompile: 
+  //sprintf(NtupleFileName,"/minerva/data/users/laliaga/HadProd/.../Tuples/p_%dGeV_C_%04d.root",id0,id1);
+
+  G4cout<<"==>>Using "<<id0<<" & "<<id1<<" as random generator numbers"<<G4endl; 
+
+  FileNtuple = new TFile(NtupleFileName, "RECREATE","hadron from had+C ntuple");   
+  ProdTree = new TTree("hCinfo","g4NA49 info from had+C");
+  
+  ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
+  ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
+  ProdTree->Branch("x",  &g4Proddata.X,"X[NPart][3]/D");
+  ProdTree->Branch("p",  &g4Proddata.P,"P[NPart][4]/D");
+  ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
+  ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
    
-    ProdTree = new TTree("nTarget","neutron_Target info");
-    ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
-    ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
-    ProdTree->Branch("intType", &g4Proddata.InterType,"IntType[NPart]/I");
-    ProdTree->Branch("part_types", &g4Proddata.PartTypes,"PartTypes[12]/I");
-    ProdTree->Branch("x",  &g4Proddata.X,"X[NPart][3]/D");
-    ProdTree->Branch("p",  &g4Proddata.P,"P[NPart][4]/D");
-    ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
-    ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
-    
-    //Get and store general information about this run: 
-    HeaderTree = new TTree("RunInfo","Run Info");
-    HeaderTree->Branch("inelasticXS",&inelasticXS,"inelXS/D");
-    HeaderTree->Branch("elasticXS",&elasticXS,"elXS/D");
-    HeaderTree->Branch("tickness",&tickness,"tickness/D");
-    HeaderTree->Branch("radius",&radius,"radius/D");
-    HeaderTree->Branch("density",&rho,"density/D");
-    HeaderTree->Branch("material",&material);
-    HeaderTree->Branch("enerPrimGen",&enerPrimGen,"enerPrimGen/D");
-    HeaderTree->Branch("PartName",&PartName);
-    HeaderTree->Branch("numberEvts",&numberEvts,"numberEvts/I");
 }
 
 
@@ -93,7 +82,6 @@ void NA49Analysis::finish()
     FileNtuple->cd();
      
     ProdTree->Write();
-    WriteHeader();
     FileNtuple->Close();
     delete FileNtuple;
 }
@@ -102,129 +90,49 @@ void NA49Analysis::finish()
 
 void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
 {
- G4RunManager* pRunManager = G4RunManager::GetRunManager();
- g4Proddata.NPart= trackInfoVec.size();
+  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+  g4Proddata.NPart= trackInfoVec.size();
 
- Int_t pdg_t;
- Int_t partNum   = 0;
- Int_t NPiPlus   = 0;
- Int_t NPiMinus  = 0;
- Int_t NPi0      = 0;
- Int_t NKPlus    = 0;
- Int_t NKMinus   = 0;
- Int_t NK0S      = 0;
- Int_t NK0L      = 0;
- Int_t NProtons  = 0; 
- Int_t NAProtons = 0; 
- Int_t NNeutrons = 0; 
- Int_t NANeutrons= 0;
- Int_t NOthers = 0;
-
- //Variables for PT, XF;
- Double_t XF,PT,Ecm,PL,beta,gamma,massPart,Pxx,Pyy,Pzz,PartE;
- Double_t BeamEnergy = 158.003*1000.;//Mev
- Double_t massProton = 0.938*1000.;//MeV
+  Int_t partNum   = 0;
+  Double_t XF,PT,Ecm,PL,beta,gamma,Pxx,Pyy,Pzz,PartE;
+  Double_t BeamEnergy = enerPrimGen; //got from Primary Generator
+  Double_t massProton = CLHEP::proton_mass_c2;
 
   std::vector<TrackInfo_t>::iterator iteTrackInfo = trackInfoVec.begin();
-   for(;iteTrackInfo != trackInfoVec.end();iteTrackInfo++){  
+  for(;iteTrackInfo != trackInfoVec.end();iteTrackInfo++){  
+    PartE = (*iteTrackInfo).Mom.E();
+    Pxx = (*iteTrackInfo).Mom.X();
+    Pyy = (*iteTrackInfo).Mom.Y();
+    Pzz = (*iteTrackInfo).Mom.Z();
+    PT    = sqrt(pow(Pxx,2.0)+pow(Pyy,2.0));
+    Ecm   = sqrt(2.0*pow(massProton,2.0)+2.*BeamEnergy*massProton);
+    beta  = sqrt(pow(BeamEnergy,2.0)-pow(massProton,2.0))/(BeamEnergy+massProton);
+    gamma = 1./sqrt(1.-pow(beta,2.0));
+    PL    = gamma*(Pzz-beta*PartE);    
+    XF    = 2.*PL/Ecm;
 
-     massPart = (*iteTrackInfo).massPart;
-     pdg_t = (*iteTrackInfo).PDGcode; 
-     Pxx   = (*iteTrackInfo).Mom.X();
-     Pyy   = (*iteTrackInfo).Mom.Y();
-     Pzz   = (*iteTrackInfo).Mom.Z();
-     PartE = (*iteTrackInfo).Mom.E();
-
-     PT    = sqrt(Pxx*Pxx+Pyy*Pyy);
-
-     Ecm   = sqrt(massProton*massProton+massProton*massProton+2.*BeamEnergy*massProton);
-
-     beta  = sqrt(BeamEnergy*BeamEnergy-massProton*massProton)/(BeamEnergy+massProton);
-     gamma = sqrt(1.-beta*beta);
-     PL    = gamma*(Pzz-beta*PartE);    
-     XF    = 2.*PL/Ecm;
+    g4Proddata.PDG[partNum] = (*iteTrackInfo).PDGcode;
+    g4Proddata.X[partNum][0]= (*iteTrackInfo).Pos.X();
+    g4Proddata.X[partNum][1]= (*iteTrackInfo).Pos.Y();
+    g4Proddata.X[partNum][2]= (*iteTrackInfo).Pos.Z();
+    g4Proddata.P[partNum][0]= Pxx;
+    g4Proddata.P[partNum][1]= Pyy;
+    g4Proddata.P[partNum][2]= Pzz;
+    g4Proddata.P[partNum][3]= PartE;
+    g4Proddata.PT[partNum]  = PT;
+    g4Proddata.XF[partNum]  = XF;
      
-     g4Proddata.PDG[partNum] = pdg_t;
-     g4Proddata.InterType[partNum] = (*iteTrackInfo).interType;
-     g4Proddata.X[partNum][0]= (*iteTrackInfo).Pos.X();
-     g4Proddata.X[partNum][1]= (*iteTrackInfo).Pos.Y();
-     g4Proddata.X[partNum][2]= (*iteTrackInfo).Pos.Z();
-     g4Proddata.P[partNum][0]= Pxx;
-     g4Proddata.P[partNum][1]= Pyy;
-     g4Proddata.P[partNum][2]= Pzz;
-     g4Proddata.P[partNum][3]= PartE;
-     g4Proddata.PT[partNum]  = PT;
-     g4Proddata.XF[partNum]  = XF;
-     
-
-     //Types of particles counter:
-     if(pdg_t ==  211)NPiPlus++;
-     if(pdg_t == -211)NPiMinus++; 
-     if(pdg_t ==  111)NPi0++; 
-     if(pdg_t ==  321)NKPlus++;
-     if(pdg_t == -321)NPiMinus++;  
-     if(pdg_t ==  310)NK0S++; 
-     if(pdg_t ==  130)NK0L++;  
-     if(pdg_t == 2212)NProtons++; 
-     if(pdg_t ==-2212)NAProtons++;
-     if(pdg_t == 2112)NNeutrons++;
-     if(pdg_t ==-2112)NANeutrons++;
-     if((3100<pdg_t && pdg_t<3400)||(-3400<pdg_t && pdg_t<-3100)||(pdg_t==221))NOthers++;
-     partNum++; 
+    partNum++; 
  }
-    
-   g4Proddata.PartTypes[0]=NPiPlus;
-   g4Proddata.PartTypes[1]=NPiMinus;
-   g4Proddata.PartTypes[2]=NPi0;
-   g4Proddata.PartTypes[3]=NKPlus;
-   g4Proddata.PartTypes[4]=NKMinus;
-   g4Proddata.PartTypes[5]=NK0S;
-   g4Proddata.PartTypes[6]=NK0L;
-   g4Proddata.PartTypes[7]=NProtons;
-   g4Proddata.PartTypes[8]=NAProtons;
-   g4Proddata.PartTypes[9]=NNeutrons;
-   g4Proddata.PartTypes[10]=NANeutrons;
-   g4Proddata.PartTypes[11]=NOthers;
-
- if (g4Proddata.NPart>0)WriteNtuple();
+     if (g4Proddata.NPart>0)WriteNtuple();
 }
-
-void NA49Analysis::WriteNtuple(){
-    
-    ProdTree->Fill();
-    
-}
-
-void NA49Analysis::GetDetConstInfo(std::vector<Double_t> DCinfo,G4Material* mat){
-  tickness = DCinfo[0];
-  radius   = DCinfo[1];
-  rho      = DCinfo[2];
-  mate = mat;
-  material = mate->GetName();
-}
-
 void NA49Analysis::GetPrimGenInfo(Double_t enerPrim,G4ParticleDefinition* Part){
   enerPrimGen = enerPrim; 
   particle    = Part;
-  PartName    = particle->GetParticleName();
+
 }
-
-void NA49Analysis::GetRunActInfo(Int_t nevt){
-  numberEvts = nevt;
-}
-
-void NA49Analysis::WriteHeader(){
-
-  //XS:
-  G4HadronicProcessStore* store = G4HadronicProcessStore::Instance();
-  int pos = material.find("_");
-  std::string elemName = material.substr(pos+1);
-  const G4Element* elm  = G4NistManager::Instance()->FindOrBuildElement(elemName);
-  inelasticXS = 1.e25*(store->GetInelasticCrossSectionPerAtom(particle,enerPrimGen,elm)); 
-  elasticXS   = 1.e25*(store->GetElasticCrossSectionPerAtom(particle,enerPrimGen,elm));
-  
-  HeaderTree->Fill();
-  HeaderTree->Write();
-
+void NA49Analysis::WriteNtuple(){
+    
+    ProdTree->Fill();
     
 }
