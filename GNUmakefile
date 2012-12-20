@@ -3,7 +3,7 @@
 # JPW. Fri Jul 25 10:39:58 CEST 2003
 # --------------------------------------------------------------
 
-name := g4numi
+name := g4na49
 
 G4TARGET := $(name)
 G4EXLIB := true
@@ -57,16 +57,17 @@ CPPFLAGS += -I$(G4INCLUDE)
 
 
 .PHONY: all
-all: g4numiCint lib  libg4numiDict bin 
+all: g4na49Cint lib  libg4na49Dict bin 
 	cp $(G4WORKDIR)/bin/Linux-g++/$(G4TARGET) .
 
 include $(G4INSTALL)/config/binmake.gmk
 
+
 CXXFLAGS_WITHOUT_O := $(filter-out -O% , $(CXXFLAGS))
 CXXFLAGS_WITHOUT_O := $(filter-out +O% , $(CXXFLAGS_WITHOUT_O))
 
-g4numiCint: include/data_t.hh include/hadmmtuple_t.hh include/draytupleSPB_t.hh include/Edep_t.hh include/draytupleMIB_t.hh include/absbkgtuple_t.hh include/zptuple_t.hh include/target_exit_t.hh Linkdef.h
-	rootcint -f ./src/g4numiCint.cc -c -I./include ../include/data_t.hh ../include/hadmmtuple_t.hh ../include/draytupleSPB_t.hh ../include/Edep_t.hh ../include/draytupleMIB_t.hh ../include/absbkgtuple_t.hh ../include/zptuple_t.hh ../include/target_exit_t.hh ../Linkdef.h
+g4na49Cint: include/ProdTuple_t.hh Linkdef2.h
+	rootcint -f ./src/g4na49Cint.cc -c -I./include ../include/ProdTuple_t.hh ../include/TrackInfo_t.hh ../Linkdef2.h
 
-libg4numiDict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/target_exit_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
-	gcc -m32 -g -shared -o libg4numiDict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/data_t.o   $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/hadmmtuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/target_exit_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4numi/g4numiCint.o
+libg4na49Dict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o
+	gcc -m32 -g -shared -o libg4na49Dict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/g4na49Cint.o
