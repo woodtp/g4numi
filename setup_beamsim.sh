@@ -4,7 +4,7 @@
 echo "You should run now setup_beamsim -w 1"
 setup_beamsim(){
     . "/grid/fermiapp/products/minerva/etc/setups.sh"
-    local TOP=${HOME}
+    local TOP=${PWD}
     local SETWDIR=0
     while getopts "w" opt
       do  case $opt in
@@ -24,10 +24,10 @@ setup_beamsim(){
         setup -f Linux+2.6-2.5 gcc v3_4_3
 	setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
 	setup -f Linux+2.6 -q GCC_3_4_6 root v5_22_00j
+	setup -f Linux+2.6-2.5 clhep v2_0_4_5
 # 	setup python # sets up the local version....
 	setup g4photon
 	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++"
-#        export LD_LIBRARY_PATH="${PWD}/tmpSolution:${LD_LIBRARY_PATH}"
 
 # people who just want to run g4numi probably do not 
 # need to set G4WORKDIR
