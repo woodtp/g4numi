@@ -63,8 +63,8 @@ void NA49Analysis::book(G4long id0,G4long id1)
 
   G4cout<<"==>>Using "<<id0<<" & "<<id1<<" as random generator numbers"<<G4endl; 
 
-  FileNtuple = new TFile(NtupleFileName, "RECREATE","hadron from had+C ntuple");   
-  ProdTree = new TTree("hCinfo","g4NA49 info from had+C");
+  FileNtuple = new TFile(NtupleFileName, "RECREATE","hadron from p+C ntuple");   
+  ProdTree = new TTree("pCinfo","g4NA49 info from p+C");
   
   ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
   ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
