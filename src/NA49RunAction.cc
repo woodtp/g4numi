@@ -2,6 +2,7 @@
 #include "NA49RunAction.hh"
 #include "G4UImanager.hh"
 #include "G4VVisManager.hh"
+#include "G4NistManager.hh"
 #include "G4Element.hh"
 #include "NA49Analysis.hh"
 #include "Randomize.hh"
@@ -22,7 +23,6 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
 {
   G4int id = aRun->GetRunID();
   G4cout << "### Run " << id << " start" << G4endl;
-  nEvts = aRun->GetNumberOfEventToBeProcessed();
 
   const G4long* table_entry;
   table_entry = CLHEP::HepRandom::getTheSeeds();
@@ -34,15 +34,12 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
 
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
 
-  if(pVVisManager)
-  {
+  if(pVVisManager){
     UI->ApplyCommand("/vis/scene/notifyHandlers");
   }
 #endif
 
-  
- NA49Analysis* analysis = NA49Analysis::getInstance();
-  
+NA49Analysis* analysis = NA49Analysis::getInstance();
   analysis->book(id0,id1);
 
 }
@@ -59,8 +56,6 @@ void NA49RunAction::EndOfRunAction(const G4Run*)
 #endif
 
 NA49Analysis* analysis = NA49Analysis::getInstance();
- analysis->GetRunActInfo(nEvts);
-
   analysis->finish();
 
 }

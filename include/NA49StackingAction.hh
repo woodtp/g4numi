@@ -7,7 +7,6 @@
 #include "G4ParticleDefinition.hh"
 #include "NA49Analysis.hh"
 
-class NA49StackingMessenger;
 class G4Track;
 class G4EventManager;
 class NA49EventAction;
@@ -27,8 +26,6 @@ public:
   G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track*);
     
 private:
-
-  NA49StackingMessenger*  stackMessenger;
 
   G4String                    pname;
   G4bool                      killSecondary;

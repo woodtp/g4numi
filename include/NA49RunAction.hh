@@ -22,7 +22,6 @@ public: // With description
 
   void EndOfRunAction(const G4Run*);
   // In this method bookHisto method is called in which histogramms are filled
-  int nEvts;
 
 };
 
