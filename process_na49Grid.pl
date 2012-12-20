@@ -14,7 +14,7 @@ use File::Basename;
 
 sub show_basic{
   print STDOUT "==============================================================================================\n";
-  print STDOUT "./process_na49Grid.pl [firstRun] [lastRun]  [Optional]\n";
+  print STDOUT "./process_na49Grid.pl [Momentum] [firstRun] [lastRun]  [Optional]\n";
   print STDOUT "                     <required> \n";
   print STDOUT "REQUIRED OPTIONS:\n\n";
   print STDOUT "   firstRun               : fisrt run number to process \n";
@@ -31,9 +31,15 @@ sub show_usage{
   print STDOUT "==============================================================================================\n";
 }
 
+$inc_mom   = $ARGV[0];
+$first_run = $ARGV[1];
+$last_run  = $ARGV[2];
 
-$first_run    = $ARGV[0];
-$last_run   = $ARGV[1];
+$firstseed = $inc_mom;
+
+$inc_mom = 1000.*$inc_mom; #From GeV to MeV:
+$massProton = 938.27201;
+$inc_energy = sqrt($inc_mom*$inc_mom+$massProton*$massProton);
 
 if( $first_run > $last_run ){
    print STDERR "\n First run number should be less than last run number.\n";
@@ -59,8 +65,8 @@ if($help==1){
 
 $hadphys   = "QGSP";
 $evtmax    = 26200000;
-#$outputtopdir = "/minerva/data/users/laliaga/NA49Sim";
-$outputtopdir = "/minerva/data/users/laliaga/prop_for_NA61";
+$outputtopdir = "/minerva/data/users/laliaga/HadProd/test";
+
 $randsteps = int(200*rand())+1;
 
 for(0 .. $#ARGV){
@@ -86,13 +92,12 @@ chmod 0755, $mac_dir;
 mkpath( $tuple_dir, 1, 0775 );
 chmod 0775, $tuple_dir;
 
+
+
 for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
 
-# $macrofile = "${mac_dir}/NA49_R${runnum}_${hadphys}.in"; 
  $macrofile = "${mac_dir}/test_R${runnum}_${hadphys}.in"; 
  $logfile = "${log_dir}/test_R${runnum}_${hadphys}.log";
-#$macrofile = "${mac_dir}/NA61_R${runnum}_${hadphys}.in"; 
-#$logfile = "${log_dir}/NA61_R${runnum}_${hadphys}.log";
 
  open (NEW,">$macrofile") or die "ERROR: Can't open $macrofile\n";
  print NEW "/control/verbose 0\n";
@@ -101,16 +106,15 @@ for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
  print NEW "/testhadr/Physics $hadphys\n";
  print NEW "/testhadr/Update\n";
  print NEW "/run/initialize\n";
-# print NEW "/random/setSeeds $runnum $randsteps\n";
- print NEW "/random/setSeeds $runnum 120\n";
+ print NEW "/random/setSeeds $firstseed $runnum\n";
  print NEW "/gun/particle proton\n";
- print NEW "/gun/energy 120.0 GeV\n";
+ print NEW "/gun/energy $inc_energy MeV\n";
  print NEW "/run/beamOn $evtmax\n";
  print NEW;
  close (NEW); 
 # system "nohup ./g4na49 ${macrofile} > ${logfile}&";
 
-system "g4na49_jobsub /minerva/app/users/laliaga/cmtuser/Minerva_v8r3/v8r3/minerva/MINERVA/MINERVA_v8r3/NumiAna/numisoft/g4numi/g4na49 ${macrofile} -L ${logfile}";
+system "g4na49_jobsub g4na49 ${macrofile} -L ${logfile}";
 }
 
 ###########################################################################
