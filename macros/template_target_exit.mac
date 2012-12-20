@@ -1,0 +1,28 @@
+
+/control/suppressAbortion 2
+
+/NuMI/run/DebugLevel 0 
+
+/NuMI/run/useNuBeam true
+
+/NuMI/run/useWaterInTgt ${dowater}
+
+/NuMI/det/LengthOfWaterInTgt ${watercm} cm
+
+/NuMI/det/RunPeriod 0
+
+/NuMI/det/UseCorrHornCurrent true
+
+/NuMI/det/BeamConfig ${beamconfig}
+
+/NuMI/output/outputTarNtuple true
+
+/NuMI/output/setTarNtupleFile ${outfile}
+
+/NuMI/det/update
+
+/NuMI/rndm/setRndmSeed ${seed}
+
+/NuMI/run/setRunID ${run}
+
+/run/beamOn ${pot}
