@@ -182,7 +182,7 @@ echo "chmod +x \$_CONDOR_SCRATCH_DIR/hackbin/gcc" >> $WRAPFILE
 echo "PATH=\$_CONDOR_SCRATCH_DIR/hackbin:\$PATH" >> $WRAPFILE
 
 echo "" >> $WRAPFILE
-echo "cd /minerva/app/users/laliaga/cmtuser/Minerva_v8r3/v8r3/minerva/MINERVA/MINERVA_v8r3/NumiAna/numisoft/g4numi/" >> $WRAPFILE
+echo "cd ${PWD}" >> $WRAPFILE
 echo ". setup_beamsim.sh" >> $WRAPFILE   
 echo "setup_beamsim -w 1" >> $WRAPFILE
 echo "" >> $WRAPFILE
@@ -208,8 +208,8 @@ chmod a+x $WRAPFILE
 status=0
 echo "Created $CMDFILE"
 curr=`/bin/pwd` ; cd /tmp
-/opt/condor/bin/condor_submit $CMDFILE
-#minerva_jobsub -L ${JOBLOGFILE} -g ${WRAPFILE}
+#/opt/condor/bin/condor_submit $CMDFILE
+minerva_jobsub -L ${JOBLOGFILE} -g ${WRAPFILE}
 status=$?
 cd $curr
 chmod g+rw ${CONDOR_TMP}
