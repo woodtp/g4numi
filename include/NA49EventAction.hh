@@ -27,7 +27,7 @@ public: // Without description
   void SetDrawFlag(G4String val)   {drawFlag = val;};
   void AddEventToDebug(G4int val)  {selectedEvents.push_back(val);
                                     nSelected++;};
-  void AddTrack(const G4Track* aTrack,G4int proc);
+  void AddTrack(const G4Track* aTrack);
 
 
 private:

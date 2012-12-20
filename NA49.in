@@ -4,16 +4,13 @@
 /tracking/verbose 0
 
 /testhadr/Physics   QGSP
-/testhadr/TargetMat G4_C
-/testhadr/TargetRadius 3 cm
-/testhadr/TargetLength 1.8 cm 
 
 /testhadr/Update
 /run/initialize
-/random/setSeeds 17 31
 
-#/testhadr/DebugEvent 34
+#We use the energy beam as the 1st random seed 
+/random/setSeeds 158 17
 
-/gun/particle neutron
-/gun/energy 55 MeV
-/run/beamOn 10000
+/gun/particle proton
+/gun/energy 158 GeV
+/run/beamOn 1
