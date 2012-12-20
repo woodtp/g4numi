@@ -48,12 +48,11 @@ void NA49EventAction::BeginOfEventAction(const G4Event* evt)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void NA49EventAction::AddTrack(const G4Track* aTrack,G4int proc)
+void NA49EventAction::AddTrack(const G4Track* aTrack)
 {
   
   TrackInfo_t aTrackInfo;
   aTrackInfo.PDGcode = (aTrack->GetDefinition())->GetPDGEncoding();
-  aTrackInfo.massPart= (aTrack->GetDefinition())->GetPDGMass();
   aTrackInfo.Pos.SetX(aTrack->GetPosition().x());
   aTrackInfo.Pos.SetY(aTrack->GetPosition().y());
   aTrackInfo.Pos.SetZ(aTrack->GetPosition().z());
@@ -61,9 +60,6 @@ void NA49EventAction::AddTrack(const G4Track* aTrack,G4int proc)
   aTrackInfo.Mom.SetPy(aTrack->GetMomentum().y());
   aTrackInfo.Mom.SetPz(aTrack->GetMomentum().z());
   aTrackInfo.Mom.SetE(aTrack->GetTotalEnergy());
-  if(proc==1)aTrackInfo.interType = 1; 
-  if(proc==2)aTrackInfo.interType = 2;
-  if(proc!=1 && proc!=2)aTrackInfo.interType = 0;
 
   TrackInfoVec.push_back(aTrackInfo);
  
@@ -79,7 +75,7 @@ void NA49EventAction::EndOfEventAction(const G4Event* evt)
   }
 
   NA49Analysis* analysis = NA49Analysis::getInstance();
-  if(TrackInfoVec.size()<100)analysis->FillNtuple(TrackInfoVec);
+  if(TrackInfoVec.size()<150)analysis->FillNtuple(TrackInfoVec);
   TrackInfoVec.clear();
 }
 
