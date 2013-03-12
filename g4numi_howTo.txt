@@ -1,0 +1,124 @@
+This document describes how to build a local copy of g4numi and GEANT4. With these tools,
+the user can modify parameters inside GEANT4 or physics lists in g4numi and produce plots 
+of the flux (neturino energy distribution) at the face of Minerva. Commands to be entered 
+into the terminal are preceded by "%". Everything else is a comment.
+
+1.  Make a fresh working area:
+
+% cd ~
+% export User_release_area=/minerva/app/users/<you>/cmtuser
+% source /grid/fermiapp/minerva/software_releases/vXrYpZ.sh
+% setenvMinerva g4numi
+
+g4numi is the name of this working area. You can call it whatever you want.
+edit cmt/project.cmt so that it says:
+
+project Minerva_g4numi
+
+use MINERVA MINERVA_vXrYpZ
+
+where XYZ are the version, release and patch number of the software release. This does not matter,
+except that you should use a recent version so you get the most up-to-date files in NumiAna
+
+2.  In /minerva/app/users/<you>/cmtuser/Minerva_g4numi, checkout the g4numi package:
+
+% cvs co NumiAna/numisoft/g4numi
+
+3.  Go to the g4numi directory and copy the setup script into your home directory
+
+% cd NumiAna/numisoft/g4numi
+% cp g4numi_setup_script.sh ~
+
+4.  Log out, and log back in. Do NOT source any setup scripts, including the standard Minerva setup. 
+Doing so will set some environment variables that you do not want.
+
+Go to the g4numi area
+% cd /minerva/app/users/<you>/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
+
+Make a directory to put Geant4 in:
+% mkdir geant4
+
+Copy the geant4 source files from the FNAL afs area into your personal geant4 directory:
+% cp -r /afs/fnal.gov/ups/geant4source/v4_9_2_p03/NULL-g77/geant4.9.2.p03 .
+
+Copy some libraries to the "data" area of your geant4 installation. The "correct" way to do this is probably 
+to configure your g4 installation to get the correct paths to these libraries. The easy way is to just copy 
+them to the place that g4 thinks they should be.
+
+% cd geant4.9.2.p03
+% mkdir data
+% cp -r /afs/fnal.gov/ups/g4photon/v2_0/NULL/PhotonEvaporation PhotonEvaporation2.0
+% cp -r /afs/fnal.gov/ups/g4radiative/v3_2/NULL/RadioactiveDecay3.2 .
+% cp -r /afs/fnal.gov/ups/g4neutron/v3_13/NULL/G4NDL3.13 .
+% cp -r /afs/fnal.gov/ups/g4abla/v3_0/NULL/G4ABLA3.0 .
+% cp -r /afs/fnal.gov/ups/g4emlow/v6_2/NULL/G4EMLOW6.2 .
+
+You are now ready to build geant4.
+
+5. Compile geant4.
+
+% cd ..
+% ./Configure -build
+
+You will now be asked a bunch of questions. Almost all of them should be answered with the default (just hit enter),
+but there are a few that you absolutely need to change, so pay attention.  The following is a complete list of the 
+things you need to do that are NOT the default.
+
+When prompted for the CLHEP_BASE_DIR, enter: /afs/fnal.gov/ups/clhep/v2_0_4_5/Linux+2.6-2.5
+When asked if you want to create shared (.so) libraries, enter: y
+When asked if you want to copy the include files to a single directory, enter: y
+
+All other questions, just hit enter for the default. After your first build, it will find a config.sh file with your 
+settings saved, so you may just hold down enter until it starts compiling.
+
+6. Go for coffee. The initial compile of geant4 takes about an hour on the minervagpvm machines under normal conditions. 
+
+7. Go back to your home area and source the setup scrip you copied there way back at the beginning. I would also log out 
+and back in again, just to make sure that any environment variables are reset. Then
+
+% cd ~
+% source g4numi_setup_script.sh
+
+DO NOT source any other minerva setup script, as it will screw everything up.
+
+8. Go back to your g4numi area and source the beamsim script:
+
+% cd /minerva/app/users/<you>/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
+% source setup_beamsim.sh
+
+9. Make sure all your environment variables are set correctly. The bash script g4numi_environment.sh, located in 
+NumiAna/numisoft/g4numi, will do this. If you called your working area something other than "g4numi", make sure to 
+modify the applicable lines in this script to point you your space.
+
+% source g4numi_environment.sh
+
+10. type "make" to execute the GNUmakefile
+
+11. If that works, then you should have an executable called "g4numi". Run a test job:
+
+g4numi NuBeam_example.mac
+
+The output file is g4numi_testing_8000.root
+
+12. To look at the output, be sure that your .rootlogon.C file does not contain any references to PlotUtils or any other 
+Minerva-specific bit of code. Also, you are using an old version of root, so some functionality may not exist. For instance,
+I had to remove "gStyle->SetLegendFillColor(0);" from mine.
+
+===============================================================================================================================
+A few comments on what you might actually want to do:
+
+The physics list is selected by g4numi.cc. Changing the physics list (from QGSP to FTFP, for example) is trivial, and basically 
+just works.  If that is all you want to do, then you do not need to build a local copy of Geant4.
+
+A harder but also interesting thing is to change parameters within Geant, such as the proton inelastic cross section. To do this, 
+modify a .cc cross section file in ...g4numi/geant4/source/processes/hadronic/cross_sections
+or whatever other kind of cross section you want to modify.
+
+This document was written in March, 2013 by Chris Marshall.
+Comments to marshall@pas.rochester.edu, but don't actually expect him to know anything. He just got lucky and somehow figured all 
+this stuff out.
+You should change this document when it becomes out-of-date. An example is if the default version of geant4 changes, then the source 
+code to copy should come from a different area, and the dependencies on the other g4 libraries may also change.
+
+
+

@@ -1,0 +1,17 @@
+export G4WORKDIR=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
+export G4INCLUDE=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/include
+export G4SYSTEM=Linux-g++
+export G4INSTALL=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03
+export G4LIB=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/lib
+export G4LEVELGAMMADATA=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/data/PhotonEvaporation2.0
+export G4RADIOACTIVEDATA=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/data/RadioactiveDecay3.2
+export G4LEDATA=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/data/G4EMLOW6.2
+export G4NEUTRONHPDATA=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/data/G4NDL3.13
+export G4ABLADATA=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/data/G4ABLA3.0
+export CLHEP_BASE_DIR=/afs/fnal.gov/ups/clhep/v2_0_4_5/Linux+2.6-2.5
+export CLHEP_INCLUDE_DIR=/afs/fnal.gov/ups/clhep/v2_0_4_5/Linux+2.6-2.5/include
+export CLHEP_LIB_DIR=/afs/fnal.gov/ups/clhep/v2_0_4_5/Linux+2.6-2.5/lib
+export CLHEP_LIB=CLHEP
+export G4UI_USE_TCSH=1
+export G4LIB_BUILD_SHARED=1
+export G4LIB_USE_GRANULAR=1
