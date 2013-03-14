@@ -15,3 +15,6 @@ export CLHEP_LIB=CLHEP
 export G4UI_USE_TCSH=1
 export G4LIB_BUILD_SHARED=1
 export G4LIB_USE_GRANULAR=1
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03/lib/${G4SYSTEM}
+export GEANT4_DIR=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install/geant4.9.2.p03
+export GEANT4SOURCE_DIR=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi/g4install
