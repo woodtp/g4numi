@@ -12,5 +12,7 @@
 #pragma link C++ class absbkgtuple_t+;
 #pragma link C++ class zptuple_t+;
 #pragma link C++ class target_exit_t+;
+#pragma link C++ class ProdTuple_t+;
+#pragma link C++ class TrackInfo_t+;
 
 #endif
