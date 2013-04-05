@@ -22,7 +22,6 @@ public:
       Double_t Npz;
       Double_t Nenergy;
 
-      Int_t Norig;
       Int_t Ndecay;
       Int_t Ntype;
       Double_t Vx;
@@ -35,7 +34,6 @@ public:
       Double_t ppdydz;
       Double_t pppz;
       Double_t ppenergy;
-      Int_t ppmedium;
       Int_t ptype;
       Double_t ppvx;
       Double_t ppvy;
@@ -46,9 +44,6 @@ public:
       Double_t mupare;
       Double_t Necm;
       Double_t Nimpwt;
-      Double_t xpoint;
-      Double_t ypoint;
-      Double_t zpoint;
       Double_t tvx;
       Double_t tvy;
       Double_t tvz;
@@ -57,51 +52,35 @@ public:
       Double_t tpz;
       Int_t tptype;
       Int_t tgen;
-      Int_t tgptype;
-      Double_t tgppx;
-      Double_t tgppy;
-      Double_t tgppz;
-      Double_t tprivx;
-      Double_t tprivy;
-      Double_t tprivz;
-      Double_t beamx;
-      Double_t beamy;
-      Double_t beamz;
-      Double_t beampx;
-      Double_t beampy;
-      Double_t beampz;
 
       Double_t NdxdzNear;
       Double_t NdydzNear;
       Double_t NenergyN;
       Double_t NWtNear;
-      Double_t NWtNear_one;
-      Double_t NdxdzFar;
-      Double_t NdydzFar;
-      Double_t NenergyF;
-      Double_t NWtFar;
+
+  Int_t pdg[10];
+  Double_t startpx[10];
+  Double_t startpy[10];
+  Double_t startpz[10];
+  Double_t stoppx[10];
+  Double_t stoppy[10];
+  Double_t stoppz[10];
+  Double_t startx[10];
+  Double_t starty[10];
+  Double_t startz[10];
+  Double_t stopx[10];
+  Double_t stopy[10];
+  Double_t stopz[10];
   
   //void SetTree(TTree &t, Int_t entry);
   void SetTree(TTree &t);
   
 private:
   Int_t entry;
-  Double_t NdxdzNear_array[11];
-  Double_t NdydzNear_array[11];
-  Double_t NenergyN_array[11];
-  Double_t NWtNear_array[11];
-  Double_t NdxdzFar_array[2];
-  Double_t NdydzFar_array[2];
-  Double_t NenergyF_array[2];
-  Double_t NWtFar_array[2];
   TLeaf *l_NdxdzNear;
   TLeaf *l_NdydzNear;
   TLeaf *l_NenergyN;
   TLeaf *l_NWtNear;
-  TLeaf *l_NdxdzFar;
-  TLeaf *l_NdydzFar;
-  TLeaf *l_NenergyF;
-  TLeaf *l_NWtFar;
 
       TLeaf *l_run;
       TLeaf *l_evtno;
@@ -109,7 +88,6 @@ private:
       TLeaf *l_Ndydz;
       TLeaf *l_Npz;
       TLeaf *l_Nenergy;
-      TLeaf *l_Norig;
       TLeaf *l_Ndecay;
       TLeaf *l_Ntype;
       TLeaf *l_Vx;
@@ -122,7 +100,6 @@ private:
       TLeaf *l_ppdydz;
       TLeaf *l_pppz;
       TLeaf *l_ppenergy;
-      TLeaf *l_ppmedium;
       TLeaf *l_ptype;
       TLeaf *l_ppvx;
       TLeaf *l_ppvy;
@@ -133,9 +110,6 @@ private:
       TLeaf *l_mupare;
       TLeaf *l_Necm;
       TLeaf *l_Nimpwt;
-      TLeaf *l_xpoint;
-      TLeaf *l_ypoint;
-      TLeaf *l_zpoint;
       TLeaf *l_tvx;
       TLeaf *l_tvy;
       TLeaf *l_tvz;
@@ -144,20 +118,23 @@ private:
       TLeaf *l_tpz;
       TLeaf *l_tptype;
       TLeaf *l_tgen;
-      TLeaf *l_tgptype;
-      TLeaf *l_tgppx;
-      TLeaf *l_tgppy;
-      TLeaf *l_tgppz;
-      TLeaf *l_tprivx;
-      TLeaf *l_tprivy;
-      TLeaf *l_tprivz;
-      TLeaf *l_beamx;
-      TLeaf *l_beamy;
-      TLeaf *l_beamz;
-      TLeaf *l_beampx;
-      TLeaf *l_beampy;
-      TLeaf *l_beampz;
 
+  // Full ancestry stuff
+
+
+  TLeaf * l_pdg;
+  TLeaf * l_startpx;
+  TLeaf * l_startpy;
+  TLeaf * l_startpz;
+  TLeaf * l_stoppx;
+  TLeaf * l_stoppy;
+  TLeaf * l_stoppz;
+  TLeaf * l_startx;
+  TLeaf * l_starty;
+  TLeaf * l_startz;
+  TLeaf * l_stopx;
+  TLeaf * l_stopy;
+  TLeaf * l_stopz;
 
 };
 
