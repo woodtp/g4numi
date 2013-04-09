@@ -1,7 +1,7 @@
 # these variables to customize based on actual installation location
 export G4NUMIDIR=/minerva/app/users/${USER}/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
 export G4BASEDIR=$G4NUMIDIR/g4install
-export G4INSTALL=$G4INSTALL/geant4.9.2.p03
+export G4INSTALL=$G4BASEDIR/geant4.9.2.p03
 export CLHEP_BASE_DIR=/afs/fnal.gov/ups/clhep/v2_0_4_5/Linux+2.6-2.5
 
 # relative paths
