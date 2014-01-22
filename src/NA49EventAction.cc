@@ -2,7 +2,7 @@
 #include "G4Event.hh"
 #include "NA49EventActionMessenger.hh"
 #include "NA49Analysis.hh"
-
+#include "NA49TrackInfo.hh"
 #include "G4UImanager.hh"
 #include "G4ios.hh"
 #include "G4Track.hh"
@@ -60,6 +60,8 @@ void NA49EventAction::AddTrack(const G4Track* aTrack)
   aTrackInfo.Mom.SetPy(aTrack->GetMomentum().y());
   aTrackInfo.Mom.SetPz(aTrack->GetMomentum().z());
   aTrackInfo.Mom.SetE(aTrack->GetTotalEnergy());
+  const NA49TrackInfo* info = dynamic_cast<NA49TrackInfo*>(aTrack->GetUserInformation());
+  aTrackInfo.FromFast = info->fast_decay_progeny;
 
   TrackInfoVec.push_back(aTrackInfo);
  

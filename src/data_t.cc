@@ -4,7 +4,7 @@
 //  ADM, July 2005
 //  This is a class that defines the data_t object that is used to 
 //  store the g4numi output in a root tree.
-// $Id: data_t.cc,v 1.3.4.4 2011/06/27 02:05:30 ltrung Exp $
+// $Id: data_t.cc,v 1.3.4.5 2014/01/22 22:31:08 kordosky Exp $
 //------------------
 
 #include "data_t.hh"

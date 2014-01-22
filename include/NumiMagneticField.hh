@@ -1,5 +1,5 @@
 
-// $Id: NumiMagneticField.hh,v 1.2.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiMagneticField.hh,v 1.2.4.2 2014/01/22 22:31:06 kordosky Exp $
 // --------------------------------------------------------------
 // NumiMagneticField.hh modified by Yuki 2004/7/16
 // modified by Yuki 8/2/04
@@ -10,6 +10,8 @@
 #include "globals.hh"
 #include "G4MagneticField.hh"
 #include "NumiDataInput.hh"
+
+#include "NumiKelvinFunctions.hh"
 
 class NumiMagneticField : public G4MagneticField
 {
@@ -35,6 +37,7 @@ class NumiMagneticFieldIC : public G4MagneticField
 
   private:
     NumiDataInput* NumiData;
+    NumiKelvinFunctions* NumiKelvin;
   //G4double current;
 };
 

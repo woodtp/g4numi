@@ -5,6 +5,7 @@
 
 use File::Path;
 use File::Basename;
+use Cwd;
 
 ########################################################################
 #
@@ -36,6 +37,8 @@ $first_run = $ARGV[1];
 $last_run  = $ARGV[2];
 
 $firstseed = $inc_mom;
+
+$mom_gev = $inc_mom;
 
 $inc_mom = 1000.*$inc_mom; #From GeV to MeV:
 $massProton = 938.27201;
@@ -78,33 +81,36 @@ for(0 .. $#ARGV){
   $outputdir     = "$outputtopdir/$hadphys";
   $log_dir       = "$outputdir/logs";
   $mac_dir       = "$outputdir/macros";
-  $tuple_dir     = "$outputdir/Tuples";
+  $tuple_dir     = "$outputdir/tuples";
+  $histo_dir     = "$outputdir/histos";
 
-mkpath( $outputdir, 1, 0755 );
-chmod 0755, $outputdir;
+mkpath( $outputdir, 1, 0775 );
+chmod 0775, $outputdir;
 
-mkpath( $log_dir, 1, 0755 );
-chmod 0755, $log_dir;
+mkpath( $log_dir, 1, 0775 );
+chmod 0775, $log_dir;
 
-mkpath( $mac_dir, 1, 0755 );
-chmod 0755, $mac_dir;
+mkpath( $mac_dir, 1, 0775 );
+chmod 0775, $mac_dir;
 
 mkpath( $tuple_dir, 1, 0775 );
 chmod 0775, $tuple_dir;
 
+mkpath( $histo_dir, 1, 0775 );
+chmod 0775, $histo_dir;
 
 
 for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
 
- $macrofile = "${mac_dir}/test_R${runnum}_${hadphys}.in"; 
- $logfile = "${log_dir}/test_R${runnum}_${hadphys}.log";
+ $macrofile = "${mac_dir}/g4na49_${mom_gev}_R${runnum}_${hadphys}.in"; 
+ $logfile = "${log_dir}/g4na49_${mom_gev}_R${runnum}_${hadphys}.log";
 
  open (NEW,">$macrofile") or die "ERROR: Can't open $macrofile\n";
  print NEW "/control/verbose 0\n";
  print NEW "/run/verbose 0\n";
  print NEW "/tracking/verbose 0\n";
- print NEW "/testhadr/Physics $hadphys\n";
- print NEW "/testhadr/Update\n";
+# print NEW "/testhadr/Physics $hadphys\n";
+# print NEW "/testhadr/Update\n";
  print NEW "/run/initialize\n";
  print NEW "/random/setSeeds $firstseed $runnum\n";
  print NEW "/gun/particle proton\n";
@@ -114,7 +120,14 @@ for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
  close (NEW); 
 # system "nohup ./g4na49 ${macrofile} > ${logfile}&";
 
-system "g4na49_jobsub g4na49 ${macrofile} -L ${logfile}";
+
+ my $working_dir=getcwd;
+
+ $keep_tuple=0;
+
+system "jobsub -g -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir} g4na49_condor.sh ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax}";
+ 
+
 }
 
 ###########################################################################

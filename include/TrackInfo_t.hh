@@ -18,6 +18,7 @@ class TrackInfo_t
   TLorentzVector Mom;
 
   Int_t PDGcode;
+  Bool_t FromFast;
  private:
   ClassDef(TrackInfo_t ,1)
 };

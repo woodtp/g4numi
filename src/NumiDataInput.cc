@@ -1,7 +1,8 @@
+
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.7 2011/11/13 22:31:45 ltrung Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.8 2014/01/22 22:31:07 kordosky Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -52,6 +53,8 @@ NumiDataInput::NumiDataInput()
     fUseCorrHornCurrent(true),
     fUseDetailedProtonBeam(false),
     fUseWaterInTgt(false),
+    fUseHornMisalign(false),
+    fUseTgtDensity(false),
     
     fBeamConfig(""),
     fTargetConfig(""),
@@ -71,6 +74,9 @@ NumiDataInput::NumiDataInput()
     fProton_cosy(-999.0),
 
     fLengthOfWaterInTgt(4.0*cm),
+
+    fSkinDepth(6.0*mm),
+    fUse_HCD(false),
 
     fPrintInfo(1)
     
@@ -1187,6 +1193,7 @@ void NumiDataInput::Print()
              << " Horn Current                                = " << HornCurrent/ampere << " A" << G4endl
              << " Horn 1               (X0, Y0, Z0) m         = (" << Horn1X0/m << ", " << Horn1Y0/m << ", " << Horn1Z0/m << ") m" << G4endl
              << " Horn 2               (X0, Y0, Z0) m         = (" << Horn2X0/m << ", " << Horn2Y0/m << ", " << Horn2Z0/m << ") m" << G4endl
+             << " Target Density                              = " << TargetDensity/g*cm3 << " g/cm^3" << G4endl
              << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/m << ", " << beamPosition[1]/m << ", " << beamPosition[2]/m << ") m" << G4endl
              << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
              << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
@@ -1297,7 +1304,60 @@ bool NumiDataInput::SetBeamConfig(G4String config)
 
    
    if(!NumiDataInput::SetHornCurrentConfig(ihornstr)) return false;
+//These lines are to change the horizontal transverse position of the position of the horns and the target density --Bruce Howard, Jr.
+   if(fUseHornMisalign){
+      //
+      //get horn 1 X0
+      //
+      std::string::size_type end_loc_h1 = config.find("hot",0);
 
+      if(end_loc_h1 == std::string::npos)
+      {
+         G4cout << "\n\n\n\n\n HORN 1 POSITION NOT PROPERLY ENTERED!! MUST ENTER AS ###hot. PROGRAM ABORTED." << G4endl;
+         std::exit (EXIT_FAILURE);
+      }
+
+      std::string ih1str = config.substr(end_loc_h1-3,3); //Grabbing the characters before end_loc_h1 (ie USE  ###hot)
+
+      if(!NumiDataInput::SetHornOnePos(ih1str)) return false;
+
+      //
+      //get horn 2 X0
+      //
+      std::string::size_type end_loc_h2 = config.find("htt",0);
+      
+      if(end_loc_h2 == std::string::npos)
+      {
+         G4cout << "\n\n\n\n\n HORN 2 POSITION NOT PROPERLY ENTERED!! MUST ENTER AS ###htt. PROGRAM ABORTED." << G4endl;
+         std::exit (EXIT_FAILURE);
+      }
+   
+      std::string ih2str = config.substr(end_loc_h2-3,3);
+   
+      if(!NumiDataInput::SetHornTwoPos(ih2str)) return false;
+   }
+   else
+   {
+     Horn1X0=0.0;
+     Horn2X0=0.0;
+   }
+   if(fUseTgtDensity){
+      std::string::size_type end_loc_tgd = config.find("tgd",0);
+
+      if(end_loc_tgd==std::string::npos)
+      {
+         G4cout << "\n\n\n\n\n TARGET DENSITY NOT PROPERLY ENTERED!! MUST ENTER AS #######tgd, in ug/cm3. PROGRAM ABORTED." <<G4endl;
+         std::exit (EXIT_FAILURE);
+      }
+
+      std::string targetdensity = config.substr(end_loc_tgd-7,7);
+      if(!NumiDataInput::SetTargetDensity(targetdensity)) return false;
+   }
+   if(!fUseTgtDensity)
+   {
+      TargetDensity=1.78*g/cm3;
+   }
+//--------------------------------------------------------------------------------------------------------------
 
    if(!NumiDataInput::ConfigureRunPeriod(config)) return false;
    
@@ -1419,6 +1479,29 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
                ihornstr == "000" ||
                ihornstr == "0.0" ||
                ihornstr == "000.0")  ihornstr = "0";
+//--------------------------------The following ihornstr added by Bruce Howard, Jr.---------------------------------
+//-----------These provide changes up and down from positive and negative 185kA, stepped by 1% of 185kA-------------
+      else if (ihornstr == "172")   ihornstr = "172.995";
+      else if (ihornstr == "174")   ihornstr = "174.816";
+      else if (ihornstr == "176")   ihornstr = "176.637";
+      else if (ihornstr == "178")   ihornstr = "178.458";
+      else if (ihornstr == "180")   ihornstr = "180.279";                                        
+      else if (ihornstr == "183")   ihornstr = "183.921";
+      else if (ihornstr == "186")   ihornstr = "185.742";
+      else if (ihornstr == "187")   ihornstr = "187.563";
+      else if (ihornstr == "189")   ihornstr = "189.384";
+      else if (ihornstr == "191")   ihornstr = "191.205";
+      else if (ihornstr == "-172")   ihornstr = "-172.995";
+      else if (ihornstr == "-174")   ihornstr = "-174.816";
+      else if (ihornstr == "-176")   ihornstr = "-176.637";
+      else if (ihornstr == "-178")   ihornstr = "-178.458";
+      else if (ihornstr == "-180")   ihornstr = "-180.279";
+      else if (ihornstr == "-183")   ihornstr = "-183.921";
+      else if (ihornstr == "-186")   ihornstr = "-185.742";
+      else if (ihornstr == "-187")   ihornstr = "-187.563";
+      else if (ihornstr == "-189")   ihornstr = "-189.384";
+      else if (ihornstr == "-191")   ihornstr = "-191.205";
+//-------------------------------------------------------------------------------------------------------------------
       else
       {
          G4cout << "NumiDataInput::SetHornConfig() - PROBLEM. Requesting to use the Corrected Horn Current but I do not know "
@@ -1445,6 +1528,39 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
 }
 
 //---------------------------------------------------------------------------------
+G4bool NumiDataInput::SetHornOnePos(G4String config)
+{
+   G4double hornpos;
+   std::istringstream posstream(config);
+   posstream >> hornpos;
+
+   NumiDataInput::SetHorn1X0((hornpos/10.)*cm); //Input as mm but we want cm
+
+   return true;
+}
+//------------------------------------------------------------------------------------
+G4bool NumiDataInput::SetHornTwoPos(G4String config)
+{
+   G4double hornpos;
+   std::istringstream posstream(config);
+   posstream >> hornpos;
+
+   NumiDataInput::SetHorn2X0((hornpos/10.)*cm); //Input as mm, but we want cm
+
+   return true;   
+}
+//------------------------------------------------------------------------------------
+G4bool NumiDataInput::SetTargetDensity(G4String config)
+{
+   G4double targetdensity;
+   std::istringstream posstream(config);
+   posstream >> targetdensity;
+
+   NumiDataInput::SetTargetDensityVal((targetdensity/1000000.)*g/cm3);
+
+   return true;
+}
+//------------------------------------------------------------------------------------
 G4bool NumiDataInput::SetHornConfig(G4String config)
 {
    if(config != "le" && config != "me")
@@ -1748,3 +1864,16 @@ void NumiDataInput::Setg3Chase(G4bool _gc)
     
 }
 
+//To set skin depth for horn current distribution studies
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetSkinDepth(G4double val)
+{
+      fSkinDepth = val;
+}
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetUseHornCurrDist(G4bool val)
+{
+      fUse_HCD = val;
+}
+//

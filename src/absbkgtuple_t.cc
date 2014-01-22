@@ -4,7 +4,7 @@
 //  ADM, July 2005
 //  This is a class that defines the absbkgtuple_t object that is used to 
 //  store the g4numi output in a root tree.
-// $Id: absbkgtuple_t.cc,v 1.1.2.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: absbkgtuple_t.cc,v 1.1.2.2 2014/01/22 22:31:08 kordosky Exp $
 //------------------
 
 #include "absbkgtuple_t.hh"

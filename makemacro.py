@@ -39,7 +39,9 @@ DESCRIPTION
           simulate water in the target  
     -L, --watercm [default=3]
           cm of water in the target 
-
+    -i, --noimpwt
+          Disable importance weighting.  
+    
 """%(os.environ['BEAMSIM']+"/macros/template.mac")
 
 def main(argv=None):
@@ -55,11 +57,12 @@ def main(argv=None):
     run='1'
     pot='500000'    
     templatefile=os.environ['BEAMSIM']+"/macros/template.mac"
-
+    doimpwt='true'
+    
     try:
-        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:", 
+        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:i", 
                                    ["help","dowater","watercm",
-                                    "beamconfig","outfile","seed","run","pot","template","nametag"])
+                                    "beamconfig","outfile","seed","run","pot","template","nametag","noimpwt"])
     except getopt.error, msg:
         raise Usage(msg)
     # more code, unchanged
@@ -86,7 +89,10 @@ def main(argv=None):
             templatefile=a
         if o in ("-n","--nametag"):
             nametag=a
+        if o in ("-i","--noimpwt"):
+            doimpwt='false'
 
+            
 # set seed to run if still null
     if len(seed)==0: 
         seed=run    
@@ -97,7 +103,7 @@ def main(argv=None):
     
     filestring=open(templatefile,'r').read()
     t=string.Template(filestring)
-    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot})
+    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt})
 
 
 if __name__ == "__main__":

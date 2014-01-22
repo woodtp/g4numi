@@ -40,7 +40,25 @@
 #Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
 #Note: cannot handle ME config right now.
 #
-/NuMI/det/BeamConfig LE010z185i
+
+#Note: It can only handle the standard horn currents (positive and negative 000,185,200,etc.) 
+#and a few I (Bruce) added to study the effects of changed horn currents. Check NumiDataInput.cc
+#to see what these horn currents are. The numbers are all 3 digits, but correspond to values
+#with more digits! e.g. 187i corresponds to 187.563 kA
+
+#Note: You can allow changes to some beam parameters by typing the lines below. A short description follows.
+#/NuMI/det/UseHornMisalign true
+#	This allows you to change the horn transverse positions by a number of mm (in x direction).
+#	Add ###hot###htt to the end of the beam configuration string below.
+#	You may place a "-" in the first # spot to make the transverse position negative
+#/NuMI/det/UseTgtDensity true
+#	Allows you to change the target density by a number of micrograms per cm^3.
+#	Add #######tgd to the end of the beam configuration string below (so 1780000tgd would be 1.78 g/cm^3).
+#It's important that you follow the above and enter information in each of the # spots
+# --Bruce
+
+
+/NuMI/det/BeamConfig le010z185i
 
 #
 #Use the Detailed Proton beam, true/false, default is false

@@ -7,13 +7,16 @@
 
 #include "NA49DetectorConstruction.hh"
 #include "NA49PhysicsList.hh"
-#include "QBBC.hh"
-#include "QGSP.hh"
+//#include "QBBC.hh"
+//#include "QGSP.hh"
+#include "FTFP_BERT.hh"
+
 #include "NA49PrimaryGeneratorAction.hh"
 
 #include "NA49RunAction.hh"
 #include "NA49EventAction.hh"
 #include "NA49StackingAction.hh"
+#include "NA49TrackingAction.hh"
 
 #include "G4VisExecutive.hh"
 
@@ -30,7 +33,9 @@ int main(int argc,char** argv) {
   //set mandatory initialization classes
   runManager->SetUserInitialization(new NA49DetectorConstruction());
 
-  runManager->SetUserInitialization(new NA49PhysicsList);
+  FTFP_BERT* physicsList = new FTFP_BERT;
+
+  runManager->SetUserInitialization(physicsList);
   //runManager->SetUserInitialization(new QBBC(1,"QBEC_HP"));
   //runManager->SetUserInitialization(new QGSP);
 
@@ -40,6 +45,7 @@ int main(int argc,char** argv) {
   runManager->SetUserAction(new NA49RunAction());
   runManager->SetUserAction(new NA49EventAction());
   runManager->SetUserAction(new NA49StackingAction());
+  runManager->SetUserAction(new NA49TrackingAction());
 
   //get the pointer to the User Interface manager
   G4UImanager* UI = G4UImanager::GetUIpointer();

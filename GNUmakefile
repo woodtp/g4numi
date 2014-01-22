@@ -51,6 +51,7 @@ ROOTLIBS      := $(filter-out -lpthread,$(ROOTLIBS))
 INTYLIBS      += $(ROOTLIBS)
 
 #for debuging
+#CPPFLAGS += -g -Wno-deprecated -Wno-array-bounds -Wno-ignored-qualifiers
 CPPFLAGS += -g -Wno-deprecated
 
 CPPFLAGS += -I$(G4INCLUDE)

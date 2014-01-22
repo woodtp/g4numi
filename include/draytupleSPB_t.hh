@@ -5,7 +5,7 @@
 // This is a class that defines the draytupleSPB_t object that is used to store 
 // the g4numi output in a root tree.
 //
-// $Id: draytupleSPB_t.hh,v 1.1.2.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: draytupleSPB_t.hh,v 1.1.2.2 2014/01/22 22:31:06 kordosky Exp $
 //----------------------------------------------------------------------
 
 #ifndef DRAYTUPLESPB_T_HH

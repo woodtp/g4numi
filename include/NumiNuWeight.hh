@@ -1,4 +1,4 @@
-// $Id: NumiNuWeight.hh,v 1.1.4.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: NumiNuWeight.hh,v 1.1.4.2 2014/01/22 22:31:06 kordosky Exp $
 
 #ifndef NUMINUWEIGHT_H
 #define NUMINUWEIGHT_H 1

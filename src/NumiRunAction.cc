@@ -58,7 +58,7 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
    G4cout << "  Starting run " << aRun->GetRunID() << G4endl;
    G4cout << "  Random seed used for this run " << CLHEP::HepRandom::getTheSeed();
    G4String randomFile="rndm/beginOfRun_";
-   char runN[4];
+   char runN[100];
    sprintf(runN,"%04d",aRun->GetRunID());
    randomFile.append(runN);
    randomFile.append(".rndm");
@@ -177,7 +177,7 @@ void NumiRunAction::EndOfRunAction(const G4Run* aRun)
   G4cout << "********************************************************************" << G4endl;
 
   G4String randomFile="rndm/endOfRun_";
-  char runN[4];
+  char runN[100];
   sprintf(runN,"%04d",aRun->GetRunID());
   randomFile.append(runN);
   randomFile.append(".rndm");

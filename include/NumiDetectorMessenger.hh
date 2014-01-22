@@ -35,6 +35,8 @@ private:
    G4UIcmdWithAnInteger*       RunPeriod;
    G4UIcmdWithAString*         BeamConfig;
    G4UIcmdWithABool*           UseCorrHornCurrent;
+   G4UIcmdWithABool*	       UseHornMisalign;
+   G4UIcmdWithABool*           UseTgtDensity;
    G4UIcmdWithAString*         AbsorberConfig;
    G4UIcmdWithAString*         Mon0AbsMatCmd;
    G4UIcmdWithAString*         Mon1AbsMatCmd;
@@ -67,6 +69,10 @@ private:
     G4UIcmdWithADoubleAndUnit* fBaffleLengthCmd;
     
     G4UIcmdWithABool* fForcedOldTargetCmd;
+
+    G4UIcmdWithADoubleAndUnit* fSkinDepthCmd;
+    G4UIcmdWithABool* fUseHCDCmd;
+
 };
 
 #endif

@@ -2,7 +2,7 @@
 // Sets the relevant memebers of the data class for storing the
 // MC data for the Hadron and Muon Monitors.
 //
-// $Id: draytupleSPB_t.cc,v 1.1.2.1 2010/08/19 19:50:54 minervacvs Exp $
+// $Id: draytupleSPB_t.cc,v 1.1.2.2 2014/01/22 22:31:08 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "draytupleSPB_t.hh"

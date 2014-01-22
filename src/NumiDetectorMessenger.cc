@@ -99,6 +99,16 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         UseCorrHornCurrent -> SetGuidance("Use the Calibration Corrected Horn Current value of the horn current configuration defined by the BeamConfiguration, true/false.");
         UseCorrHornCurrent -> SetParameterName("UseCorrHornCurrent",false);
         UseCorrHornCurrent -> AvailableForStates(G4State_PreInit,G4State_Idle);
+
+        UseHornMisalign = new G4UIcmdWithABool("/NuMI/det/UseHornMisalign",this);
+        UseHornMisalign -> SetGuidance("Set to use a nonstandard mm trans. dist. of the horns - forms are  ###hot and ###htt");
+        UseHornMisalign -> SetParameterName("UseHornMisalign",false);
+        UseHornMisalign -> AvailableForStates(G4State_PreInit,G4State_Idle);
+
+        UseTgtDensity = new G4UIcmdWithABool("/NuMI/det/UseTgtDensity",this);
+        UseTgtDensity -> SetGuidance("Set to use a nonstandard target density (in ug/cm3) - forms are  #######tgd");
+        UseTgtDensity -> SetParameterName("UseTgtDensity",false);
+        UseTgtDensity -> AvailableForStates(G4State_PreInit,G4State_Idle);
         
 
         AbsorberConfig = new G4UIcmdWithAString("/NuMI/det/absorberConfig",this);
@@ -232,6 +242,21 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	fForcedOldTargetCmd->SetGuidance("Force to use the old target"); 
 	fForcedOldTargetCmd->SetParameterName("forceOldTarget",true); 
 	fForcedOldTargetCmd->SetDefaultValue(false); 
+
+	//To study the horn current distribution:
+	
+	fUseHCDCmd = new G4UIcmdWithABool("/NuMI/det/UseHCD",this); 
+	fUseHCDCmd->SetGuidance("Use Horn Current Distribution for syst. studies"); 
+	fUseHCDCmd->SetParameterName("UseHCD",true); 
+	fUseHCDCmd->SetDefaultValue(ND->fUse_HCD); 
+	fUseHCDCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+	fSkinDepthCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/SkinDepth",this);
+        fSkinDepthCmd->SetGuidance("Set the skin depth for Horn Current Distribution.");
+	fSkinDepthCmd->SetParameterName("SkinDepth",true);
+	fSkinDepthCmd->SetUnitCategory("Length");
+        fSkinDepthCmd->SetDefaultValue(ND->fSkinDepth); 
+	fSkinDepthCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
         
 }
 
@@ -271,7 +296,11 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
         delete fBaffleInnerRadiusCmd;
         delete fBaffleLengthCmd;
         delete fForcedOldTargetCmd;
-        
+ 
+	delete fSkinDepthCmd;
+	delete fUseHCDCmd;
+
+       
 }
 
 
@@ -297,6 +326,8 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    if( command == UseCorrHornCurrent)  { NumiData->SetUseCorrHornCurrent(UseCorrHornCurrent->GetNewBoolValue(newValue)); }
    if( command == LengthOfWaterInTgt)  { NumiData->SetLengthOfWaterInTgt(LengthOfWaterInTgt->GetNewDoubleValue(newValue));}
 
+   if( command == UseHornMisalign)	{ NumiData->SetHornMisalign(UseHornMisalign->GetNewBoolValue(newValue)); }
+   if( command == UseTgtDensity)        { NumiData->SetTgtDensity(UseTgtDensity->GetNewBoolValue(newValue)); }
    
    if ( command == TargetGasCmd ) {
       //NumiDetector->SetTargetGas(newValue);
@@ -410,7 +441,16 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    } else if (command == fForcedOldTargetCmd) {
        G4bool forced = fForcedOldTargetCmd->GetNewBoolValue(newValue);
        NumiDetector->SetForcedOldTarget(forced);
-   } else {}
+   
+   } else if (command == fSkinDepthCmd) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetSkinDepth(fSkinDepthCmd->GetNewDoubleValue(newValue));
+
+   } else if (command == fUseHCDCmd) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetUseHornCurrDist(fUseHCDCmd->GetNewBoolValue(newValue));    
+   
+   }else {}
       
    
    return;

@@ -72,7 +72,7 @@ void NA49Analysis::book(G4long id0,G4long id1)
   ProdTree->Branch("p",  &g4Proddata.P,"P[NPart][4]/D");
   ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
   ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
-   
+  ProdTree->Branch("ff", &g4Proddata.FF,"FF[NPart]/O");
 }
 
 
@@ -121,6 +121,7 @@ void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
     g4Proddata.P[partNum][3]= PartE;
     g4Proddata.PT[partNum]  = PT;
     g4Proddata.XF[partNum]  = XF;
+    g4Proddata.FF[partNum]  = (*iteTrackInfo).FromFast;
      
     partNum++; 
  }

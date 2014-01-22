@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.7 2011/11/13 22:13:29 ltrung Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.8 2014/01/22 22:31:06 kordosky Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -36,17 +36,26 @@ private:
    G4bool ConfigureRunPeriod(G4String &beamconfig);
    G4bool SetTargetConfig(G4String config);
    G4bool SetHornCurrentConfig(G4String config);
+   G4bool SetHornOnePos(G4String config);
+   G4bool SetHornTwoPos(G4String config);
+   G4bool SetTargetDensity(G4String config);
    G4bool SetHornConfig(G4String config);
 
    void SetTargetZ0(G4double val)       { TargetZ0 = val;}
    void SetBaffleZ0(G4double val)       { HPBaffleZ0 = val;}
    void SetBeamZ0(G4double val)         { beamPosition[2] = val;}
    void SetHornCurrent(G4double val)    { HornCurrent = val;}
+
+   void SetHorn1X0(G4double val)	  {Horn1X0=val;}
+   void SetHorn2X0(G4double val)	  {Horn2X0=val;}
+   void SetTargetDensityVal(G4double val) {TargetDensity=val;}
    
 public:
+  
+   void SetSkinDepth(G4double val);
+  
+   void SetUseHornCurrDist(G4bool val);
 
-   
-   
    G4bool SetBeamConfig(G4String config);
    
    void SetDetailedProtonBeam(G4bool val);
@@ -96,6 +105,8 @@ public:
    void SetKillTrackingThreshold(G4double th )  { KillTrackingThreshold=th;}
    void SetjCompare(G4bool _jc);
    void Setg3Chase(G4bool _gc);
+   void SetHornMisalign(G4bool val)		{fUseHornMisalign=val;}
+   void SetTgtDensity(G4bool val)		{fUseTgtDensity=val;}
 
 
    G4int    GetRunPeriod()                    { return fRunPeriod;}
@@ -126,7 +137,8 @@ public:
    G4double GetProton_cosy()                  { return fProton_cosy;}
    G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;} 
 
-  
+   G4double GetSkinDepth()                    { return fSkinDepth;}  
+   G4double GetUseHornCurrDist()              { return fUse_HCD;}
    
    //--------------------------------------------------------------
    //Specifically for Muon Monitor simulation and Absorber background simulation
@@ -202,6 +214,8 @@ public:
    G4bool fUseCorrHornCurrent;
    G4bool fUseDetailedProtonBeam;
    G4bool fUseWaterInTgt;
+   G4bool fUseHornMisalign;
+   G4bool fUseTgtDensity;
 
    G4String extNtupleFileName;
    G4String fBeamConfig;
@@ -227,7 +241,9 @@ public:
 
    G4int fPrintInfo;
 
-   
+   G4double fSkinDepth;
+   G4bool   fUse_HCD;
+
    //////////////////////////////
    
    G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;
