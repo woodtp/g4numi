@@ -26,7 +26,7 @@ sub show_usage{
   &show_basic;
   print STDOUT "GENERAL OPTIONS:\n";
   print STDOUT "    -------------------------------------------------------------------------\n";
-  print STDOUT "   (-p) Had Physics : Hadronic physics to use (QGSP/FTFP_BERT)  default is QGSP \n";
+  print STDOUT "   (-p) Had Physics : NOT WORKING. MUST EDIT BY HAND. Hadronic physics to use (QGSP/FTFP_BERT)  default is FTFP_BERT \n";
   print STDOUT "   (-n) evtmax      : Maximum number of events per run         default 26.2M events\n";         
   print STDOUT "   (-o)output dir   : Directory for output                     default /minerva/data/users/laliaga\n"; 
   print STDOUT "==============================================================================================\n";
@@ -66,7 +66,7 @@ if($help==1){
   exit 1;
 }
 
-$hadphys   = "QGSP";
+$hadphys   = "FTFP_BERT";
 $evtmax    = 26200000;
 $outputtopdir = "/minerva/data/users/laliaga/HadProd/test";
 
@@ -125,7 +125,9 @@ for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
 
  $keep_tuple=0;
 
-system "jobsub -g -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir} g4na49_condor.sh ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax}";
+#Q:why are we calling system here??
+#A: so that we can test "jobsub -g ... " by printing it to the screen rather than calling system (i.e., comment it out)
+system "jobsub -g -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir} g4na49_job.sh ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax}";
  
 
 }

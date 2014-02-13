@@ -1,0 +1,141 @@
+$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/running_instructions.txt,v 1.1.2.1 2014/02/13 21:12:03 kordosky Exp $
+
+Original author: Mike Kordosky, Feb 13, 2014
+
+What do the various scripts, programs, and macros do and how do I use them??
+
+============================ programs =====================================
+
+g4numi
+======
+The simulation of the NuMI beamline in geant 4.  The simluation includes the whole beamline geometry, starting with the target and ending with the hadron absorber. The program takes a single argument, the name of a .mac file which lists the job options. Users can create their own macro file by hand or, better, use makemacro.py
+
+
+g4na49
+======
+A deceptively named program!  No, it doesn't simulate the NA49 experiment.  It is, instead, a thin target simulation used to calculate particle production cross-sections by analyzing the interaction records for many events. You can then *compare* those cross-sections to the data from NA49/61 and other hadron production experiments.
+
+========================= setup scripts ====================================
+
+setup_beamsim.sh
+================
+Source this file to setup the environment needed to build and run g4numi (and g4na49). This file must be sourced while sitting inside the g4numi area (directory containing g4numi.cc). It chooses the appropriate versions of root and g4, and sets LD_LIBRARY_PATH.
+
+
+custom_g4_environment.sh
+=========================
+Sets up the environment for a customized version of geant4.  This is only needed if you are working with a local build of geant4. Otherwise setup_beamsim.sh does this work (via UPS setup commands). Should not be used in conjunction with setup_beamsim.sh 
+
+============================== grid jobs ====================================
+
+g4numi_grid_submit.sh
+=====================
+
+Submit a collection of jobs onto the grid at fermilab. Users edit this file to change the beam configuration, POTs, number of jobs, output directory, etc. 
+
+This script calls jobsub with a number of arguments to pass information into g4numi_job.sh, the actual job script that runs on the farm.
+
+g4numi_job.sh
+=============
+This is the actual job than runs on the grid nodes. It basically calls makemacro to make a macro file, then runs g4numi. It relies on jobsub to copy files back from the grid node.
+
+
+process_na49Grid.pl
+===================
+This perl script (written by Leo and later modified by Mike) submits multiple g4na49 jobs to the grid. Run it without arguments to see the options. 
+
+
+g4na49_job.sh
+================
+This is the actual job that runs g4na49 on the grid. It calls g4na49 and then calls CreateYields.C to make a histogram of the yields. Interatively, I was also able to call CreateInvXS.C but for some reason that did not work on the grid (problems compiling). 
+
+============================= utilities =====================================
+
+make_macro.py
+=============
+
+Reads 
+    macros/template.mac
+    and writes a new .mac file to standard output, 
+    substituting some ${flags} in the file 
+    according to defaults or the command line.
+
+This script takes various command line options. Run ./makemacro.py -h for more information. Used by g4numi_job.sh
+
+
+macros/template.mac
+===================
+Used with makemacro.py to create the .mac file you need to supply when running g4numi.  The template file has various fields like this one:
+
+/NuMI/det/BeamConfig ${beamconfig}
+
+which makemacro.py overwrites.  Note this template file is relevant for the LE horn configuration that NuMI operated from 2005-12
+
+macros/template_ME.mac
+======================
+This is the template for the ME, a.k.a., NOVA beam. It was easier to make a second template than modify makemacro to move a number of different pieces of the geometry around. This template may be supplied to makemacro via the -t flag and an option to simulate the ME beam has been integrated into g4numi_job.sh
+
+
+renameG4Numi.py
+===============
+
+When g4numi is run it produces outputfiles that do not adhere to the usual minerva naming convention. Specifically, the numerical fields are not fixed width. This script renames such files. This is really only needed when doing a standard production. Users should look at the source of this script and comments in the header to figure out how to use it appropriately.
+
+================================= analysis ===================================
+
+CreateYields.C
+==============
+
+Reads the ntuple produced by g4na49 and histograms the yield (in xF,pT) from each inelastic interaction:
+
+ TFile*		/minerva/data/users/kordosky/hp/FTFP_BERT/histos/Yields_FTFP_BERT_pC0120GeV_mc99.root	
+  KEY: TDirectoryFile	pip;1	pip
+  KEY: TDirectoryFile	pim;1	pim
+  KEY: TDirectoryFile	kap;1	kap
+  KEY: TDirectoryFile	kam;1	kam
+  KEY: TDirectoryFile	klong;1	klong
+  KEY: TDirectoryFile	kshort;1	kshort
+  KEY: TDirectoryFile	prt;1	prt
+  KEY: TDirectoryFile	neu;1	neu
+  KEY: TH2D	xFpT_pip;1	
+  KEY: TH2D	xFpT_pim;1	
+  KEY: TH2D	xFpT_kap;1	
+  KEY: TH2D	xFpT_kam;1	
+  KEY: TH2D	xFpT_klong;1	
+  KEY: TH2D	xFpT_kshort;1	
+  KEY: TH2D	xFpT_prt;1	
+  KEY: TH2D	xFpT_neu;1	
+  KEY: TH1D	dndxf_neu;1	
+  KEY: TH1D	dndxf_neu_cut;1	
+  KEY: TH1D	dndxf_neu_prod;1	
+  KEY: TH1D	dndxf_neu_prod_cut;1	
+
+
+Note, the directories have a bunch of 1D histograms that tabulate the yield as a function of pT for narrow xF slices. Those are not really used anymore. 
+
+A summary "QEInfo" file tabulating various interaction categories, is also created:
+
+   Processing 1 trees in the chain
+   #Nentries Entries el_like qe_like frag_like prod_entries
+   394582    394582    2527     27500    20292     344263
+   average pi+ multiplicity per production event: 2.97258
+   average pi- multiplicity per production event: 2.63708
+
+
+CreateInvXS.C
+=============
+Reads the output of CreateYields.C and transforms it into an invariant cross-section. 
+
+Note, CreateYields and CreateInvXS are rather "fiddly" and assume quite a lot about how g4na49 was run, including the thickness and density of the target, the beam energy, etc. They should be used with a skeptical and careful eye. 
+
+make_mc_reweight_files.py
+========================
+
+Reads a set of yields files produced by many g4na49 jobs, concatenates them, then calculates the invariant cross-section. This program duplicates the basic calculation done in CreateInvXS (which was easier than figuring out how to call that program). It's also a script that assumes a whole lot about how g4na49 was run, including some hardcoded output directories, the beam energy, thin target details, number of incident protons per job, etc. It was crated to handle the thousands of files we made when running g4na49 at different proton energies for use in the energy scaling correction.
+
+compare_mc_reweight_files.py
+=============================
+
+Compares the files produced by make_mcreweight_files.py with the previous version in the minerva repository. Again, has hardcoded lines and makes some assumptions about how upstream programs were run.
+
+

@@ -1,31 +1,31 @@
-This document describes how to build a local copy of g4numi and GEANT4.
+Modernized by Mike Kordosky, Feb 13, 2014
 
-1.  Make a fresh working area:
+This document describes how to build a local copy of g4numi and GEANT4.  It should, in general, not be necessary to build GEANT4 since we take it from UPS. The instructions here were written by Chris Marshal at a time when the particular version of G4 that we were using wasn't available in UPS or there was some issue with using it (e.g., 64 bit vs 32 bit, SLC4 vs SLC5) 
 
-% cd ~
-% export User_release_area=/minerva/app/users/<you>/cmtuser
-% source /grid/fermiapp/minerva/software_releases/vXrYpZ.sh
-% setenvMinerva g4numi
 
-g4numi is the name of this working area. You can call it whatever you want.
-edit cmt/project.cmt so that it says:
+0. Start with a clean environment in which you have not sourced any of the MINERvA offline software setup scripts. g4numi is independent of the offline software and depends on a different version of GEANT4.
 
-project Minerva_g4numi
+1.  Make a fresh working area under /minerva/app/users/<you>/
 
-use MINERVA MINERVA_vXrYpZ
 
-where XYZ are the version, release and patch number of the software release. You won't 
-actually use it at all and it doesn't matter.
+2.  Checkout the g4numi package:
 
-2.  In /minerva/app/users/<you>/cmtuser/Minerva_g4numi, checkout the g4numi package:
+%  cvs -d :ext:p-numi-beam-sim@cdcvs.fnal.gov/cvs/projects/numi-beam-sim co -r minerva g4numi
 
-% cvs co NumiAna/numisoft/g4numi
+NOTE, we are checking out the MINERvA branch of g4numi from the official repository. One can also checkout the minos and nova branches in a similar way.
 
-3.  Log out, and log back in. Do NOT source any setup scripts, including the standard Minerva setup. 
-Doing so will set some environment variables that you do not want.
+Note there is a redmine site for the numi beam simulation:
 
-Go to the g4numi area
-% cd /minerva/app/users/<you>/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
+https://cdcvs.fnal.gov/redmine/projects/numi-beam-sim/wiki
+
+Including some build instuctions:
+
+https://cdcvs.fnal.gov/redmine/projects/numi-beam-sim/wiki/How_to_build_the_code
+
+Most users can go to step 7 listed below. Steps 3-6 deal with building G4 from source. 
+
+
+3. Go to the g4numi area under /minerva/app/users/<you>/
 
 Make a directory to put Geant4 in:
 % mkdir geant4
@@ -94,7 +94,6 @@ settings saved, so you may just hold down enter until it starts compiling.
 
 7. Go back to your g4numi area and source the beamsim script:
 
-% cd /minerva/app/users/<you>/cmtuser/Minerva_g4numi/NumiAna/numisoft/g4numi
 % source setup_beamsim.sh
 
 8. type "make" to execute the GNUmakefile

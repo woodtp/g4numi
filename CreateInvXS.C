@@ -1,3 +1,4 @@
+// $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/CreateInvXS.C,v 1.1.2.2 2014/02/13 21:12:03 kordosky Exp $
 
 #include "TMath.h"
 #include "TH1.h"

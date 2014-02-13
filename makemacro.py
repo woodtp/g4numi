@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.5 2014/02/13 21:12:03 kordosky Exp $
+
 import os, re, sys, getopt,string
 from string import Template
 
@@ -11,7 +14,8 @@ SYNOPSIS
     makemacro.py [OPTIONS]
 DESCRIPTION
     Reads 
-    %s/template.mac 
+    %s
+    [by default, see option -t below]
     and writes a new .mac file to standard output, 
     substituting some ${flags} according to defaults or the command line.
     -h, --help
@@ -31,6 +35,8 @@ DESCRIPTION
     -s, --seed [default=run]
           The random seed used in the g4numi run. By default this will
           be set equal to the run number
+    -t, --template
+          The template file to use. Default listed above.
     -n, --nametag [default='']
           If not '', '_<nametag>' will be appended to the filename
           g4numi$G4NUMIVER_<beamconfig>_<nametag>
