@@ -12,7 +12,7 @@ echo "G4NUMIAREA = $G4NUMIAREA"
 WORKDIR=$G4NUMIAREA
 source $WORKDIR/setup_beamsim.sh
 
-setup_beamsim -w 1
+setup_beamsim
 #create the macro file
 
 echo "BEAMCONFIG=$BEAMCONFIG"
