@@ -1,22 +1,21 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.3 2014/02/14 20:16:05 kordosky Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.4 2014/02/18 16:40:39 kordosky Exp $
 
 # for interactive running use GRID=""
 #export GRID=""
 # for production account, non group-writable, use GRID="-g"
 #export GRID="-g"
 # for submitting as myself, use GRID="-g --use_gftp"
-export GRID="-g --use_gftp"
-#export GRID="-g --opportunistic"
+export GRID="-g --opportunistic --use_gftp"
 
 ########################### g4numi configuration ###########################
 export BEAMCONFIG="le010z185i"
 export DOWATER="false"
 export WATERCM="3"
 export DOIMPWT="false"
-export POT="500000" 
-export NJOBS="10"
+export POT="1000" 
+export NJOBS="2"
 export RUN="1"
 export OUTDIR="/minerva/data/users/$USER/flux/targ_pos/"
 export LOGFILE="${OUTDIR}/g4numi_${BEAMCONFIG}_${RUN}_\${PROCESS}.log"
