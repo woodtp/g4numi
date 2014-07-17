@@ -1,4 +1,4 @@
-// $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/CreateYields.C,v 1.1.2.2 2014/02/13 21:12:03 kordosky Exp $
+// $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/CreateYields.C,v 1.1.2.3 2014/07/17 22:44:30 laliaga Exp $
 
 #include <iostream>
 #include <fstream>
@@ -31,7 +31,7 @@ Double_t getxF(Int_t id);
 void CreateYields(Int_t Mom, std::string hadPhys, std::string files, Int_t run, bool include_ff)
 {
 
-
+  //Just a dummy message to test my understanding of cvs
   TFile* foutput = new TFile(Form("Yields_%s_pC%04dGeV_mc%02d.root",hadPhys.c_str(),Mom,run),"RECREATE");
 
   std::ofstream qeinfo;
