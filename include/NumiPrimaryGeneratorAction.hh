@@ -123,6 +123,31 @@ class NumiPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
    G4bool fStart;
    
    NtpMuon* fMuon;
+   //
+   // Geantinos
+   //
+     G4bool fUseGeantino;
+  G4bool fUseMuonGeantino;
+  G4double fZOriginGeantino;
+  G4double fSigmaZOriginGeantino;
+  G4double fPolarAngleGeantino;
+  G4double fPolarAngleGeantinoMin;
+
+public: 
+
+   inline void SetPolarAngleGeantino(double r) {fPolarAngleGeantino=r;}
+   inline void SetPolarAngleGeantinoMin(double r) {fPolarAngleGeantinoMin=r;}
+   inline void SetUseGeantino(bool t) {fUseGeantino=t;}
+   inline void SetUseMuonGeantino(bool t) {fUseMuonGeantino=t;}
+   inline void SetZOriginGeantino(double v) {fZOriginGeantino=v;}
+   inline void SetSigmaZOriginGeantino(double v) {fSigmaZOriginGeantino=v;}
+   
+   inline bool GetUseMuonGeantino() const { return fUseMuonGeantino; }
+   inline bool GetUseGeantino() const { return fUseGeantino; }   
+
+private:
+   void Geantino(G4Event* anEvent);
+   
 
 };
 

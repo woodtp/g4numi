@@ -41,8 +41,49 @@ private:
 
    G4bool fPrintProcesses;
    G4bool fPrintTouchableHistory;
-  
+   mutable std::ofstream fOutStudyGeantino;
 
+   mutable G4String fGeantinoStudyName;
+   mutable G4String fKeyVolumeNameFrom;
+   mutable G4String fKeyVolumeNameTo;
+     
+  //
+  // Geantino analysis 
+  //
+  mutable double fTotalAbsDecayChan;
+  mutable double fTotalAbsHorn1Neck;
+  mutable double fTotalAbsHorn2Entr;
+  mutable double fWaterAbsDecayChan;
+  mutable double fWaterAbsHorn1Neck;
+  mutable double fWaterAbsHorn2Entr;
+  mutable double fAlumAbsHorn2Entr;
+  mutable bool fGoneThroughHorn1Neck;
+  mutable bool fGoneThroughHorn2Entr;
+  mutable int fEvtIdPrevious;
+  
+  void StudyAbsorption(const G4Step*); 
+  void StudyPropagation(const G4Step*); 
+  void StudyCheckOverlap(const G4Step*);
+   
+public:
+
+   inline void SetGeantinoStudyName(G4String s) const { fGeantinoStudyName = s;} // G4 does not seems to allow to modify 
+                                                                                 // an Action container.. 
+   inline std::string GetGeantinoStudyName() const { return fGeantinoStudyName;}
+   
+   inline void OpenOutStudyGeantino(const char *fName) const {
+      if(fOutStudyGeantino.is_open()) {
+        G4Exception("NumiSteppingAction::OpenOutStudyGeantino, Geantino Output file already open"); 
+         exit(2); // only under 4.9.2 .. not reachable under 4.9.5 
+      }
+      fOutStudyGeantino.open(fName);
+      if (fGeantinoStudyName.contains("PropCO")) fOutStudyGeantino << " id x y z xo yo zo step matPre matPost " << std::endl;
+      if (fGeantinoStudyName.contains("Absorb")) 
+        fOutStudyGeantino << " id x y z AbsTDecayChan AbsTHorn1Neck AbsHorn2E AbsWaterDecayChan AbsWHorn1Neck AbsWHorn2E AbsAlumHorn2Entr  " 
+	              << std::endl;
+   }
+   inline void SetKeyVolumeNameFrom(G4String s) const { fKeyVolumeNameFrom  = s;}
+   inline void SetKeyVolumeNameTo(G4String s) const { fKeyVolumeNameTo  = s;}
 };
 
 #endif

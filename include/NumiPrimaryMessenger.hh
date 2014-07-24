@@ -39,7 +39,15 @@ private:
   G4UIcmdWithADoubleAndUnit* setInnerR;
   G4UIcmdWithADoubleAndUnit* setOuterR;
   G4UIcmdWithAString*        setParticle;  
-
+ //
+ // Geantino control for checking the geometry. P.L. July 2014. 
+ //
+  G4UIcmdWithoutParameter*      fUseGeantino;
+  G4UIcmdWithoutParameter*      fUseMuonGeantino;
+  G4UIcmdWithADoubleAndUnit*    fGeantinoOpeningAngle;
+  G4UIcmdWithADoubleAndUnit*    fGeantinoOpeningAngleMin;
+  G4UIcmdWithADoubleAndUnit*    fGeantinoZOrigin;
+  G4UIcmdWithADoubleAndUnit*    fGeantinoZOriginSigma;
 
 };
 
