@@ -103,6 +103,48 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   PrimaryAction->PG_InnerR(0.0);
   PrimaryAction->PG_OuterR(0.0);
   PrimaryAction->PG_Particle(particleTable->FindParticle("pi+"));
+
+
+  fUseGeantino  = new G4UIcmdWithoutParameter("/NuMI/primary/useGeantino",this);
+  fUseGeantino->SetGuidance("Using a Geantino at the Primary, to study absorption");
+  fUseGeantino->AvailableForStates(G4State_Idle);
+    
+  fUseMuonGeantino  = new G4UIcmdWithoutParameter("/NuMI/primary/useMuonGeantino",this);
+  fUseMuonGeantino->SetGuidance("Using a muon at the Primary, to study absorption, with magnetic field effect ");
+  fUseMuonGeantino->AvailableForStates(G4State_Idle);
+  
+  fGeantinoOpeningAngle  = new G4UIcmdWithADoubleAndUnit("/NuMI/primary/geantinoOpeningAngle",this);
+  fGeantinoOpeningAngle->SetGuidance("Polar angle generating the geantino (or mu geantino)  ");
+  fGeantinoOpeningAngle->SetParameterName("GeantinoOpeningAngle",true);
+  fGeantinoOpeningAngle->SetDefaultValue (0.005*radian);
+  fGeantinoOpeningAngle->SetDefaultUnit("radian");
+  fGeantinoOpeningAngle->SetUnitCandidates("radian");
+  fGeantinoOpeningAngle->AvailableForStates(G4State_Idle);
+   
+  fGeantinoOpeningAngleMin  = new G4UIcmdWithADoubleAndUnit("/NuMI/primary/geantinoOpeningAngleMin",this);
+  fGeantinoOpeningAngleMin->SetGuidance("Minimum Polar angle generating the geantino (or mu geantino)  ");
+  fGeantinoOpeningAngleMin->SetParameterName("GeantinoOpeningAngleMin",true);
+  fGeantinoOpeningAngleMin->SetDefaultValue (0.);
+  fGeantinoOpeningAngleMin->SetDefaultUnit("radian");
+  fGeantinoOpeningAngleMin->SetUnitCandidates("radian");
+  fGeantinoOpeningAngleMin->AvailableForStates(G4State_Idle);
+   
+  fGeantinoZOrigin  = new G4UIcmdWithADoubleAndUnit("/NuMI/primary/geantinoZOrigin",this);
+  fGeantinoZOrigin->SetGuidance("Z origin  generating the geantino (or mu geantino) (in mm) ");
+  fGeantinoZOrigin->SetParameterName("GeantinoOpeningAngle",true);
+  fGeantinoZOrigin->SetDefaultValue (-515.);
+  fGeantinoZOrigin->SetDefaultUnit ("mm");
+  fGeantinoZOrigin->SetUnitCandidates ("mm cm m");
+  fGeantinoZOrigin->AvailableForStates(G4State_Idle);
+  
+  fGeantinoZOriginSigma  = 
+     new G4UIcmdWithADoubleAndUnit("/NuMI/primary/geantinoSigmaZOrigin",this);
+  fGeantinoZOriginSigma->SetGuidance("Z origin  longitudinal spread generating the geantino (or mu geantino) (in mm) ");
+  fGeantinoZOriginSigma->SetParameterName("GeantinoSigmaZOrigin",true);
+  fGeantinoZOriginSigma->SetDefaultValue (100.);
+  fGeantinoZOriginSigma->SetDefaultUnit ("mm");
+  fGeantinoZOriginSigma->SetUnitCandidates ("mm cm m");
+  fGeantinoZOriginSigma->AvailableForStates(G4State_Idle);
   
 }
 
@@ -117,6 +159,11 @@ NumiPrimaryMessenger::~NumiPrimaryMessenger()
   delete setInnerR;
   delete setOuterR;
   delete setParticle;
+  delete fUseGeantino;
+  delete fUseMuonGeantino;
+  delete fGeantinoOpeningAngle;
+  delete fGeantinoZOrigin;
+  delete fGeantinoZOriginSigma;
 }
 
 void NumiPrimaryMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
@@ -159,6 +206,31 @@ void NumiPrimaryMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
 	  PrimaryAction->PG_Particle(pd);
 	}
   }
-  G4cout << "NumiPrimaryMessenger complete" << G4endl;
+  if (command == fGeantinoOpeningAngle) {
+      G4UIcmdWithADoubleAndUnit* cmdWD = dynamic_cast<G4UIcmdWithADoubleAndUnit*> (command);
+      PrimaryAction->SetPolarAngleGeantino(cmdWD->GetNewDoubleValue(newValues));
+  } else if (command ==  fGeantinoZOrigin ) {
+      G4UIcmdWithADoubleAndUnit* cmdWD = dynamic_cast<G4UIcmdWithADoubleAndUnit*> (command);
+      PrimaryAction->SetZOriginGeantino( cmdWD->GetNewDoubleValue(newValues));   
+  } else if (command ==  fGeantinoOpeningAngleMin ) {
+      G4UIcmdWithADoubleAndUnit* cmdWD = dynamic_cast<G4UIcmdWithADoubleAndUnit*> (command);
+      PrimaryAction->SetPolarAngleGeantinoMin(cmdWD->GetNewDoubleValue(newValues));   
+  } else if (command ==  fGeantinoZOriginSigma ) {
+      G4UIcmdWithADoubleAndUnit* cmdWD = dynamic_cast<G4UIcmdWithADoubleAndUnit*> (command);
+      PrimaryAction->SetSigmaZOriginGeantino( cmdWD->GetNewDoubleValue(newValues));   
+   } else if (command ==  fUseGeantino ) {
+      if (PrimaryAction->GetUseMuonGeantino()) {
+        G4Exception("LBNEPrimaryMessenger", "Inconsistency in particle choice ", FatalException,
+	              "Can't use both a muon geantino, and a geantino ");
+      }
+      PrimaryAction->SetUseGeantino(true);
+   } else if (command ==  fUseMuonGeantino ) {
+      if (PrimaryAction->GetUseGeantino()) {
+        G4Exception("LBNEPrimaryMessenger", "Inconsistency in particle choice ", FatalException,
+	              "Can't use both a muon geantino, and a geantino ");
+      }
+      PrimaryAction->SetUseMuonGeantino(true);
+  }
+//  G4cout << "NumiPrimaryMessenger complete" << G4endl; // does not make much sense to print for every command.. 
 }
 

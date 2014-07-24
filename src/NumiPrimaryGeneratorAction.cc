@@ -33,7 +33,13 @@
 using namespace std;
 
 NumiPrimaryGeneratorAction::NumiPrimaryGeneratorAction()
-   :fStart(false)
+   :fStart(false),
+    fUseGeantino(false),
+    fUseMuonGeantino(false),
+    fZOriginGeantino(-515.), // Upstream of target.
+    fSigmaZOriginGeantino(100.), // Upstream of target.
+    fPolarAngleGeantino(.005),
+    fPolarAngleGeantinoMin(0.)
 {
   beamMessenger = new NumiPrimaryMessenger(this);
   fND=NumiDataInput::GetNumiDataInput();
@@ -113,6 +119,52 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
 
   fCurrentPrimaryNo=0;
 }
+
+//
+// Used to begug geometry, and/or, Radiography of the detector. 
+//
+void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
+{
+// If nothing else is set, use a proton beam
+    
+    const double dr = fPolarAngleGeantinoMin + 
+                      (fPolarAngleGeantino - fPolarAngleGeantinoMin)*CLHEP::RandFlat::shoot();
+// Back door to study tile of Horn1 via magentic effect. Take a point source at = 0.
+//     double dPhi  = M_PI/2.;
+//     while (((dPhi >  M_PI/4.) && (dPhi <  3.0*M_PI/4.)) ||
+//            ((dPhi > (M_PI + M_PI/4.)) && (dPhi < (2.0*M_PI - M_PI/4.))))
+//        dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
+	
+    const double dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
+//    const double dPhi = -M_PI/2.; // Shooting up, test Hadron Absorber. 
+    const double dx = dr*std::cos(dPhi);
+    const double dy = dr*std::sin(dPhi);
+    const double dz = sqrt(1.0 - (dx*dx + dy*dy));
+    G4ThreeVector direction(dx, dy, dz);
+//
+// Store it a proton internally to Numi d/s  ... Messy: 
+//    fProtonN = fCurrentPrimaryNo;
+    
+    fTgen=0;
+    const double x =  G4RandGauss::shoot(0.0, 1.3);  
+    const double y =  G4RandGauss::shoot(0.0, 1.3);  
+// Back door to study tile of Horn1 via magentic effect. Take a point source at = 0.
+//    const double x =  G4RandGauss::shoot(0.0, 1.3e-10);  
+//    const double y =  G4RandGauss::shoot(0.0, 1.3e-10);  
+// Back door to study effect of overlap
+//    const double dPhiPos = 2.0*M_PI*CLHEP::RandFlat::shoot();
+//    const double x =  G4RandGauss::shoot(0.0, 0.00001) + 26.0 * std::sin(dPhiPos);  
+//    const double y =  G4RandGauss::shoot(0.0, 0.00001) + 26.0 * std::cos(dPhiPos);  
+    const double z =  fZOriginGeantino +  G4RandGauss::shoot(0.0, fSigmaZOriginGeantino);  
+    fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+    fParticleGun->SetParticleMomentumDirection(direction);
+//    std::cerr << " Muon Vertex " << G4ThreeVector(x, y, z) << " direction " << direction << std::endl;
+    if (fUseMuonGeantino) fParticleGun->SetParticleEnergy(fND->protonKineticEnergy); // back door use of the proton momentum data card. 
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+    fCurrentPrimaryNo++;
+    
+}
+
 
 
 G4bool NumiPrimaryGeneratorAction::OpenNtuple(G4String ntupleName)
@@ -607,6 +659,9 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticleMomentum(G4ThreeVector(px, py, pz));
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
+  }
+  else if (fUseGeantino || fUseMuonGeantino ) {
+        this->Geantino(anEvent);
   }
   else
   {

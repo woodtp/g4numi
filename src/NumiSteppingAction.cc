@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.5 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.6 2014/07/24 15:55:39 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -39,16 +39,21 @@ NumiSteppingAction::NumiSteppingAction()
     fPrintDeltaAlcove2(false),
     fPrintDeltaAlcove3(false),
     fPrintProcesses(false),
-    fPrintTouchableHistory(false)
+    fPrintTouchableHistory(false),
+    fGeantinoStudyName("none"),
+    fKeyVolumeNameFrom("none"),
+    fKeyVolumeNameTo("none")
+
 {
   NDI = NumiDataInput::GetNumiDataInput();
   pRunManager=(NumiRunManager*)NumiRunManager::GetRunManager();
 
-  
+  fEvtIdPrevious = -5555;
 }
 
 NumiSteppingAction::~NumiSteppingAction()
 {
+   if(fOutStudyGeantino.is_open())  fOutStudyGeantino.close(); 
 }
 
 
@@ -61,7 +66,6 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
       std::cout << "Event " << evtno << ": NumiSteppingAction::UserSteppingAction() Called." << std::endl;
    }
 
-   
    NumiAnalysis* analysis = NumiAnalysis::getInstance();
    analysis->FillBXDRAW(theStep);
    
@@ -787,7 +791,6 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
      //for spiltting deltas. see above
      //
      if(reWeightedDelta) (stepManager -> GetfPostStepPoint()) -> SetWeight(newWeight);
-     
   }//end if(NDI->useMuonBeam)
    //
   //
@@ -819,7 +822,13 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
   //
   //*****************************************************************
   //*****************************************************************
-
+  //
+  // Geantino Analysis, P.L. July 2014
+  if (fOutStudyGeantino.is_open()) {
+       if (fGeantinoStudyName.find("Absorb") != std::string::npos) StudyAbsorption(theStep);
+       if (fGeantinoStudyName.find("Propa") != std::string::npos) StudyPropagation(theStep);
+       if (fGeantinoStudyName.find("PropCO") != std::string::npos) StudyCheckOverlap(theStep);
+  }
   //================================
   //=======for Raytracing===========
   //--------------------------------
@@ -962,6 +971,225 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
       }
   }
 
+}
+void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
+//
+//make sure we are dealing with a geantino, or a mu, to include lengthening of step due to curling in 
+// B Field
+//
+   G4Track * theTrack = theStep->GetTrack();
+//   if (((theTrack->GetParticleDefinition()->GetParticleName()).find("geantino") == std::string::npos) && (
+//        ((theTrack->GetParticleDefinition()->GetParticleName()).find("mu+") == std::string::npos ))) return; //for v4.9.4 and above. 
+
+   if (((theTrack->GetDefinition()->GetParticleName()).find("geantino") == std::string::npos) && (
+        ((theTrack->GetDefinition()->GetParticleName()).find("mu+") == std::string::npos ))) return;
+ 	
+   G4StepPoint* prePtr = theStep->GetPreStepPoint();
+   if (prePtr == 0) return;
+/*
+   if ( theTrack->GetNextVolume() == 0 ) {
+       fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
+        for (size_t k=0; k!=3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k];
+	fOutStudyGeantino << " " << totalAbsDecayChan << " " <<  totalAbsHorn1Neck 
+	          << " " << totalAbsHorn2Entr;
+	fOutStudyGeantino << " " << waterAbsDecayChan << " " <<  waterAbsHorn1Neck 
+	          << " " << waterAbsHorn2Entr << " " <<  alumAbsHorn2Entr << std::endl;
+		  return;
+   }		  
+*/
+   //
+   // I set the position of the geantino production vertex at Z=0.;
+   //
+//   G4LogicalVolume *volPre = prePtr->GetPhysicalVolume()->GetLogicalVolume();
+   if (fEvtIdPrevious  != pRunManager->GetCurrentEvent()->GetEventID() ) { 
+//     std::cerr << " Evt id " << 
+//           pRunManager->GetCurrentEvent()->GetEventID() <<
+//	      " Starting point, z = " << prePtr->GetPosition()[2] << std::endl;
+     fTotalAbsDecayChan= 0.;
+     fTotalAbsHorn1Neck=0.;
+     fTotalAbsHorn2Entr=0.;
+     fWaterAbsDecayChan= 0.;
+     fWaterAbsHorn1Neck=0.;
+     fWaterAbsHorn2Entr=0.;
+     fAlumAbsHorn2Entr=0.;
+     fGoneThroughHorn1Neck = false;
+     fGoneThroughHorn2Entr = false;
+     fEvtIdPrevious = pRunManager->GetCurrentEvent()->GetEventID();
+     return;
+   } 
+
+   if(theStep->GetPreStepPoint()->GetPhysicalVolume() == NULL) return;
+   const double ll = theStep->GetStepLength();
+   G4StepPoint* postPtr = theStep->GetPostStepPoint();
+/*
+   if (postPtr == NULL) {
+       fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
+        for (size_t k=0; k!=3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k];
+	fOutStudyGeantino << " " << totalAbsDecayChan << " " <<  totalAbsHorn1Neck 
+	          << " " << totalAbsHorn2Entr;
+	fOutStudyGeantino << " " << waterAbsDecayChan << " " <<  waterAbsHorn1Neck 
+	          << " " << waterAbsHorn2Entr << " " <<  alumAbsHorn2Entr << std::endl;
+		  return;
+   } 		  
+*/
+  if (postPtr == NULL) return;
+   G4VPhysicalVolume *physVol = postPtr->GetPhysicalVolume();
+   std::string vName(physVol->GetName());
+   G4Material *material = theTrack->GetMaterial();
+    
+   if (pRunManager->GetCurrentEvent()->GetEventID() < 20) {
+      const double r = std::sqrt(postPtr->GetPosition()[0]*postPtr->GetPosition()[0] + 
+                                 postPtr->GetPosition()[1]*postPtr->GetPosition()[1]); 
+      const double t = r/std::abs(postPtr->GetPosition()[2] + 515.25); // ZOrigin = -515.25
+      // debugging only valid for Zorigin of -515.
+      std::cerr << " r = " << r << " theta " << t <<  " z = " << postPtr->GetPosition()[2] << 
+	      " In " << vName << " material " << material->GetName()
+	      << " InterLength " << material->GetNuclearInterLength() << std::endl;  
+   } 
+   if (postPtr->GetPosition()[2] > 500.) fGoneThroughHorn1Neck=true; // approximate... 
+   if (postPtr->GetPosition()[2] > 6560.) fGoneThroughHorn2Entr=true; //truly approximate. 
+   if (ll < 1.0e-10) return; 
+
+   fTotalAbsDecayChan += ll/material->GetNuclearInterLength(); 
+   if (vName.find("ICW") != std::string::npos) fWaterAbsDecayChan += ll/material->GetNuclearInterLength(); 
+   if (!fGoneThroughHorn1Neck) {
+     fTotalAbsHorn1Neck += ll/material->GetNuclearInterLength(); 
+     if (vName.find("ICW") != std::string::npos) fWaterAbsHorn1Neck += ll/material->GetNuclearInterLength(); 
+   }
+   if (!fGoneThroughHorn2Entr) {
+     fTotalAbsHorn2Entr += ll/material->GetNuclearInterLength();
+//     if (theTrack->GetTrackLength() < (6000.0*mm)) 
+//       std::cerr << " trackLength = " << theTrack->GetTrackLength() << " Z = " << postPtr->GetPosition()[2] << 
+//         " Abs L " << totalAbsHorn2Entr << std::endl;
+     
+     if (vName.find("ICW") != std::string::npos) {
+        fWaterAbsHorn2Entr += ll/material->GetNuclearInterLength(); 
+     } else {
+       if ((vName.find("Horn1") != std::string::npos) && (material->GetName().find("Alumin") != std::string::npos))
+         fAlumAbsHorn2Entr += ll/material->GetNuclearInterLength(); 
+      }
+   }
+   if (postPtr->GetPosition()[2] > 12100. !=  std::string::npos) {
+        fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
+        for (size_t k=0; k!=3; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+	fOutStudyGeantino << " " << fTotalAbsDecayChan << " " <<  fTotalAbsHorn1Neck 
+	          << " " << fTotalAbsHorn2Entr;
+	fOutStudyGeantino << " " << fWaterAbsDecayChan << " " <<  fWaterAbsHorn1Neck 
+	          << " " << fWaterAbsHorn2Entr << " " <<  fAlumAbsHorn2Entr << std::endl;
+        theTrack->SetTrackStatus(fStopAndKill);
+	return;
+   } 
+    
+}
+void NumiSteppingAction::StudyPropagation(const G4Step * theStep) {
+//
+//make sure we are dealing with a geantino... 
+//
+   G4Track * theTrack = theStep->GetTrack();
+//   if ((theTrack->GetParticleDefinition()->GetParticleName()).find("geantino") == std::string::npos) return; v4.9.4 and beyond
+   if ((theTrack->GetDefinition()->GetParticleName()).find("geantino") == std::string::npos) return;
+   G4StepPoint* prePtr = theStep->GetPreStepPoint();
+   if (prePtr == 0) return;
+   G4StepPoint* postPtr = theStep->GetPostStepPoint();
+   if (postPtr == 0) return;
+   if (theStep->GetStepLength() < 0.1*mm) return;
+   G4LogicalVolume *volPost = postPtr->GetPhysicalVolume()->GetLogicalVolume();
+   G4LogicalVolume *volPre = prePtr->GetPhysicalVolume()->GetLogicalVolume();
+   std::string volNamePost(volPost->GetName());
+   std::string volNamePre(volPre->GetName());
+   if ((volNamePost.find(fKeyVolumeNameTo.c_str()) != std::string::npos) || 
+      (volNamePre.find(fKeyVolumeNameFrom.c_str()) != std::string::npos)) {
+       std::cout << " NumiSteppingAction::StudyPropagation, critical volume " << std::endl 
+	  << ".. from " << volNamePre << " to " << volNamePost 
+	             << " detected at " <<  prePtr->GetPosition() << " going to " << postPtr->GetPosition() << std::endl;
+       const G4VTouchable *preHist = prePtr->GetTouchable();
+       const G4VTouchable *postHist = postPtr->GetTouchable();
+       const G4int nDepthPre = preHist->GetHistoryDepth();
+       const G4int nDepthPost = postHist->GetHistoryDepth();
+       std::cerr << " ....  History depth for pre point " <<  nDepthPre << " Post " << nDepthPost << std::endl;
+       for (int k=0; k!=  std::max(nDepthPre, nDepthPost); k++) {
+         if ((k <nDepthPre) && (k <nDepthPost))
+	     std::cerr << " ............. Translation at depth, pre ... " << preHist->GetTranslation(k) 
+	               << " Post " <<  postHist->GetTranslation(k) <<   std::endl;
+	 else if (k <nDepthPre) 	       
+	     std::cerr << " ..............Translation at depth, pre ... " << preHist->GetTranslation(k) << std::endl;
+	 else  if (k <nDepthPost)     
+	     std::cerr << " ..............Translation at depth, post ... " << postHist->GetTranslation(k) << std::endl;
+       }
+       std::cerr << " ------------------------------------------- " << std::endl;	     
+   }   
+   if (volPre->GetMaterial()->GetName() == volPost->GetMaterial()->GetName()) return;
+   fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
+   for (int k=0; k != 3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k];
+   for (int k=0; k != 3; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+   fOutStudyGeantino << " " << postPtr->GetPosition()[2];
+   fOutStudyGeantino << " " << theStep->GetStepLength();
+   fOutStudyGeantino << " " << volPre->GetMaterial()->GetName();
+   fOutStudyGeantino << " " << volPost->GetMaterial()->GetName();
+   fOutStudyGeantino << std::endl;
+   G4String vName(volPre->GetName());
+//   if (vName.find("DecayPipe") !=  std::string::npos) {
+//        theTrack->SetTrackStatus(fStopAndKill);
+//    }
+}
+void NumiSteppingAction::StudyCheckOverlap(const G4Step * theStep) {
+//
+//make sure we are dealing with a geantino... 
+//
+   G4Track * theTrack = theStep->GetTrack();
+   // Skip this cut for X-checking the muon-genatinos 
+//   if ((theTrack->GetParticleDefinition()->GetParticleName()).find("geantino") == std::string::npos) return;
+   if( theTrack->GetNextVolume() == 0 ) {
+        if (pRunManager->GetCurrentEvent()->GetEventID() < 3) 
+	   std::cout << " Out of world with track length  = " << theTrack->GetTrackLength()  << std::endl; 
+       return;
+   }
+   G4StepPoint* prePtr = theStep->GetPreStepPoint();
+   if (prePtr == 0) return;
+   G4StepPoint* postPtr = theStep->GetPostStepPoint();
+   if (postPtr == 0) {
+        if (pRunManager->GetCurrentEvent()->GetEventID() < 3) 
+	   std::cout << " No Post Point, Last step at Z = " << prePtr->GetPosition()[2] << " r " <<            
+	      std::sqrt(prePtr->GetPosition()[0]*prePtr->GetPosition()[0] +
+	         prePtr->GetPosition()[1]*prePtr->GetPosition()[1]) << std::endl; 
+ 
+       return;
+   }
+   if (postPtr->GetPhysicalVolume() == 0) {
+        if (pRunManager->GetCurrentEvent()->GetEventID() < 3) 
+	   std::cout << " No Post Point Volume Last step at Z = " << prePtr->GetPosition()[2] << " r " <<            
+	      std::sqrt(prePtr->GetPosition()[0]*prePtr->GetPosition()[0] +
+	         prePtr->GetPosition()[1]*prePtr->GetPosition()[1]) << std::endl; 
+   
+    return;
+   }
+   if (prePtr->GetPhysicalVolume() == 0) return;
+   G4LogicalVolume *volPost = postPtr->GetPhysicalVolume()->GetLogicalVolume();
+   G4LogicalVolume *volPre = prePtr->GetPhysicalVolume()->GetLogicalVolume();
+   if (volPre == 0) return;
+   if (volPost == 0) return;
+  std::string volNamePost(volPost->GetName());
+   std::string volNamePre(volPre->GetName());
+   if (pRunManager->GetCurrentEvent()->GetEventID() < 3) 
+     std::cout << " at Z = " << prePtr->GetPosition()[2] << " r " << 
+           std::sqrt(prePtr->GetPosition()[0]*prePtr->GetPosition()[0] +
+	         prePtr->GetPosition()[1]*prePtr->GetPosition()[1]) 
+	   << ", " << volNamePre  << " to " << postPtr->GetPosition() << ", " << volNamePost
+	    << " Check Names, pre " << fKeyVolumeNameFrom << " to " << fKeyVolumeNameTo << std::endl;  
+//   if (((volNamePost.find(fKeyVolumeName.c_str()) != std::string::npos) || 
+//      (volNamePre.find(fKeyVolumeName.c_str()) != std::string::npos)) &&
+//      ( (volNamePost.find(fKeyVolumeNameTo.c_str()) != std::string::npos) || 
+//      (volNamePre.find(fKeyVolumeNameTo.c_str()) != std::string::npos))) {
+   if ( (volNamePre.find(fKeyVolumeNameFrom.c_str()) != std::string::npos) &&
+        (volNamePost.find(fKeyVolumeNameTo.c_str()) != std::string::npos)) {
+     fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
+     for (int k=0; k != 3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k];
+     for (int k=0; k != 3; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+     fOutStudyGeantino << " " << theStep->GetStepLength();
+     fOutStudyGeantino << " " << volPre->GetMaterial()->GetName();
+     fOutStudyGeantino << " " << volPost->GetMaterial()->GetName();
+     fOutStudyGeantino << std::endl;
+  }
 }
 
 
