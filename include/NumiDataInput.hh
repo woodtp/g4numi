@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.8 2014/01/22 22:31:06 kordosky Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.9 2014/07/24 15:50:42 lebrun Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -140,6 +140,8 @@ public:
    G4double GetSkinDepth()                    { return fSkinDepth;}  
    G4double GetUseHornCurrDist()              { return fUse_HCD;}
    
+   G4double GetHornWaterLayerThick()          { return fHornWaterLayerThick; }
+   
    //--------------------------------------------------------------
    //Specifically for Muon Monitor simulation and Absorber background simulation
    //
@@ -168,6 +170,7 @@ public:
    void OutputAbsBkgNtuple(G4bool output)      {createAbsBkgNtuple=output;}
    void SetAbsBkgNtupleName(G4String fileName) {absbkgNtupleName=fileName;}
    void SetAbsBkgNtupleDir(G4String fileDir)   {absbkgNtupleDir=fileDir;}
+   void SetHornWaterLayerThick(G4double d)     {fHornWaterLayerThick = d;}
    
    G4bool   GetMuonBeam()            {return useMuonBeam;}
    G4int    GetNInputParts()         {return NInputParts;}
@@ -243,7 +246,7 @@ public:
 
    G4double fSkinDepth;
    G4bool   fUse_HCD;
-
+      
    //////////////////////////////
    
    G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;
@@ -380,6 +383,13 @@ public:
   G4double HadrBox_width, HadrBox_height, HadrBox_length;
 
   // Horn 1 & 2
+  
+   //////////////////////////////
+   // July 2014: Adding the layer of water, Paul Lebrun. Declared public.. Why placing access functon them
+   // But other variables are declared this way. 
+   //
+   
+   G4double fHornWaterLayerThick;
 
    //-----------------
    //do these variables get used?!

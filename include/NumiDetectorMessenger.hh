@@ -72,6 +72,9 @@ private:
 
     G4UIcmdWithADoubleAndUnit* fSkinDepthCmd;
     G4UIcmdWithABool* fUseHCDCmd;
+    
+    G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
+    
 
 };
 
