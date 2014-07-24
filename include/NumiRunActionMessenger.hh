@@ -102,6 +102,14 @@ private:
    G4UIcmdWithAString*         setTarNtupleFile;
    G4UIcmdWithABool*           KillTracking;
    G4UIcmdWithADoubleAndUnit*  KillTrackingThreshold;
+   //
+   // P. L. Use of Geantinos
+   //
+   G4UIcmdWithAString*         SteppingActionGeantinoCmd;
+   G4UIcmdWithAString*         OutputASCIIFileNameCmd;
+   G4UIcmdWithAString*         KeyVolumeNameFrom;
+   G4UIcmdWithAString*         KeyVolumeNameTo;
+
    
 };
 

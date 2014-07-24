@@ -17,6 +17,7 @@
 #include "globals.hh"
 #include "Randomize.hh"
 #include "G4RunManager.hh"
+#include "NumiSteppingAction.hh"
 
 NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   :runAction (RA)
@@ -367,7 +368,34 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   KillTrackingThreshold->SetParameterName("KillTrackingThreshold",true);
   KillTrackingThreshold->SetDefaultValue(NumiData->KillTrackingThreshold);
   KillTrackingThreshold->AvailableForStates(G4State_PreInit,G4State_Idle);
-
+  //
+  // Geantino Studies..
+  //
+  SteppingActionGeantinoCmd  = new G4UIcmdWithAString("/NuMI/stepping/name",this);
+  SteppingActionGeantinoCmd->SetGuidance("Name for the Geantino study in question");
+  SteppingActionGeantinoCmd->SetParameterName("Name",true);
+  SteppingActionGeantinoCmd->SetDefaultValue ("GeomPosGeantino101");
+  SteppingActionGeantinoCmd->AvailableForStates(G4State_Idle);
+    
+  OutputASCIIFileNameCmd  = new G4UIcmdWithAString("/NuMI/stepping/filename",this);
+  OutputASCIIFileNameCmd->SetGuidance("Ascii file Name for a plain ASCII file with positions of the geantino  ");
+  OutputASCIIFileNameCmd->SetParameterName("FileName",true);
+  OutputASCIIFileNameCmd->SetDefaultValue ("./steppingActionOut.txt");
+  OutputASCIIFileNameCmd->AvailableForStates(G4State_Idle);
+    
+  KeyVolumeNameFrom  = new G4UIcmdWithAString("/NuMI/stepping/KeyVolumeNameFrom",this);
+  KeyVolumeNameFrom->SetGuidance("A volume that will trigger output running geantino propagation ");
+  KeyVolumeNameFrom->SetParameterName("KeyVolumeNameFrom",true);
+  KeyVolumeNameFrom->SetDefaultValue ("blank");
+  KeyVolumeNameFrom->AvailableForStates(G4State_Idle);
+  
+  KeyVolumeNameTo  = new G4UIcmdWithAString("/NuMI/stepping/KeyVolumeNameTo",this);
+  KeyVolumeNameTo->SetGuidance(
+   "A volume that will trigger output running geantino propagation, second one Post or pre step  ");
+  KeyVolumeNameTo->SetParameterName("KeyVolumeNameTo ",true);
+  KeyVolumeNameTo->SetDefaultValue ("blank");
+  KeyVolumeNameTo->AvailableForStates(G4State_Idle);
+  
 }
 
 NumiRunActionMessenger::~NumiRunActionMessenger()
@@ -430,7 +458,14 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setZpNtupleFile;
   delete KillTracking;
   delete KillTrackingThreshold;
-
+ //
+ // Geantino studies..
+ //
+ delete SteppingActionGeantinoCmd;
+ delete OutputASCIIFileNameCmd;
+ delete KeyVolumeNameFrom;
+ delete KeyVolumeNameTo;
+ 
 }
 
 void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
@@ -616,6 +651,25 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
    if (command== KillTrackingThreshold){
      NumiData->SetKillTrackingThreshold(KillTrackingThreshold->GetNewDoubleValue(newValues));
    }
-
+   if (command == SteppingActionGeantinoCmd) {
+     G4RunManager *grM = G4RunManager::GetRunManager();
+     const NumiSteppingAction *NSA = dynamic_cast<const NumiSteppingAction *> (grM->GetUserSteppingAction());
+     NSA->SetGeantinoStudyName(newValues);
+   }
+   if (command == OutputASCIIFileNameCmd) {
+     G4RunManager *grM = G4RunManager::GetRunManager();
+     const NumiSteppingAction *NSA = dynamic_cast<const NumiSteppingAction *> (grM->GetUserSteppingAction());
+     NSA->OpenOutStudyGeantino(newValues.c_str());
+   }
+   if (command == KeyVolumeNameFrom) {
+     G4RunManager *grM = G4RunManager::GetRunManager();
+     const NumiSteppingAction *NSA = dynamic_cast<const NumiSteppingAction *>(grM->GetUserSteppingAction());
+     NSA->SetKeyVolumeNameFrom(newValues);
+   }
+   if (command == KeyVolumeNameTo) {
+     G4RunManager *grM = G4RunManager::GetRunManager();
+     const NumiSteppingAction *NSA = dynamic_cast<const NumiSteppingAction *>(grM->GetUserSteppingAction());
+     NSA->SetKeyVolumeNameTo(newValues);
+   }
 }
 

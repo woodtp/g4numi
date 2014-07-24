@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.8 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.9 2014/07/24 15:52:20 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -839,7 +839,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   Horn2Y0 = 0.0*cm;
   Horn2Z0 = 10.0*m;
   
-
+  fHornWaterLayerThick = 0.0*mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
   
 
   NPHorn2EndN=3;
