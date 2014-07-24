@@ -81,6 +81,8 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
   G4VPhysicalVolume* myVolume = numinavigator->LocateGlobalPointAndSetup(Position);
   G4TouchableHistoryHandle aTouchable = numinavigator->CreateTouchableHistoryHandle();
   G4ThreeVector localPosition = aTouchable->GetHistory()->GetTopTransform().TransformPoint(Position);
+//  std::cerr << " Evaluating magnetic field in volume " << myVolume->GetName() 
+//              << " R " << std::sqrt(Point[0]*Point[0] + Point[1]*Point[1]) << " z " << Point[2] << std::endl;
 
   delete numinavigator;
 
@@ -91,7 +93,9 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
   G4double dIn=0.;
   G4double magBField = 0.;  
 
-  if (myVolume->GetName().contains("IC")){
+  if (myVolume->GetName().contains("IC") && (!myVolume->GetName().contains("ICWater"))){
+//    std::cerr << " Evaluating magnetic field in IC volume " << myVolume->GetName()
+//              << " R " << std::sqrt(Point[0]*Point[0] + Point[1]*Point[1]) << " z " << Point[2] << std::endl;
     dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
     dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
     if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 

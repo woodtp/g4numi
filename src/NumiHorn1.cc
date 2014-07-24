@@ -1,5 +1,5 @@
 #include "NumiDetectorConstruction.hh"
-
+#include "globals.hh"
 #include "G4Material.hh"
 #include "G4VSolid.hh"
 #include "G4Box.hh"
@@ -24,7 +24,17 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
 {
   G4ThreeVector translation;
   G4RotationMatrix rotation;
-  NumiDataInput* ND=NumiDataInput::GetNumiDataInput(); 
+  NumiDataInput* ND=NumiDataInput::GetNumiDataInput();
+  
+  const double hornWaterLayerThick = ND->GetHornWaterLayerThick(); // July 16-19 2014, P.L.
+     if ( hornWaterLayerThick > 10.) {
+     std::ostringstream messageOStr; messageOStr << " Unreasonable amount of water " << hornWaterLayerThick;
+     std::string message(messageOStr.str());
+     G4Exception("NumiDetectorConstruction::ConstructHorn1");
+     exit(2); // only under 4.9.2 .. not reachable under 4.9.5 
+   }
+   const bool placeWaterLayer = (hornWaterLayerThick > 0.001*mm);
+
   // subtract TargetHallPosition to get origin at the face of Horn1
   G4ThreeVector TargetHallPosition=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0);
   // G4double MHorn1Length=133.966*2.54*cm+3.938*in+1.75*in+2.5*in;
@@ -53,6 +63,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   G4double zPos(0);
   vdouble_t OCzPos,OCRout,OCRin, ICzPos,ICRout,ICRin;
   vdouble_t FzPos, FRin, FRout, MVzPos,MVRout,MVRin;
+  vdouble_t FRinW, FRoutW; // for Water layer...July 16 2014
   
   OCzPos.push_back(OCZ0); OCRin.push_back(PHorn1OCRin(OCzPos[0])); OCRout.push_back(PHorn1OCRout(OCzPos[0]));
   ICzPos.push_back(ICZ0); ICRin.push_back(PHorn1ICRin(ICzPos[0])); ICRout.push_back(PHorn1ICRout(ICzPos[0]));
@@ -130,7 +141,18 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   OCzPos.push_back(OCZ1); OCRin.push_back(PHorn1OCRin(OCzPos[nOut]));OCRout.push_back(PHorn1OCRout(OCzPos[nOut]));
   nMV++;
   MVzPos.push_back(endZ+MVgap);
-
+  
+  if (placeWaterLayer) { // July 
+    FRinW.clear(); FRoutW.clear();
+    for (size_t i=0; i != FRin.size(); i++) {
+      FRinW.push_back(FRin[i]);
+      FRoutW.push_back(FRin[i] + hornWaterLayerThick);
+      FRin[i] += hornWaterLayerThick + epsilon;
+//      std::cerr << " Radial setting for section " << i << " FRinW " << FRinW[i] << " FRoutW "
+//                << FRoutW[i] << " FRin " << FRin[i] << " FRout " << FRout[i] << " at Z " << ICzPos[i] << std::endl;
+    }
+  }
+//  std::cerr << " FRIn size " << FRin.size() <<  " nIn + 1 = " << nIn +1 << std::endl;
   if (maxR>=PHorn1OCRout(zPos)) MVRout.push_back(maxR+MVgap);
   else MVRout.push_back(PHorn1OCRout(zPos)+MVgap);
   if (minR<=PHorn1ICRin(zPos)) MVRin.push_back(minR-MVgap);
@@ -138,8 +160,14 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
 
   // Create Mother Volume
   G4VSolid* sMHorn1;
-  G4Material* material=Vacuum; 
-  sMHorn1= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
+//  G4Material* material=Vacuum;
+  G4Material* material=Air; // Air inside Air allows for cracks without changing material budget. 
+  // Check size .. P.L. July 2014.. 
+  if ((MVzPos.size()  != MVRin.size()) || (MVzPos.size()  != MVRout.size())) {
+    std::cerr << " Inconsistent of number of section for lvMHorn1, Z /R size  " << MVzPos.size()
+              << " / " <<  MVRin.size() << " / " << MVRout.size() << std::endl; exit(2);
+  }
+  sMHorn1= new G4Polycone("sMH",0.,360.*deg, static_cast<int>(MVzPos.size()), &MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn1 = new G4LogicalVolume(sMHorn1,material,"lvMHorn1",0,0,0);
   ND->ApplyStepLimits(lvMHorn1); // Limit Step Size
   ND->ApplyTimeLimits(lvMHorn1);//limit TOF for step
@@ -147,7 +175,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvMHorn1->SetVisAttributes(invisible);
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
-  G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother",lvMHorn1,TGAR,false,0);
+  G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother",lvMHorn1,TGAR,false,0, true);
   pvMHorn1 -> CheckOverlaps();
 
   /**
@@ -180,9 +208,14 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   ND->ApplyStepLimits(lvHorn1Front); // Limit Step Size
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=-MHorn1Origin+G4ThreeVector(0.,0.,OCZ0);
-  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1Front",lvHorn1Front,pvMHorn1,false,0);
+  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1Front",lvHorn1Front,pvMHorn1,false,0, true);
   
   //Outer Conductor
+  if ((OCzPos.size()  != OCRin.size()) || (OCzPos.size()  != OCRout.size()) || ((nOut+1) != static_cast<int>(OCRout.size()))) {
+    std::cerr << " Inconsistent of number of section for sPHorn1OC, Z /R size  " << MVzPos.size()
+              << " / " <<  MVRin.size() << " / " << MVRout.size() << " (nOut+1) " << (nOut+1) << std::endl;
+    exit(2);	      
+  }
   G4Polycone* sPHorn1OC=new G4Polycone("sPHorn1OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
   G4LogicalVolume* lvPHorn1OC=new G4LogicalVolume(sPHorn1OC,GetMaterial(ND->hrnmat),"lvPHorn1OC",0,0,0);
   ND->ApplyStepLimits(lvPHorn1OC); // Limit Step Size
@@ -192,9 +225,14 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvPHorn1OC->SetFieldManager(FieldMgr2,true); //attach the local field to logical volume
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0.)-MHorn1Origin;
-  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1OC",lvPHorn1OC,pvMHorn1,false,0);
+  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1OC",lvPHorn1OC,pvMHorn1,false,0, true);
  
   //Inner Conductor
+  if ((ICzPos.size()  != ICRin.size()) || (ICzPos.size()  != ICRout.size()) || ((nIn+1) != static_cast<int>(ICRout.size()))) {
+    std::cerr << " Inconsistent of number of section fors PHorn1IC , Z /R size  " << ICzPos.size()
+              << " / " <<  ICRin.size() << " / " << ICRout.size() << " (nIn+1) " << (nIn+1) << std::endl;
+	      exit(2);
+  }
   G4Polycone* sPHorn1IC=new G4Polycone("sPHorn1IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn1IC=new G4LogicalVolume(sPHorn1IC,GetMaterial(ND->hrnmat),"lvPHorn1IC",0,0,0);
   ND->ApplyStepLimits(lvPHorn1IC); // Limit Step Size
@@ -204,9 +242,32 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvPHorn1IC->SetFieldManager(FieldMgr,true); //attach the local field to logical volume
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn1Origin;
-  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1IC",lvPHorn1IC,pvMHorn1,false,0);
+  new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1IC",lvPHorn1IC,pvMHorn1,false,0, true);
    
   //Field Part
+  // July 2014: Split this in 2 parts. 
+  // Water and Air...
+  //
+  if (placeWaterLayer) {
+//    std::cerr << " Reaching water layer ( " << hornWaterLayerThick << "mm ), placement in Horn1, with nIn = " 
+//              << nIn <<  " and quit " << std::endl; exit(2);
+    if ((ICzPos.size()  != FRinW.size()) || (ICzPos.size()  != FRoutW.size()) || ((nIn) != static_cast<int>(FRoutW.size()))) {
+      std::cerr << " Inconsistent of number of section fors PHorn1ICWater , Z /R size  " << ICzPos.size()
+              << " / " <<  FRinW.size() << " / " << FRoutW.size() << " (nIn) " << (nIn) << std::endl;
+      std::cerr << " Probably O.K., take the minimum of these " << std::endl;
+    }
+    int numSectW = std::min(static_cast<int>(FRinW.size()), static_cast<int>(ICzPos.size()));
+    // Take the last one out.. Inconsistent inner radiis.. 
+    numSectW--;
+    G4Polycone* sPHorn1ICW=new G4Polycone("sPHorn1ICWater",0.,360.*deg, numSectW,&ICzPos[0],&FRinW[0],&FRoutW[0]);
+    G4LogicalVolume* lvPHorn1ICW=new G4LogicalVolume(sPHorn1ICW, Water, "lvPHorn1ICWater", 0,0,0);
+    ND->ApplyStepLimits(lvPHorn1ICW); // Limit Step Size
+    lvPHorn1ICW->SetFieldManager(FieldMgr,true); //attach the local field to logical volume
+    rotation=G4RotationMatrix(0.,0.,0.);
+    translation=G4ThreeVector(0.,0.,0)-MHorn1Origin;
+    new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1ICWater",lvPHorn1ICW,pvMHorn1,false,0, true);
+//    std::cerr << " Water volume placed...num subsection " << (nIn) << std::endl; 
+  }
   G4Polycone* sPConeF=new G4Polycone("sPCone1F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn1Z0+frontRmax);
@@ -225,7 +286,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvPHorn1F->SetFieldManager(FieldMgr3,true); //attach the local field to logical volume
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn1Origin;
-  G4VPhysicalVolume *pvPHorn1F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1F",lvPHorn1F,pvMHorn1,false,0);
+  G4VPhysicalVolume *pvPHorn1F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn1F",lvPHorn1F,pvMHorn1,false,0, true);
   
   //Spider Support
   for (G4int ii=0;ii<G4int(ND->Horn1SS.size());ii++){
@@ -235,6 +296,8 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       G4double rIn=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]+halfThick)+Fgap;//
       G4double rIn2=PHorn1ICRout(ND->Horn1SpiderSupportZ0[ii]-halfThick)+Fgap;
       if (rIn2>rIn) rIn=rIn2;
+      if (placeWaterLayer) rIn += hornWaterLayerThick + 3.0*epsilon;
+//      std::cerr << " Inner radius for spider support at Z = " << ND->Horn1SpiderSupportZ0[ii] << "  is " << rIn << std::endl; 
       G4double rOut=PHorn1OCRin(ND->Horn1SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
       ConstructSpiderSupport(&(ND->Horn1SS[ii]),angle,ND->Horn1SpiderSupportZ0[ii],rIn,rOut,pvPHorn1F,ii+jj);
     }
@@ -250,7 +313,7 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
       ND->ApplyStepLimits(lvPHorn1End); // Limit Step Size
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn1EndZ0[ii]+ND->PHorn1EndLength[ii]/2.)-MHorn1Origin;
-      new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0);
+      new G4PVPlacement(G4Transform3D(rotation,translation),volName,lvPHorn1End,pvMHorn1,false,0, true);
     }
 
 
@@ -294,7 +357,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   G4RotationMatrix rotPos=G4RotationMatrix(0.,0.,angle);
   G4ThreeVector transPos=G4ThreeVector((rIn+(bottomThickMid-bottomH/2.))*sin(angle),(rIn+(bottomThickMid-bottomH/2.))*cos(angle),zPos);
   G4Transform3D position3D=G4Transform3D(rotPos,transPos);
-  new G4PVPlacement(position3D,"SpiderSupport",lvSpider,motherVolume,false,copyNo);
+  new G4PVPlacement(position3D,"SpiderSupport",lvSpider,motherVolume,false,copyNo, true);
 
   G4double ceramicRodL=rOut-rIn-topH-bottomThickMid-stripH-2.*mm;
   G4Tubs *sCeramicRod=new G4Tubs("sCeramicRod",0.,ceramicRodR,ceramicRodL/2.,0.,360.*deg);
@@ -304,7 +367,7 @@ void NumiDetectorConstruction::ConstructSpiderSupport(NumiHornSpiderSupport *HSS
   rotPos.rotateX(90.*deg); rotPos.rotateZ(-angle);
   transPos=transPos+G4ThreeVector((bottomH/2.+stripH+topH+ceramicRodL/2.)*sin(angle),(bottomH/2.+stripH+topH+ceramicRodL/2.)*cos(angle),0);
   position3D=G4Transform3D(rotPos,transPos);
-  new G4PVPlacement(position3D,"CeramicRod",lvCeramicRod,motherVolume,false,copyNo);
+  new G4PVPlacement(position3D,"CeramicRod",lvCeramicRod,motherVolume,false,copyNo, true);
 }
 
 G4double NumiDetectorConstruction::PHorn1OCRout(G4double z)

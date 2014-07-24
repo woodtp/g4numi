@@ -258,6 +258,13 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fSkinDepthCmd->SetDefaultValue(ND->fSkinDepth); 
 	fSkinDepthCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
         
+	fHornWaterLayerThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/HornWaterLayerThickness",this);
+        fHornWaterLayerThick->SetGuidance("Set the Water Layer thicknes on Horn inner conductors");
+	fHornWaterLayerThick->SetParameterName("Water Layer thicknes on Horn inner conductors",true);
+	fHornWaterLayerThick->SetUnitCategory("Length");
+        fHornWaterLayerThick->SetDefaultValue(ND->GetHornWaterLayerThick()); 
+	fHornWaterLayerThick->AvailableForStates(G4State_PreInit,G4State_Idle);
+        
 }
 
 NumiDetectorMessenger::~NumiDetectorMessenger() {
@@ -299,6 +306,7 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
  
 	delete fSkinDepthCmd;
 	delete fUseHCDCmd;
+	delete fHornWaterLayerThick;
 
        
 }
@@ -450,7 +458,10 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetUseHornCurrDist(fUseHCDCmd->GetNewBoolValue(newValue));    
    
-   }else {}
+   } else if (command == fHornWaterLayerThick) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetHornWaterLayerThick(fHornWaterLayerThick->GetNewDoubleValue(newValue));
+   } else {}
       
    
    return;
