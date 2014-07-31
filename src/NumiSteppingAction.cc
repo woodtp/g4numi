@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.6 2014/07/24 15:55:39 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.7 2014/07/31 18:19:48 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -977,12 +977,14 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
 //make sure we are dealing with a geantino, or a mu, to include lengthening of step due to curling in 
 // B Field
 //
+// July 2014 : P.L. changes his mind, do this for pions. only.. 
+
    G4Track * theTrack = theStep->GetTrack();
+   const double eTrack = theTrack->GetTotalEnergy();
 //   if (((theTrack->GetParticleDefinition()->GetParticleName()).find("geantino") == std::string::npos) && (
 //        ((theTrack->GetParticleDefinition()->GetParticleName()).find("mu+") == std::string::npos ))) return; //for v4.9.4 and above. 
 
-   if (((theTrack->GetDefinition()->GetParticleName()).find("geantino") == std::string::npos) && (
-        ((theTrack->GetDefinition()->GetParticleName()).find("mu+") == std::string::npos ))) return;
+   if (((theTrack->GetDefinition()->GetPDGEncoding())) != 211) return;
  	
    G4StepPoint* prePtr = theStep->GetPreStepPoint();
    if (prePtr == 0) return;
@@ -1012,6 +1014,7 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
      fWaterAbsHorn1Neck=0.;
      fWaterAbsHorn2Entr=0.;
      fAlumAbsHorn2Entr=0.;
+     fGoneThroughTarget = false;
      fGoneThroughHorn1Neck = false;
      fGoneThroughHorn2Entr = false;
      fEvtIdPrevious = pRunManager->GetCurrentEvent()->GetEventID();
@@ -1032,7 +1035,7 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
 		  return;
    } 		  
 */
-  if (postPtr == NULL) return;
+   if (postPtr == NULL) return;
    G4VPhysicalVolume *physVol = postPtr->GetPhysicalVolume();
    std::string vName(physVol->GetName());
    G4Material *material = theTrack->GetMaterial();
@@ -1045,7 +1048,12 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
       std::cerr << " r = " << r << " theta " << t <<  " z = " << postPtr->GetPosition()[2] << 
 	      " In " << vName << " material " << material->GetName()
 	      << " InterLength " << material->GetNuclearInterLength() << std::endl;  
-   } 
+   }
+   if (vName.find("AlTube2LV") != std::string::npos) {
+       fGoneThroughTarget=true;
+       return;
+   }
+   if (!fGoneThroughTarget) return;
    if (postPtr->GetPosition()[2] > 500.) fGoneThroughHorn1Neck=true; // approximate... 
    if (postPtr->GetPosition()[2] > 6560.) fGoneThroughHorn2Entr=true; //truly approximate. 
    if (ll < 1.0e-10) return; 
@@ -1069,9 +1077,10 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
          fAlumAbsHorn2Entr += ll/material->GetNuclearInterLength(); 
       }
    }
-   if (postPtr->GetPosition()[2] > 12100. !=  std::string::npos) {
+   if (postPtr->GetPosition()[2] > 12100.) {
         fOutStudyGeantino << " " << pRunManager->GetCurrentEvent()->GetEventID(); 
-        for (size_t k=0; k!=3; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+        for (size_t k=0; k!=2; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+	fOutStudyGeantino << " " << eTrack;
 	fOutStudyGeantino << " " << fTotalAbsDecayChan << " " <<  fTotalAbsHorn1Neck 
 	          << " " << fTotalAbsHorn2Entr;
 	fOutStudyGeantino << " " << fWaterAbsDecayChan << " " <<  fWaterAbsHorn1Neck 
