@@ -259,7 +259,10 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn2Z0+frontRmax);
   G4UnionSolid *sPHorn2F=new G4UnionSolid("sPHorn2F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
   //  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Ar,"lvPHorn2F",0,0,0);
-  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Air,"lvPHorn2F",0,0,0);
+//  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Air,"lvPHorn2F",0,0,0);
+// Revert back to argon, because Jim Hylen stated in his e-mail, July 31 2014, that it is indeed Argon.. 
+//
+  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F, Ar, "lvPHorn2F",0,0,0);
   lvPHorn2F->SetVisAttributes(invisible);
   G4FieldManager* FieldMgr3 = new G4FieldManager(numiMagField); //create a local field      
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
