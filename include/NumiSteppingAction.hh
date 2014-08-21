@@ -58,6 +58,7 @@ private:
   mutable double fWaterAbsHorn2Entr;
   mutable double fAlumAbsHorn2Entr;
   mutable bool fGoneThroughHorn1Neck;
+  mutable bool fGoneThroughTarget;
   mutable bool fGoneThroughHorn2Entr;
   mutable int fEvtIdPrevious;
   
@@ -79,7 +80,7 @@ public:
       fOutStudyGeantino.open(fName);
       if (fGeantinoStudyName.contains("PropCO")) fOutStudyGeantino << " id x y z xo yo zo step matPre matPost " << std::endl;
       if (fGeantinoStudyName.contains("Absorb")) 
-        fOutStudyGeantino << " id x y z AbsTDecayChan AbsTHorn1Neck AbsHorn2E AbsWaterDecayChan AbsWHorn1Neck AbsWHorn2E AbsAlumHorn2Entr  " 
+        fOutStudyGeantino << " id x y E AbsTDecayChan AbsTHorn1Neck AbsHorn2E AbsWaterDecayChan AbsWHorn1Neck AbsWHorn2E AbsAlumHorn2Entr  " 
 	              << std::endl;
    }
    inline void SetKeyVolumeNameFrom(G4String s) const { fKeyVolumeNameFrom  = s;}

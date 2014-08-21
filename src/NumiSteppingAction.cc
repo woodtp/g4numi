@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.7 2014/07/31 18:19:48 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.8 2014/08/21 18:19:03 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -1184,7 +1184,7 @@ void NumiSteppingAction::StudyCheckOverlap(const G4Step * theStep) {
            std::sqrt(prePtr->GetPosition()[0]*prePtr->GetPosition()[0] +
 	         prePtr->GetPosition()[1]*prePtr->GetPosition()[1]) 
 	   << ", " << volNamePre  << " to " << postPtr->GetPosition() << ", " << volNamePost
-	    << " Check Names, pre " << fKeyVolumeNameFrom << " to " << fKeyVolumeNameTo << std::endl;  
+	    << " Pre Material "  << volPre->GetMaterial()->GetName() << std::endl;  
 //   if (((volNamePost.find(fKeyVolumeName.c_str()) != std::string::npos) || 
 //      (volNamePre.find(fKeyVolumeName.c_str()) != std::string::npos)) &&
 //      ( (volNamePost.find(fKeyVolumeNameTo.c_str()) != std::string::npos) || 
