@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.9 2014/02/14 20:16:05 kordosky Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.10 2014/09/09 16:35:12 laliaga Exp $
 
 
 setup_beamsim(){
@@ -10,7 +10,7 @@ setup_beamsim(){
 #   setup -f Linux+2.6-2.5 gcc v3_4_3
 # Comment OUT the line below if you are using a local geant4 - g4numi_environment.sh will do this correctly for you
     setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
-    setup -f Linux+2.6 -q GCC_3_4_6 root v5_22_00j
+    setup -q debug -f Linux+2.6-2.5 root v5_30_00
 
     if [ -e "/grid/fermiapp/minerva/condor/setup.minerva.condor.sh" ]; then
 	source /grid/fermiapp/minerva/condor/setup.minerva.condor.sh
