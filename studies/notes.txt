@@ -1,0 +1,11 @@
+
+1. NumiKelvinFunctions:
+-  NumiKelvinFunctions.hh
+-  NumiKelvinFunctions.cc
+   
+   Set of functions to calculate Kelvin Functions. We were using this to
+   get an analytical solution for the horn current distribution. The 
+   solution that we implement was wrong (Minerva doc 9528) but we keep 
+   here these functions that can be useful in the future.
+
+
