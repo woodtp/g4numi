@@ -1,5 +1,6 @@
 
 1. NumiKelvinFunctions:
+
 -  NumiKelvinFunctions.hh
 -  NumiKelvinFunctions.cc
    
@@ -9,3 +10,63 @@
    here these functions that can be useful in the future.
 
 
+2. Total inelastic cross section:
+
+-  G4MinervaPionIXS.cc  
+-  G4MinervaPionIXS.hh  
+-  G4MinervaProtonIXS.cc  
+-  G4MinervaProtonIXS.hh   
+
+   We get the total inelastic cross section. Basically we get a copy 
+   from geant4 standard cross section and modified them to include 
+   some knobs. In our first approach, we just change the cross section
+   by a overaal factor. 
+
+   To do this, we follow the next steps:
+
+   -  In NumiRunActionMessenger, we add new geant4 cmd messengers:
+      G4UIcmdWithADouble*         scaleProtonIXS;
+      G4UIcmdWithADouble*         scalePionIXS;	
+      
+      Defined as:
+
+      scaleProtonIXS = new G4UIcmdWithADouble("/NuMI/run/scalePRTIXS",this);
+      scaleProtonIXS->SetGuidance("set scale for total proton inelastic crosss section");
+      scaleProtonIXS->SetParameterName("ScalePRT_IXS",true);
+      scaleProtonIXS->SetDefaultValue(1.0);
+      scaleProtonIXS->AvailableForStates(G4State_PreInit,G4State_Idle); 
+   
+      scalePionIXS = new G4UIcmdWithADouble("/NuMI/run/scalePIIXS",this);
+      scalePionIXS->SetGuidance("set scale for total pion inelastic crosss section");
+      scalePionIXS->SetParameterName("ScalePI_IXS",true);
+      scalePionIXS->SetDefaultValue(1.0);
+      scalePionIXS->AvailableForStates(G4State_PreInit,G4State_Idle);  
+
+-  In NumiRunAction, we get the values of these variables and apply to  the G4HadronicProcessStore:
+
+      G4double this_scalePRT_IXS = fNDI->GetScalePRT_IXS();
+      G4double this_scalePI_IXS = fNDI->GetScalePI_IXS();
+      
+      //Store and particles:
+      G4HadronicProcessStore* store = G4HadronicProcessStore::Instance();
+      G4ParticleDefinition * proton = G4Proton::ProtonDefinition();
+      G4ParticleDefinition* pip     = G4PionPlus::PionPlusDefinition();
+      G4ParticleDefinition* pim     = G4PionMinus::PionMinusDefinition();
+   
+      //Processes:
+      G4HadronicProcess* hp_prt  = store->FindProcess(proton,fHadronInelastic); 
+      G4HadronicProcess* hp_pip  = store->FindProcess(pip,fHadronInelastic); 
+      G4HadronicProcess* hp_pim  = store->FindProcess(pim,fHadronInelastic); 
+
+      //New Cross Section:
+      G4MinervaProtonIXS* new_prt_ixs = new G4MinervaProtonIXS();
+      G4MinervaPionIXS*   new_pi_ixs  = new G4MinervaPionIXS();
+
+      new_prt_ixs->SetScale(this_scalePRT_IXS);
+      new_pi_ixs->SetScale(this_scalePI_IXS);
+
+      //Adding data set:
+      hp_prt->AddDataSet(new_prt_ixs);
+      hp_pip->AddDataSet(new_pi_ixs);
+      hp_pim->AddDataSet(new_pi_ixs);
+   
