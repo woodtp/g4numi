@@ -9,8 +9,6 @@
 #include "NumiDataInput.hh" 
 #include "G4VPhysicalVolume.hh"
 
-#include "NumiKelvinFunctions.hh"
-
 //magnetic field between conductors ====================================================
 NumiMagneticField::NumiMagneticField()
 {
@@ -102,35 +100,8 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
       {
 	magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
 	
-	//Adding by to calculate the right Horn Current Distributuon (see the Minerva doc 9528):
-	if( NumiData->fUse_HCD){
-	  
-	  G4double pival = 3.14159265358979323846;
-
-	  G4double r_xx   = radius*pival/(NumiData->fSkinDepth);
-	  G4double r_in   = (radius-dIn)*pival/(NumiData->fSkinDepth);
-	  G4double r_ot   = (radius+dOut)*pival/(NumiData->fSkinDepth);
-
-	  G4double dker_xx = NumiKelvin->DKer(r_xx);
-	  G4double dker_in = NumiKelvin->DKer(r_in);
-	  G4double dker_ot = NumiKelvin->DKer(r_ot);
-	  
-	  G4double dkei_xx = NumiKelvin->DKei(r_xx);
-	  G4double dkei_in = NumiKelvin->DKei(r_in);
-	  G4double dkei_ot = NumiKelvin->DKei(r_ot);
-
-	  
-	  
-	  G4double Irr = sqrt(pow(r_xx*dkei_xx-r_in*dkei_in,2) + pow(r_xx*dker_xx-r_in*dker_in,2));
-	  G4double I00 = sqrt(pow(r_ot*dkei_ot-r_in*dkei_in,2) + pow(r_ot*dker_ot-r_in*dker_in,2));
-	  
-	  magBField = magBField*Irr/I00;
-	  
-	}
-
-	else{
-	  magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
-	}
+	magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
+       
       }
   }
   /*

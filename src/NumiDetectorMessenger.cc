@@ -243,21 +243,7 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	fForcedOldTargetCmd->SetParameterName("forceOldTarget",true); 
 	fForcedOldTargetCmd->SetDefaultValue(false); 
 
-	//To study the horn current distribution:
-	
-	fUseHCDCmd = new G4UIcmdWithABool("/NuMI/det/UseHCD",this); 
-	fUseHCDCmd->SetGuidance("Use Horn Current Distribution for syst. studies"); 
-	fUseHCDCmd->SetParameterName("UseHCD",true); 
-	fUseHCDCmd->SetDefaultValue(ND->fUse_HCD); 
-	fUseHCDCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fSkinDepthCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/SkinDepth",this);
-        fSkinDepthCmd->SetGuidance("Set the skin depth for Horn Current Distribution.");
-	fSkinDepthCmd->SetParameterName("SkinDepth",true);
-	fSkinDepthCmd->SetUnitCategory("Length");
-        fSkinDepthCmd->SetDefaultValue(ND->fSkinDepth); 
-	fSkinDepthCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-        
+       
 	fHornWaterLayerThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/HornWaterLayerThickness",this);
         fHornWaterLayerThick->SetGuidance("Set the Water Layer thicknes on Horn inner conductors");
 	fHornWaterLayerThick->SetParameterName("Water Layer thicknes on Horn inner conductors",true);
@@ -304,8 +290,6 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
         delete fBaffleLengthCmd;
         delete fForcedOldTargetCmd;
  
-	delete fSkinDepthCmd;
-	delete fUseHCDCmd;
 	delete fHornWaterLayerThick;
 
        
@@ -450,15 +434,7 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
        G4bool forced = fForcedOldTargetCmd->GetNewBoolValue(newValue);
        NumiDetector->SetForcedOldTarget(forced);
    
-   } else if (command == fSkinDepthCmd) {
-      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
-      NumiData->SetSkinDepth(fSkinDepthCmd->GetNewDoubleValue(newValue));
-
-   } else if (command == fUseHCDCmd) {
-      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
-      NumiData->SetUseHornCurrDist(fUseHCDCmd->GetNewBoolValue(newValue));    
-   
-   } else if (command == fHornWaterLayerThick) {
+   }  else if (command == fHornWaterLayerThick) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHornWaterLayerThick(fHornWaterLayerThick->GetNewDoubleValue(newValue));
    } else {}

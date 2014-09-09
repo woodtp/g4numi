@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.9 2014/07/24 15:50:42 lebrun Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.10 2014/09/09 17:26:58 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -52,10 +52,6 @@ private:
    
 public:
   
-   void SetSkinDepth(G4double val);
-  
-   void SetUseHornCurrDist(G4bool val);
-
    G4bool SetBeamConfig(G4String config);
    
    void SetDetailedProtonBeam(G4bool val);
@@ -137,9 +133,6 @@ public:
    G4double GetProton_cosy()                  { return fProton_cosy;}
    G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;} 
 
-   G4double GetSkinDepth()                    { return fSkinDepth;}  
-   G4double GetUseHornCurrDist()              { return fUse_HCD;}
-   
    G4double GetHornWaterLayerThick()          { return fHornWaterLayerThick; }
    
    //--------------------------------------------------------------
@@ -244,9 +237,6 @@ public:
 
    G4int fPrintInfo;
 
-   G4double fSkinDepth;
-   G4bool   fUse_HCD;
-      
    //////////////////////////////
    
    G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;

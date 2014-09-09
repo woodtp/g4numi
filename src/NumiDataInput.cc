@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.9 2014/07/24 15:52:20 lebrun Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.10 2014/09/09 17:28:28 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -74,9 +74,6 @@ NumiDataInput::NumiDataInput()
     fProton_cosy(-999.0),
 
     fLengthOfWaterInTgt(4.0*cm),
-
-    fSkinDepth(6.0*mm),
-    fUse_HCD(false),
 
     fPrintInfo(1)
     
@@ -1864,16 +1861,3 @@ void NumiDataInput::Setg3Chase(G4bool _gc)
     
 }
 
-//To set skin depth for horn current distribution studies
-//---------------------------------------------------------------------------------
-void NumiDataInput::SetSkinDepth(G4double val)
-{
-      fSkinDepth = val;
-}
-
-//---------------------------------------------------------------------------------
-void NumiDataInput::SetUseHornCurrDist(G4bool val)
-{
-      fUse_HCD = val;
-}
-//
