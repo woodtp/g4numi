@@ -85,7 +85,10 @@ class NumiTrajectory : public G4VTrajectory
     inline void SetParentMomentumAtThisProduction(const G4ThreeVector& mom) {
         fParentMomentumAtThisProduction = mom;
     }
-
+  //for dk2nu:
+  inline G4double GetTime() const
+   { return fTime; }
+  
    virtual void ShowTrajectory() const;
    virtual void ShowTrajectory(std::ostream& o) const;
    virtual void DrawTrajectory(G4int i_mode=0) const;
@@ -113,8 +116,10 @@ class NumiTrajectory : public G4VTrajectory
    NumiTrajectoryVolumeName*        fPreStepVolume;
    DVec*                            fStepLength;
    G4String                         fProcessName;
-        /// Momentum of the parent particle when producing this particle
+  /// Momentum of the parent particle when producing this particle
    G4ThreeVector      fParentMomentumAtThisProduction; 
+  //New for dk2nu:
+  G4double                         fTime;
     
 
    NumiDataInput* fND;

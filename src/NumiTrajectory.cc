@@ -36,7 +36,9 @@ NumiTrajectory::NumiTrajectory()
    fPreStepVolume=0;
    fStepLength = 0;
    fProcessName = "";
-
+   //for dk2nu:
+   fTime = 0.0;
+   //
    fND=NumiDataInput::GetNumiDataInput();
 
 }
@@ -67,7 +69,9 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
    } else {
        fProcessName = "Primary";
    }
-
+   //for dk2nu:
+   fTime = aTrack->GetGlobalTime();
+   //
    NumiTrackInformation* info=(NumiTrackInformation*)(aTrack->GetUserInformation());
    if (info!=0) {
      fDecayCode = info->GetDecayCode();
@@ -124,7 +128,9 @@ NumiTrajectory::NumiTrajectory(NumiTrajectory & right)
   fDecayCode = right.fDecayCode;
   fTgen = right.fTgen;
   fNImpWt = right.fNImpWt;
-
+  //for dk2nu:
+  fTime = right.fTime;
+  //
   fND=NumiDataInput::GetNumiDataInput();
 }
 

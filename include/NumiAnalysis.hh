@@ -34,6 +34,18 @@ class absbkgtuple_t;
 class zptuple_t;
 class target_exit_t;
 
+//New for DK2NU:///
+#include "dkmeta.h"
+#include "dk2nu.h"
+class bsim::Location;
+class bsim::DkMeta;
+class bsim::NuRay;
+class bsim::Decay;
+class bsim::Ancestor;
+class bsim::TgtExit;
+class bsim::Traj;
+class bsim::Dk2Nu;
+///////////////////
 
 class NumiAnalysis
 {
@@ -44,6 +56,7 @@ public:
    
    void book();
    void finish();
+   void FillMeta(); //new function to fill dk2meta
    void FillNeutrinoNtuple(const G4Track& track,
                            const std::vector<G4VTrajectory*>& nuHistory);
    void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
@@ -118,6 +131,18 @@ private:
    std::vector<bool> fAlcEdep_called;
    std::vector<bool> fMuInAlc;
    
+   //New fr DK2NU:////////////////////////
+  std::vector<bsim::Location> vec_loc;
+  bsim::DkMeta*  this_meta;
+  TTree* meta;
+
+  bsim::Dk2Nu* this_dk2nu;
+  bsim::Decay this_decay; 
+  bsim::TgtExit this_tgtexit; 
+  std::vector<bsim::Traj> vec_traj;
+  std::vector<bsim::NuRay> vec_nuray;   
+  std::vector<bsim::Ancestor> vec_ancestor;
+  //////////////////////////////////////////
 
 };
 

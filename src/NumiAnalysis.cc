@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.9 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.10 2014/09/16 16:21:41 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -46,6 +46,12 @@
 #include "NumiNuWeight.hh"
 #include "NumiTrajectory.hh"
 
+//NEW For DK2NU
+#include <string>
+#include <sstream>
+#include <iostream>
+
+
 using namespace std;
 
 NumiAnalysis* NumiAnalysis::instance = 0;
@@ -74,6 +80,9 @@ NumiAnalysis::NumiAnalysis()
   g4zpdata = new zptuple_t();
   g4tardata = new target_exit_t();
   
+  //New for DK2NU:
+  this_meta  = new bsim::DkMeta();
+  this_dk2nu = new bsim::Dk2Nu();
 
   fcount = 0;
   fentry = 0;
@@ -128,8 +137,16 @@ void NumiAnalysis::book()
     sprintf(nuNtupleFileName,"%s_%04d%s.root",(NumiData->nuNtupleName).c_str(),pRunManager->GetCurrentRun()->GetRunID(), (NumiData->geometry).c_str());
     nuNtuple = new TFile(nuNtupleFileName,"RECREATE","root ntuple");
     G4cout << "Creating neutrino ntuple: "<<nuNtupleFileName<<G4endl;
+    /*
     tree = new TTree("nudata","g4numi Neutrino ntuple");
     tree->Branch("data","data_t",&g4data,32000,1);
+    */
+    //NEW DK2NU:
+    tree = new TTree("dk2nuTree","g4numi Neutrino ntuple");
+    tree->Branch("this_dk2nu","bsim::Dk2Nu",&this_dk2nu,32000,99);
+    meta = new TTree("dkmetaTree","Meta info for neutrino run");
+    meta->Branch("this_meta","bsim::DkMeta",&this_meta,32000,99);
+
   }
 
   if (NumiData->createTarNtuple){
@@ -370,6 +387,7 @@ void NumiAnalysis::finish()
    
   if (NumiData->createNuNtuple){
     nuNtuple->cd();
+    meta->Write(); //write dkmeta
     tree->Write();
     nuNtuple->Close();
     delete nuNtuple;
@@ -402,6 +420,75 @@ void NumiAnalysis::finish()
     tarNtuple->Close();
     delete tarNtuple;
   }
+}
+
+void NumiAnalysis::FillMeta(){
+
+  //This class fills dk2meta:
+  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+  int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
+
+  G4String namentp = (NumiData->nuNtupleName);
+  G4int namesize = (NumiData->nuNtupleName).length();
+  namentp.remove(0,namesize-3);
+  istringstream buffer(namentp);
+  int valjob;
+  buffer >> valjob;
+  NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
+ 
+  this_meta->job  = valjob;
+  this_meta->pots = NPots;
+
+  //We are going to do this manually for now:
+  //Perhaps should be part of NumiDatInput??
+  this_meta->beamsim = "g4numi_v5";   
+  this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0"; 
+  this_meta->physcuts = "nofillyet";
+
+  G4String hornC = NumiData->GetBeamConfig();
+  G4String tgtC  = NumiData->GetBeamConfig();
+  G4int confsize = (NumiData->GetBeamConfig()).length();
+  hornC.remove(0,6);
+  tgtC.remove(6,confsize);
+  
+  G4bool isHe = NumiData->HeInDecayPipe;
+  std::string decayVolMat = "vacuum";
+  if(isHe)decayVolMat = "helium";
+  this_meta->tgtcfg = std::string(tgtC);  
+  this_meta->horncfg = std::string(hornC);  
+  this_meta->dkvolcfg = decayVolMat;
+  //////////////////////////////////////////
+  
+  this_meta->beam0x = NumiData->beamPosition[0]/cm;
+  this_meta->beam0y = NumiData->beamPosition[1]/cm;
+  this_meta->beam0z = NumiData->beamPosition[2]/cm;
+  this_meta->beamhwidth = NumiData->beamSigmaX/cm;
+  this_meta->beamvwidth = NumiData->beamSigmaY/cm;
+
+  G4ThreeVector protonMomentum = NPGA->GetProtonMomentum();
+  this_meta->beamdxdz = protonMomentum[0]/protonMomentum[2];
+  this_meta->beamdydz = protonMomentum[1]/protonMomentum[2];
+
+  G4double mm2cm = 0.1;
+  vec_loc.push_back(bsim::Location(mm2cm*0.0,mm2cm*0.0,mm2cm*0.0,"random"));
+  for (G4int ii=0; ii<NumiData->nNear; ++ii){
+    G4double xxdet = mm2cm*(NumiData->xdet_near[ii]);
+    G4double yydet = mm2cm*(NumiData->ydet_near[ii]);
+    G4double zzdet = mm2cm*(NumiData->zdet_near[ii]);
+    vec_loc.push_back(bsim::Location(xxdet,yydet,zzdet,NumiData->det_near_name[ii]));
+  }
+  for (G4int ii=0; ii<NumiData->nFar; ++ii){ 
+    G4double xxdet = mm2cm*(NumiData->xdet_far[ii]);
+    G4double yydet = mm2cm*(NumiData->ydet_far[ii]);
+    G4double zzdet = mm2cm*(NumiData->zdet_far[ii]);
+    vec_loc.push_back(bsim::Location(xxdet,yydet,zzdet,NumiData->det_far_name[ii]));
+  }
+		    
+  this_meta->location = vec_loc;
+
+
+  meta->Fill();
+  
 }
 
 //------------------------------------------------------------------------------------
@@ -974,6 +1061,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   */
   
   //if not using external ntuple then need to find the particle that exited the target
+  
+  G4int tar_pdg = 0; //auxiliar variable to convert to PDG code
   if(!NumiData->useFlukaInput && !NumiData->useMarsInput) 
     {
         G4bool findTarget = false;
@@ -995,6 +1084,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
                     ParticleMomentum = PParentTrack->GetMomentum(ii);              
                     ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();  
                     tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
+		    tar_pdg = PParentTrack->GetPDGEncoding();
                     findTarget = true;
                 }
             }
@@ -1249,6 +1339,185 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   }
 
+  /////////////////////////////////////////////////////////////////////////
+  //In this approach, I am not deleting any g4data variables.
+  //Just copying or accomodating values for dk2nu:
+  
+  //For conversions:
+  G4double mm2cm   = 0.1;
+  G4double MeV2GeV = 0.001;
+
+  //cleanning everything:
+  vec_traj.clear();
+  vec_nuray.clear();
+  vec_ancestor.clear();
+
+  //1) Ancestries:
+
+  std::size_t ntrajectory = history.size();
+  for (std::size_t index = 0; index < ntrajectory; ++index) {
+      NumiTrajectory* traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(index));
+
+      bsim::Ancestor tmp_ancestor;
+      
+      G4double startx = mm2cm*(traj->GetPoint(0)->GetPosition().x());
+      G4double starty = mm2cm*(traj->GetPoint(0)->GetPosition().y());
+      G4double startz = mm2cm*(traj->GetPoint(0)->GetPosition().z());  
+      G4double localt = traj->GetTime();
+      tmp_ancestor.SetStartXYZT(startx,starty,startz,localt);
+      
+      G4double startpx = MeV2GeV*(traj->GetMomentum(0).x());
+      G4double startpy = MeV2GeV*(traj->GetMomentum(0).y());
+      G4double startpz = MeV2GeV*(traj->GetMomentum(0).z());
+      tmp_ancestor.SetStartP(startpx,startpy,startpz);
+      
+      tmp_ancestor.pdg = traj->GetPDGEncoding();
+
+      const int lastPoint = traj->GetPointEntries()-1;
+      
+      G4double stoppx  = MeV2GeV*(traj->GetMomentum(lastPoint).x());
+      G4double stoppy  = MeV2GeV*(traj->GetMomentum(lastPoint).y());
+      G4double stoppz  = MeV2GeV*(traj->GetMomentum(lastPoint).z());
+      tmp_ancestor.SetStopP(stoppx,stoppy,stoppz);
+
+      G4double pprodpx = MeV2GeV*(traj->GetParentMomentumAtThisProduction().x());
+      G4double pprodpy = MeV2GeV*(traj->GetParentMomentumAtThisProduction().y());
+      G4double pprodpz = MeV2GeV*(traj->GetParentMomentumAtThisProduction().z());
+      tmp_ancestor.SetPProdP(pprodpx,pprodpy,pprodpz);
+      
+      tmp_ancestor.proc    = traj->GetProcessName();
+      tmp_ancestor.ivol    = traj->GetPreStepVolumeName(0);
+      tmp_ancestor.imat    = "NotFillYet";      
+      tmp_ancestor.nucleus = 0;      
+
+      tmp_ancestor.polx = 0.0;
+      tmp_ancestor.poly = 0.0;
+      tmp_ancestor.polz = 0.0;
+      vec_ancestor.push_back(tmp_ancestor);
+  }
+  /////
+
+  //2) TGT Exit:
+  
+  this_tgtexit.tvx = g4data->tvx;
+  this_tgtexit.tvy = g4data->tvy;
+  this_tgtexit.tvz = g4data->tvz;
+  this_tgtexit.tpx = g4data->tpx;
+  this_tgtexit.tpy = g4data->tpy;
+  this_tgtexit.tpz = g4data->tpz;
+  this_tgtexit.tptype = tar_pdg;
+  this_tgtexit.tgen   =g4data->tgen;
+  /////
+
+  //3) Trajectories (ray tracing):
+  for (G4int ii=0; ii<10; ++ii){
+    bsim::Traj tmp_traj;
+    tmp_traj.trkx  = g4data->trkx[ii];
+    tmp_traj.trky  = g4data->trky[ii];
+    tmp_traj.trkz  = g4data->trkz[ii];
+    tmp_traj.trkpx = g4data->trkpx[ii];
+    tmp_traj.trkpy = g4data->trkpy[ii];
+    tmp_traj.trkpz = g4data->trkpz[ii];
+    vec_traj.push_back(tmp_traj);
+  }
+  ///////
+
+  //4) Decay:
+  this_decay.norig  = g4data->Norig;
+  this_decay.ndecay = g4data->Ndecay;
+  this_decay.ntype = particleType->GetPDGEncoding();
+  this_decay.vx = x/cm;
+  this_decay.vy = y/cm;
+  this_decay.vz = z/cm;
+  this_decay.pdpx     = g4data->pdPx;
+  this_decay.pdpy     = g4data->pdPy;
+  this_decay.pdpz     = g4data->pdPz;
+  this_decay.ppdxdz   = ParentMomentumProduction[0]/ParentMomentumProduction[2];
+  this_decay.ppdydz   = ParentMomentumProduction[1]/ParentMomentumProduction[2];
+  this_decay.pppz     = ParentMomentumProduction[2]/GeV;
+  this_decay.ppenergy = g4data->ppenergy;
+  this_decay.ppmedium = int(g4data->ppmedium);
+  this_decay.ptype    = NuParentTrack->GetPDGEncoding();
+  this_decay.muparpx  = g4data->muparpx;  
+  this_decay.muparpy  = g4data->muparpy;
+  this_decay.muparpz  = g4data->muparpz;
+  this_decay.mupare   = g4data->mupare;
+  this_decay.necm     = g4data->Necm;
+  this_decay.nimpwt   = g4data->Nimpwt;
+  //////
+
+  //5) NuRay:
+
+  // Random decay:
+  G4double RdecPx = NuMomentum[0]/GeV;
+  G4double RdecPy = NuMomentum[1]/GeV;
+  G4double RdecPz = NuMomentum[2]/GeV;
+  G4double RdecE  = track.GetTotalEnergy()/GeV;
+  bsim::NuRay tmp_nuray_random(RdecPx,RdecPy,RdecPz,RdecE,1.0);
+  vec_nuray.push_back(tmp_nuray_random);
+  
+  //calculating again...
+  //I will optimize this.
+
+  //for near detectors: 
+  for(G4int ii=0; ii<NumiData->nNear; ++ii){
+    NumiNuWeight nuwgh;
+    G4double nu_wght;
+    G4double nu_energy;
+    std::vector<double> r_det;
+    r_det.push_back(NumiData->xdet_near[ii]/cm);
+    r_det.push_back(NumiData->ydet_near[ii]/cm);
+    r_det.push_back(NumiData->zdet_near[ii]/cm);
+    nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+    G4double mom_nu[3];
+    mom_nu[0] = (r_det[0]- g4data->Vx) * nu_energy / rad;
+    mom_nu[1] = (r_det[1]- g4data->Vy) * nu_energy / rad;
+    mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
+    bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
+    vec_nuray.push_back(tmp_nuray);
+  }
+  //for far detectors: 
+  for(G4int ii=0; ii<NumiData->nFar; ++ii){      
+      NumiNuWeight nuwgh;
+      G4double nu_wght;
+      G4double nu_energy;
+      std::vector<double> r_det;
+      r_det.push_back(NumiData->xdet_far[ii]/cm);
+      r_det.push_back(NumiData->ydet_far[ii]/cm);
+      r_det.push_back(NumiData->zdet_far[ii]/cm);
+      nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
+      G4double mom_nu[3];
+      mom_nu[0] = (r_det[0]- g4data->Vx) * nu_energy / rad;
+      mom_nu[1] = (r_det[1]- g4data->Vy) * nu_energy / rad;
+      mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
+      bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
+      vec_nuray.push_back(tmp_nuray);      
+  }
+  ////
+  //6) Others:
+
+  //calculating the job number:
+  G4String namentp = (NumiData->nuNtupleName);
+  G4int namesize = (NumiData->nuNtupleName).length();
+  namentp.remove(0,namesize-3);
+  istringstream buffer(namentp);
+  int valjob;
+  buffer >> valjob;
+  this_dk2nu->job = valjob;
+  
+  this_dk2nu->potnum = g4data->evtno;
+  this_dk2nu->ppvx = g4data->ppvx;
+  this_dk2nu->ppvy = g4data->ppvy;
+  this_dk2nu->ppvz = g4data->ppvz;
+
+  //Placing in dk2nu:
+  this_dk2nu->ancestor = vec_ancestor;
+  this_dk2nu->tgtexit = this_tgtexit;
+  this_dk2nu->traj = vec_traj;
+  this_dk2nu->decay = this_decay;
+  this_dk2nu->nuray = vec_nuray;
+  
+  /////////////////////////////////////////////////////////////////////////
 
   
   tree->Fill();  

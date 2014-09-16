@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.10 2014/09/09 17:28:28 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.11 2014/09/16 16:21:41 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -969,16 +969,17 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //---------------------------------------------------------
   
   //Near & Far Detector location
-  nNear=11;//was 9 without the different energy for the ND positions.
+  nNear=3;//just 3 for now
   nFar=2;
-  G4double xdetNear[]    = {0     , 0.     , 7.     , 11.    , 14.    , 14.    , 14.   , 0.  , 25.84  , 4.8/2.       , -4.8/2.       };
-  G4double ydetNear[]    = {0     , -3.    , -5.    , -5.    , -6.    , -3.    , 0.    , 71. , 78.42  , 3.8/2.       , -3.8/2.       };
-  G4double zdetNear[]    = {1040  , 1010.  , 975.   , 958.   , 940.   , 840.   , 740.  , 940., 745.25 , 1040+16.6/2. , 1040-16.6/2.  };
-  G4String detNameNear[] = {"Near","Nova1a","Nova1b","Nova1c","Nova2a","Nova2b","Nova3","MSB","MiniBooNE","Near +x +y +z","Near -x -y -z"};
-  G4double xdetFar[]     = {0     , 28.81258   };
-  G4double ydetFar[]     = {0     , 81.39258   };
-  G4double zdetFar[]     = {735000, 811400     };
-  G4String detNameFar[]  = {"Far" , "Ash River"};
+  G4double xdetNear[]    = {0           ,   11.414   ,  25.84};
+  G4double ydetNear[]    = {0           ,   -3.456   ,  78.42};
+  G4double zdetNear[]    = {1040        ,  994.665   , 745.25};
+  G4String detNameNear[] = {"Minos Near", "Nova Near", "MiniBooNE"};
+
+  G4double xdetFar[]     = {0           ,      11129.};
+  G4double ydetFar[]     = {0           ,      -4164.};
+  G4double zdetFar[]     = {735000      ,     810550.};
+  G4String detNameFar[]  = {"Minos Far" , "Nova Far"};
 
   for(G4int ii=0;ii<nNear;ii++){
     xdet_near.push_back(xdetNear[ii]*m);

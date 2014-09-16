@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiRunManager.cc
-// $Id: NumiRunManager.cc,v 1.8.4.4 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiRunManager.cc,v 1.8.4.5 2014/09/16 16:21:41 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include "G4RunManager.hh"
@@ -30,14 +30,12 @@ NumiRunManager::~NumiRunManager()
 }
 void NumiRunManager::BeamOn(G4int n_event,const char* macroFile,G4int n_select)
 {
+
    if(NumiData->GetDebugLevel() > 0)
    {
       G4cout << "NumiRunManager::BeamOn() Called." << G4endl;
    }
-   
-   
-   
-   
+      
   nEvents = n_event;
   G4bool runOn(true);
   G4bool cond = ConfirmBeamOnCondition();

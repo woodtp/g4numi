@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiTrackingAction.cc
-// $Id: NumiTrackingAction.cc,v 1.8.4.6 2014/01/22 22:31:08 kordosky Exp $
+// $Id: NumiTrackingAction.cc,v 1.8.4.7 2014/09/16 16:21:41 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include "NumiTrackInformation.hh"
@@ -44,7 +44,6 @@ void NumiTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
         //Store tracks in trajectory container
     fpTrackingManager->SetStoreTrajectory(true);
     fpTrackingManager->SetTrajectory(new NumiTrajectory(aTrack));
-  
     
    if(ND->GetDebugLevel() > 1)
    {
