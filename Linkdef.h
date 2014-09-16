@@ -15,4 +15,15 @@
 #pragma link C++ class ProdTuple_t+;
 #pragma link C++ class TrackInfo_t+;
 
+#pragma link C++ nestedclass;
+#pragma link C++ namespace bsim;
+#pragma link C++ class bsim::Location+;
+#pragma link C++ class bsim::DkMeta+;
+#pragma link C++ class bsim::NuRay+;
+#pragma link C++ class bsim::Decay+;
+#pragma link C++ class bsim::Ancestor+;
+#pragma link C++ class bsim::TgtExit+;
+#pragma link C++ class bsim::Traj+;
+#pragma link C++ class bsim::Dk2Nu+;
+
 #endif

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.9 2014/02/18 16:41:59 kordosky Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.10 2014/09/16 16:26:57 laliaga Exp $
 
 import os, re, sys, getopt,string
 from string import Template
@@ -46,7 +46,9 @@ DESCRIPTION
     -L, --watercm [default=3]
           cm of water in the target 
     -i, --noimpwt
-          Disable importance weighting.  
+          Disable importance weighting.
+    -z, --playlist [default='']
+          correct the Z target posision per playlist
     
 """%(os.environ['BEAMSIM']+"/macros/template.mac")
 
@@ -64,11 +66,11 @@ def main(argv=None):
     pot='500000'    
     templatefile=os.environ['BEAMSIM']+"/macros/template.mac"
     doimpwt='true'
-    
+    playlist='0'
     try:
-        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:i", 
+        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:z:i", 
                                    ["help","dowater","watercm",
-                                    "beamconfig","outfile","seed","run","pot","template","nametag","noimpwt"])
+                                    "beamconfig","outfile","seed","run","pot","template","nametag","playlist","noimpwt"])
     except getopt.error, msg:
         raise Usage(msg)
     # more code, unchanged
@@ -97,19 +99,56 @@ def main(argv=None):
             nametag=a
         if o in ("-i","--noimpwt"):
             doimpwt='false'
-
+        if o in ("-z","--playlist"):
+            playlist=a
             
 # set seed to run if still null
     if len(seed)==0: 
         seed=run    
     if len(outfile)==0:
-        outfile='g4numi%s_%s'%(os.environ['G4NUMIVER'],beamconfig)
+        outfile='g4numi%s_playlist%s_%s'%(os.environ['G4NUMIVER'],playlist,beamconfig)
         if len(nametag)>0:
             outfile=outfile+'_'+nametag
+        tgtzpos=''
     
+    if beamconfig == 'le010z185i' or beamconfig == 'LE010z185i':
+        if playlist=='1':
+            tgtzpos="-44.50"   #tgt2H1 =  9.50
+        if playlist=='7':
+	    tgtzpos="-44.18"   #tgt2H1 =  9.18
+        if playlist=='9':
+	    tgtzpos="-45.4"    #tgt2H1 = 10.40
+        if playlist=='13':
+            tgtzpos="-44.17"   #tgt2H1 =  9.17
+    if beamconfig == 'le010z-185i' or beamconfig == 'LE010z-185i':
+        if playlist=='0':
+            tgtzpos="-44.50"   #tgt2H1 = 9.50
+        if playlist=='5':
+	    tgtzpos="-43.85"   #tgt2H1 = 8.85
+        if playlist=='10':
+	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
+    if beamconfig == 'le010z000i' or beamconfig == 'LE010z000i':
+        if playlist=='6':
+	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
+    if beamconfig == 'le100z200i' or beamconfig == 'LE100z200i':
+        if playlist=='2':
+            tgtzpos="-134.57"  #tgt2H1 = 99.57
+        if playlist=='11':
+	    tgtzpos="-134.17"  #tgt2H1 = 99.17
+    if beamconfig == 'le100z-200i' or beamconfig == 'LE100z-200i':
+        if playlist=='3':
+            tgtzpos="-134.57"  #tgt2H1 = 99.57
+        if playlist=='12':
+	    tgtzpos="-134.17"  #tgt2H1 = 99.17
+    if beamconfig == 'le250z200i' or beamconfig == 'LE250z200i':
+        if playlist=='4':
+            tgtzpos="-284.57"  #tgt2H1 =249.57
+        if playlist=='8':
+	    tgtzpos="-285.09"  #tgt2H1 =250.09
+            
     filestring=open(templatefile,'r').read()
     t=string.Template(filestring)
-    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt})
+    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos})
 
 
 if __name__ == "__main__":

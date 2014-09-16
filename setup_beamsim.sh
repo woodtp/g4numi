@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.10 2014/09/09 16:35:12 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.11 2014/09/16 16:26:57 laliaga Exp $
 
 
 setup_beamsim(){
@@ -24,7 +24,7 @@ setup_beamsim(){
 
 
     export BEAMSIM="${TOP}"
-    export G4NUMIVER="v4"
+    export G4NUMIVER="v5"
     setup g4photon
     export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++"
 #    export LD_LIBRARY_PATH="${PWD}/tmpSolution:${LD_LIBRARY_PATH}"

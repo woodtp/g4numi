@@ -34,6 +34,18 @@ case $BEAMCONFIG in
     *"$metag2"*)templatename="template_ME.mac";;
 esac
 
+#check for LE target position input (all cases that it is applicable):
+
+case $BEAMCONFIG in 
+    "le010z185i"|"LE010z185i")TGTPOS="-z $PLAYLIST";;
+    "le010z-185i"|"LE010z-185i")TGTPOS="-z $PLAYLIST";;
+    "le010z000i"|"LE010z000i")TGTPOS="$-z $PLAYLIST";;
+    "le100z200i"|"LE100z200i")TGTPOS="$-z $PLAYLIST";;
+    "le100z-200i"|"LE100z-200i")TGTPOS="-z $PLAYLIST";;
+    "le250z200i"|"LE250z200i")TGTPOS="-z $PLAYLIST";;
+esac
+echo "TGTPOS=$TGTPOS"
+
 IFLAG=""
 if [ "$DOIMPWT" = "false" ]; then
     IFLAG="-i"
@@ -41,11 +53,11 @@ fi
 
 if [ "$DOWATER" = "false" ]; then
     
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -p $POT -r $RUN -n $PROCESS -s $SEED $IFLAG > g4numi.mac
+    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
 
 else 
 
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -w -L $WATERCM -p $POT -r $RUN -n $PROCESS -s $SEED $IFLAG > g4numi.mac
+    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -w -L $WATERCM -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
 	
 fi
 
