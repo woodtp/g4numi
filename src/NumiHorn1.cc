@@ -30,7 +30,11 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
      if ( hornWaterLayerThick > 10.) {
      std::ostringstream messageOStr; messageOStr << " Unreasonable amount of water " << hornWaterLayerThick;
      std::string message(messageOStr.str());
+#ifndef MODERN_G4
      G4Exception("NumiDetectorConstruction::ConstructHorn1");
+#else
+     G4Exception("numiHorn1","NumiHorn1",FatalException,"NumiDetectorConstruction::ConstructHorn1");
+#endif
      exit(2); // only under 4.9.2 .. not reachable under 4.9.5 
    }
    const bool placeWaterLayer = (hornWaterLayerThick > 0.001*mm);

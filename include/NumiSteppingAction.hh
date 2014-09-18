@@ -74,7 +74,11 @@ public:
    
    inline void OpenOutStudyGeantino(const char *fName) const {
       if(fOutStudyGeantino.is_open()) {
+#ifdef ANCIENT_G4
         G4Exception("NumiSteppingAction::OpenOutStudyGeantino, Geantino Output file already open"); 
+#else
+        G4Exception("NumiSteppingAction","NumiSteppingAction",FatalException,"OpenOutStudyGeantino, Geantino Output file already open"); 
+#endif
          exit(2); // only under 4.9.2 .. not reachable under 4.9.5 
       }
       fOutStudyGeantino.open(fName);

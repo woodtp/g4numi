@@ -71,7 +71,12 @@ private:
     G4UIcmdWithABool* fForcedOldTargetCmd;
 
     G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
-    
+
+#ifdef MODERN_G4
+    G4UIcmdWithAString* fGDMLOutputCmd;
+    G4UIcmdWithABool*   fGDMLStoreRefCmd;
+    G4bool              fGDMLStoreReferences;
+#endif
 
 };
 

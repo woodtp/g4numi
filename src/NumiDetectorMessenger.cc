@@ -18,6 +18,12 @@
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UnitsTable.hh"
 
+#ifndef FLUGG
+  #ifdef MODERN_G4
+    #include "G4GDMLParser.hh"
+  #endif
+#endif
+
 NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet):NumiDetector(NumiDet)
 {
 
@@ -251,6 +257,19 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fHornWaterLayerThick->SetDefaultValue(ND->GetHornWaterLayerThick()); 
 	fHornWaterLayerThick->AvailableForStates(G4State_PreInit,G4State_Idle);
         
+#ifdef MODERN_G4
+        fGDMLOutputCmd = new G4UIcmdWithAString("/NuMI/output/writeGDML",this);
+        fGDMLOutputCmd->SetGuidance("Write GDML file");
+        fGDMLOutputCmd->SetParameterName("choice",false);
+        fGDMLOutputCmd->AvailableForStates(G4State_Init,G4State_Idle);
+  
+        fGDMLStoreRefCmd = new G4UIcmdWithABool("/NuMI/output/GDMLref",this);
+        fGDMLStoreRefCmd->SetGuidance("GDML file will have ptr references for uniqueness");
+        fGDMLStoreRefCmd->SetParameterName("choice",false);
+        fGDMLStoreRefCmd->AvailableForStates(G4State_Init,G4State_Idle);
+        fGDMLStoreReferences = false;
+#endif
+
 }
 
 NumiDetectorMessenger::~NumiDetectorMessenger() {
@@ -292,7 +311,11 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
  
 	delete fHornWaterLayerThick;
 
-       
+#ifdef MODERN_G4
+        delete fGDMLOutputCmd;
+        delete fGDMLStoreRefCmd;
+#endif
+
 }
 
 
@@ -438,7 +461,22 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHornWaterLayerThick(fHornWaterLayerThick->GetNewDoubleValue(newValue));
    } else {}
-      
+
+#ifdef MODERN_G4      
+   if ( command == fGDMLStoreRefCmd ) {
+     fGDMLStoreReferences = fGDMLStoreRefCmd->GetNewBoolValue(newValue);
+   }
+   if ( command == fGDMLOutputCmd ) {
+     G4String outgdml = newValue;
+     if ( outgdml != "" ) {
+       G4cout << "%%% write output GDML " << outgdml << G4endl;
+       G4VPhysicalVolume* pvol = 0;
+       G4GDMLParser gdml_parser;
+       // fGDMLStoreReferences: use ptr addresses to make name unique
+       gdml_parser.Write(outgdml,pvol,fGDMLStoreReferences);
+     }
+   }
+#endif
    
    return;
 

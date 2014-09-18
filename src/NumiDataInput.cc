@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.11 2014/09/16 16:21:41 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.12 2014/09/18 23:08:52 rhatcher Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -83,7 +83,12 @@ NumiDataInput::NumiDataInput()
    if(fPrintInfo > 0 || debugOn) G4cout << "NumiDataInput Constructor Called" << G4endl;
 
    if (fNumiDataInput)
+#ifndef MODERN_G4
     { G4Exception("NumiDataInput constructed twice.");}
+#else
+   { G4Exception("NumiDataInput","NumiDataInput",FatalException,"NumiDataInput constructed twice"); }
+#endif
+
 //  fNumiDataInput = this;
 
 

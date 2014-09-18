@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.10 2014/09/16 16:21:41 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.11 2014/09/18 23:08:52 rhatcher Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -160,7 +160,11 @@ void NumiAnalysis::book()
       tartree->Branch("target_exit","target_exit_t",&g4tardata,32000,99);
     }
     else{
+#ifndef MODERN_G4
       G4Exception("Something went wrong with tarNtuple");
+#else
+      G4Exception("NumiAnalysis","NumiAnalysis",FatalException,"Something went wrong with tarNtuple");
+#endif
     }
   }
 
@@ -299,7 +303,11 @@ void NumiAnalysis::book()
       zptree->Branch("zpdata", "zptuple_t", &g4zpdata,32000,1);
     }
     else{
+#ifndef MODERN_G4
       G4Exception("Something went wrong with zpNtuple");
+#else
+      G4Exception("NumiAnalysis","NumiAnalysis",FatalException,"Something went wrong with zpNtuple");
+#endif
     }
     G4cout<<" End of if statement"<<G4endl;
   }
