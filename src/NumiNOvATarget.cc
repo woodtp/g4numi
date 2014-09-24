@@ -140,8 +140,10 @@ void NumiDetectorConstruction::ConstructNOvATarget()
 
   
   G4VSolid* TGT1_solid;
-  
+
+  //  assert(NumiData->TargetEndRounded);
   if (NumiData->TargetEndRounded){
+    //    G4cout<<"Rounded TGT1"<<G4endl;
     TGT_l=TGT_l - NumiData->TargetSegWidth/2.;
     G4Box* TGT2_solid   =new G4Box("TGT2_solid",TGT_w,TGT_h,TGT_l);
     G4Tubs* TGTRE_solid =new G4Tubs("TGTRE_solid",0.,TGT_w,TGT_h,0.,360.*deg);
@@ -185,7 +187,11 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   new G4PVPlacement(G4Transform3D(rotation, translation), "Budal_VFHS", LVTargetFin, pvTargetMotherVol, false, 0, NumiData->pSurfChk);
 
   // The target segments
-  for (G4int ii=0; ii<NumiData->TargetSegmentNo; ii++){
+  // MAK: There is no reason to make the number of target segments a variable
+  // that appears in another header and is shared with the LE target
+  // this just leads to bugs
+  const int NumberOfNonBudalFinsInMETarget=48;
+  for (G4int ii=0; ii< NumberOfNonBudalFinsInMETarget; ii++){
     
     TGT_x = 0.0;
     TGT_y = -NumiData->TargetSegHeight/2.0 + NumiData->TargetSegWidth/2.0;
