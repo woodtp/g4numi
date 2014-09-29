@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.10 2014/09/16 16:26:57 laliaga Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.11 2014/09/29 20:38:11 laliaga Exp $
 
 import os, re, sys, getopt,string
 from string import Template
@@ -106,44 +106,44 @@ def main(argv=None):
     if len(seed)==0: 
         seed=run    
     if len(outfile)==0:
-        outfile='g4numi%s_playlist%s_%s'%(os.environ['G4NUMIVER'],playlist,beamconfig)
+        outfile='g4numi%s_%s_%s'%(os.environ['G4NUMIVER'],playlist,beamconfig)
         if len(nametag)>0:
             outfile=outfile+'_'+nametag
         tgtzpos=''
     
     if beamconfig == 'le010z185i' or beamconfig == 'LE010z185i':
-        if playlist=='1':
+        if playlist=='minerva1':
             tgtzpos="-44.50"   #tgt2H1 =  9.50
-        if playlist=='7':
+        if playlist=='minerva7':
 	    tgtzpos="-44.18"   #tgt2H1 =  9.18
-        if playlist=='9':
+        if playlist=='minerva9':
 	    tgtzpos="-45.4"    #tgt2H1 = 10.40
-        if playlist=='13':
+        if playlist=='minerva13':
             tgtzpos="-44.17"   #tgt2H1 =  9.17
     if beamconfig == 'le010z-185i' or beamconfig == 'LE010z-185i':
-        if playlist=='0':
+        if playlist=='downstream':
             tgtzpos="-44.50"   #tgt2H1 = 9.50
-        if playlist=='5':
+        if playlist=='minerva5':
 	    tgtzpos="-43.85"   #tgt2H1 = 8.85
-        if playlist=='10':
+        if playlist=='minerva10':
 	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
     if beamconfig == 'le010z000i' or beamconfig == 'LE010z000i':
-        if playlist=='6':
+        if playlist=='minerva6':
 	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
     if beamconfig == 'le100z200i' or beamconfig == 'LE100z200i':
-        if playlist=='2':
+        if playlist=='minerva2':
             tgtzpos="-134.57"  #tgt2H1 = 99.57
-        if playlist=='11':
+        if playlist=='minerva11':
 	    tgtzpos="-134.17"  #tgt2H1 = 99.17
     if beamconfig == 'le100z-200i' or beamconfig == 'LE100z-200i':
-        if playlist=='3':
+        if playlist=='minerva3':
             tgtzpos="-134.57"  #tgt2H1 = 99.57
-        if playlist=='12':
+        if playlist=='minerva12':
 	    tgtzpos="-134.17"  #tgt2H1 = 99.17
     if beamconfig == 'le250z200i' or beamconfig == 'LE250z200i':
-        if playlist=='4':
+        if playlist=='minerva4':
             tgtzpos="-284.57"  #tgt2H1 =249.57
-        if playlist=='8':
+        if playlist=='minerva8':
 	    tgtzpos="-285.09"  #tgt2H1 =250.09
             
     filestring=open(templatefile,'r').read()
