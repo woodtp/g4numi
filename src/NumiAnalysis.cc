@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.11 2014/09/18 23:08:52 rhatcher Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.12 2014/09/29 20:35:34 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -143,9 +143,9 @@ void NumiAnalysis::book()
     */
     //NEW DK2NU:
     tree = new TTree("dk2nuTree","g4numi Neutrino ntuple");
-    tree->Branch("this_dk2nu","bsim::Dk2Nu",&this_dk2nu,32000,99);
+    tree->Branch("dk2nu","bsim::Dk2Nu",&this_dk2nu,32000,99);
     meta = new TTree("dkmetaTree","Meta info for neutrino run");
-    meta->Branch("this_meta","bsim::DkMeta",&this_meta,32000,99);
+    meta->Branch("dkmeta","bsim::DkMeta",&this_meta,32000,99);
 
   }
 
@@ -437,18 +437,22 @@ void NumiAnalysis::FillMeta(){
   int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
 
   G4String namentp = (NumiData->nuNtupleName);
-  G4int namesize = (NumiData->nuNtupleName).length();
-  namentp.remove(0,namesize-3);
+  G4int pos_last = namentp.last('_');
+  namentp.remove(0,pos_last+1);
   istringstream buffer(namentp);
   int valjob;
   buffer >> valjob;
+  //if we are running interactevely (or more than 1000 jobs), we will write
+  //job ID = -1
+  if(valjob<0 || valjob>=1000)valjob=-1;
+
   NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
  
   this_meta->job  = valjob;
   this_meta->pots = NPots;
 
   //We are going to do this manually for now:
-  //Perhaps should be part of NumiDatInput??
+  //Perhaps should be part of NumiDataInput??
   this_meta->beamsim = "g4numi_v5";   
   this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0"; 
   this_meta->physcuts = "nofillyet";
