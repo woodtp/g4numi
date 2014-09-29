@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.12 2014/09/18 23:08:52 rhatcher Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.13 2014/09/29 20:36:52 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -974,16 +974,17 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //---------------------------------------------------------
   
   //Near & Far Detector location
-  nNear=3;//just 3 for now
+  nNear=7;//just 7 for now
   nFar=2;
-  G4double xdetNear[]    = {0           ,   11.414   ,  25.84};
-  G4double ydetNear[]    = {0           ,   -3.456   ,  78.42};
-  G4double zdetNear[]    = {1040        ,  994.665   , 745.25};
-  G4String detNameNear[] = {"Minos Near", "Nova Near", "MiniBooNE"};
+  //We are checking now Minerva positions. 
+  G4double xdetNear[]    = {-0.5628   ,     0      ,   11.57    ,  -0.29,    26.04      ,    53.    ,    197.6};
+  G4double ydetNear[]    = {-0.5329317,     0      ,   -3.64    ,  92.21,    78.64      ,    76.    ,     53.4};
+  G4double zdetNear[]    = {1032.319  ,  1040      ,  993.35    , 841.76,   744.87      ,   679.    ,    339.4};
+  G4String detNameNear[] = {"MINERvA" ,"Minos Near", "Nova Near", "NDOS", "MiniBooNE" , "MicroBooNE", "SciBooNE"};
 
-  G4double xdetFar[]     = {0           ,      11129.};
-  G4double ydetFar[]     = {0           ,      -4164.};
-  G4double zdetFar[]     = {735000      ,     810550.};
+  G4double xdetFar[]     = {0           ,      11037.46};
+  G4double ydetFar[]     = {0           ,      -4162.64};
+  G4double zdetFar[]     = {735000      ,     810422.32};
   G4String detNameFar[]  = {"Minos Far" , "Nova Far"};
 
   for(G4int ii=0;ii<nNear;ii++){
