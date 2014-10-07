@@ -1,23 +1,23 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.4 2014/02/18 16:40:39 kordosky Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.5 2014/10/07 16:25:19 kordosky Exp $
 
 # for interactive running use GRID=""
 #export GRID=""
 # for production account, non group-writable, use GRID="-g"
 #export GRID="-g"
 # for submitting as myself, use GRID="-g --use_gftp"
-export GRID="-g --opportunistic --use_gftp"
+export GRID="--environment=LD_LIBRARY_PATH --OS=SL6 -g --opportunistic --use_gftp"
 
 ########################### g4numi configuration ###########################
 export BEAMCONFIG="le010z185i"
 export DOWATER="false"
 export WATERCM="3"
-export DOIMPWT="false"
+export DOIMPWT="true"
 export POT="1000" 
 export NJOBS="2"
 export RUN="1"
-export OUTDIR="/minerva/data/users/$USER/flux/targ_pos/"
+export OUTDIR="/minerva/data/users/$USER/flux/sl6test/"
 export LOGFILE="${OUTDIR}/g4numi_${BEAMCONFIG}_${RUN}_\${PROCESS}.log"
 mkdir -p $OUTDIR
 # make it writable for minervaana
