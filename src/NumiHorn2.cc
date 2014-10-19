@@ -233,6 +233,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   // July 2014: Split this in 2 parts. 
   // Water and Air...
   //
+  G4LogicalVolume* lvPHorn2ICW = 0;
   if (placeWaterLayer) {
     if ((ICzPos.size()  != FRinW.size()) || (ICzPos.size()  != FRoutW.size()) || ((nIn) != static_cast<int>(FRoutW.size()))) {
       std::cerr << " Inconsistent of number of section fors PHorn2ICWater , Z /R size  " << ICzPos.size()
@@ -249,7 +250,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 //	       << FRinW[iSect] << " ROutW " << FRoutW[iSect] <<  std::endl;
 //    }	
     G4Polycone* sPHorn2ICW=new G4Polycone("sPHorn2ICWater",0.,360.*deg, numSectW, &ICzPos[0],&FRinW[0],&FRoutW[0]);
-    G4LogicalVolume* lvPHorn2ICW=new G4LogicalVolume(sPHorn2ICW, Water,"lvPHorn2ICWater",0,0,0);
+    lvPHorn2ICW=new G4LogicalVolume(sPHorn2ICW, Water,"lvPHorn2ICWater",0,0,0);
     ND->ApplyStepLimits(lvPHorn2ICW); // Limit Step Size
     lvPHorn2ICW->SetFieldManager(FieldMgr,true); //attach the local field to logical volume
     rotation=G4RotationMatrix(0.,0.,0.);
@@ -272,6 +273,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
   FieldMgr3->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
   lvPHorn2F->SetFieldManager(FieldMgr3,true); //attach the local field to logical volume
+  if (placeWaterLayer) lvPHorn2ICW->SetFieldManager(FieldMgr3,true); //attach the local field to logical volume
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
   G4VPhysicalVolume *pvPHorn2F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2F",lvPHorn2F,pvMHorn2,false,0, true);
