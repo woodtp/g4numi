@@ -71,6 +71,10 @@ private:
     G4UIcmdWithABool* fForcedOldTargetCmd;
 
     G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
+    G4UIcmdWithABool* fHorn1IsAlternate;
+    G4UIcmdWithADoubleAndUnit* fHorn1ExtraLayerAlum;
+    G4UIcmdWithABool* fDumpBFieldPlease;
+    
 
 #ifdef MODERN_G4
     G4UIcmdWithAString* fGDMLOutputCmd;

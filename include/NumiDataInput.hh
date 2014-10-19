@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.10 2014/09/09 17:26:58 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.11 2014/10/19 00:15:44 lebrun Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -133,7 +133,10 @@ public:
    G4double GetProton_cosy()                  { return fProton_cosy;}
    G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;} 
 
-   G4double GetHornWaterLayerThick()          { return fHornWaterLayerThick; }
+   G4double GetHornWaterLayerThick() const    { return fHornWaterLayerThick; }
+   G4bool GetHorn1IsAlternate()  const        { return fHorn1IsAlternate; }
+   G4double GetHorn1ExtraLayerAlum() const    { return fHorn1ExtraLayerAlum; }
+   G4bool GetDumpBFieldPlease() const    { return fDumpBFieldPlease; }
    
    //--------------------------------------------------------------
    //Specifically for Muon Monitor simulation and Absorber background simulation
@@ -164,7 +167,10 @@ public:
    void SetAbsBkgNtupleName(G4String fileName) {absbkgNtupleName=fileName;}
    void SetAbsBkgNtupleDir(G4String fileDir)   {absbkgNtupleDir=fileDir;}
    void SetHornWaterLayerThick(G4double d)     {fHornWaterLayerThick = d;}
-   
+   void SetHorn1IsAlternate(G4bool t)          {fHorn1IsAlternate = t;}
+   void SetHorn1ExtraLayerAlum(G4double d)     {fHorn1ExtraLayerAlum = d;}
+   void SetDumpBFieldPlease(G4bool t)          {fDumpBFieldPlease = t;}
+ 
    G4bool   GetMuonBeam()            {return useMuonBeam;}
    G4int    GetNInputParts()         {return NInputParts;}
    G4int    GetNInputPart()          {return NInputPart;}
@@ -244,6 +250,7 @@ public:
 
    G4bool useMuonBeam, useMuonInput, solidMuMons, simAbsBkg, reWeightDeltas;
    G4String absorberConfig;
+   G4bool fHorn1IsAlternate; // An different way of coding up Horn1 (P.L., Sept 2014) 
    G4int    NInputPart, NInputParts, nSplitDeltas;
    G4bool simDRays, useZPosCut, createAbsBkgNtuple;
    G4double muonBeamMomentum, muonBeamGaussXsig, muonBeamGaussYsig, muonBeamZPos;
@@ -380,6 +387,12 @@ public:
    //
    
    G4double fHornWaterLayerThick;
+   G4double fHorn1ExtraLayerAlum;
+   
+   //
+   // A logical flag to indicate the request to dump the magnetic field map 
+   //
+   G4bool fDumpBFieldPlease; 
 
    //-----------------
    //do these variables get used?!

@@ -11,6 +11,7 @@
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
+#include "G4PVPlacement.hh"
 #include <vector>
 
 class G4VSolid;
@@ -23,6 +24,9 @@ class NumiMagneticFieldIC;
 class NumiMagneticFieldOC;
 class NumiHornSpiderSupport;
 class G4VisAttributes;
+class G4VisAttributes;
+class LBNEHornRadialEquation; // LBNE misnomer, these equation are found in the NUMI drawings, 
+                              // For AD drawing numbers, see ../src/NumiHorn1.cc 
 
 typedef std::vector<G4double> vdouble_t; 
 typedef std::vector<G4int> vint_t;
@@ -85,6 +89,12 @@ private:
                                G4double rOut,
                                G4VPhysicalVolume *motherVolume,
                                G4int copyNo); 
+   void ConstructHorn1Alternate(G4ThreeVector pos, G4RotationMatrix rot);
+   void CreateAndPlaceFinalIOUpstr(const std::string &aName, G4PVPlacement *mother);
+   void Horn1InstallSpiderHanger(const G4String &nameStrH, double zLocTweakedDC, 
+                                 double zPosMotherVolume, double outerRad, G4PVPlacement *vMother );
+   int GetNumberOfInnerHornSubSections(size_t eqn, double z1, double z2, int nMax) const;
+
    void ConstructHorn2(G4ThreeVector pos, G4RotationMatrix rot);
    void ConstructSecMonitors();
    void DefineMaterials();
@@ -201,7 +211,38 @@ private:
     G4double fBaffleLength;
 
         /// Allow to run ME beam simulation with the old target
-    G4bool fForcedOldTarget;
+    G4bool fForcedOldTarget; 
+    // 
+    // The extra layer of Aluminum on top of Horn1 Conductor 
+    // 
+    G4double fHorn1ExtraLayerAlum; 
+    // 
+    // The Horn1 equation, implemented first for LBNE.. 
+    //
+    std::vector<LBNEHornRadialEquation> fHorn1Equations;
+
+};
+class LBNEHornRadialEquation  {
+
+  public:
+      LBNEHornRadialEquation(); // to be able to store in an stl vector. 
+      LBNEHornRadialEquation(double rSqrtCoefficient, double zCoefficient, double rOffset, bool parabolic=true);
+      double GetVal(double z) const ; 
+      void test1() const; // Cross check for equation 1. Will generate G4Exception 
+  
+  private:
+      static double inchDef;
+      bool parabolic;
+      double rCoeff;
+      double zCoeff;
+      double rOff;
+      double rResc;
+      double zResc;
+      
+  public:    
+    inline void SetLongRescaleFactor(double r) {zResc = r;}   // Applicable only for LBNE, but it does not hurt to leave them here.. 
+    inline void SetRadialRescaleFactor(double r) {rResc = r;}
+
 };
 
 #endif

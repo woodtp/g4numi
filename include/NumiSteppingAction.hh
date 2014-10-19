@@ -65,6 +65,7 @@ private:
   void StudyAbsorption(const G4Step*); 
   void StudyPropagation(const G4Step*); 
   void StudyCheckOverlap(const G4Step*);
+  void StudyBFieldWithMuons(const G4Step*);
    
 public:
 
@@ -86,6 +87,7 @@ public:
       if (fGeantinoStudyName.contains("Absorb")) 
         fOutStudyGeantino << " id x y E AbsTDecayChan AbsTHorn1Neck AbsHorn2E AbsWaterDecayChan AbsWHorn1Neck AbsWHorn2E AbsAlumHorn2Entr  " 
 	              << std::endl;
+       if (fGeantinoStudyName.contains("BField")) fOutStudyGeantino << " id x y z px py pz matPre matPost " << std::endl;
    }
    inline void SetKeyVolumeNameFrom(G4String s) const { fKeyVolumeNameFrom  = s;}
    inline void SetKeyVolumeNameTo(G4String s) const { fKeyVolumeNameTo  = s;}

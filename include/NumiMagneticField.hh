@@ -1,5 +1,5 @@
 
-// $Id: NumiMagneticField.hh,v 1.2.4.3 2014/09/09 17:26:58 laliaga Exp $
+// $Id: NumiMagneticField.hh,v 1.2.4.4 2014/10/19 00:15:58 lebrun Exp $
 // --------------------------------------------------------------
 // NumiMagneticField.hh modified by Yuki 2004/7/16
 // modified by Yuki 8/2/04
@@ -16,11 +16,12 @@ class NumiMagneticField : public G4MagneticField
     NumiMagneticField();
     ~NumiMagneticField();
 
-  virtual void GetFieldValue( const double Point[3],
-                               double *Bfield ) const;
+  virtual void GetFieldValue( const double Point[3],  double *Bfield ) const;  
+  void DumpItToAsciiFile(); // Not implemented, but could be useful..
   
   private:
     NumiDataInput* NumiData;
+    mutable bool dumpHasBeenDump;
   //G4double current;
 };
 
@@ -31,9 +32,11 @@ class NumiMagneticFieldIC : public G4MagneticField
     ~NumiMagneticFieldIC();
 
   virtual void GetFieldValue( const double Point[3], double *Bfield ) const;
+  void DumpItToAsciiFile();
 
   private:
     NumiDataInput* NumiData;
+    mutable bool dumpHasBeenDump;
   //G4double current;
 };
 
