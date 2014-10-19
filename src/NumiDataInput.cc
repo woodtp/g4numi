@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.13 2014/09/29 20:36:52 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.14 2014/10/19 00:27:52 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -159,6 +159,7 @@ NumiDataInput::NumiDataInput()
   fNEvents = -1;
   solidMuMons = false;
   absorberConfig = "None";
+  fHorn1IsAlternate = false;
   simAbsBkg = false;
   createAbsBkgNtuple = false;
   absbkgNtupleName = "";
@@ -841,8 +842,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   Horn2Y0 = 0.0*cm;
   Horn2Z0 = 10.0*m;
   
-  fHornWaterLayerThick = 0.0*mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
-  
+//  fHornWaterLayerThick = 0.0*mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
+  fHornWaterLayerThick = 1.0*mm; // Oct 18 2014, Based on studies done
+//  mid-October, after fixing bug in the Magnetic field pointer assignments,
+//  default is now what it should be 
+  fHorn1ExtraLayerAlum = 0.0*mm;
+  fDumpBFieldPlease = false;
 
   NPHorn2EndN=3;
   
@@ -1525,7 +1530,15 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
    //
 
    NumiDataInput::SetHornCurrent(ihorn*1000.*ampere);
-
+   //
+   // Do something naughty: Multiply by 1000 for BFieldMu geantino analysis. 
+   //
+   if (fDumpBFieldPlease) {
+       NumiDataInput::SetHornCurrent(ihorn*1.e6*ampere);
+       std::cerr << " Horn Current has been multiplied by 1 e3 for Muon Geantino use, Hor Current is now  " 
+                 << this->HornCurrent << std::endl;
+//       exit(2);
+   }
    fIHornConfig = ihornstr + "i";
    
    return true;

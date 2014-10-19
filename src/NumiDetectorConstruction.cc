@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.7 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.8 2014/10/19 00:23:58 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -42,7 +42,9 @@ NumiDetectorConstruction::NumiDetectorConstruction()
       fBaffleOuterRadius(3.0*cm),
       fBaffleInnerRadius(5.5*mm),
       fBaffleLength(1.5*m),
-      fForcedOldTarget(false)
+      fForcedOldTarget(false),
+      fHorn1ExtraLayerAlum(0.)
+      
 {
   //Scan the input file     
   NumiData = NumiDataInput::GetNumiDataInput();

@@ -13,7 +13,7 @@
 NumiMagneticField::NumiMagneticField()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
-
+  dumpHasBeenDump = false;
 }
 
 NumiMagneticField::~NumiMagneticField(){;}
@@ -21,6 +21,7 @@ NumiMagneticField::~NumiMagneticField(){;}
 void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) const
 {
   static bool first = true;
+  
   
   G4double current = NumiData->HornCurrent/ampere/1000.;
 
@@ -34,7 +35,11 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   Bfield[0] = -B*Point[1]/radius;
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
-
+  
+  if (!dumpHasBeenDump && NumiData->GetDumpBFieldPlease()) {
+     dumpHasBeenDump= true;
+//     DumpItToAsciiFile(); No need, we will use the Muon Geantino and look at trajectories. 
+  }
   if(NumiData->jCompare) {// Make gnumi like horns - this is for validation
     G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
     G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
@@ -58,11 +63,11 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
     }     
   }
 }
-
 //magnetic field in inner conductor ====================================================
 NumiMagneticFieldIC::NumiMagneticFieldIC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
+  dumpHasBeenDump = false;
 }
 
 NumiMagneticFieldIC::~NumiMagneticFieldIC(){;}

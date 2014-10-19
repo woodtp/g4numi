@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.8 2014/08/21 18:19:03 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.9 2014/10/19 00:24:49 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -16,6 +16,7 @@
 #include "NumiTrajectory.hh"
 #include "G4TrajectoryContainer.hh"
 #include "G4RunManager.hh"
+#include "G4Run.hh"
 #include "NumiTrackInformation.hh"
 #include "NumiDataInput.hh"
 #include "NumiAnalysis.hh"
@@ -828,6 +829,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
        if (fGeantinoStudyName.find("Absorb") != std::string::npos) StudyAbsorption(theStep);
        if (fGeantinoStudyName.find("Propa") != std::string::npos) StudyPropagation(theStep);
        if (fGeantinoStudyName.find("PropCO") != std::string::npos) StudyCheckOverlap(theStep);
+       if (fGeantinoStudyName.find("BFieldMu") != std::string::npos) StudyBFieldWithMuons(theStep);
   }
   //================================
   //=======for Raytracing===========
@@ -1200,5 +1202,21 @@ void NumiSteppingAction::StudyCheckOverlap(const G4Step * theStep) {
      fOutStudyGeantino << std::endl;
   }
 }
-
-
+void NumiSteppingAction::StudyBFieldWithMuons(const G4Step * theStep) {
+    const G4Event* evtTmp = G4EventManager::GetEventManager()->GetConstCurrentEvent();
+    const int eId = evtTmp->GetEventID();
+    G4StepPoint* prePtr = theStep->GetPreStepPoint();
+    if (prePtr == 0) return;
+    G4StepPoint* postPtr = theStep->GetPostStepPoint();
+    if (postPtr == 0) return;
+    if (postPtr->GetPosition()[2] > 15000.) return;
+    G4LogicalVolume *volPost = postPtr->GetPhysicalVolume()->GetLogicalVolume();
+    G4LogicalVolume *volPre = prePtr->GetPhysicalVolume()->GetLogicalVolume();
+    fOutStudyGeantino << " " << eId; 
+    for (int k=0; k != 3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k]; 
+    const G4DynamicParticle *tr = theStep->GetTrack()->GetDynamicParticle();
+    for (int k=0; k != 3; k++) fOutStudyGeantino << " " << tr->GetMomentum()[k];   
+    fOutStudyGeantino << " " << volPre->GetMaterial()->GetName();
+    fOutStudyGeantino << " " << volPost->GetMaterial()->GetName();
+    fOutStudyGeantino << std::endl;
+}

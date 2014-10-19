@@ -248,15 +248,41 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	fForcedOldTargetCmd->SetGuidance("Force to use the old target"); 
 	fForcedOldTargetCmd->SetParameterName("forceOldTarget",true); 
 	fForcedOldTargetCmd->SetDefaultValue(false); 
-
-       
-	fHornWaterLayerThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/HornWaterLayerThickness",this);
-        fHornWaterLayerThick->SetGuidance("Set the Water Layer thicknes on Horn inner conductors");
-	fHornWaterLayerThick->SetParameterName("Water Layer thicknes on Horn inner conductors",true);
-	fHornWaterLayerThick->SetUnitCategory("Length");
-        fHornWaterLayerThick->SetDefaultValue(ND->GetHornWaterLayerThick()); 
-	fHornWaterLayerThick->AvailableForStates(G4State_PreInit,G4State_Idle);
+	//
+	// Horn Water layer on the inner Conductor 
+	//
+        fHornWaterLayerThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/HornWaterLayerThickness",this);
+	fHornWaterLayerThick->SetGuidance("Set the Water Layer thicknes on Horn inner conductors");
+        fHornWaterLayerThick->SetParameterName("Water Layer thicknes on Horn inner conductors",true);
+        fHornWaterLayerThick->SetUnitCategory("Length");
+	fHornWaterLayerThick->SetDefaultValue(ND->GetHornWaterLayerThick()); 
+        fHornWaterLayerThick->AvailableForStates(G4State_PreInit,G4State_Idle);
+	//
+	// Horn 1 Inner conductor coating layer.  
+	//
+        fHorn1ExtraLayerAlum = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn1ExtraLayerAlum",this);
+	fHorn1ExtraLayerAlum->SetGuidance("Set an extra layer of aluminum.  This extra coating can be negative ");
+        fHorn1ExtraLayerAlum->SetParameterName("Extra Layer on Horn1 inner conductors",true);
+        fHorn1ExtraLayerAlum->SetUnitCategory("Length");
+	fHorn1ExtraLayerAlum->SetDefaultValue(ND->GetHorn1ExtraLayerAlum()); 
+        fHorn1ExtraLayerAlum->AvailableForStates(G4State_PreInit, G4State_Idle);
+	std::cerr << " I have defined the command Horn1ExtraLayerAlum at point value " << (void*) fHorn1ExtraLayerAlum << std::endl;
+        // 
+	// Allow for the option of replacing the existing impementation of Horn1 with the one used for LBNE 700 kW systematics 
+	// studies. 
+	// 
+	fHorn1IsAlternate = new G4UIcmdWithABool("/NuMI/det/Horn1IsAlternate",this);
+        fHorn1IsAlternate->SetGuidance("Build the Horn 1 inner conductors following set of drawings from AD ");
+	fHorn1IsAlternate->SetParameterName("Horn1IsAlternate", true);
+        fHorn1IsAlternate->SetDefaultValue(ND->GetHorn1IsAlternate()); 
+	fHorn1IsAlternate->AvailableForStates(G4State_PreInit,G4State_Idle);
         
+	fDumpBFieldPlease = new G4UIcmdWithABool("/NuMI/det/DumpBfieldPlease",this);
+        fDumpBFieldPlease->SetGuidance("Dump the BField (one time only) ");
+	fDumpBFieldPlease->SetParameterName("DumpBFieldPlease", true);
+        fDumpBFieldPlease->SetDefaultValue(ND->GetDumpBFieldPlease()); 
+	fDumpBFieldPlease->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
 #ifdef MODERN_G4
         fGDMLOutputCmd = new G4UIcmdWithAString("/NuMI/output/writeGDML",this);
         fGDMLOutputCmd->SetGuidance("Write GDML file");
@@ -310,6 +336,9 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
         delete fForcedOldTargetCmd;
  
 	delete fHornWaterLayerThick;
+	delete fHorn1IsAlternate;
+	delete fHorn1ExtraLayerAlum;
+	delete fDumpBFieldPlease;
 
 #ifdef MODERN_G4
         delete fGDMLOutputCmd;
@@ -460,7 +489,20 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    }  else if (command == fHornWaterLayerThick) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHornWaterLayerThick(fHornWaterLayerThick->GetNewDoubleValue(newValue));
-   } else {}
+   }  else if (command == fHorn1IsAlternate) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetHorn1IsAlternate(fHorn1IsAlternate->GetNewBoolValue(newValue));
+   }  else if (command == fDumpBFieldPlease) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetDumpBFieldPlease(fDumpBFieldPlease->GetNewBoolValue(newValue));
+   }  else if (command == fHorn1ExtraLayerAlum) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetHorn1ExtraLayerAlum(fHorn1ExtraLayerAlum->GetNewDoubleValue(newValue));
+   } else {
+   
+//       std::cerr << " In messenger, Unknown Cmd " << (void *) (command) << " and I will quit " << std::endl;
+//      exit(2);
+  }
 
 #ifdef MODERN_G4      
    if ( command == fGDMLStoreRefCmd ) {
