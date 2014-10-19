@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.12 2014/09/29 20:35:34 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.13 2014/10/19 00:29:05 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -432,6 +432,7 @@ void NumiAnalysis::finish()
 
 void NumiAnalysis::FillMeta(){
 
+
   //This class fills dk2meta:
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
   int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
@@ -498,8 +499,7 @@ void NumiAnalysis::FillMeta(){
 		    
   this_meta->location = vec_loc;
 
-
-  meta->Fill();
+  if (NumiData->createNuNtuple) meta->Fill(); // If we don't have the Ntuple properly open, won't work.
   
 }
 
