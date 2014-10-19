@@ -23,6 +23,8 @@
 #include "NumiRunManager.hh"
 #include "NumiParticleCode.hh"
 #include "NumiAnalysis.hh"
+#include "G4RunManager.hh"
+#include "G4Run.hh"
 
 #include "TROOT.h"
 #include <TFile.h>
@@ -159,7 +161,22 @@ void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
     fParticleGun->SetParticleMomentumDirection(direction);
 //    std::cerr << " Muon Vertex " << G4ThreeVector(x, y, z) << " direction " << direction << std::endl;
-    if (fUseMuonGeantino) fParticleGun->SetParticleEnergy(fND->protonKineticEnergy); // back door use of the proton momentum data card. 
+    if (fUseMuonGeantino) {
+       //
+       // Go systematically in polar angle, event by event..  Phi fixed to 45 degrees.
+       //
+       const G4Run *mRun = G4RunManager::GetRunManager()->GetCurrentRun();
+       const double frEvt = (double) anEvent->GetEventID()/((double) mRun->GetNumberOfEventToBeProcessed());
+       const double dr = fPolarAngleGeantinoMin + (fPolarAngleGeantino - fPolarAngleGeantinoMin)*frEvt;
+       const double dx = std::sqrt(0.5)*dr;
+       const double dy = dx;
+       const double dz = sqrt(1.0 - (dx*dx + dy*dy));
+       G4ThreeVector direction(dx, dy, dz);
+       fParticleGun->SetParticlePosition(G4ThreeVector(0., 37.,  fZOriginGeantino));
+       fParticleGun->SetParticleMomentumDirection(direction);
+       fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(-13)); // mu + 
+       fParticleGun->SetParticleEnergy(fND->protonKineticEnergy); // back door use of the proton momentum data card. 
+    }
     fParticleGun->GeneratePrimaryVertex(anEvent);
     fCurrentPrimaryNo++;
     
