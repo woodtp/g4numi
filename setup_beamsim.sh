@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.11 2014/09/16 16:26:57 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.12 2014/10/26 22:39:25 laliaga Exp $
 
 
 setup_beamsim(){
@@ -9,7 +9,11 @@ setup_beamsim(){
     local TOP=${PWD}
 #   setup -f Linux+2.6-2.5 gcc v3_4_3
 # Comment OUT the line below if you are using a local geant4 - g4numi_environment.sh will do this correctly for you
+# Also, comment out the line below if you want the geant4 version that contains the class to store hadronic interaction 
+# kinematics and add this line:   . /minerva/app/users/laliaga/EROICA_G4NUMI/geant4/geant4.9.2.p03/env.sh 
+# and use the processor directive to define USEMODGEANT4
     setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
+#    . /minerva/app/users/laliaga/EROICA_G4NUMI/geant4/geant4.9.2.p03/env.sh 
     setup -q debug -f Linux+2.6-2.5 root v5_30_00
 
     if [ -e "/grid/fermiapp/minerva/condor/setup.minerva.condor.sh" ]; then
