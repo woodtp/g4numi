@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.14 2014/10/26 22:47:22 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.15 2014/10/26 22:58:19 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -51,7 +51,7 @@
 #include <sstream>
 #include <iostream>
 
-#define USEMODGEANT4
+//#define USEMODGEANT4
 #ifdef USEMODGEANT4 
 
 #include "MinervaElementInter.hh"
