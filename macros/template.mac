@@ -32,6 +32,10 @@
 #
 /NuMI/det/LengthOfWaterInTgt ${watercm} cm
 
+# The water layer around the inner conductor. Defaul value: 1 mm.
+#
+/NuMI/det/HornWaterLayerThickness 1 mm
+
 #
 #Set the Run Period, default is -999 which is no run period at all. MUST SET IT.
 #Run Period 0 is like a "default" run period, everything is aligned, it is not
