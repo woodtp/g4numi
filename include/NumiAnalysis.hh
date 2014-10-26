@@ -59,6 +59,7 @@ public:
    void FillMeta(); //new function to fill dk2meta
    void FillNeutrinoNtuple(const G4Track& track,
                            const std::vector<G4VTrajectory*>& nuHistory);
+   G4int GetNucleus(G4String nucl_name); //new function to get target element
    void FillHadmmNtuple(const G4Track& track,Int_t mm_num,Int_t cellNum);
    void FillHadmmNtuple();
    void FillBXDRAW(const G4Step* aStep);
@@ -142,6 +143,7 @@ private:
   std::vector<bsim::Traj> vec_traj;
   std::vector<bsim::NuRay> vec_nuray;   
   std::vector<bsim::Ancestor> vec_ancestor;
+  std::vector<int> vec_int;
   //////////////////////////////////////////
 
 };
