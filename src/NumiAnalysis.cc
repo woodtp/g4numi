@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.13 2014/10/19 00:29:05 lebrun Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.14 2014/10/26 22:47:22 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -51,6 +51,12 @@
 #include <sstream>
 #include <iostream>
 
+#define USEMODGEANT4
+#ifdef USEMODGEANT4 
+
+#include "MinervaElementInter.hh"
+
+#endif
 
 using namespace std;
 
@@ -454,7 +460,13 @@ void NumiAnalysis::FillMeta(){
 
   //We are going to do this manually for now:
   //Perhaps should be part of NumiDataInput??
+
+#ifdef USEMODGEANT4
+  this_meta->beamsim = "g4numi_v5_MODGEANT4"; 
+#else 
   this_meta->beamsim = "g4numi_v5";   
+#endif
+
   this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0"; 
   this_meta->physcuts = "nofillyet";
 
@@ -499,6 +511,9 @@ void NumiAnalysis::FillMeta(){
 		    
   this_meta->location = vec_loc;
 
+  //Storing the name of special storing:
+  (this_meta->vintnames).push_back("Index_Tar_In_Ancestry");
+  
   if (NumiData->createNuNtuple) meta->Fill(); // If we don't have the Ntuple properly open, won't work.
   
 }
@@ -1075,6 +1090,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   //if not using external ntuple then need to find the particle that exited the target
   
   G4int tar_pdg = 0; //auxiliar variable to convert to PDG code
+  G4int tar_trackId = -1;
   if(!NumiData->useFlukaInput && !NumiData->useMarsInput) 
     {
         G4bool findTarget = false;
@@ -1097,6 +1113,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
                     ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();  
                     tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
 		    tar_pdg = PParentTrack->GetPDGEncoding();
+		    tar_trackId = PParentTrack->GetTrackID();
                     findTarget = true;
                 }
             }
@@ -1317,6 +1334,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       // the maxGen value should be increased to 13 or higher.
   g4data->ntrajectory = history.size();
   if (history.size()>maxGen) g4data->overflow = true;
+  int idx_tar_in_chain = -1;
 
       // Create a temporary vector so that it can be reversed.
   std::vector<G4VTrajectory*> tmpHistory(history);
@@ -1349,6 +1367,12 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       g4data->ivol[index] = traj->GetPreStepVolumeName(0);
       g4data->fvol[index] = traj->GetPreStepVolumeName(lastPoint);
 
+      //Searching for the index of the hadron that the target:
+      //This is saved later in dk2nu:
+      if(g4data->trackId[index] == tar_trackId){
+	idx_tar_in_chain = int(index); 
+      }
+
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -1363,8 +1387,19 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   vec_traj.clear();
   vec_nuray.clear();
   vec_ancestor.clear();
-
+  vec_int.clear();
+ 
   //1) Ancestries:
+
+#ifdef USEMODGEANT4 
+
+  MinervaElementInter*  ei =  MinervaElementInter::getInstance();
+  std::map<G4int,G4String> ei_map =  ei->GetInfo();
+  std::map<G4int,G4String>::iterator ei_it;
+  std::map<G4int,G4ThreeVector> pi_map =  ei->GetP();
+  std::map<G4int,G4ThreeVector>::iterator pi_it;
+  
+#endif
 
   std::size_t ntrajectory = history.size();
   for (std::size_t index = 0; index < ntrajectory; ++index) {
@@ -1395,16 +1430,43 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       G4double pprodpx = MeV2GeV*(traj->GetParentMomentumAtThisProduction().x());
       G4double pprodpy = MeV2GeV*(traj->GetParentMomentumAtThisProduction().y());
       G4double pprodpz = MeV2GeV*(traj->GetParentMomentumAtThisProduction().z());
-      tmp_ancestor.SetPProdP(pprodpx,pprodpy,pprodpz);
       
       tmp_ancestor.proc    = traj->GetProcessName();
       tmp_ancestor.ivol    = traj->GetPreStepVolumeName(0);
       tmp_ancestor.imat    = "NotFillYet";      
-      tmp_ancestor.nucleus = 0;      
+      G4int elemID = 0;     
 
       tmp_ancestor.polx = 0.0;
       tmp_ancestor.poly = 0.0;
       tmp_ancestor.polz = 0.0;
+
+#ifdef USEMODGEANT4 
+      
+      //filling inter. elem. and momuntum info:
+      ei_it = ei_map.find(traj->GetTrackID());
+      pi_it = pi_map.find(traj->GetTrackID());     
+      
+      if(ei_it != ei_map.end()){
+	elemID = GetNucleus(ei_it->second);
+	// if(elemID == 0) G4cout<< "NO FOUND IN THE TABLE "<< ei_it->second << G4endl;
+      }
+      else{
+	//the final neutrino does not interact:
+	elemID = 0;
+      }
+      
+      if(pi_it != pi_map.end()){
+	G4ThreeVector mom_inter = pi_it->second;
+	pprodpx  = mom_inter.x()*MeV2GeV;
+	pprodpy  = mom_inter.y()*MeV2GeV;
+	pprodpz  = mom_inter.z()*MeV2GeV;
+      } 
+      
+#endif
+
+      tmp_ancestor.nucleus = elemID;
+      tmp_ancestor.SetPProdP(pprodpx,pprodpy,pprodpz);
+
       vec_ancestor.push_back(tmp_ancestor);
   }
   /////
@@ -1419,6 +1481,9 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   this_tgtexit.tpz = g4data->tpz;
   this_tgtexit.tptype = tar_pdg;
   this_tgtexit.tgen   =g4data->tgen;
+
+  //2.1)Storing the index of tar:
+  vec_int.push_back(idx_tar_in_chain);
   /////
 
   //3) Trajectories (ray tracing):
@@ -1528,7 +1593,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   this_dk2nu->traj = vec_traj;
   this_dk2nu->decay = this_decay;
   this_dk2nu->nuray = vec_nuray;
-  
+  this_dk2nu->vint = vec_int; //Storing the index of tar
+
   /////////////////////////////////////////////////////////////////////////
 
   
@@ -1763,4 +1829,51 @@ void NumiAnalysis::WriteTarNtuple(){//Melissa added
     g4tardata->tptype=-10;
     g4tardata->run=-100;
     g4tardata->evtno=-100;  
+}
+
+//----------------------------
+G4int NumiAnalysis::GetNucleus(G4String nucl_name){
+  
+  //The new dk2nu store the nucleus element as integer.
+  //We have the element name from our custumized geant4. 
+  //Form now, I created this map will all elements in g4numi:
+  //I am contructing the pdg code based on the convention:
+  //+-10LZZZAAAI, where L is the number of s quarks, 
+  //I is the isomer id (both set to zero).
+  G4int id = 0;
+
+  if(nucl_name == "Hydrogen")        return  1000010010;
+  if(nucl_name == "Helium")          return  1000020040;
+  if(nucl_name == "Carbon")          return  1000060120;
+  if(nucl_name == "Nitrogen")        return  1000070140;
+  if(nucl_name == "Oxygen")          return  1000080160;
+  if(nucl_name == "Natrium")         return  1000110230;
+  if(nucl_name == "Magnesium")       return  1000120240;
+  if(nucl_name == "Aluminum")        return  1000130270;
+  if(nucl_name == "Silicon")         return  1000140280;
+  if(nucl_name == "Phosphorus")      return  1000150310;
+  if(nucl_name == "Sulfur")          return  1000160320;
+  if(nucl_name == "Argon")           return  1000180400;
+  if(nucl_name == "Potassium")       return  1000190390;
+  if(nucl_name == "Calcium")         return  1000200400;
+  if(nucl_name == "Titanium")        return  1000220480;
+  if(nucl_name == "Chromium")        return  1000240520;
+  if(nucl_name == "Manganese")       return  1000250550;
+  if(nucl_name == "Iron")            return  1000260560;
+  if(nucl_name == "Nickel")          return  1000280590;
+  if(nucl_name == "Copper")          return  1000290640;
+  if(nucl_name == "Gallium")         return  1000310700;
+  if(nucl_name == "Mercury")         return  1000802010; 
+  if(nucl_name == "Sodium")          return  1000110230;
+  if(nucl_name == "Phospho")         return  1000150310;
+  if(nucl_name == "Berylliu")        return  1000040090;
+  if(nucl_name == "Berillium")       return  1000040090;
+  if(nucl_name == "Target")          return  1000060120;
+  if(nucl_name == "Lead")            return  1000822070;
+  if(nucl_name == "SecMonitorHelium")return  1000020040;
+  if(nucl_name == "TargetHelium")    return  1000020040;
+  if(nucl_name == "HeGas")           return  1000020040;
+
+  return id;
+
 }

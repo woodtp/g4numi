@@ -17,6 +17,13 @@
 #include "G4Trajectory.hh"
 #include "G4ios.hh"
 
+#define USEMODGEANT4
+#ifdef USEMODGEANT4 
+
+#include "MinervaElementInter.hh"
+
+#endif
+
 //------------------------------------------------------------------------------------- 
 NumiEventAction::NumiEventAction()
    :fTrajectoryContainer(0),
@@ -281,7 +288,12 @@ void NumiEventAction::EndOfEventAction(const G4Event* evt)
       fZPosMap.clear();
    }
 
-     
+#ifdef USEMODGEANT4 
+   
+   MinervaElementInter*  this_elementinter =  MinervaElementInter::getInstance();
+   this_elementinter->CleanInfo();
+   
+#endif
 
 }
 
