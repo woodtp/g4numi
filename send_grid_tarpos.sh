@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/send_grid_tarpos.sh,v 1.1.2.2 2014/09/29 20:39:28 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/send_grid_tarpos.sh,v 1.1.2.3 2014/10/26 22:51:59 laliaga Exp $
 
 # for interactive running use GRID=""
 #export GRID=""
 # for production account, non group-writable, use GRID="-g"
 #export GRID="-g"
 # for submitting as myself, use GRID="-g --use_gftp"
-export GRID="-g --opportunistic --use_gftp"
+export GRID="--OS=SL6 -g --opportunistic --use_gftp"
 
 #############################
 #General variables:
