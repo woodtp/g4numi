@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.9 2014/10/19 00:24:49 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.10 2014/11/06 12:49:47 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -1219,4 +1219,10 @@ void NumiSteppingAction::StudyBFieldWithMuons(const G4Step * theStep) {
     fOutStudyGeantino << " " << volPre->GetMaterial()->GetName();
     fOutStudyGeantino << " " << volPost->GetMaterial()->GetName();
     fOutStudyGeantino << std::endl;
+    // Flag the end of Horn1, so we can document.. 
+    if (std::abs(prePtr->GetPosition()[2] - 3340.70) < 1.0) {
+      std::cerr << " Exiting Horn1, PreName " << volPre->GetName() 
+                << " Material " << volPre->GetMaterial()->GetName() << " Post " 
+		<< volPost->GetName() << " Material " << volPost->GetMaterial()->GetName() << std::endl; 
+    }
 }
