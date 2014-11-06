@@ -179,6 +179,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
               << " / " <<  MVRin.size() << " / " << MVRout.size() << std::endl; exit(2);
   }
   sMHorn1= new G4Polycone("sMH",0.,360.*deg, static_cast<int>(MVzPos.size()), &MVzPos[0],&MVRin[0],&MVRout[0]);
+//  std::cerr << " Horn1 Polycone Mother Default Parameters  " << std::endl; 
+//  for (size_t k=0; k != MVzPos.size(); k++) {
+//    std::cerr << " ZPos " << MVzPos[k] << " Rin " << MVRin[k] << " ROut " << MVRout[k] << std::endl;
+//  }
   G4LogicalVolume *lvMHorn1 = new G4LogicalVolume(sMHorn1,material,"lvMHorn1",0,0,0);
   ND->ApplyStepLimits(lvMHorn1); // Limit Step Size
   ND->ApplyTimeLimits(lvMHorn1);//limit TOF for step
@@ -187,6 +191,8 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
   G4VPhysicalVolume* pvMHorn1 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother",lvMHorn1,TGAR,false,0, true);
+  std::cerr << " Position for Horn1 Mother, Default version " << translation << std::endl;
+//  std::cerr << " And quit now ... " << std::endl; exit(2);
   pvMHorn1 -> CheckOverlaps();  
   /**
    * FLUGG - 
@@ -538,7 +544,6 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
   G4ThreeVector translation;
   G4RotationMatrix rotation;
   NumiDataInput* ND=NumiDataInput::GetNumiDataInput();
-  std::cerr << " Not ready for primt time, stope here ! " << std::endl; exit(2);
   // 
   // Preparation phase.  Extracted from LBNEVolumePlacements::DeclareHorn1Dims  Make all variable local. Renamed, to avoid 
   // the confusion with the old target region (split geometry) in LBNE 
@@ -762,7 +767,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
   //
   // Now the outer...
   // 
-   const double rOut = 16.25*in + 15.0*in + 2.5*cm; // 15 inches is an overestimate of the max. outer dimension of exhaust piping, downstream. 
+   const double rOut = 16.25*in + 7.50*in + 2.5*cm; // 7.5 inches is an overestimate of the max. outer dimension of exhaust piping, downstream. 
     // 2.5 in is a guess the thickness of the outer tube. 
    aMotherHorn1AllRads.push_back(rOut);
    aMotherHorn1AllLengths.push_back(zCurrent);
@@ -792,11 +797,24 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
    for (std::vector<double>::iterator il = zz.begin(); il != zz.end(); il++) *il -= maxLengthHorn1/2.;       
    G4Polycone* aPConMother = new G4Polycone(std::string("MHorn1"), 0.*deg, 360.0*deg, 
                                             static_cast<int>(aMotherHorn1AllLengths.size()), &aMotherHorn1AllRads[0], &zz[0]);
+  std::cerr << " Horn1 Polycone Mother Alternate Parameters  " << std::endl; 
+  for (size_t k=0; k != zz.size(); k++) {
+    std::cerr << " ZPos " << zz[k] << " Radius in RZ " << aMotherHorn1AllRads[k] << std::endl;
+  }
    G4LogicalVolume* aLogVolMother = new G4LogicalVolume(aPConMother, G4Material::GetMaterial(std::string("Air")), 
                                                          std::string("lvMHorn1")); 
    const bool aCheckVolumeOverLapWC=true;
-   G4PVPlacement* motherTop = new G4PVPlacement(&hornrot, hornpos, aLogVolMother, 
-	                             std::string("pvMHorn1Mother"), TGAR->GetLogicalVolume(), false, 0, aCheckVolumeOverLapWC);
+   G4ThreeVector TargetHallPosition=G4ThreeVector(0,0,ND->TargetAreaLength/2.+ ND->TargetAreaZ0);
+//   G4ThreeVector hornTranslation(hornpos-TargetHallPosition); 
+//   hornTranslation[2] += (-1.0*zz[0]) - 30.*mm; // Guess.. to be check with Geantinos
+//   G4PVPlacement* motherTop = new G4PVPlacement(&hornrot, hornTranslation, aLogVolMother, 
+//	                             std::string("pvMHorn1Mother"), TGAR->GetLogicalVolume(), false, 0, aCheckVolumeOverLapWC);
+   rotation=hornrot;
+   translation=hornpos-TargetHallPosition; // Guess.. to be check with Geantinos
+   translation[2] += maxLengthHorn1/2 - 61.84; // The way the G4Polycon is defined.. And the infamous MCZero with respect to the start of the Horn1.
+   G4PVPlacement* motherTop = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother", aLogVolMother,TGAR,false,0, true);
+   std::cerr << " Position for Horn1 Mother, Alternate version " << translation << std::endl;
+   std::cerr << "  ......... hornPos " << hornpos[2] << " Tgt Hall Position " <<  TargetHallPosition[2] << std::endl;
    				     
 // 
 // Start with upstream Inner to Out transition. Usptream means at Z MC (Z Geant4 world coord. ) Negative
@@ -807,13 +825,14 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
 //      Create(nameHorn1IOCont);
       const double aRmin = horn1IOInnerRadsDownstr[0] - 0.2*mm;
       const double aRmax = horn1IOInnerRadsDownstr[4] + horn1IOTransThick[4] + 1.*mm; 
-      const double aLength = horn1IOUpstrLengths[0] +  horn1IOUpstrLengths[1] + horn1IOUpstrLengths[2] + 0.05*mm;; // few mm safety... 
+      const double aLength = horn1IOUpstrLengths[0] +  horn1IOUpstrLengths[1] + horn1IOUpstrLengths[2] + 0.05*mm;; // few mm safety...
+      std::cerr << " Params for  UpstrHorn1TransInnerOuterCont rMin " << aRmin << "rmax " << aRmax << " aLength " << aLength << std::endl;
       G4Tubs* aTubs = new G4Tubs(nameHorn1IO, aRmin, aRmax, aLength/2.,
 	                           0., 360.0*deg);
       G4LogicalVolume* aLVol = new G4LogicalVolume(aTubs, G4Material::GetMaterial(std::string("Air")), nameHorn1IO);
       G4ThreeVector aPosition(0., 0., 0.);
       aPosition[2]=  -maxLengthHorn1/2. + aLength/2.; 
-       std::cerr << " Setting position for UpstrHorn1TransInnerOuterCont, length "  
+       std::cerr << " Setting position for UpstrHorn1TransInnerOuterCont, length " << aLength  
 	              << " length mother " << aLength << " zRel " << aPosition << std::endl;
       
       G4PVPlacement *vHorn1IOCont = new G4PVPlacement((G4RotationMatrix *) 0, aPosition , aLVol, 
@@ -828,17 +847,21 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
            const double r1 = horn1IOInnerRadsUpstr[iPartIO] + horn1IOTransThick[iPartIO];
            const double r3 = horn1IOInnerRadsDownstr[iPartIO] + horn1IOTransThick[iPartIO];
 	   const double zL = horn1IOUpstrLengths[iPartIO];
+           std::cerr << " Params for  UpstrHorn1TransInnerOuterPart " << iPartIO << " r0 " << r0 
+	             << " r1 " << r1 << " r2 " << r2 << " r3 " << r3  << " zl " << zL << std::endl;
+	   
            G4Cons* aCons = new G4Cons(nameStr, r0, r1, r2, r3, zL/2., 0., 360.0*deg);
            vlPartIO = new G4LogicalVolume(aCons, G4Material::GetMaterial(std::string("Aluminum")), nameStr);
 	} else { 
            const double rMin = horn1IOInnerRadsUpstr[iPartIO];
            const double rMax = horn1IOInnerRadsUpstr[iPartIO] + horn1IOTransThick[iPartIO];
-	   const double zL= aHorn1UpstrLengths[iPartIO];
+	   const double zL= horn1IOUpstrLengths[iPartIO];
            G4Tubs* aTubs = new G4Tubs(nameStr, rMin, rMax, zL/2., 0., 360.0*deg);
            vlPartIO = new G4LogicalVolume(aTubs, G4Material::GetMaterial(std::string("Aluminum")), nameStr);
 	}
         G4ThreeVector aPosition(0., 0., 0.);
-	aPosition[2] = aHorn1UpstrZPositions[iPartIO];
+	aPosition[2] = horn1IOUpstrZPositions[iPartIO];
+        std::cerr << " Z Position  UpstrHorn1TransInnerOuterPart " << iPartIO << " = " << aPosition[2] << std::endl;
         new G4PVPlacement((G4RotationMatrix *) 0, aPosition ,vlPartIO, 
 	                             std::string("pv")+nameStr, vHorn1IOCont->GetLogicalVolume(), 
 				     false, 0, aCheckVolumeOverLapWC);;	
@@ -923,7 +946,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
      G4LogicalVolume *pCurrent = new G4LogicalVolume(aCons, G4Material::GetMaterial(aHorn1InnerCondMat), nameStr);
      G4ThreeVector posTmp; posTmp[0] = 0.; posTmp[1] = 0.;
      // plHUpst constain part of the Inner Outer Transition. Shift downtream by it's length 
-     posTmp[2] = -maxLengthHorn1/2. + zOffsetDrawingUpstrEdge + 0.005*mm + deltaZ/2.;
+     posTmp[2] = -maxLengthHorn1/2. + zOffsetDrawingUpstrEdge + 0.005*mm + deltaZ/2. + (iSub*deltaZ);
      std::cerr << " Placing section " << nameStr << " at z = " << posTmp[2] << std::endl;			      
 //	       
      G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
@@ -1128,7 +1151,8 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
 	                              (deltaZ - 0.005*mm)/2., 0., 360.0*deg);
        G4LogicalVolume *pCurrent = new G4LogicalVolume(aCons, G4Material::GetMaterial(aHorn1InnerCondMat), nameStr);
        G4ThreeVector posTmp; posTmp[0] = 0.; posTmp[1] = 0.;
-       posTmp[2] = -1.0*maxLengthHorn1 + zzBegin   + zShiftDrawingDownstr + deltaZ/2.;			      
+       posTmp[2] = -1.0*maxLengthHorn1/2. + zzBegin   + zShiftDrawingDownstr + deltaZ/2.;
+       std::cerr << " Placing " << nameStr << " at z " << posTmp[2] << std::endl;			      
        G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, (aCheckVolumeOverLapWC));	
 			
