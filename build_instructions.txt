@@ -12,6 +12,10 @@ This document describes how to build a local copy of g4numi and GEANT4.  It shou
 
 %  cvs -d :ext:p-numi-beam-sim@cdcvs.fnal.gov/cvs/projects/numi-beam-sim co -r minerva g4numi
 
+If you get permission denied errors you will need to contact Robert Hatcher and ask for read/write access. In the meantime you can still checkout g4numi but will not be able to commit any changes to the repository:
+
+ % cvs -d :pserver:anonymous@cdcvs.fnal.gov/cvs/projects/numi-beam-sim co -r minerva g4numi
+
 NOTE, we are checking out the MINERvA branch of g4numi from the official repository. One can also checkout the minos and nova branches in a similar way.
 
 Note there is a redmine site for the numi beam simulation:
