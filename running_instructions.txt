@@ -1,4 +1,4 @@
-$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/running_instructions.txt,v 1.1.2.1 2014/02/13 21:12:03 kordosky Exp $
+$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/running_instructions.txt,v 1.1.2.2 2014/11/25 17:40:08 kordosky Exp $
 
 Original author: Mike Kordosky, Feb 13, 2014
 
@@ -34,6 +34,10 @@ g4numi_grid_submit.sh
 Submit a collection of jobs onto the grid at fermilab. Users edit this file to change the beam configuration, POTs, number of jobs, output directory, etc. 
 
 This script calls jobsub with a number of arguments to pass information into g4numi_job.sh, the actual job script that runs on the farm.
+
+send_grid_tarpos.sh
+===================
+Submits a large production, with MINERvA playlist dependent target positions, onto the grid. This script was used to do the low energy MINERvA "eroica" production in Autumn 2014.
 
 g4numi_job.sh
 =============
