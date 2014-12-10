@@ -275,13 +275,25 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fHorn1IsAlternate->SetGuidance("Build the Horn 1 inner conductors following set of drawings from AD ");
 	fHorn1IsAlternate->SetParameterName("Horn1IsAlternate", true);
         fHorn1IsAlternate->SetDefaultValue(ND->GetHorn1IsAlternate()); 
-	fHorn1IsAlternate->AvailableForStates(G4State_PreInit,G4State_Idle);
-        
+	fHorn1IsAlternate->AvailableForStates(G4State_PreInit, G4State_Idle);
+        // 
+	// Allow for the option of making small changes to the existing Numi Horn1 code to test the accuracy of the geometry. 
+	// P. L. Dec 1 2014. 
+	// 
+	fHorn1IsRefined = new G4UIcmdWithABool("/NuMI/det/Horn1IsRefined",this);
+        fHorn1IsRefined->SetGuidance("Build the Horn 1 inner conductors making some asjustment in the geometry ");
+	fHorn1IsRefined->SetParameterName("Horn1IsRefined", true);
+        fHorn1IsRefined->SetDefaultValue(ND->GetHorn1IsRefined()); 
+	fHorn1IsRefined->AvailableForStates(G4State_PreInit, G4State_Idle);
+        //
+	// Back door to study the magnetic field maps. 
+	// 
 	fDumpBFieldPlease = new G4UIcmdWithABool("/NuMI/det/DumpBfieldPlease",this);
-        fDumpBFieldPlease->SetGuidance("Dump the BField (one time only) ");
+        fDumpBFieldPlease->SetGuidance("Dump the BField as tracking proceeds ");
 	fDumpBFieldPlease->SetParameterName("DumpBFieldPlease", true);
         fDumpBFieldPlease->SetDefaultValue(ND->GetDumpBFieldPlease()); 
-	fDumpBFieldPlease->AvailableForStates(G4State_PreInit,G4State_Idle);
+	fDumpBFieldPlease->AvailableForStates(G4State_PreInit, G4State_Idle);
+	// 
 	
 #ifdef MODERN_G4
         fGDMLOutputCmd = new G4UIcmdWithAString("/NuMI/output/writeGDML",this);
@@ -337,6 +349,7 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
  
 	delete fHornWaterLayerThick;
 	delete fHorn1IsAlternate;
+	delete fHorn1IsRefined;
 	delete fHorn1ExtraLayerAlum;
 	delete fDumpBFieldPlease;
 
@@ -492,9 +505,15 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    }  else if (command == fHorn1IsAlternate) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHorn1IsAlternate(fHorn1IsAlternate->GetNewBoolValue(newValue));
+      std::cerr << " Setting Alternate Horn1 " << std::endl;
+   }  else if (command == fHorn1IsRefined) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->SetHorn1IsRefined(fHorn1IsAlternate->GetNewBoolValue(newValue));
+      std::cerr << " Using refined precision for  Horn1 " << std::endl;
    }  else if (command == fDumpBFieldPlease) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetDumpBFieldPlease(fDumpBFieldPlease->GetNewBoolValue(newValue));
+      std::cerr << " Setting SetDumpBFieldPlease " << std::endl;
    }  else if (command == fHorn1ExtraLayerAlum) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHorn1ExtraLayerAlum(fHorn1ExtraLayerAlum->GetNewDoubleValue(newValue));
