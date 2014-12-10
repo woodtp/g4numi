@@ -67,6 +67,10 @@ public:
     void SetBaffleLength(G4double length);
     
     void SetForcedOldTarget(G4bool forced);
+    //Place a new public interface to check that we are in the field region, in case we have 
+    // the Alternate Horn1 
+    //
+   G4double PHorn1ICRin(G4double z) const ;
     
 private:
    NumiDataInput* NumiData;
@@ -114,7 +118,7 @@ private:
    G4double PHorn2ICRout(G4double z);
    G4double PHorn2OCRin(G4double z);
    G4double PHorn2OCRout(G4double z);
-   G4double PHorn1ICRin(G4double z);
+//   G4double PHorn1ICRin(G4double z); // Not removed!  See above.  Needed to support Alternate Horn1 
    G4double PHorn1ICRout(G4double z);
    G4double PHorn1OCRin(G4double z);
    G4double PHorn1OCRout(G4double z);
