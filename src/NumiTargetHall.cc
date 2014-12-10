@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // Target hall chase and duratek blocks modifications by Zachary Barnett.
-// $Id: NumiTargetHall.cc,v 1.11.4.4 2014/01/22 22:31:08 kordosky Exp $
+// $Id: NumiTargetHall.cc,v 1.11.4.5 2014/12/10 16:18:34 lebrun Exp $
 //----------------------------------------------------------------------
 #include "NumiDetectorConstruction.hh"
 
@@ -140,7 +140,7 @@ void NumiDetectorConstruction::ConstructTargetHall()
     for(G4int ii=0; ii<NumiData->THBlockNblock; ii++) {
       
       DuratekCasing_position = G4ThreeVector(NumiData->THBlockX0[ii], NumiData->THBlockY0[ii], NumiData->THBlockZ0[ii]) - targetHallPosition ;
-      
+
       // if statement controls which blocks are rotated about the Z axis for placement.  Also places the modified top covering blocks
       if (ii == 3 || (ii >= 6 && ii < 15)) {
 	new G4PVPlacement(tallrotation, DuratekCasing_position, "DuratekBlock", lvDuratekBlock, TGAR, false, 0); 
