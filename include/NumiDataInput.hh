@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.11 2014/10/19 00:15:44 lebrun Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.12 2014/12/10 16:16:17 lebrun Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -135,6 +135,7 @@ public:
 
    G4double GetHornWaterLayerThick() const    { return fHornWaterLayerThick; }
    G4bool GetHorn1IsAlternate()  const        { return fHorn1IsAlternate; }
+   G4bool GetHorn1IsRefined()  const        { return fHorn1IsRefined; }
    G4double GetHorn1ExtraLayerAlum() const    { return fHorn1ExtraLayerAlum; }
    G4bool GetDumpBFieldPlease() const    { return fDumpBFieldPlease; }
    
@@ -168,8 +169,9 @@ public:
    void SetAbsBkgNtupleDir(G4String fileDir)   {absbkgNtupleDir=fileDir;}
    void SetHornWaterLayerThick(G4double d)     {fHornWaterLayerThick = d;}
    void SetHorn1IsAlternate(G4bool t)          {fHorn1IsAlternate = t;}
+   void SetHorn1IsRefined(G4bool t)          {fHorn1IsRefined = t;}
    void SetHorn1ExtraLayerAlum(G4double d)     {fHorn1ExtraLayerAlum = d;}
-   void SetDumpBFieldPlease(G4bool t)          {fDumpBFieldPlease = t;}
+   void SetDumpBFieldPlease(G4bool t)          {fDumpBFieldPlease = t; }
  
    G4bool   GetMuonBeam()            {return useMuonBeam;}
    G4int    GetNInputParts()         {return NInputParts;}
@@ -251,6 +253,7 @@ public:
    G4bool useMuonBeam, useMuonInput, solidMuMons, simAbsBkg, reWeightDeltas;
    G4String absorberConfig;
    G4bool fHorn1IsAlternate; // An different way of coding up Horn1 (P.L., Sept 2014) 
+   G4bool fHorn1IsRefined; // An improved version of Horn1, using Numi existing code (P.L., November 2014) 
    G4int    NInputPart, NInputParts, nSplitDeltas;
    G4bool simDRays, useZPosCut, createAbsBkgNtuple;
    G4double muonBeamMomentum, muonBeamGaussXsig, muonBeamGaussYsig, muonBeamZPos;
