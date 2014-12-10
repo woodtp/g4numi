@@ -8,12 +8,20 @@
 #include "G4TransportationManager.hh"
 #include "NumiDataInput.hh" 
 #include "G4VPhysicalVolume.hh"
+#include "G4RunManager.hh"
+#include "NumiTrackingAction.hh"
+#include "NumiDataInput.hh"
+#include "NumiDetectorConstruction.hh"
 
 //magnetic field between conductors ====================================================
 NumiMagneticField::NumiMagneticField()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
   dumpHasBeenDump = false;
+  //
+  // temporary debugging... To be commented out when done.. Avoiding a G4UI card that
+  //  must defined at detector construction time.. 
+  //
 }
 
 NumiMagneticField::~NumiMagneticField(){;}
@@ -32,13 +40,45 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
   
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);    
   G4double B = current / (5.*radius/cm)/10*tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+  //
+  // Check that we are indeed in the field region.. 
+  //
+  if (Point[2] < 4500.) {
+    const G4RunManager* pRunMgr = G4RunManager::GetRunManager();
+    const NumiDetectorConstruction* pDet = reinterpret_cast<const NumiDetectorConstruction*>(pRunMgr->GetUserDetectorConstruction());
+    const double ric = pDet->PHorn1ICRin((Point[2] - 30.)); // in Drawing coordinate system, MCZero = 30 mm
+    if (radius < ric) B=0.;  
+  }
+  // Should do the same for Horn2, if need be!!! 
+  
+  //
+  //  Avoid leakage downstream the end.., for Horn1.  Paul November 23 2014. 
+  //  
+  if ((Point[2] > 3277.) && (Point[2] < 4500.)) B = 0.;
+  //
+  //  Unknown field fpr Z < 0.  Paul November 24 2014. 
+  //  
+  if (Point[2] < 0. ) B = 0.;
   Bfield[0] = -B*Point[1]/radius;
   Bfield[1] = B*Point[0]/radius;
   Bfield[2] = 0.;
   
   if (!dumpHasBeenDump && NumiData->GetDumpBFieldPlease()) {
      dumpHasBeenDump= true;
-//     DumpItToAsciiFile(); No need, we will use the Muon Geantino and look at trajectories. 
+//    std::cerr << " NumiMagneticField::NumiMagneticField set up to dumpt field, but quit here " << std::endl; exit(2);
+    G4String aNameD("/scratch/minerva/lebrun/G4/BFieldDumpMainTmp");
+    if (NumiData->GetHorn1IsAlternate()) aNameD += G4String("Alt");
+    else aNameD += G4String("Nom");
+    aNameD += G4String(".txt");
+    fSteppingStream.open(aNameD.c_str());
+    fSteppingStream << " id x y z Bx By Bz " << std::endl;
+//    double currNow = NumiData->HornCurrent * 1000.;
+//    NumiData->SetHornCurrent(currNow);
+//    std::cerr << " Horn Current has been multiplied by 1 e3 for Muon Geantino use, Hor Current is now  " 
+//                 << NumiData->HornCurrent << std::endl;
+  } else {
+//    std::cerr << " NumiMagneticField::NumiMagneticField NOT set up to dumpt field, but quit here " << std::endl; exit(2);
+  
   }
   if(NumiData->jCompare) {// Make gnumi like horns - this is for validation
     G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
@@ -62,6 +102,12 @@ void NumiMagneticField::GetFieldValue(const double Point[3],double *Bfield) cons
       Bfield[2]=0;
     }     
   }
+  if (fSteppingStream.is_open()) {
+    const G4RunManager * pRunManager = G4RunManager::GetRunManager();
+    fSteppingStream << " " << pRunManager->GetCurrentEvent()->GetEventID();
+    fSteppingStream << " " << Point[0] << " " << Point[1] << " " << Point[2];
+    fSteppingStream << " " << Bfield[0] << " " << Bfield[1] << " " << Bfield[2] << std::endl;;
+  }
 }
 //magnetic field in inner conductor ====================================================
 NumiMagneticFieldIC::NumiMagneticFieldIC()
@@ -75,6 +121,16 @@ NumiMagneticFieldIC::~NumiMagneticFieldIC(){;}
 void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) const
 {
   static bool first = true;
+  
+  if (!dumpHasBeenDump && NumiData->GetDumpBFieldPlease()) {
+    dumpHasBeenDump = true; 
+    G4String aNameD("/scratch/minerva/lebrun/G4/BFieldDumpICTmp");
+    if (NumiData->GetHorn1IsAlternate()) aNameD += G4String("Alt");
+    else aNameD += G4String("Nom");
+    aNameD += G4String(".txt");
+    fSteppingStream.open(aNameD.c_str());
+    fSteppingStream << " id x y z Bx By Bz " << std::endl;
+  }
 
   G4double current = NumiData->HornCurrent/ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
@@ -89,26 +145,50 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
 
   delete numinavigator;
 
-  G4VSolid * solid=myVolume->GetLogicalVolume()->GetSolid();
 
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);
   G4double dOut=0.;
   G4double dIn=0.;
-  G4double magBField = 0.;  
-
-  if (myVolume->GetName().contains("IC") && (!myVolume->GetName().contains("ICWater"))){
-//    std::cerr << " Evaluating magnetic field in IC volume " << myVolume->GetName()
-//              << " R " << std::sqrt(Point[0]*Point[0] + Point[1]*Point[1]) << " z " << Point[2] << std::endl;
-    dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
-    dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
-    if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 
-      {
-	magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
-	
-	magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
-       
+  G4double magBField = 0.; 
+   
+  if ((myVolume != 0) && (myVolume->GetLogicalVolume() != 0)) {
+    
+    G4VSolid * solid=myVolume->GetLogicalVolume()->GetSolid();
+    if (solid != 0) {
+      bool inOKVolume = false;
+      if (Point[2] < 4500.) { // Ugly, but acceptable.. Horn1 here 
+         if (!NumiData->GetHorn1IsAlternate()) {
+	   inOKVolume = (myVolume->GetName().contains("IC") && (!myVolume->GetName().contains("ICWater")));
+	 } else {  
+            if (myVolume->GetName().contains("SubSect")) inOKVolume = true;
+            if (myVolume->GetName().contains("Neck")) inOKVolume = true;
+	    if (myVolume->GetName().contains("Water"))inOKVolume = false;
+	 }
+        //
+        // Check that we are indeed in the field region.. 
+       //
+        const G4RunManager* pRunMgr = G4RunManager::GetRunManager();
+        const NumiDetectorConstruction* pDet = reinterpret_cast<const NumiDetectorConstruction*>(pRunMgr->GetUserDetectorConstruction());
+        const double ric = pDet->PHorn1ICRin((Point[2] - 30.)); // in Drawing coordinate system, MCZero = 30 mm
+        if (radius < ric) inOKVolume = false; 
+      } else { // Horn2  Same code as before Horn1 Alternate study. 
+        inOKVolume = (myVolume->GetName().contains("IC") && (!myVolume->GetName().contains("ICWater")));
       }
-  }
+      if (inOKVolume) {  
+//        std::cerr << " Evaluating magnetic field in IC volume " << myVolume->GetName()
+//                  << " R " << std::sqrt(Point[0]*Point[0] + Point[1]*Point[1]) 
+//	          << " z " << Point[2] <<  " solid Ptr " << solid << std::endl;
+        dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
+        dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
+        if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 
+         {
+	  magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+	
+	  magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
+         }
+      } 
+    } // solid exists 
+  }// volume Ptr o.k. 
   /*
   if (Point[2]>92*cm&&Point[2]<92.1*cm) {
      G4cout<<"ICMag: "<<myVolume->GetName()<<" "
@@ -139,6 +219,12 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
       Bfield[1]=0;
       Bfield[2]=0;
     }
+    if (fSteppingStream.is_open()) {
+      const G4RunManager * pRunManager = G4RunManager::GetRunManager();
+      fSteppingStream << " " << pRunManager->GetCurrentEvent()->GetEventID();
+      fSteppingStream << " " << Point[0] << " " << Point[1] << " " << Point[2];
+      fSteppingStream << " " << Bfield[0] << " " << Bfield[1] << " " << Bfield[2] << std::endl;;
+    }
 
 }
 
@@ -147,6 +233,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double Point[3],double *Bfield) co
 NumiMagneticFieldOC::NumiMagneticFieldOC()
 {
   NumiData=NumiDataInput::GetNumiDataInput();
+  dumpHasBeenDump = false;
 }
 
 NumiMagneticFieldOC::~NumiMagneticFieldOC(){;}
@@ -154,6 +241,15 @@ NumiMagneticFieldOC::~NumiMagneticFieldOC(){;}
 void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) const
 {
   static bool first = true;
+  if (!dumpHasBeenDump && NumiData->GetDumpBFieldPlease()) {
+    dumpHasBeenDump = true; 
+    G4String aNameD("/scratch/minerva/lebrun/G4/BFieldDumpOCTmp");
+    if (NumiData->GetHorn1IsAlternate()) aNameD += G4String("Alt");
+    else aNameD += G4String("Nom");
+    aNameD += G4String(".txt");
+    fSteppingStream.open(aNameD.c_str());
+    fSteppingStream << " id x y z Bx By Bz " << std::endl;
+  }
 
   G4double current = NumiData->HornCurrent/ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
@@ -205,6 +301,12 @@ void NumiMagneticFieldOC::GetFieldValue(const double Point[3],double *Bfield) co
       Bfield[0]=0;
       Bfield[1]=0;
       Bfield[2]=0;
+    }
+    if (fSteppingStream.is_open()) {
+      const G4RunManager * pRunManager = G4RunManager::GetRunManager();
+      fSteppingStream << " " << pRunManager->GetCurrentEvent()->GetEventID();
+      fSteppingStream << " " << Point[0] << " " << Point[1] << " " << Point[2];
+      fSteppingStream << " " << Bfield[0] << " " << Bfield[1] << " " << Bfield[2] << std::endl;;
     }
 
 }
