@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.15 2014/10/26 22:42:38 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.16 2014/12/10 16:36:28 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -160,6 +160,7 @@ NumiDataInput::NumiDataInput()
   solidMuMons = false;
   absorberConfig = "None";
   fHorn1IsAlternate = false;
+  fHorn1IsRefined = false;
   simAbsBkg = false;
   createAbsBkgNtuple = false;
   absbkgNtupleName = "";
@@ -848,6 +849,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 //  default is now what it should be 
   fHorn1ExtraLayerAlum = 0.0*mm;
   fDumpBFieldPlease = false;
+//  fDumpBFieldPlease = true;// To get enhanced field.. Dirty back door... 
 
   NPHorn2EndN=3;
   
