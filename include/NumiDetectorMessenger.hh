@@ -72,6 +72,7 @@ private:
 
     G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
     G4UIcmdWithABool* fHorn1IsAlternate;
+    G4UIcmdWithABool* fHorn1IsRefined;
     G4UIcmdWithADoubleAndUnit* fHorn1ExtraLayerAlum;
     G4UIcmdWithABool* fDumpBFieldPlease;
     
