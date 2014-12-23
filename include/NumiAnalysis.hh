@@ -88,7 +88,7 @@ public:
    G4int GetCount();
    void SetEntry(G4int entry);
    G4int GetEntry();
-   
+   G4double GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String wanted_vol);
 private:
    std::string GetOFileName(std::string ifilename);
    
@@ -144,6 +144,7 @@ private:
   std::vector<bsim::NuRay> vec_nuray;   
   std::vector<bsim::Ancestor> vec_ancestor;
   std::vector<int> vec_int;
+  std::vector<double> vec_dbl;
   //////////////////////////////////////////
 
 };
