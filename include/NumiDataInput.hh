@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.12 2014/12/10 16:16:17 lebrun Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.13 2015/01/19 03:37:09 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -53,6 +53,8 @@ private:
 public:
   
    G4bool SetBeamConfig(G4String config);
+
+   G4bool SetPlaylist(G4String pl);
    
    void SetDetailedProtonBeam(G4bool val);
 
@@ -118,6 +120,7 @@ public:
    G4bool   GetDetailedProtonBeam()           { return fUseDetailedProtonBeam;}
    
    G4String GetBeamConfig()                   { return fBeamConfig;}
+   G4String GetPlaylist()                     { return fPlaylist;}
    G4String GetSimulation()                   { return fSimulation;}
    G4String GetRunNumber()                    { return RunNumber; }
    G4String GetGeometryTag()                  { return geometry; }
@@ -223,6 +226,7 @@ public:
 
    G4String extNtupleFileName;
    G4String fBeamConfig;
+   G4String fPlaylist;
    G4String fTargetConfig;
    G4String fIHornConfig;
    G4String fHornConfig;

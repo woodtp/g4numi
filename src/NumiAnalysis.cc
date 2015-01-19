@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
+ //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.16 2014/12/23 01:52:32 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.17 2015/01/19 03:37:10 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -475,11 +475,12 @@ void NumiAnalysis::FillMeta(){
   G4int confsize = (NumiData->GetBeamConfig()).length();
   hornC.remove(0,6);
   tgtC.remove(6,confsize);
+  G4String playlist  = NumiData->GetPlaylist();
   
   G4bool isHe = NumiData->HeInDecayPipe;
   std::string decayVolMat = "vacuum";
   if(isHe)decayVolMat = "helium";
-  this_meta->tgtcfg = std::string(tgtC);  
+  this_meta->tgtcfg = std::string(tgtC+"_"+playlist);  
   this_meta->horncfg = std::string(hornC);  
   this_meta->dkvolcfg = decayVolMat;
   //////////////////////////////////////////
@@ -1388,10 +1389,12 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   //for now, I write it by hand but I
   //need to figure out how to do it automatically 
   G4double density_IC  = 2.7; //g/cm3
+  G4double A_IC  = 26.98; //g/mol  mass number
   //looking at parent(0), grand-parent(1), great-gran-parent(2):
   const int Nancestors_ic = 3;
-  double dist_IC1[Nancestors_ic] = {-1/density_IC,-1/density_IC,-1/density_IC};
-  double dist_IC2[Nancestors_ic] = {-1/density_IC,-1/density_IC,-1/density_IC};
+  G4double init_val =  A_IC/density_IC; //this gives -1 when we fill:
+  double dist_IC1[Nancestors_ic] = {-1.0*init_val,-1.0*init_val,-1.0*init_val};
+  double dist_IC2[Nancestors_ic] = {-1.0*init_val,-1.0*init_val,-1.0*init_val};
   
   NumiTrajectory* tmp_traj;
   for(int ii=0;ii<Nancestors_ic;ii++){
@@ -1514,8 +1517,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   
   //2.2)Storing the distance by density of the particle in IC:
   for(int ii=0;ii<Nancestors_ic;ii++){
-    vec_dbl.push_back(density_IC*dist_IC1[ii]);
-    vec_dbl.push_back(density_IC*dist_IC2[ii]);
+    vec_dbl.push_back(dist_IC1[ii]/init_val);
+    vec_dbl.push_back(dist_IC2[ii]/init_val);
   }
   /////
   

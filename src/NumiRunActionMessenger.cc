@@ -368,6 +368,14 @@ NumiRunActionMessenger::NumiRunActionMessenger(NumiRunAction* RA)
   KillTrackingThreshold->SetParameterName("KillTrackingThreshold",true);
   KillTrackingThreshold->SetDefaultValue(NumiData->KillTrackingThreshold);
   KillTrackingThreshold->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  //Set the Minerva playlist for dkmeta.
+  setMinervaPlaylist = new G4UIcmdWithAString("/NuMI/run/setMinervaPlaylist",this);
+  setMinervaPlaylist->SetGuidance("set the Minerva playlist for dkmeta");
+  setMinervaPlaylist->SetParameterName("PlaylistName",true);
+  setMinervaPlaylist->SetDefaultValue (NumiData->GetPlaylist());
+  setMinervaPlaylist->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   //
   // Geantino Studies..
   //
@@ -458,6 +466,10 @@ NumiRunActionMessenger::~NumiRunActionMessenger()
   delete setZpNtupleFile;
   delete KillTracking;
   delete KillTrackingThreshold;
+
+  //playlist name for dkmeta:
+  delete setMinervaPlaylist;
+
  //
  // Geantino studies..
  //
@@ -647,10 +659,14 @@ void NumiRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValues
   }
   if (command== KillTracking){
      NumiData->SetKillTracking(KillTracking->GetNewBoolValue(newValues));
-   }
-   if (command== KillTrackingThreshold){
+  }
+  if (command== KillTrackingThreshold){
      NumiData->SetKillTrackingThreshold(KillTrackingThreshold->GetNewDoubleValue(newValues));
-   }
+  }
+  if (command == setMinervaPlaylist){
+     NumiData->SetPlaylist(newValues);
+  }
+
    if (command == SteppingActionGeantinoCmd) {
      G4RunManager *grM = G4RunManager::GetRunManager();
      const NumiSteppingAction *NSA = dynamic_cast<const NumiSteppingAction *> (grM->GetUserSteppingAction());

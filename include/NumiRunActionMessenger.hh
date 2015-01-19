@@ -93,7 +93,7 @@ private:
    G4UIcmdWithADouble*         setTestTheta;
    G4UIcmdWithABool*           useDecayPipeSelect;
    G4UIcmdWithADoubleAndUnit*  setStepLimit;
-   
+   G4UIcmdWithAString*         setMinervaPlaylist;  
    
    G4UIcmdWithABool*           UseMacro;
    G4UIcmdWithABool*           outputZpNtuple;

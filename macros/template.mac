@@ -84,7 +84,7 @@
 #Add target position:
 #
 /NuMI/det/set/targetPosition 0 0 ${tgtzpos} cm
-
+/NuMI/run/setMinervaPlaylist ${playlist}
 #
 #Whether or not to create output ntuple with data_t
 #default is false

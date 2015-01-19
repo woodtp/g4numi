@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.11 2014/09/29 20:38:11 laliaga Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.12 2015/01/19 03:37:09 laliaga Exp $
 
 import os, re, sys, getopt,string
 from string import Template
@@ -101,7 +101,7 @@ def main(argv=None):
             doimpwt='false'
         if o in ("-z","--playlist"):
             playlist=a
-            
+
 # set seed to run if still null
     if len(seed)==0: 
         seed=run    
@@ -110,7 +110,7 @@ def main(argv=None):
         if len(nametag)>0:
             outfile=outfile+'_'+nametag
         tgtzpos=''
-    
+
     if beamconfig == 'le010z185i' or beamconfig == 'LE010z185i':
         if playlist=='minerva1':
             tgtzpos="-44.50"   #tgt2H1 =  9.50
@@ -144,12 +144,12 @@ def main(argv=None):
         if playlist=='minerva4':
             tgtzpos="-284.57"  #tgt2H1 =249.57
         if playlist=='minerva8':
-	    tgtzpos="-285.09"  #tgt2H1 =250.09
-            
+            tgtzpos="-285.09"  #tgt2H1 =250.09
+
     filestring=open(templatefile,'r').read()
     t=string.Template(filestring)
-    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos})
-
-
+    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos,'playlist':playlist})
+    
+    
 if __name__ == "__main__":
     sys.exit(main())

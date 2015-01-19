@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.16 2014/12/10 16:36:28 lebrun Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.17 2015/01/19 03:37:09 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -57,6 +57,7 @@ NumiDataInput::NumiDataInput()
     fUseTgtDensity(false),
     
     fBeamConfig(""),
+    fPlaylist(""),
     fTargetConfig(""),
     fIHornConfig(""),
     fHornConfig(""),
@@ -1210,6 +1211,7 @@ void NumiDataInput::Print()
       }
       G4cout << " Run Period                                  = " << fRunPeriod << G4endl
              << " Beam Configuration                          = " << fBeamConfig << G4endl
+	     << " Playlist                                    = " << fPlaylist << G4endl
              << " Horn Configuration                          = " << fHornConfig << G4endl
              << " Target Configuration                        = " << fTargetConfig << G4endl
              << " Horn Current Configuration                  = " << fIHornConfig << G4endl
@@ -1385,6 +1387,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    }
 //--------------------------------------------------------------------------------------------------------------
 
+
    if(!NumiDataInput::ConfigureRunPeriod(config)) return false;
    
    
@@ -1394,6 +1397,14 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    
    return true;
       
+}
+
+//---------------------------------------------------------------------------------
+G4bool NumiDataInput::SetPlaylist(G4String pl)
+{
+   fPlaylist = pl;
+   
+   return true;
 }
 
 //---------------------------------------------------------------------------------
