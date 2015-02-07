@@ -21,7 +21,11 @@
 /NuMI/run/useNImpWeight ${doimpwt}
 
 /NuMI/det/set/horn1Position 0 0 3 cm
-/NuMI/det/set/horn2Position 0 0 1900 cm
+#/NuMI/det/set/horn2Position 0 0 1900 cm
+# Updated by Paul Lebrun, Feb 7 2015, per directive of Jim Hylen,
+# talk given at the NumiX meeting, Aug. 2014. 
+# See also Minverva Docdb 10512 
+/NuMI/det/set/horn2Position 0 0 1918.0 cm
 /NuMI/det/set/bafflePosition 0 0 -380 cm
 /NuMI/det/set/targetPosition 0 0 -143.3 cm
 
