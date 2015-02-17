@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.17 2015/01/19 03:37:10 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.18 2015/02/17 16:53:30 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -45,6 +45,8 @@
 #include "NumiDataInput.hh"
 #include "NumiNuWeight.hh"
 #include "NumiTrajectory.hh"
+#include "NumiRunManager.hh"
+#include "NumiSteppingAction.hh"
 
 //NEW For DK2NU
 #include <string>
@@ -963,6 +965,10 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
  
   if (!NumiData->createNuNtuple) return;
     
+  G4String myHorn1Config =  NumiData->GetHornConfig();
+  const NumiRunManager* theRunManager = reinterpret_cast<const NumiRunManager*>(NumiRunManager::GetRunManager());
+  const NumiSteppingAction* theSteppingAction =
+     reinterpret_cast<const NumiSteppingAction*>(theRunManager->GetUserSteppingAction());
   
   //Neutrino vertex position and momentum
   G4ThreeVector pos = track.GetPosition()/mm; 
@@ -1115,9 +1121,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
             G4int numberOfPoints = PParentTrack->GetPointEntries();
             for (G4int ii=0;ii<numberOfPoints-1; ++ii){
                 G4String lastVolName = PParentTrack->GetPreStepVolumeName(ii);
-                G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1); 
-                if (lastVolName.contains("TGTExit") && nextVolName.contains("TargetMother"))
-                {
+                G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1);
+		if (theSteppingAction->EscapingTarget(lastVolName, nextVolName)) {
                     // tv_ and tp_ are equal to position and
                     // momentum of the particle exiting the target (actually shell around target)
                     ParticleMomentum = PParentTrack->GetMomentum(ii);              
@@ -1126,7 +1131,9 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 		    tar_pdg = PParentTrack->GetPDGEncoding();
 		    tar_trackId = PParentTrack->GetTrackID();
                     findTarget = true;
-                }
+//	            std::cerr << " NumiAnalysis::FillNeutrinoNtuple Find Target is true Position " 
+//		              << ParticlePosition << " momentum " << ParticleMomentum << std::endl;
+                  }
             }
             PParentTrack = GetParentTrajectory(PParentTrack->GetParentID());
             particleID = PParentTrack->GetTrackID();
@@ -1202,7 +1209,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4ThreeVector ParentPosition;
   
   G4bool wasInHorn1 = false;
-  G4bool wasInHorn2 = false;  
+  G4bool wasInHorn2 = false;
+   
   for (G4int ii=0; ii<point_no-1; ++ii){ 
       ParentMomentum = NuParentTrack->GetMomentum(ii);
       ParentPosition = (NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
@@ -1220,13 +1228,16 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
           g4data->trkpy[0] = ParentMomentum[1]/GeV;
           g4data->trkpz[0] = ParentMomentum[2]/GeV;}
           //parent at exits target
-      if ((prevolname.contains("TGTExit")) && postvolname.contains("TargetMother")){
-          g4data->trkx[1] = ParentPosition[0]/cm;
-          g4data->trky[1] = ParentPosition[1]/cm;
-          g4data->trkz[1] = ParentPosition[2]/cm;
-          g4data->trkpx[1] = ParentMomentum[0]/GeV;
-          g4data->trkpy[1] = ParentMomentum[1]/GeV;
-          g4data->trkpz[1] = ParentMomentum[2]/GeV;}
+      if (theSteppingAction->EscapingTarget(prevolname, postvolname)) {
+            g4data->trkx[1] = ParentPosition[0]/cm;
+            g4data->trky[1] = ParentPosition[1]/cm;
+            g4data->trkz[1] = ParentPosition[2]/cm;
+            g4data->trkpx[1] = ParentMomentum[0]/GeV;
+            g4data->trkpy[1] = ParentMomentum[1]/GeV;
+            g4data->trkpz[1] = ParentMomentum[2]/GeV;
+//	    std::cerr << " NumiAnalysis::FillNeutrinoNtuple filling point 1 ... " << ParentPosition << std::endl;
+	 }
+	    
           //enter horn1
       if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
           g4data->trkx[2] = ParentPosition[0]/cm;

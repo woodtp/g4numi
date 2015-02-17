@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.13 2015/01/19 03:37:09 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.14 2015/02/17 16:51:10 lebrun Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -332,6 +332,11 @@ public:
    G4int TargetGEANTmat,TargetSegmentNo;
    G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
    G4bool TargetEndRounded;
+   //
+   // Added virtual (assembly) volume such that one can simulate the ME configuration, while 
+   // having a virtual LE/MIPP target, for MIPP correction.. 
+   G4double TargetVirtualCanisterHeight;
+   G4double TargetVirtualCanisterWidth;
    
    //Rings holding target and cooling pipes
    G4int NTgtRingN;
@@ -556,7 +561,10 @@ public:
 
    G4double CoolingPlateCutoutWidth;
    G4double CoolingPlateCutoutHeight;
-
+//
+// To be use to fill the Ntuple, info about the particle 6D phase space exiting the target. 
+//
+   inline G4String GetHornConfig() const { return fHornConfig; } 
 
    
 };

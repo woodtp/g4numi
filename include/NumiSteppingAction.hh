@@ -46,6 +46,9 @@ private:
    mutable G4String fGeantinoStudyName;
    mutable G4String fKeyVolumeNameFrom;
    mutable G4String fKeyVolumeNameTo;
+   //
+   // Tentative MIPP renormalization Utility tool.  
+   //
      
   //
   // Geantino analysis 
@@ -68,6 +71,8 @@ private:
   void StudyBFieldWithMuons(const G4Step*);
    
 public:
+
+   bool EscapingTarget(const G4String &preVolName, const G4String &postVolName) const;
 
    inline void SetGeantinoStudyName(G4String s) const { fGeantinoStudyName = s;} // G4 does not seems to allow to modify 
                                                                                  // an Action container.. 

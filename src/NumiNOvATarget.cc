@@ -138,9 +138,11 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4double TGT_h = NumiData->TargetSegHeight/2.;
   G4double TGT_l = NumiData->TargetSegLength/2.;
 
+  std::cerr << " TGT dims " << TGT_w << " / " << TGT_h << " / " <<  TGT_l << std::endl; 
+//  exit(2);
   
   G4VSolid* TGT1_solid;
-
+  
   //  assert(NumiData->TargetEndRounded);
   if (NumiData->TargetEndRounded){
     //    G4cout<<"Rounded TGT1"<<G4endl;
@@ -201,6 +203,12 @@ void NumiDetectorConstruction::ConstructNOvATarget()
     translation=G4ThreeVector(TGT_x, TGT_y, TGT_z) - TargetMVOrigin;
 	
     new G4PVPlacement(G4Transform3D(rotation, translation), "TGT1", LVTargetFin, pvTargetMotherVol, false, ii, NumiData->pSurfChk);
+// Temporarily define a different name for each copy... debugging overlaps. 
+//
+//    std::ostringstream aNameTmpStrStr; aNameTmpStrStr << "TGT1-" << ii;
+//    std::string aNameTmpStr(aNameTmpStrStr.str());
+//    std::cerr << " Translation for " << aNameTmpStr << " is " << translation << std::endl;
+//    new G4PVPlacement(G4Transform3D(rotation, translation), aNameTmpStr , LVTargetFin, pvTargetMotherVol, false, ii, NumiData->pSurfChk);
   }
   
 
@@ -237,8 +245,8 @@ void NumiDetectorConstruction::ConstructNOvATarget()
 				  NumiData->TargetOutsideCasingOutRad,
 				  NumiData->TargetCasingLength/2.0,
 				  0.0,360.*deg);
-  translation=G4ThreeVector(NumiData->TargetCasingX0,
-			    NumiData->TargetCasingY0,
+  translation=G4ThreeVector(0.,
+			    -NumiData->TargetSegHeight/2.0 + NumiData->TargetSegWidth/2.0,
 			    NumiData->TargetCasingZ0+NumiData->TargetCasingLength/2.0) - TargetMVOrigin;
   OutsideCasingLV = new G4LogicalVolume(OutsideCasingSolid,Al,"OutsideCasingLV",0,0,0);
   new G4PVPlacement(0,translation,"OutsideCasing",OutsideCasingLV,pvTargetMotherVol,false,0,NumiData->pSurfChk);
@@ -275,6 +283,79 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   InsideCasingLV = new G4LogicalVolume(InsideCasingSolid,Al,"InsideCasingLV",0,0,0);
   new G4PVPlacement(0,translation,"InsideCasing",InsideCasingLV,pvTargetMotherVol,false,0,NumiData->pSurfChk);
 
+//  std::cerr << " InsideCasingSolid rads...  .. " << 	NumiData->TargetInsideCasingInRad 
+//            << " " << NumiData->TargetInsideCasingOutRad << " Length " 
+//	    << NumiData->TargetCasingLength << " and quit ... " << std::endl; 
+//  exit(2);	    			
+//
+// Install an assembly volume, physically virtual, that simulates the LE target outside boundary. 
+// 
+  
+  const double lengthInsideLEModel = 
+     NumberOfNonBudalFinsInMETarget*(NumiData->TargetSegLength + NumiData->TargetSegPitch) + NumiData->TargetSegPitch - 0.2*mm;
+ 
+  const double zOffsetBudal = NumiData->BudalHFVSLength + NumiData->BudalHFVSPitch + NumiData->BudalVFHSLength + NumiData->BudalVFHSPitch;    
+  
+  const double zOffInsideLEModel = lengthInsideLEModel/2. +  zOffsetBudal + 0.5*NumiData->TargetSegLength; // ???? ? 
+   std::cerr << " Length Target Casing " << NumiData->TargetCasingLength << " LEModel " << lengthInsideLEModel 
+             << " zOffInsideLEModel " << zOffInsideLEModel 
+	     << " TargetCasingZ0 "  << NumiData->TargetCasingZ0 << " Budal Z-off " << 
+	      zOffsetBudal << std::endl;
+   std::cerr << " Width TGT + epsil " << NumiData->TargetVirtualCanisterWidth	<<
+                " Height TGT + epsil " << NumiData->TargetVirtualCanisterHeight << std::endl;     
+  // 
+  // Make 4 thin sides..that can be use to detect detect particle escaping the target.. (related to MIPP analysis..)  
+  //
+  G4VSolid* InsideLEModelSolidVert = new G4Box("InsideLEModelVSolid",
+				  0.1*mm,
+				  NumiData->TargetVirtualCanisterHeight/2. - 0.050*mm,
+				  lengthInsideLEModel/2.0 - 0.01*mm);
+  G4VSolid* InsideLEModelSolidHor = new G4Box("InsideLEModelHSolid",
+				  NumiData->TargetVirtualCanisterWidth/2.,
+				  0.1*mm,
+				  lengthInsideLEModel/2.0 - 0.01*mm); 
+ const double yOffsetLEModel = -NumiData->TargetSegHeight/2.0 + NumiData->TargetSegWidth/2.0; // same as the fins.. but weird.. 
+ std::cerr << " yOffsetLEModel " << yOffsetLEModel << std::endl;				  
+ G4LogicalVolume* InsideLEModelVertLV = new G4LogicalVolume(InsideLEModelSolidVert, TargetHelium,"InsideLEModelSolidVertLV",0,0,0);
+ translation  = G4ThreeVector( - (NumiData->TargetVirtualCanisterWidth/2. + 0.15*mm),
+			       yOffsetLEModel,
+			       zOffInsideLEModel) - TargetMVOrigin;
+  std::cerr << "  Translation for InsideLEModelVertLV is " << translation << std::endl;
+  new G4PVPlacement(0,translation,"InsideLEModelVertLeft", InsideLEModelVertLV, pvTargetMotherVol,false,0,NumiData->pSurfChk);
+ translation  = G4ThreeVector(NumiData->TargetCasingX0 + (NumiData->TargetVirtualCanisterWidth/2. + 0.015*mm),
+			       yOffsetLEModel,
+			       zOffInsideLEModel) - TargetMVOrigin;
+  new G4PVPlacement(0,translation,"InsideLEModelVertRight", InsideLEModelVertLV, pvTargetMotherVol,false,1,NumiData->pSurfChk);
+
+  G4LogicalVolume* InsideLEModelHorLV = new G4LogicalVolume(InsideLEModelSolidHor, TargetHelium,"InsideLEModelSolidHorLV",0,0,0);
+  translation  = G4ThreeVector(0.0,
+			       yOffsetLEModel - (NumiData->TargetVirtualCanisterHeight/2. + 0.15*mm),
+			       zOffInsideLEModel) - TargetMVOrigin;
+  std::cerr << " Delta Y for InsideLEModelHorBot	" << yOffsetLEModel - (NumiData->TargetVirtualCanisterHeight/2. + 0.15*mm) << 
+              " Delta Z " << NumiData->TargetCasingZ0+zOffInsideLEModel << " Translation " << translation << std::endl;
+	      		       
+//
+// We do not place this volumes. I clashed with target botton.. So we have a real volume on which we can trigger 
+// for detecting the tracks that escape the NoVa target. 
+//
+//  new G4PVPlacement(0,translation,"InsideLEModelHorBot", InsideLEModelHorLV, pvTargetMotherVol,false,0,NumiData->pSurfChk);
+  translation  = G4ThreeVector(0.0,
+			       yOffsetLEModel + (NumiData->TargetVirtualCanisterHeight/2. + 0.15*mm),
+			       zOffInsideLEModel) - TargetMVOrigin;
+  new G4PVPlacement(0,translation,"InsideLEModelHorTop", InsideLEModelHorLV, pvTargetMotherVol,false,0,NumiData->pSurfChk);
+
+  G4VSolid* InsideLEModelSolidVertEnd = new G4Box("InsideLEModelESolid",
+				  NumiData->TargetVirtualCanisterWidth/2. - 0.05*mm,
+				  NumiData->TargetVirtualCanisterHeight/2. - 0.05*mm,
+				  0.1*mm);
+  G4LogicalVolume* InsideLEModelVertEndLV = new G4LogicalVolume(InsideLEModelSolidVertEnd, TargetHelium,"InsideLEModelSolidVertELV",0,0,0);
+  const double zOffInsideLEModelEnd =  zOffsetBudal + NumiData->TargetSegLength + 
+                                        NumberOfNonBudalFinsInMETarget*(NumiData->TargetSegLength + NumiData->TargetSegPitch);
+				  
+  translation  = G4ThreeVector(0.,
+			       yOffsetLEModel,
+			       zOffInsideLEModelEnd) - TargetMVOrigin;
+  new G4PVPlacement(0,translation,"InsideLEModelVertEndTop", InsideLEModelVertEndLV, pvTargetMotherVol,false,0,NumiData->pSurfChk);
 
   // Downstream Flange
   G4VSolid* TargetDnFlangeSolid;

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.10 2014/11/06 12:49:47 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.11 2015/02/17 16:53:22 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -60,7 +60,6 @@ NumiSteppingAction::~NumiSteppingAction()
 
 void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 {
-
    if(NDI->GetDebugLevel() > 3)
    {
       G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
@@ -102,9 +101,9 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
    //
    if(NDI->createTarNtuple){
       if( (theStep->GetPreStepPoint()->GetPhysicalVolume() != NULL) && (theStep->GetPostStepPoint()->GetPhysicalVolume() != NULL)){
-         G4String testNamePre = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-         G4String testNamePost = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-         if( (testNamePre.contains("TGTExit")) && (testNamePost.contains("TargetMother"))){
+         G4String prevolname = theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+         G4String postvolname = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();	 
+         if (this->EscapingTarget(prevolname, postvolname)) {
             NumiAnalysis* analysis=NumiAnalysis::getInstance();
             analysis->FillTarNtuple(*theTrack);
             theTrack->SetTrackStatus(fStopAndKill);
@@ -1225,4 +1224,25 @@ void NumiSteppingAction::StudyBFieldWithMuons(const G4Step * theStep) {
                 << " Material " << volPre->GetMaterial()->GetName() << " Post " 
 		<< volPost->GetName() << " Material " << volPost->GetMaterial()->GetName() << std::endl; 
     }
+}
+//
+// To support MIPP data re-weighting..
+//
+bool NumiSteppingAction::EscapingTarget(const G4String &preVolName, const G4String &postVolName) const {
+
+   NumiDataInput* myNumiData = NumiDataInput::GetNumiDataInput();
+   G4String myHorn1Config =  myNumiData->GetHornConfig();
+
+   if (myHorn1Config.contains("le") || myHorn1Config.contains("LE")){
+      return (preVolName.contains("TGTExit") && postVolName.contains("TargetMother"));
+   } else if (myHorn1Config.contains("me") || myHorn1Config.contains("ME")) {
+     // More complicated geometry for the off-axis configuration.. 
+      return ((preVolName.contains("InsideLEMod") && postVolName.contains("TargetMother")) || // Top, Left/right side, Downstream end  
+              (preVolName.contains("TargetFin") && postVolName.contains("TargetBot")));
+   } else {
+     G4Exception("NumiSteppingAction::EscapingTarget","NumiSteppingAction::EscapingTarget",
+                   RunMustBeAborted, "Unknown target configuration, Ntuple will be incomplete...  "); 
+   }
+   return false;	         
+
 }

@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.17 2015/01/19 03:37:09 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.18 2015/02/17 16:51:46 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -497,6 +497,9 @@ if(!vacuumworld && !airhrn){
   G4double CTubeRout_[]   ={22e-3  , 34.67e-3, 1.9e-2 , 34.67e-3, 107e-3  , 83e-3 , 120e-3, 16.0e-3 , 21.4e-3,106e-3 , 106e-3 , 24e-3  ,18.5e-3,18.5e-3, 16e-3    , 16.4e-3  , 15e-3    , .35         , 15.101e-3   ,14.15e-3, 15.1e-3  };
   G4int CTubeGeantMat_[]  ={   5   ,  10     ,   10   , 10      , 10      , 10    , 10    ,  31     , 10     , 10    , 10     ,  10    , 10    ,10     , 10       , 9        , 9        ,15           ,  15         ,  5     ,  15};
   G4String CTubeVolName_[]={"BeUp1", "BeUp2" , "Added", "BeUp3" , "BFront", "Body", "BEnd","CerTube", "Conn1","CLid1", "CLid2", "Conn2","Conn3","Tube1a" ,"Tube1b", "AlTube1", "AlTube2","TGTExitCyl1","TGTExitCyl2", "BeDW" ,"TGTExitTop"};
+
+ TargetVirtualCanisterHeight = 63.0*mm + 0.075*mm; // Sett Mova Target Heigth... 
+ TargetVirtualCanisterWidth = 13.75*mm; // a bit bigger than LE as well, 
 
  for (G4int ii=0;ii<NContainerN;ii++){
     CTubeZ0.push_back(CTubeZ0_[ii]*m);
@@ -1589,6 +1592,8 @@ G4bool NumiDataInput::SetHornTwoPos(G4String config)
    G4double hornpos;
    std::istringstream posstream(config);
    posstream >> hornpos;
+
+   std::cerr << " Setting Horn2 position at " << hornpos << std::endl; 
 
    NumiDataInput::SetHorn2X0((hornpos/10.)*cm); //Input as mm, but we want cm
 
