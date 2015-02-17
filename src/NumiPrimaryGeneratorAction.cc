@@ -128,6 +128,8 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
 void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
 {
 // If nothing else is set, use a proton beam
+
+    fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("geantino")); // geantino
     
     const double dr = fPolarAngleGeantinoMin + 
                       (fPolarAngleGeantino - fPolarAngleGeantinoMin)*CLHEP::RandFlat::shoot();
@@ -139,20 +141,25 @@ void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
 	
     const double dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
 //    const double dPhi = -M_PI/2.; // Shooting up, test Hadron Absorber. 
+//   
     const double dx = dr*std::cos(dPhi);
+// Shoot downs to check the bottom plate.. 
+//    const double dx = 0.; 
     const double dy = dr*std::sin(dPhi);
     const double dz = sqrt(1.0 - (dx*dx + dy*dy));
     G4ThreeVector direction(dx, dy, dz);
+// Shoot downs to check the bottom plate.. 
+//    G4ThreeVector direction(dx, -1.0*std::abs(dy), dz);
 //
 // Store it a proton internally to Numi d/s  ... Messy: 
 //    fProtonN = fCurrentPrimaryNo;
     
     fTgen=0;
-    const double x =  G4RandGauss::shoot(0.0, 1.3);  
-    const double y =  G4RandGauss::shoot(0.0, 1.3);  
+//    const double x =  G4RandGauss::shoot(0.0, 1.3);  
+//    const double y =  G4RandGauss::shoot(0.0, 1.3);  
 // Back door to study tile of Horn1 via magentic effect. Take a point source at = 0.
-//    const double x =  G4RandGauss::shoot(0.0, 1.3e-10);  
-//    const double y =  G4RandGauss::shoot(0.0, 1.3e-10);  
+    const double x =  G4RandGauss::shoot(0.0, 1.3e-10);  
+    const double y =  G4RandGauss::shoot(0.0, 1.3e-10);  
 // Back door to study effect of overlap
 //    const double dPhiPos = 2.0*M_PI*CLHEP::RandFlat::shoot();
 //    const double x =  G4RandGauss::shoot(0.0, 0.00001) + 26.0 * std::sin(dPhiPos);  
