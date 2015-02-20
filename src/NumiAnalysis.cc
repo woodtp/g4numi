@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.18 2015/02/17 16:53:30 lebrun Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.19 2015/02/20 09:56:51 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -513,20 +513,13 @@ void NumiAnalysis::FillMeta(){
   }
 		    
   this_meta->location = vec_loc;
-
-  //Storing the name of special storing
-  //for now, I am writing the name of the variables in this way
-  //I think the best place would be NumiDataInput. 
-  (this_meta->vintnames).push_back("Index_Tar_In_Ancestry");
-  char namevar[30];
-  const char* genname[3] = {"parent","granparent","greatgranparent"};
-  for(int ii=0;ii<3;ii++){
-    sprintf(namevar,"%s_IC1_Dist",genname[ii]);
-    (this_meta->vdblnames).push_back(std::string(namevar));
-    sprintf(namevar,"%s_IC2_Dist",genname[ii]);
-    (this_meta->vdblnames).push_back(std::string(namevar));
+  
+  for(int ii=0;ii<NumiData->nVintTot;ii++){
+    (this_meta->vintnames).push_back(NumiData->VolVintName[ii]);
   }
-
+  for(int ii=0;ii<NumiData->nVdblTot;ii++){
+    (this_meta->vdblnames).push_back(NumiData->VolVdblName[ii]);
+  }
   if (NumiData->createNuNtuple) meta->Fill(); // If we don't have the Ntuple properly open, won't work.
   
 }
@@ -1397,23 +1390,40 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   }
 
-  //for now, I write it by hand but I
-  //need to figure out how to do it automatically 
-  G4double density_IC  = 2.7; //g/cm3
-  G4double A_IC  = 26.98; //g/mol  mass number
-  //looking at parent(0), grand-parent(1), great-gran-parent(2):
-  const int Nancestors_ic = 3;
-  G4double init_val =  A_IC/density_IC; //this gives -1 when we fill:
-  double dist_IC1[Nancestors_ic] = {-1.0*init_val,-1.0*init_val,-1.0*init_val};
-  double dist_IC2[Nancestors_ic] = {-1.0*init_val,-1.0*init_val,-1.0*init_val};
+  //For now, I write it by hand but I need to figure out how to do it automatically 
+  //this values were extracted from NumiMaterials and checking the volumes definition 
+  //of IC, DPIP and DVOL. the fact_X is mass number over density ( gr/mole / g /cm3 )
+  //and looking at parent(0), grand-parent(1), great-gran-parent(2)
+  // (Leo Aliaga. Feb18, 2015)
+
+  const int Nanc = NumiData->nGenAbs;
+
+  G4double fact_Al = (26.98) / (2.7); 
+  G4double fact_Fe = (55.85) / (7.869990); 
+  G4double fact_He = (4.003) / (0.000145); 
+  G4double dist_IC1[3];
+  G4double dist_IC2[3];
+  G4double dist_DPIP[3];
+  G4double dist_DVOL[3];
   
+  //initializing:
+  for(int ii=0; ii<Nanc;ii++){
+    dist_IC1[ii]  = -1.0*fact_Al;
+    dist_IC2[ii]  = -1.0*fact_Al;
+    dist_DPIP[ii] = -1.0*fact_Fe;
+    dist_DVOL[ii] = -1.0*fact_He;
+  }
+  //Getting values:
   NumiTrajectory* tmp_traj;
-  for(int ii=0;ii<Nancestors_ic;ii++){
+  for(int ii=0;ii<Nanc;ii++){
     if(history.size()<=3 && ii==2)continue;
     tmp_traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(history.size()-(ii+2)));
-    dist_IC1[ii] = GetDistanceInVolume(tmp_traj,"PHorn1IC");
-    dist_IC2[ii] = GetDistanceInVolume(tmp_traj,"PHorn2IC");
+    dist_IC1[ii]  = GetDistanceInVolume(tmp_traj,"PHorn1IC");
+    dist_IC2[ii]  = GetDistanceInVolume(tmp_traj,"PHorn2IC");
+    dist_DPIP[ii] = GetDistanceInVolume(tmp_traj,"DPIP");
+    dist_DVOL[ii] = GetDistanceInVolume(tmp_traj,"DVOL");
   }
+
   
   /////////////////////////////////////////////////////////////////////////
   //In this approach, I am not deleting any g4data variables.
@@ -1523,14 +1533,38 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   this_tgtexit.tptype = tar_pdg;
   this_tgtexit.tgen   =g4data->tgen;
 
-  //2.1)Storing the index of tar:
+  //2.1)Storing integer values:
+
+  //-) Storing the index of tar
   vec_int.push_back(idx_tar_in_chain);
+
+  //-) We need to see how to do it better. We already store the playlsit in the meta tree 
+  // but GENIE is not propagating dkmeta (just dk2nu) and then this playlist ID is going 
+  // to know the playlist used.
+  G4String playlist  = NumiData->GetPlaylist();
+  int plID = -1;
+  if(playlist=="downstream")plID = 0;
+  if(playlist=="minerva1")  plID = 1;
+  if(playlist=="minerva2")  plID = 2;
+  if(playlist=="minerva3")  plID = 3;
+  if(playlist=="minerva4")  plID = 4;
+  if(playlist=="minerva5")  plID = 5;
+  if(playlist=="minerva6")  plID = 6;
+  if(playlist=="minerva7")  plID = 7;
+  if(playlist=="minerva8")  plID = 8;
+  if(playlist=="minerva9")  plID = 9;
+  if(playlist=="minerva10") plID = 10;
+  if(playlist=="minerva11") plID = 11;
+  if(playlist=="minerva12") plID = 12;
+  if(playlist=="minerva13") plID = 13;
+  vec_int.push_back(plID);
   
   //2.2)Storing the distance by density of the particle in IC:
-  for(int ii=0;ii<Nancestors_ic;ii++){
-    vec_dbl.push_back(dist_IC1[ii]/init_val);
-    vec_dbl.push_back(dist_IC2[ii]/init_val);
-  }
+  for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_IC1[ii]/fact_Al);
+  for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_IC2[ii]/fact_Al);
+  for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_DPIP[ii]/fact_Fe);
+  for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_DVOL[ii]/fact_He);
+
   /////
   
 
@@ -1945,9 +1979,9 @@ G4double NumiAnalysis::GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String
     ParticlePos = (wanted_traj->GetPoint(ii)->GetPosition()/m)*m;
     G4String postvol = "";
     G4String prevol  = wanted_traj->GetPreStepVolumeName(ii);
-    if(ii<npoints-2) postvol = wanted_traj->GetPreStepVolumeName(ii+1);
+    if(ii<npoints-1) postvol = wanted_traj->GetPreStepVolumeName(ii+1);
 
-    G4bool vol_in  = (prevol != wanted_vol) && (postvol == wanted_vol);
+    G4bool vol_in  = ( (prevol != wanted_vol) && (postvol == wanted_vol) ) || ( ii==0 && prevol== wanted_vol);
     G4bool vol_out = (prevol == wanted_vol) && (postvol != wanted_vol);
     if(vol_in){	
       enter_vol = true;
@@ -1961,7 +1995,7 @@ G4double NumiAnalysis::GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String
       tmp_dist += tmp_disp.mag();
       tmp_ipos = tmp_fpos;
     }
-    if(vol_out){
+    if(enter_vol && vol_out){
       tmp_fpos  = G4ThreeVector(ParticlePos[0]/cm,ParticlePos[1]/cm,ParticlePos[2]/cm);
       tmp_disp  = tmp_fpos - tmp_ipos;
       tmp_dist += tmp_disp.mag();

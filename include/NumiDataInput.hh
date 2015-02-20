@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.14 2015/02/17 16:51:10 lebrun Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.15 2015/02/20 09:56:50 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -565,6 +565,18 @@ public:
 // To be use to fill the Ntuple, info about the particle 6D phase space exiting the target. 
 //
    inline G4String GetHornConfig() const { return fHornConfig; } 
+
+    //Variables needed for custumized dk2nu storing (Leo Aliaga, Feb17, 2015)
+  //Absorption:
+  G4int nGenAbs;  //generations under absorption study 
+  G4int nVolAbs;  //volumes under absorption study 
+  G4int nVdblTot;  //number of values to be store in vdbl 
+  vstring_t GenAbsName;  
+  vstring_t VolAbsName;
+  vstring_t VolVdblName;
+  
+  G4int nVintTot;  //number of values to be store in vint
+  vstring_t VolVintName;
 
    
 };

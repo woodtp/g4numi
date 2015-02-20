@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.18 2015/02/17 16:51:46 lebrun Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.19 2015/02/20 09:56:51 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -1025,6 +1025,39 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     zdet_far.push_back(zdetFar[ii]*m);
     det_far_name.push_back(detNameFar[ii]);
   }
+
+  //Variables needed fr custumized dk2nu storing (Leo Aliaga, Feb17, 2015)
+  
+  // vdbl: 
+  //For now, just storing values for absorption studies
+  nGenAbs = 3;
+  nVolAbs = 4;
+  G4String name_gen[] = {"parent","granparent","greatgranparent"};
+  G4String name_vol[] = {"PHorn1IC","PHorn2IC","DPIP","DVOL"};
+  for(G4int ii=0;ii<nGenAbs;ii++){
+    GenAbsName.push_back(name_gen[ii]);
+  }
+  for(G4int ii=0;ii<nVolAbs;ii++){
+    VolAbsName.push_back(name_vol[ii]);
+  }
+  char namevar[50];
+  for(int ii=0; ii<nVolAbs; ii++){
+    for(int jj=0; jj<nGenAbs; jj++){
+      sprintf(namevar,"Material_%s_%s",VolAbsName[ii].c_str(),GenAbsName[jj].c_str());
+      VolVdblName.push_back(G4String(namevar));
+    }
+  }
+  nVdblTot = int(VolVdblName.size());
+
+  // vint: 
+  //For now, storing two values
+  nVintTot = 2;
+  G4String name_vint[] = {"Index_Tar_In_Ancestry","playlistID"};
+  for(G4int ii=0;ii<nVintTot;ii++){
+    VolVintName.push_back(name_vint[ii]);
+  }
+
+
 
      // =================================================
   // Nova Medium Energy Target
