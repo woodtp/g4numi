@@ -127,7 +127,8 @@ for ($runnum = $first_run; $runnum <= $last_run; $runnum++) {
 
 #Q:why are we calling system here??
 #A: so that we can test "jobsub -g ... " by printing it to the screen rather than calling system (i.e., comment it out)
-system "jobsub -g -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir} g4na49_job.sh ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax}";
+#system "jobsub -g -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir} g4na49_job.sh ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax}";
+system "jobsub_submit  --OS=SL6 -g --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC --use_gftp --role=Analysis -L ${logfile} -dTUPLES ${tuple_dir} -dHISTOS ${histo_dir}  ${working_dir} ${macrofile} ${mom_gev} ${runnum} ${keep_tuple} ${evtmax} file://g4na49_job.sh";
  
 
 }
