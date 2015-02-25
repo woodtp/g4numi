@@ -1,14 +1,15 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/send_grid_tarpos.sh,v 1.1.2.3 2014/10/26 22:51:59 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/send_grid_tarpos.sh,v 1.1.2.4 2015/02/25 20:51:10 drut1186 Exp $
 
 # for interactive running use GRID=""
 #export GRID=""
 # for production account, non group-writable, use GRID="-g"
 #export GRID="-g"
 # for submitting as myself, use GRID="-g --use_gftp"
-export GRID="--OS=SL6 -g --opportunistic --use_gftp"
-
+#export for the old job submission method kept here just in case
+#export GRID="--OS=SL6 -g --opportunistic --use_gftp"
+export GRID="--environment=LD_LIBRARY_PATH --OS=SL6 -g --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC --use_gftp --role=Analysis -G minerva "
 #############################
 #General variables:
 export DOWATER="false"
@@ -40,5 +41,6 @@ do
   export G4NUMIAREA=`pwd`
   echo "Will use code and scripts from $G4NUMIAREA"  
 
-  jobsub $GRID -N $NJOBS -dG4NUMI $OUTDIR -e G4NUMIAREA  -e BEAMCONFIG -e DOWATER -e WATERCM -e POT -e RUN -e DOIMPWT -e PLAYLIST -L $LOGFILE $BEAMSIM/g4numi_job.sh  
+#  jobsub $GRID -N $NJOBS -dG4NUMI $OUTDIR -e G4NUMIAREA  -e BEAMCONFIG -e DOWATER -e WATERCM -e POT -e RUN -e DOIMPWT -e PLAYLIST -L $LOGFILE $BEAMSIM/g4numi_job.sh  
+  jobsub_submit $GRID -N $NJOBS -dG4NUMI $OUTDIR -e G4NUMIAREA  -e BEAMCONFIG -e DOWATER -e WATERCM -e POT -e RUN -e DOIMPWT -e PLAYLIST -L $LOGFILE file://$BEAMSIM/g4numi_job.sh
 done
