@@ -12,6 +12,8 @@
 
 /NuMI/det/LengthOfWaterInTgt ${watercm} cm
 
+/NuMI/det/HornWaterLayerThickness 1 mm
+
 /NuMI/det/RunPeriod 0
 
 /NuMI/det/UseCorrHornCurrent false
