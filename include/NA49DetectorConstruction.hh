@@ -7,6 +7,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 #include "G4Material.hh"
+#include "NA49Config.hh"
 
 class G4LogicalVolume;
 class NA49DetectorMessenger;
@@ -17,7 +18,7 @@ class NA49DetectorConstruction : public G4VUserDetectorConstruction
 {
 public:
 
-  NA49DetectorConstruction();
+  NA49DetectorConstruction(const Target &t);
   virtual ~NA49DetectorConstruction();
 
 public:

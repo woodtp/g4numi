@@ -24,19 +24,19 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-NA49DetectorConstruction::NA49DetectorConstruction()
+NA49DetectorConstruction::NA49DetectorConstruction(const Target &t)
 {
   logicTarget = 0;
   logicWorld  = 0;
   detectorMessenger = new NA49DetectorMessenger(this);
 
-  TargetZ = 6.;
-  TargetA = 12.01*g/mole;
-  TargetDensity = 1.78*g/cm3;
+  TargetZ = t.Z;
+  TargetA = t.A*g/mole;
+  TargetDensity = t.density*g/cm3;
 
-  radius = 0.3*cm;
+  radius = t.radius*cm;
 
-  targetMaterial = new G4Material("TargetMat",TargetZ, TargetA, TargetDensity);
+  targetMaterial = new G4Material(t.name,TargetZ, TargetA, TargetDensity);
   worldMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
 
 }

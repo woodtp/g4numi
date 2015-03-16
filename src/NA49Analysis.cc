@@ -54,17 +54,20 @@ NA49Analysis* NA49Analysis::getInstance()
   return instance;
 }
 //------------------------------------------------------------------------------------
-void NA49Analysis::book(G4long id0,G4long id1)
+void NA49Analysis::book(const NA49Config &config)
 {
-  sprintf(NtupleFileName,"p_%dGeV_C_%04d.root",int(id0),int(id1));
+  //sprintf(NtupleFileName,"p_%dGeV_C_%04d.root",int(id0),int(id1));
 
   //Uncomment, omplete the path for tuples and recompile: 
   //sprintf(NtupleFileName,"/minerva/data/users/laliaga/HadProd/.../Tuples/p_%dGeV_C_%04d.root",id0,id1);
 
-  G4cout<<"==>>Using "<<id0<<" & "<<id1<<" as random generator numbers"<<G4endl; 
+  //G4cout<<"==>>Using "<<id0<<" & "<<id1<<" as random generator numbers"<<G4endl; 
 
-  FileNtuple = new TFile(NtupleFileName, "RECREATE","hadron from p+C ntuple");   
-  ProdTree = new TTree("pCinfo","g4NA49 info from p+C");
+  FileNtuple = new TFile((config.getOutputDir() + "/" +
+                          config.getOutputFile()).c_str(),
+                          "RECREATE","hadron from h+A ntuple");   
+
+  ProdTree = new TTree("hAinfo","g4NA49 info from h+A");
   
   ProdTree->Branch("npart",&g4Proddata.NPart,"NPart/I");
   ProdTree->Branch("pdg", &g4Proddata.PDG,"PDG[NPart]/I");
@@ -73,6 +76,8 @@ void NA49Analysis::book(G4long id0,G4long id1)
   ProdTree->Branch("xf", &g4Proddata.XF,"XF[NPart]/D");
   ProdTree->Branch("pt", &g4Proddata.PT,"PT[NPart]/D");
   ProdTree->Branch("ff", &g4Proddata.FF,"FF[NPart]/O");
+
+  NA49Setup = config.createTree();
 }
 
 
@@ -82,6 +87,7 @@ void NA49Analysis::finish()
     FileNtuple->cd();
      
     ProdTree->Write();
+    NA49Setup->Write();
     FileNtuple->Close();
     delete FileNtuple;
 }

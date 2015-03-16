@@ -9,8 +9,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-NA49RunAction::NA49RunAction()
-{}
+//~ NA49RunAction::NA49RunAction(const G4String &filename) : output(filename)
+//~ {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -40,7 +40,7 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
 #endif
 
 NA49Analysis* analysis = NA49Analysis::getInstance();
-  analysis->book(id0,id1);
+  analysis->book(config);
 
 }
 

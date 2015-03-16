@@ -52,6 +52,7 @@ INTYLIBS      += $(ROOTLIBS)
 
 #for debuging
 CPPFLAGS += -g -Wno-deprecated
+#CPPFLAGS += -g -Wno-deprecated -fPIC
 
 CPPFLAGS += -I$(G4INCLUDE)
 
@@ -71,3 +72,6 @@ g4na49Cint: include/ProdTuple_t.hh Linkdef2.h
 
 libg4na49Dict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/g4na49Cint.o
 	gcc -m32 -g -shared -o libg4na49Dict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/g4na49Cint.o
+
+#libg4na49Dict:  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/g4na49Cint.o
+#	gcc -g -shared -o libg4na49Dict.so    $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/ProdTuple_t.o  $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/TrackInfo_t.o $(G4WORKDIR)/tmp/$(G4SYSTEM)/g4na49/g4na49Cint.o
