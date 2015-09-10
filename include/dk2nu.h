@@ -9,13 +9,13 @@
  *
  * \author (last to touch it) $Author: laliaga $
  *
- * \version $Revision: 1.1.2.1 $
+ * \version $Revision: 1.1.2.2 $
  *
- * \date $Date: 2014/09/16 16:19:30 $
+ * \date $Date: 2015/09/10 19:21:46 $
  *
  * Contact: rhatcher@fnal.gov
  *
- * $Id: dk2nu.h,v 1.1.2.1 2014/09/16 16:19:30 laliaga Exp $
+ * $Id: dk2nu.h,v 1.1.2.2 2015/09/10 19:21:46 laliaga Exp $
  *
  * Notes tagged with "DK2NU" are questions that should be answered
  */
@@ -30,7 +30,7 @@
 #include <vector>
 #include <string>
 
-#define DK2NUVER 9   // KEEP THIS UP-TO-DATE!  increment for each change
+#define DK2NUVER 8   // KEEP THIS UP-TO-DATE!  increment for each change
 
 namespace bsim {
   /**
