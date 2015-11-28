@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.12 2015/01/19 03:37:09 laliaga Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.13 2015/11/28 04:47:23 laliaga Exp $
 
 import os, re, sys, getopt,string
 from string import Template
@@ -43,6 +43,8 @@ DESCRIPTION
           useful for recording a sort of 'subrun'
     -w, --dowater [default=false]
           simulate water in the target  
+    -m, --donewhorn1 [default=false]
+          use the alternate horn1 model
     -L, --watercm [default=3]
           cm of water in the target 
     -i, --noimpwt
@@ -57,6 +59,7 @@ def main(argv=None):
         argv = sys.argv
         
     dowater='false'    
+    donewhorn1='false'    
     watercm='3'
     beamconfig='le010z185i'
     outfile=''
@@ -68,8 +71,8 @@ def main(argv=None):
     doimpwt='true'
     playlist='0'
     try:
-        opts, args = getopt.getopt(argv[1:], "hwL:b:o:s:r:p:t:n:z:i", 
-                                   ["help","dowater","watercm",
+        opts, args = getopt.getopt(argv[1:], "hwmL:b:o:s:r:p:t:n:z:i", 
+                                   ["help","dowater","donewhorn1","watercm",
                                     "beamconfig","outfile","seed","run","pot","template","nametag","playlist","noimpwt"])
     except getopt.error, msg:
         raise Usage(msg)
@@ -80,6 +83,8 @@ def main(argv=None):
             sys.exit()
         if o in ("-w", "--dowater"):
             dowater='true'
+        if o in ("-m", "--donewhorn1"):
+            donewhorn1='true'
         if o in ("-L","--watercm"):
             watercm=a
         if o in ("-b", "--beamconfig"):
@@ -148,7 +153,7 @@ def main(argv=None):
 
     filestring=open(templatefile,'r').read()
     t=string.Template(filestring)
-    print t.substitute({'dowater':dowater,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos,'playlist':playlist})
+    print t.substitute({'dowater':dowater,'donewhorn1':donewhorn1,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos,'playlist':playlist})
     
     
 if __name__ == "__main__":

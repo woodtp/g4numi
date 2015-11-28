@@ -10,6 +10,9 @@
 
 /NuMI/run/useWaterInTgt ${dowater}
 
+#Switch to the alternate horn1
+/NuMI/det/Horn1IsAlternate ${donewhorn1}
+
 /NuMI/det/LengthOfWaterInTgt ${watercm} cm
 
 /NuMI/det/HornWaterLayerThickness 1 mm

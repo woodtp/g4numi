@@ -25,6 +25,10 @@
 #
 /NuMI/run/useWaterInTgt ${dowater}
 
+#Switch to the alternate horn1
+#
+/NuMI/det/Horn1IsAlternate ${donewhorn1}
+
 #
 #Set the amount (length) of water that fills the target starting from the downstream end.
 #Can't have less than 3 cm of water right now. 

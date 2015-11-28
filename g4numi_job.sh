@@ -17,6 +17,7 @@ setup_beamsim
 
 echo "BEAMCONFIG=$BEAMCONFIG"
 echo "DOWATER=$DOWATER"
+echo "DONEWHORN1=$DONEWHORN1"
 echo "WATERCM=$WATERCM"
 echo "DOIMPWT=$DOIMPWT"
 echo "POT=$POT"
@@ -51,13 +52,18 @@ if [ "$DOIMPWT" = "false" ]; then
     IFLAG="-i"
 fi
 
+MFLAG=""
+if [ "$DONEWHORN1" = "true" ]; then
+    MFLAG="-m"
+fi
+
 if [ "$DOWATER" = "false" ]; then
     
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
+    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG ${MFLAG} -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
 
 else 
 
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -w -L $WATERCM -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
+    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -w ${MFLAG} -L $WATERCM -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
 	
 fi
 
