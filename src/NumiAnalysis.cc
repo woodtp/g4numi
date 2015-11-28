@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.20 2015/11/28 04:33:16 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.21 2015/11/28 05:08:58 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -464,9 +464,9 @@ void NumiAnalysis::FillMeta(){
   //Perhaps should be part of NumiDataInput??
 
 #ifdef USEMODGEANT4
-  this_meta->beamsim = "g4numi_v5_MODGEANT4"; 
+  this_meta->beamsim = "g4numi_v6_MODGEANT4"; 
 #else 
-  this_meta->beamsim = "g4numi_v5";   
+  this_meta->beamsim = "g4numi_v6";   
 #endif
 
   this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0"; 

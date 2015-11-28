@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.14 2015/11/28 04:33:15 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.15 2015/11/28 05:08:58 laliaga Exp $
 
 
 setup_beamsim(){
@@ -23,13 +23,18 @@ setup_beamsim(){
 
 
     source /grid/fermiapp/products/minerva/etc/setups.sh
-    source /grid/fermiapp/products/common/etc/setups.sh
-    setup cpn -z /grid/fermiapp/products/common/db
-    setup jobsub_tools v1_2q -z /grid/fermiapp/products/common/db 
 
+    # setup for jobsub client
+    # according to the prescription in Mike Kirby's talk
+    # minerva doc-10551, Dec 2014    
+    source /grid/fermiapp/products/common/etc/setups.sh
+    setup jobsub_client
+    setup ifdhc
+
+    export IFDH_BASE_URI="http://samweb-minerva.fnal.gov:20004/sam/minerva/api"
 
     export BEAMSIM="${TOP}"
-    export G4NUMIVER="v5"
+    export G4NUMIVER="v6"
     setup g4photon
     export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++"
 #    export LD_LIBRARY_PATH="${PWD}/tmpSolution:${LD_LIBRARY_PATH}"
