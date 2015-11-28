@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.13 2015/02/16 00:09:06 laliaga Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.14 2015/11/28 04:33:15 laliaga Exp $
 
 
 setup_beamsim(){
@@ -9,12 +9,12 @@ setup_beamsim(){
     local TOP=${PWD}
 #   setup -f Linux+2.6-2.5 gcc v3_4_3
 
-# For using the modified version of geant4 (that contains a class to store hadronic interaction 
-# kinematics), you need to add this line:   . /grid/fermiapp/minerva/beamsim/geant4/geant4.9.2.p03_mod/env.sh 
-# and comment out the next line (which defines the ups version). 
-# Also, you need to use the processor directive to define USEMODGEANT4
-    setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
-#    . /grid/fermiapp/minerva/beamsim/geant4/geant4.9.2.p03_mod/env.sh 
+# This line sets the modified version of geant4 (that contains a class to store hadronic interaction 
+# kinematics):
+    . /grid/fermiapp/minerva/beamsim/geant4/geant4.9.2.p03_mod/env.sh 
+
+#    setup -q g77-OpenGL -f Linux+2.6 geant4 v4_9_2_p03
+
     setup -q debug -f Linux+2.6-2.5 root v5_30_00
 
     if [ -e "/grid/fermiapp/minerva/condor/setup.minerva.condor.sh" ]; then
