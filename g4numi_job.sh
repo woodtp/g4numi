@@ -11,7 +11,7 @@ cd $CONDOR_DIR_G4NUMI
 echo "G4NUMIAREA = $G4NUMIAREA"
 WORKDIR=$G4NUMIAREA
 source $WORKDIR/setup_beamsim.sh
-
+export HOME=${TMPDIR} 
 setup_beamsim
 #create the macro file
 
