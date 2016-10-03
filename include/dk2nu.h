@@ -9,13 +9,13 @@
  *
  * \author (last to touch it) $Author: laliaga $
  *
- * \version $Revision: 1.1.2.2 $
+ * \version $Revision: 1.1.2.3 $
  *
- * \date $Date: 2015/09/10 19:21:46 $
+ * \date $Date: 2016/10/03 00:32:10 $
  *
  * Contact: rhatcher@fnal.gov
  *
- * $Id: dk2nu.h,v 1.1.2.2 2015/09/10 19:21:46 laliaga Exp $
+ * $Id: dk2nu.h,v 1.1.2.3 2016/10/03 00:32:10 laliaga Exp $
  *
  * Notes tagged with "DK2NU" are questions that should be answered
  */
@@ -30,7 +30,8 @@
 #include <vector>
 #include <string>
 
-#define DK2NUVER 8   // KEEP THIS UP-TO-DATE!  increment for each change
+#define DK2NUVER 11   // KEEP THIS UP-TO-DATE!  increment for each change
+#define KEEP_ANCESTOR_PPRODPXYZ 1
 
 namespace bsim {
   /**
@@ -144,6 +145,15 @@ namespace bsim {
        muons:    grandparent decay point
        hadrons:  grandparent production point
        Huh?  this needs better documentation
+       Marco DT says: One should look at parent type ptype. 
+                     If ptype is a muon, then muparpx,y,z,e 
+                     are momentum and energy of the neutrino 
+                     grandparent (muon parent) at its decay point. 
+                     Otherwise (for all other values of ptype), 
+                     muparpx,y,z,e refer to neutrino grandparent
+                     (a hadron in this case) production point.
+                     If the Ancestor List is on , then
+                     these variables are superfluous.
     */
    Double_t muparpx;      ///< %
    Double_t muparpy;      ///< %
@@ -193,12 +203,22 @@ namespace bsim {
     Double_t polz;     ///< z component of polarization
     
     // what are these ... somehow different from stoppx[-1]?
+    // Marco DT says: Yes, they can be different. Nu parent first entry can
+    //                be different than [-1]. Exapmle: it could be [-2], then [-1] 
+    //                contains a parent elastic interaction.
+    //                I'm gettint rid of these variables and I'll add a
+    //                parIndex instead, see following.
+#ifdef KEEP_ANCESTOR_PPRODPXYZ
     Double_t pprodpx;  ///< parent x momentum when producing this particle
     Double_t pprodpy;  ///< parent y momentum when producing this particle
     Double_t pprodpz;  ///< parent z momentum when producing this particle
+#endif
     
     Int_t    nucleus;  ///< nucleus (PDG) type causing the scatter
-    
+
+    // Marco DT is adding parIndex    
+    Int_t    parIndex; ///< particle index, from nu (0), parent (1) ... to proton (n)
+ 
     std::string proc;  ///< name of the process that creates this particle
     std::string ivol;  ///< name of the volume where the particle starts
     std::string imat;  ///< name of the material where the particle starts
@@ -221,8 +241,14 @@ namespace bsim {
     Double_t    startp() const;
     Double_t    stoppt() const;
     Double_t    stopp() const;
+
+    // helper functions added by Marco
+    bool        IsInTarget();
+
+#ifdef KEEP_ANCESTOR_PPRODPXYZ
     Double_t    pprodpt() const;
     Double_t    pprodp() const;
+#endif
 
   private:
     ClassDef(bsim::Ancestor,DK2NUVER)
@@ -294,6 +320,8 @@ namespace bsim {
   public:
    Int_t job;                        ///< identifying job #
    Int_t potnum;                     ///< proton # processed by simulation
+   Int_t jobindx;                    ///< unique # within the job
+                                     ///<    potnum isn't sufficient
    bsim::Decay decay;                ///< basic decay information
    std::vector<bsim::NuRay> nuray;   ///< rays through detector fixed points
    std::vector<bsim::Ancestor> ancestor;  ///< chain from proton to neutrino
