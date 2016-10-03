@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.19 2015/02/20 09:56:51 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.20 2016/10/03 00:33:13 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -989,29 +989,27 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   //Miniboone, Microboone and Sciboone (Zarko Pavlovic private e-mail 2014-09-12)
   
-  //Minos Near1 and Far1: positions that were before in g4numi v4.
-  //Minos Near2 and Far2: positions from R. Hatcher (GENIE GNuMIFlux R-2_8_4 transformation)
+  //Minos Near and Far: positions from R. Hatcher using GENIE GNuMIFlux R-2_8_4 transformation.
   
-  //Nova Near1: NuMIX-DocDB-17 v2 (Luke Corwin 2014-01-15)
-  //Nova Near2: positions from R. Hatcher (GENIE GNuMIFlux R-2_8_4 transformation)
-  //Nova Far: NuMIX-DocDB-17 v2 (Luke Corwin 2014-01-15)
+  //Nova Near and Far: positions from R. Hatcher (using GENIE GNuMIFlux R-2_8_4 transformation) and updated by 
+  //Alex Radovic and Ryan Nichol.
   
-  //Minerva values are in revision. These suposse to be the center of the tracker: (0,0,716.95cm) in the Minerva coordinate system. 
-  //We provide these number to Robert Hatcher and he calculated the numbers below using GENIE GNuMIFlux R-2_8_4 transformation.
-  //but we know that these posotions are incorrect in Genie and then needs to be corrected (See M. Kordosky Minerva docdb 10414)
+  //Minerva values are in the center of the tracker: (0,0,716.95cm) in the Minerva coordinate system. 
+  //We provide these numbers to Robert Hatcher and he calculated the numbers below using GENIE GNuMIFlux R-2_8_4 transformation.
+  //See also M. Kordosky Minerva docdb 10414.
   
-  nNear=9;//just 7 for now
-  nFar=3;
+  nNear=7;
+  nFar=2;
   //We are checking now Minerva positions. 
-  G4double xdetNear[]    = {-0.5628   ,     0        ,       0      ,   11.57     ,   11.50172   ,  -0.29,    26.04      ,    53.    ,    197.6};
-  G4double ydetNear[]    = {-0.5329317,     0        ,       0      ,   -3.64     ,   -2.800719  ,  92.21,    78.64      ,    76.    ,     53.4};
-  G4double zdetNear[]    = {1032.319  ,  1040        ,    1036.488  ,  993.35     , 1000.992     , 841.76,   744.87      ,   679.    ,    339.4};
-  G4String detNameNear[] = {"MINERvA" ,"Minos Near 1","Minos Near 2","Nova Near 1", "Nova Near 2", "NDOS", "MiniBooNE" , "MicroBooNE", "SciBooNE"};
+  G4double xdetNear[]    = {-0.5628   ,     0         ,   11.7174545 ,  -0.29,    26.04      ,    53.    ,    197.6};
+  G4double ydetNear[]    = {-0.5329317,     0         ,   -3.3151325 ,  92.21,    78.64      ,    76.    ,     53.4};
+  G4double zdetNear[]    = {1032.319  ,  1036.488     ,  992.9347347 , 841.76,   744.87      ,   679.    ,    339.4};
+  G4String detNameNear[] = {"MINERvA" ,"MINOS NearDet","NOvA NearDet", "NDOS", "MiniBooNE" , "MicroBooNE", "SciBooNE"};
 
-  G4double xdetFar[]     = {0            ,         0    ,   11037.46};
-  G4double ydetFar[]     = {0            ,         0    ,   -4162.64};
-  G4double zdetFar[]     = {735000       ,    735340    ,  810422.32};
-  G4String detNameFar[]  = {"Minos Far 1", "Minos Far 2", "Nova Far"};
+  G4double xdetFar[]     = {0             ,   11037.29645};
+  G4double ydetFar[]     = {0             ,   -4162.557681};
+  G4double zdetFar[]     = {735340        ,  810422.3274};
+  G4String detNameFar[]  = {"MINOS FarDet", "Nova FarDet"};
 
   for(G4int ii=0;ii<nNear;ii++){
     xdet_near.push_back(xdetNear[ii]*m);
