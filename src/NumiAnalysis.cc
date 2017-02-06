@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.21 2015/11/28 05:08:58 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.22 2017/02/06 07:11:42 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1582,8 +1582,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   ///////
 
   //4) Decay:
-  this_decay.norig  = g4data->Norig;
-  this_decay.ndecay = g4data->Ndecay;
+  this_decay.norig  = Norig;
+  this_decay.ndecay = NuParentTrack->GetDecayCode();
   this_decay.ntype = particleType->GetPDGEncoding();
   this_decay.vx = x/cm;
   this_decay.vy = y/cm;
