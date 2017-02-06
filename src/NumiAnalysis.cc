@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.22 2017/02/06 07:11:42 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.23 2017/02/06 08:00:25 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1414,15 +1414,53 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     dist_DVOL[ii] = -1.0*fact_He;
   }
   //Getting values:
-  NumiTrajectory* tmp_traj;
+  NumiTrajectory* tmp_traj; 
   for(int ii=0;ii<Nanc;ii++){
     if(history.size()<=3 && ii==2)continue;
     tmp_traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(history.size()-(ii+2)));
-    dist_IC1[ii]  = GetDistanceInVolume(tmp_traj,"PHorn1IC");
+    //If the Horn1 is alternate (See doc 10573), the name convention of the Horn1 IC volumes changes. 
+    //Ths part of the code checks if the horn1 is alternate. If not, it assumes it is the nominal (Horn 1 
+    //model we used in g4numi v5). 
+    double tmp_dist_h1 = 0;
+    if( NumiData->GetHorn1IsAlternate() ){
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont0_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont1_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont2_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont3_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect0WeldUpstr_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect0_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect1_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect2_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect1Weld0_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect0_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect1_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect2_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect3_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1Neck_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect0_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect1_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect2_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect3_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect4_P");
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect5_P");
+      
+      tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1Weld1_P");
+    }
+    else{
+      tmp_dist_h1 = GetDistanceInVolume(tmp_traj,"PHorn1IC");
+    }
+    dist_IC1[ii]  = tmp_dist_h1;
     dist_IC2[ii]  = GetDistanceInVolume(tmp_traj,"PHorn2IC");
     dist_DPIP[ii] = GetDistanceInVolume(tmp_traj,"DPIP");
     dist_DVOL[ii] = GetDistanceInVolume(tmp_traj,"DVOL");
-  }
+    
+ }
 
   
   /////////////////////////////////////////////////////////////////////////
