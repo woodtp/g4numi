@@ -5,6 +5,15 @@
 
 /NuMI/run/useNuBeam true
 
+/NuMI/run/useWaterInTgt false
+
+#Switch to the alternate horn1
+/NuMI/det/Horn1IsAlternate true
+
+/NuMI/det/LengthOfWaterInTgt 3 cm
+
+/NuMI/det/HornWaterLayerThickness 1 mm
+
 # Currently run period is defined only for LE beam
 /NuMI/det/RunPeriod 0 
 
@@ -15,8 +24,10 @@
 # For ME simulation, don't change 000z. It will not do anything, please
 # change the target position explicitly by using the 'targetPosition' command
 /NuMI/det/BeamConfig ME000z200i
+/NuMI/run/useNImpWeight true
+
 /NuMI/det/set/horn1Position 0 0 3 cm
-/NuMI/det/set/horn2Position 0 0 1900 cm
+/NuMI/det/set/horn2Position 0 0 1918 cm
 /NuMI/det/set/bafflePosition 0 0 -380 cm
 /NuMI/det/set/targetPosition 0 0 -143.3 cm
 
@@ -35,9 +46,6 @@
 /NuMI/output/outputNuNtuple true
 
 /NuMI/output/setNuNtupleFile numi-ntuple-newtarget
-
-
-
 
 
 /NuMI/det/update
