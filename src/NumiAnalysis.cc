@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.23 2017/02/06 08:00:25 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.24 2017/02/15 21:15:47 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1695,8 +1695,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   //calculating the job number:
   G4String namentp = (NumiData->nuNtupleName);
-  G4int namesize = (NumiData->nuNtupleName).length();
-  namentp.remove(0,namesize-3);
+  G4int namesize = (NumiData->nuNtupleName).last('_');
+  namentp.remove(0,namesize+1);
   istringstream buffer(namentp);
   int valjob;
   buffer >> valjob;
