@@ -1,6 +1,6 @@
-//----------------------------------------------------------------------
+ //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.15 2015/02/20 09:56:50 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.16 2017/02/15 20:02:35 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -142,6 +142,9 @@ public:
    G4double GetHorn1ExtraLayerAlum() const    { return fHorn1ExtraLayerAlum; }
    G4bool GetDumpBFieldPlease() const    { return fDumpBFieldPlease; }
    
+  void SetBeamSigmaX(G4double val);
+  void SetBeamSigmaY(G4double val);
+
    //--------------------------------------------------------------
    //Specifically for Muon Monitor simulation and Absorber background simulation
    //

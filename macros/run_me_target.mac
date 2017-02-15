@@ -5,6 +5,9 @@
 
 /NuMI/run/useNuBeam true
 
+#/NuMI/Beam/SigmaX 1.3 mm
+#/NuMI/Beam/SigmaY 1.3 mm
+
 /NuMI/run/useWaterInTgt false
 
 #Switch to the alternate horn1

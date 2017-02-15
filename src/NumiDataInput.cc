@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.20 2016/10/03 00:33:13 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.21 2017/02/15 20:02:35 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -1945,3 +1945,14 @@ void NumiDataInput::Setg3Chase(G4bool _gc)
     
 }
 
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetBeamSigmaX(G4double val)
+{
+  beamSigmaX = val;
+}
+
+//---------------------------------------------------------------------------------
+void NumiDataInput::SetBeamSigmaY(G4double val)
+{
+  beamSigmaY = val;
+}

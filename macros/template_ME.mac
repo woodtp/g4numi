@@ -8,6 +8,10 @@
 
 /NuMI/run/useNuBeam true
 
+#Beam spot size:
+/NuMI/Beam/SigmaX 1.3 mm
+/NuMI/Beam/SigmaY 1.3 mm
+
 /NuMI/run/useWaterInTgt ${dowater}
 
 #Switch to the alternate horn1

@@ -80,7 +80,18 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   setOuterR->SetDefaultUnit("cm");
   setOuterR->SetUnitCandidates("micron mm cm m km");
 
- 
+  setBeamSigmaX = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/SigmaX",this);
+  setBeamSigmaX->SetGuidance("Beam spot sigma x (mm by default)");
+  setBeamSigmaX->SetParameterName("bsigmaX",true, true);
+  setBeamSigmaX->SetDefaultValue (1.1);
+  setBeamSigmaX->SetDefaultUnit("mm");
+
+  setBeamSigmaY = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/SigmaY",this);
+  setBeamSigmaY->SetGuidance("Beam spot sigma y (mm by default)");
+  setBeamSigmaY->SetParameterName("bsigmaY",true, true);
+  setBeamSigmaY->SetDefaultValue (1.1);
+  setBeamSigmaY->SetDefaultUnit("mm");
+
   setParticle = new G4UIcmdWithAString("/NuMI/Beam/particle",this);
   setParticle->SetGuidance("Name of beam particle");
   setParticle->SetParameterName("particle",true);
@@ -198,7 +209,13 @@ void NumiPrimaryMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
 	PrimaryAction->PG_InnerR(setInnerR->GetNewDoubleValue(newValues));
   }
   else if( command==setOuterR ) { 
-	PrimaryAction->PG_OuterR(setOuterR->GetNewDoubleValue(newValues));
+        PrimaryAction->PG_OuterR(setOuterR->GetNewDoubleValue(newValues));
+  }
+  else if( command==setBeamSigmaX ) { 
+        NumiData->SetBeamSigmaX(setBeamSigmaX->GetNewDoubleValue(newValues));
+  }
+  else if( command==setBeamSigmaY ) { 
+        NumiData->SetBeamSigmaY(setBeamSigmaY->GetNewDoubleValue(newValues));
   }
   else if( command==setParticle ) {
 	G4ParticleDefinition* pd = particleTable->FindParticle(newValues);
