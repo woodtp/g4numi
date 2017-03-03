@@ -7,6 +7,8 @@
 
 #/NuMI/Beam/SigmaX 1.3 mm
 #/NuMI/Beam/SigmaY 1.3 mm
+#/NuMI/Beam/ShiftX 0.0 mm
+#/NuMI/Beam/ShiftY 0.0 mm
 
 /NuMI/run/useWaterInTgt false
 

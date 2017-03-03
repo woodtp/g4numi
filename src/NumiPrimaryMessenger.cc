@@ -92,6 +92,18 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   setBeamSigmaY->SetDefaultValue (1.1);
   setBeamSigmaY->SetDefaultUnit("mm");
 
+  setBeamShiftX = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/ShiftX",this);
+  setBeamShiftX->SetGuidance("Beam center shift x (mm by default)");
+  setBeamShiftX->SetParameterName("bshiftX",true, true);
+  setBeamShiftX->SetDefaultValue (0.0);
+  setBeamShiftX->SetDefaultUnit("mm");
+
+  setBeamShiftY = new G4UIcmdWithADoubleAndUnit("/NuMI/Beam/ShiftY",this);
+  setBeamShiftY->SetGuidance("Beam center shift y (mm by default)"); 
+  setBeamShiftY->SetParameterName("bshiftY",true, true);
+  setBeamShiftY->SetDefaultValue (0.0);
+  setBeamShiftY->SetDefaultUnit("mm");
+
   setParticle = new G4UIcmdWithAString("/NuMI/Beam/particle",this);
   setParticle->SetGuidance("Name of beam particle");
   setParticle->SetParameterName("particle",true);
@@ -169,6 +181,10 @@ NumiPrimaryMessenger::~NumiPrimaryMessenger()
   delete setDivergence;
   delete setInnerR;
   delete setOuterR;
+  delete setBeamSigmaX;
+  delete setBeamSigmaY;
+  delete setBeamShiftX;
+  delete setBeamShiftY;
   delete setParticle;
   delete fUseGeantino;
   delete fUseMuonGeantino;
@@ -216,6 +232,12 @@ void NumiPrimaryMessenger::SetNewValue(G4UIcommand* command,G4String newValues)
   }
   else if( command==setBeamSigmaY ) { 
         NumiData->SetBeamSigmaY(setBeamSigmaY->GetNewDoubleValue(newValues));
+  }
+  else if( command==setBeamShiftX ) { 
+        NumiData->SetBeamX0(setBeamShiftX->GetNewDoubleValue(newValues));
+  }
+  else if( command==setBeamShiftY ) { 
+        NumiData->SetBeamY0(setBeamShiftY->GetNewDoubleValue(newValues));
   }
   else if( command==setParticle ) {
 	G4ParticleDefinition* pd = particleTable->FindParticle(newValues);

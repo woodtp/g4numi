@@ -40,6 +40,8 @@ private:
   G4UIcmdWithADoubleAndUnit* setOuterR;
   G4UIcmdWithADoubleAndUnit* setBeamSigmaX;
   G4UIcmdWithADoubleAndUnit* setBeamSigmaY;
+  G4UIcmdWithADoubleAndUnit* setBeamShiftX;
+  G4UIcmdWithADoubleAndUnit* setBeamShiftY;
   G4UIcmdWithAString*        setParticle;  
  //
  // Geantino control for checking the geometry. P.L. July 2014. 

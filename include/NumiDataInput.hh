@@ -1,6 +1,6 @@
  //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.16 2017/02/15 20:02:35 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.17 2017/03/03 07:12:56 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -56,6 +56,10 @@ public:
 
    G4bool SetPlaylist(G4String pl);
    
+   void SetBeamX0(G4double val) { beamPosition[0] = val;}
+  
+   void SetBeamY0(G4double val) { beamPosition[1] = val;}
+
    void SetDetailedProtonBeam(G4bool val);
 
    void SetLengthOfWaterInTgt(G4double val);
@@ -307,7 +311,7 @@ public:
    G4int hallmat;
    //===================================
 
-   G4double protonMomentum, beamSigmaX, beamSigmaY, protonKineticEnergy, materialSigma;
+   G4double protonMomentum, beamSigmaX, beamSigmaY, beamShiftX, beamShiftY, protonKineticEnergy, materialSigma;
    G4double KillTrackingThreshold;
    G4ThreeVector beamPosition, beamDirection;
    
