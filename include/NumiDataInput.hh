@@ -1,6 +1,6 @@
  //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.17 2017/03/03 07:12:56 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.18 2017/03/18 19:15:00 laliaga Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -443,6 +443,8 @@ public:
    //
    G4double Horn1X0, Horn1Y0, Horn1Z0;
    //----------------
+  //Horn1 rotation:
+  G4double Horn1Phi, Horn1Theta, Horn1Psi;
    
    G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
   
@@ -465,7 +467,8 @@ public:
    //
    G4double Horn2X0, Horn2Y0, Horn2Z0;
    //----------------
-   
+  //Horn2 rotation
+  G4double Horn2Phi, Horn2Theta, Horn2Psi;
   G4int NPHorn2OCN,NPHorn2ICN,NPHorn2EndN;
   
   vdouble_t PHorn2OCRout,PHorn2OCRin,PHorn2OCZ0;

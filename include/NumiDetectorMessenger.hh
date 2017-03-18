@@ -64,6 +64,11 @@ private:
     G4UIcmdWith3VectorAndUnit* fHorn1PositionCmd;
     G4UIcmdWith3VectorAndUnit* fHorn2PositionCmd;
 
+    //Adding horn rotation feature
+    G4UIcmdWith3VectorAndUnit* fHorn1RotationCmd;
+    G4UIcmdWith3VectorAndUnit* fHorn2RotationCmd;
+    //
+
     G4UIcmdWithADoubleAndUnit* fBaffleOuterRadiusCmd;
     G4UIcmdWithADoubleAndUnit* fBaffleInnerRadiusCmd;
     G4UIcmdWithADoubleAndUnit* fBaffleLengthCmd;

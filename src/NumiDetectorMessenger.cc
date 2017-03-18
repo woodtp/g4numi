@@ -225,6 +225,15 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fHorn2PositionCmd->SetParameterName("Horn2PositionX", "Horn2PositionY", "Horn2PositionZ", false);
         fHorn2PositionCmd->SetGuidance("Set the horn2 position");
         
+	fHorn1RotationCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn1Rotation", this);
+        fHorn1RotationCmd->SetParameterName("Horn1RotationPhi", "Horn1RotationTheta", "Horn1RotationPsi", false);
+        fHorn1RotationCmd->SetGuidance("Set the horn1 rotation");
+	fHorn1RotationCmd->SetDefaultValue(0.0*rad);
+
+	fHorn2RotationCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn2Rotation", this);
+        fHorn2RotationCmd->SetParameterName("Horn2RotationPhi", "Horn2RotationTheta", "Horn2RotationPsi", false);
+        fHorn2RotationCmd->SetGuidance("Set the horn2 rotation");
+	fHorn2RotationCmd->SetDefaultValue(0.0*rad);
 
         fBaffleOuterRadiusCmd
             = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleOuterRadius",this);
@@ -342,6 +351,8 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
         delete fTargetPositionCmd;
         delete fHorn1PositionCmd;
         delete fHorn2PositionCmd;
+	delete fHorn1RotationCmd;
+        delete fHorn2RotationCmd;
         delete fBaffleOuterRadiusCmd;
         delete fBaffleInnerRadiusCmd;
         delete fBaffleLengthCmd;
@@ -482,6 +493,14 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    } else if (command == fHorn2PositionCmd) {
        G4ThreeVector horn2Pos = fHorn2PositionCmd->GetNew3VectorValue(newValue);
        NumiDetector->SetHorn2Position(horn2Pos);
+
+   } else if (command == fHorn1RotationCmd) {
+       G4ThreeVector horn1Rot = fHorn1RotationCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetHorn1Rotation(horn1Rot);
+
+   } else if (command == fHorn2RotationCmd) {
+       G4ThreeVector horn2Rot = fHorn2RotationCmd->GetNew3VectorValue(newValue);
+       NumiDetector->SetHorn2Rotation(horn2Rot);
 
    } else if (command == fBaffleOuterRadiusCmd) {
        double Rout = fBaffleOuterRadiusCmd->GetNewDoubleValue(newValue);

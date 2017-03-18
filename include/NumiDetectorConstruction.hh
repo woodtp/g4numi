@@ -61,6 +61,8 @@ public:
     void SetTargetPosition(const G4ThreeVector& pos);
     void SetHorn1Position(const G4ThreeVector& pos);
     void SetHorn2Position(const G4ThreeVector& pos);
+    void SetHorn1Rotation(const G4ThreeVector& rot);
+    void SetHorn2Rotation(const G4ThreeVector& rot);
 
     void SetBaffleOuterRadius(G4double Rout);
     void SetBaffleInnerRadius(G4double Rin);

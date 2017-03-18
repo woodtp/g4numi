@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.21 2017/02/15 20:02:35 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.22 2017/03/18 19:15:00 laliaga Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -847,6 +847,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   Horn2Y0 = 0.0*cm;
   Horn2Z0 = 10.0*m;
   
+  Horn1Phi   = 0.0*rad;
+  Horn1Theta = 0.0*rad;
+  Horn1Psi   = 0.0*rad;
+
+  Horn2Phi   = 0.0*rad;
+  Horn2Theta = 0.0*rad;
+  Horn2Psi   = 0.0*rad;
+
 //  fHornWaterLayerThick = 0.0*mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
   fHornWaterLayerThick = 1.0*mm; // Oct 18 2014, Based on studies done
 //  mid-October, after fixing bug in the Magnetic field pointer assignments,
@@ -1254,7 +1262,9 @@ void NumiDataInput::Print()
              << " Horizontal Fin w.r.t. Target (X0, Y0, Z0) m = (" << BudalX0/m << ", " << BudalY0/m << ", " << BudalZ0/m << ") m" << G4endl
              << " Horn Current                                = " << HornCurrent/ampere << " A" << G4endl
              << " Horn 1               (X0, Y0, Z0) m         = (" << Horn1X0/m << ", " << Horn1Y0/m << ", " << Horn1Z0/m << ") m" << G4endl
+	     << " Horn 1               (Phi, Theta, Psi) rad  = (" << Horn1Phi/rad << ", " << Horn1Theta/rad << ", " << Horn1Psi/rad << ") rad" << G4endl
              << " Horn 2               (X0, Y0, Z0) m         = (" << Horn2X0/m << ", " << Horn2Y0/m << ", " << Horn2Z0/m << ") m" << G4endl
+	     << " Horn 2               (Phi, Theta, Psi) rad  = (" << Horn2Phi/rad << ", " << Horn2Theta/rad << ", " << Horn2Psi/rad << ") rad" << G4endl
              << " Target Density                              = " << TargetDensity/g*cm3 << " g/cm^3" << G4endl
              << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/m << ", " << beamPosition[1]/m << ", " << beamPosition[2]/m << ") m" << G4endl
              << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
