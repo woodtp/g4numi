@@ -1,6 +1,6 @@
  //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.18 2017/03/18 19:15:00 laliaga Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.19 2017/05/11 10:53:27 lcremone Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -387,7 +387,10 @@ public:
   // Decay Pipe Shield
   G4double ShieldX0,ShieldY0,ShieldZ0,ShieldDxdz, ShieldDydz,ShieldLength,ShieldRout,ShieldRin;
   G4int ShieldGEANTmat;
-  
+  // Magnetic Field in decay pipe
+  G4bool applyDecayPipeMagneticField;
+
+
   //Target Hall Blocks
   G4double THBlockNblock;
   vdouble_t THBlockX0,THBlockY0,THBlockZ0, THBlockDxdz,THBlockDydz;

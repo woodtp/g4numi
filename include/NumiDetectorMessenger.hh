@@ -49,7 +49,7 @@ private:
    G4UIcmdWithADoubleAndUnit*  Mon2AbsDistCmd;
    G4UIcmdWithADoubleAndUnit*  LengthOfWaterInTgt;
    G4UIcmdWithABool*           HeInDecayPipe;
-
+   G4UIcmdWithABool*           applyDecayPipeMagneticField;
    //G4UIcmdWithAnInteger*     NbLayersCmd;    
    G4UIcmdWithoutParameter*    UpdateCmd;
 

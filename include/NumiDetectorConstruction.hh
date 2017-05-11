@@ -22,6 +22,7 @@ class NumiDataInput;
 class NumiMagneticField;
 class NumiMagneticFieldIC;
 class NumiMagneticFieldOC;
+class NumiDecayPipeMagneticField;
 class NumiHornSpiderSupport;
 class G4VisAttributes;
 class G4VisAttributes;
@@ -79,12 +80,13 @@ private:
    NumiMagneticField* numiMagField;
    NumiMagneticFieldIC* numiMagFieldIC;
    NumiMagneticFieldOC* numiMagFieldOC;
+   NumiDecayPipeMagneticField* numiDecayMagField;
    
    void ConstructTargetHall();
    void ConstructTarget();
    void ConstructNOvATarget();
    void ConstructBaffle();
-   void ConstructDecayPipe(G4bool=true);
+   void ConstructDecayPipe(G4bool=true, G4bool=false);
    void ConstructHadronAbsorber();  
    void ConstructHorns();  
    void ConstructHorn1(G4ThreeVector pos, G4RotationMatrix rot);
