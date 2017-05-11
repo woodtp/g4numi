@@ -57,6 +57,12 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	HeInDecayPipe->SetDefaultValue (ND->HeInDecayPipe); 
 	HeInDecayPipe->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+	applyDecayPipeMagneticField = new G4UIcmdWithABool("/NuMI/det/applyDecayPipeMagneticField",this); 
+	applyDecayPipeMagneticField->SetGuidance("Apply magnetic field  Bx=0.1, By=-0.3, Bz=-0.07 gauss - on/off"); 
+	applyDecayPipeMagneticField->SetParameterName("applyDecayPipeMagneticField",true); 
+	applyDecayPipeMagneticField->SetDefaultValue (ND->applyDecayPipeMagneticField); 
+	applyDecayPipeMagneticField->AvailableForStates(G4State_PreInit,G4State_Idle);
+
         
         LengthOfWaterInTgt = new G4UIcmdWithADoubleAndUnit("/NuMI/det/LengthOfWaterInTgt",this);
         LengthOfWaterInTgt->SetGuidance("Set length of water in target for Water In the Target simulation.");
@@ -414,6 +420,13 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->HeInDecayPipe=HeInDecayPipe->GetNewBoolValue(newValue);
    }
+
+   if ( command == applyDecayPipeMagneticField ) {
+      NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
+      NumiData->applyDecayPipeMagneticField=applyDecayPipeMagneticField->GetNewBoolValue(newValue);
+   }
+
+
    if ( command == ConstructSolidMuMons ) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetSolidMuMons(ConstructSolidMuMons->GetNewBoolValue(newValue));
