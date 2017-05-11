@@ -12,10 +12,20 @@
 /NuMI/Beam/SigmaX 1.3 mm
 /NuMI/Beam/SigmaY 1.3 mm
 
+#Beam position shift
+/NuMI/Beam/ShiftX 0.0 mm
+/NuMI/Beam/ShiftY 0.0 mm
+
+#Magnetic field in decay pipe
+/NuMI/det/applyDecayPipeMagneticField false
+
 /NuMI/run/useWaterInTgt ${dowater}
 
 #Switch to the alternate horn1
 /NuMI/det/Horn1IsAlternate ${donewhorn1}
+
+#Use refined definition of horn1
+/NuMI/det/Horn1IsRefined true
 
 /NuMI/det/LengthOfWaterInTgt ${watercm} cm
 
@@ -36,7 +46,8 @@
 # See also Minverva Docdb 10512 
 /NuMI/det/set/horn2Position 0 0 1918.0 cm
 /NuMI/det/set/bafflePosition 0 0 -380 cm
-/NuMI/det/set/targetPosition 0 0 -143.3 cm
+/NuMI/det/set/targetPosition 0 0 -143.3 cm  
+# nominal z is -143.3 cm
 
 /NuMI/det/set/deltaOuterThickness 0.9525 cm
 /NuMI/det/set/duratekShift 4.5 m
