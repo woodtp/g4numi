@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.9 2017/03/18 19:15:01 laliaga Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.10 2017/05/11 10:52:32 lcremone Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -22,6 +22,7 @@
 #include "G4PVReplica.hh"
 #include "G4AssemblyVolume.hh"
 #include "NumiMagneticField.hh"
+#include "NumiDecayPipeMagneticField.hh"
 #include "G4Transform3D.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -58,7 +59,8 @@ NumiDetectorConstruction::NumiDetectorConstruction()
   numiMagField = new NumiMagneticField(); 
   numiMagFieldIC = new NumiMagneticFieldIC();
   numiMagFieldOC = new NumiMagneticFieldOC();
-  
+  numiDecayMagField = new NumiDecayPipeMagneticField();
+
 #ifndef FLUGG
   // create commands for interactive definition of the geometry
   detectorMessenger = new NumiDetectorMessenger(this);
@@ -77,6 +79,7 @@ NumiDetectorConstruction::~NumiDetectorConstruction()
    delete numiMagField; 
    delete numiMagFieldIC;
    delete numiMagFieldOC; 
+   delete numiDecayMagField;
    delete NumiData;
    DestroyMaterials();
 #ifndef FLUGG
@@ -116,7 +119,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
       numiMagField = new NumiMagneticField(); 
       numiMagFieldIC = new NumiMagneticFieldIC();
       numiMagFieldOC = new NumiMagneticFieldOC();
-
+      numiDecayMagField = new NumiDecayPipeMagneticField();
       DefineMaterials();
   }
 
@@ -132,7 +135,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ROCK = new G4PVPlacement(0,G4ThreeVector(),ROCK_log,"ROCK",0,false,0);
   
   ConstructTargetHall();
-  ConstructDecayPipe(NumiData->HeInDecayPipe);
+  ConstructDecayPipe(NumiData->HeInDecayPipe, NumiData->applyDecayPipeMagneticField);
   ConstructBaffle();
   // insertion point for horn 1 is @3cm
   // drawings have z=0 at insertion point

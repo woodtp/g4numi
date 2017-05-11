@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.22 2017/03/18 19:15:00 laliaga Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.23 2017/05/11 10:52:32 lcremone Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -563,7 +563,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   DecayPipeGEANTmat  = 10;
   DecayPipeFWinmat   = 9;
   DecayPipeEWinmat   = 10;
-  HeInDecayPipe = true;
+  HeInDecayPipe      = true;
+  applyDecayPipeMagneticField = false;
   // New Target Hall by Zach Barnett 
   
   //==========================================================================
@@ -1270,7 +1271,8 @@ void NumiDataInput::Print()
              << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
              << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
              << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl
-	     << " Decay Pipe Helium                           = " << std::boolalpha << HeInDecayPipe<<G4endl;
+	     << " Decay Pipe Helium                           = " << std::boolalpha << HeInDecayPipe<<G4endl
+	     << " Decay Pipe Magnetic Field                   = " << std::boolalpha << applyDecayPipeMagneticField << G4endl;
       
       if(fUseDetailedProtonBeam)
       {
@@ -1596,7 +1598,6 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
    std::istringstream ihornstrm(ihornstr);
    ihornstrm >> ihorn;
 
-   
    //
    //note the horn current must be stored in amps
    //
@@ -1966,3 +1967,5 @@ void NumiDataInput::SetBeamSigmaY(G4double val)
 {
   beamSigmaY = val;
 }
+
+

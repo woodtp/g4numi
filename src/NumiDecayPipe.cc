@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDecayPipe.cc,v 1.8.4.4 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiDecayPipe.cc,v 1.8.4.5 2017/05/11 10:52:32 lcremone Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -22,10 +22,12 @@
 #include "G4RotationMatrix.hh"
 #include "G4AssemblyVolume.hh"
 #include "NumiDataInput.hh"
+#include "NumiDecayPipeMagneticField.hh"
+#include "G4FieldManager.hh"
 
 static G4double in=2.54*cm;
 
-void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe)
+void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool applyDecayPipeMagneticField)
 {
   G4ThreeVector translation=G4ThreeVector(0.,0.,0.);
   G4RotationMatrix rotation=G4RotationMatrix(0.,0.,0.);
@@ -82,6 +84,18 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe)
   G4Material* decayVolMaterial=DecayPipeVacuum;
   if(heInDecayPipe) decayVolMaterial=DecayPipeHelium;
   G4LogicalVolume* lvDVOL = new G4LogicalVolume(sDVOL,decayVolMaterial,"DVOL_log",0,0,0); 
+
+
+  G4cout << "Just to be sure the value is " << applyDecayPipeMagneticField  << G4endl;
+  // Decay pipe magnetic field
+  if (applyDecayPipeMagneticField) {
+    G4cout << "And Im in here "<< G4endl;
+    G4FieldManager* FieldMngr = new G4FieldManager(numiDecayMagField); //create a local field 
+    FieldMngr->SetDetectorField(numiDecayMagField); //set the field 
+    FieldMngr->CreateChordFinder(numiDecayMagField); //create the objects which calculate the trajectory
+    lvDVOL->SetFieldManager(FieldMngr,true); //attach the local field to logical volume
+  }
+  
   G4VPhysicalVolume* pvDVOL=new G4PVPlacement(0,decayVolumePosition,"DVOL",lvDVOL,pvDPIP,false,0);
 
   //****************************************************
