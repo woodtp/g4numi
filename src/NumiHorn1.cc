@@ -33,7 +33,10 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   }
   const bool isAlternate = ND->GetHorn1IsAlternate();
   const bool isRefined = ND->GetHorn1IsRefined();
+  G4cout << "NumiDetectorConstruction::ConstructHorn1 horn 1 is alternate: " << isAlternate << G4endl;
+  G4cout << "NumiDetectorConstruction::ConstructHorn1 horn 1 is refined: " << isRefined << G4endl;
   if (isAlternate) {
+    G4cout << "Entering ConstructHorn1Alternate" << G4endl;
     this->ConstructHorn1Alternate(hornpos, hornrot); 
     return;
   }
@@ -1006,7 +1009,8 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
    // Temporary change to study the effect of the segmentation., parabolic vs polygonal approx 
    // November 30 2014. 
    const bool crudeSegmentation = false;
-   const bool refinedSegmentation = false;
+   const bool refinedSegmentation = ND->GetHorn1IsRefined();
+   G4cout << "NumiDetectorConstruction::ConstructHorn1Alternate: refined segmentation is " << refinedSegmentation << G4endl;
    
    const double z21p088 = 21.088*in; //Equation change.  
    const double zOffsetDrawingUpstrEdge = 5.752*in; // On the inner conductor, excluding I/O trans. Drawing 363097 
