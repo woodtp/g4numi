@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.8 2017/07/05 17:13:33 bmesserl Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.9 2017/07/05 17:19:29 bmesserl Exp $
 
 export GRID="--environment=LD_LIBRARY_PATH --OS=SL6 -g --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC --role=Analysis -G minerva "
-export MEMORY="--memory 500MB "
+#export MEMORY="--memory 500MB "
 
 ########################### g4numi configuration ###########################
 export DO_HORN1_OLD_GEOMETRY="false"       #"false" the new horn is considered default (01/2016)
