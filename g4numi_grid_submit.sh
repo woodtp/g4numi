@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.7 2017/07/05 16:13:21 bmesserl Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.8 2017/07/05 17:13:33 bmesserl Exp $
 
 export GRID="--environment=LD_LIBRARY_PATH --OS=SL6 -g --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC --role=Analysis -G minerva "
 export MEMORY="--memory 500MB "
@@ -11,8 +11,8 @@ export DO_HORN1_FINE_SEGMENTATION="false"  #"false" works for both old and new h
 export DO_TARGET_WATER_LAYER="false"       #"false" TARGET water layer
 export IMPORTANCE_WEIGHTING="true"         #"true"
 export TARGET_WATER_CM="3"                 #"3" TARGET water layer
-export HORN1_POSITION_X="2"                #"0.0" #cm
-export HORN1_POSITION_Y="-2"                #"0.0" #cm
+export HORN1_POSITION_X="0"                #"0.0" #cm
+export HORN1_POSITION_Y="0"                #"0.0" #cm
 export HORN2_POSITION_X="0"                #"0.0" #cm
 export HORN_WATER_MM="1.0"                 #"1.0" #mm
 export TARGET_POSITION_X="0.0"             #"0.0" #cm
@@ -22,8 +22,8 @@ export BEAM_POSITION_X="0.0"               #"0" #m
 export BEAM_POSITION_Y="0.0"               #"0" #m
 export BEAM_SPOTSIZE_X="1.4"               #"1.4" #mm. obtained from typical ME-era ACNET values (~1.3),
 export BEAM_SPOTSIZE_Y="1.4"               #"1.4" #mm. properly scaled by 1.08 (see Hylen numi ops 02/16/16)
-export POT="4000"                        #"400000"
-export NJOBS="1"                        #"1020"
+export POT="400000"                        #"400000"
+export NJOBS="1020"                        #"1020"
 export RUN="1"
 export BEAMCONFIG="me000z200i"             #the whole beamconfig thing is not used for ME. Should still work for LE.
 export PLAYLIST="minervame"
