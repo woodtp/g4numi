@@ -1,160 +1,202 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.13 2015/11/28 04:47:23 laliaga Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.14 2017/07/05 16:13:21 bmesserl Exp $
 
-import os, re, sys, getopt,string
+import os, re, sys, getopt,string,optparse
 from string import Template
 
-def usage():
-    
-    print """
-NAME
-    makemacro.py - makes g4numi.mac control files from a template
-SYNOPSIS
-    makemacro.py [OPTIONS]
-DESCRIPTION
-    Reads 
-    %s
-    [by default, see option -t below]
-    and writes a new .mac file to standard output, 
-    substituting some ${flags} according to defaults or the command line.
-    -h, --help
-          this message 
-    -b, --beamconfig [default=LE010z185i]
-          Configure the neutrino beam.   
-          This sets the TargetZ0 and Baffle Z0 and HornCurrent.
-          Must be in the form 'LE#z#i' or 'le#z#i', where # is any number. 
-          Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.
-    -o, --outfile [default=g4numi$G4NUMIVER_<beamconfig>]
-          Directory and filename (without the .root) to write output ntuple
-          the run number will be appended to the filename 
-    -r, --run [default=1]
-          The run number
-    -p, --pot [default=500000]
-          The number of protons on target to simulate
-    -s, --seed [default=run]
-          The random seed used in the g4numi run. By default this will
-          be set equal to the run number
-    -t, --template
-          The template file to use. Default listed above.
-    -n, --nametag [default='']
-          If not '', '_<nametag>' will be appended to the filename
-          g4numi$G4NUMIVER_<beamconfig>_<nametag>
-          useful for recording a sort of 'subrun'
-    -w, --dowater [default=false]
-          simulate water in the target  
-    -m, --donewhorn1 [default=false]
-          use the alternate horn1 model
-    -L, --watercm [default=3]
-          cm of water in the target 
-    -i, --noimpwt
-          Disable importance weighting.
-    -z, --playlist [default='']
-          correct the Z target posision per playlist
-    
-"""%(os.environ['BEAMSIM']+"/macros/template.mac")
+#beamconfig/playlist/targetZpos lookup
+beamconfig_dict = { "le010z185i"  : {"minerva1"   : "-44.50",    #tgt2H1 = 9.50
+                                     "minerva7"   : "-44.18",    #tgt2H1 = 9.18
+                                     "minerva9"   : "-45.40",    #tgt2H1 = 10.40 
+                                     "minerva13"  : "-44.17"},   #tgt2H1 = 9.17
+                    "le010z-185i" : {"downstream" : "-44.50",    #tgt2H1 = 9.5
+                                     "minerva5"   : "-43.85",    #tgt2H1 = 8.85
+                                     "minerva10"  : "-44.18"},   #tgt2H1 = 9.18
+                    "le010z000i"  : {"minerva6"   : "-44.18"},   #tgt2H1 = 9.18
+                    "le100z200i"  : {"minerva2"   : "-134.57",   #tgt2H1 = 99.57
+                                     "minerva11"  : "-134.17"},  #tgt2H1 = 99.17
+                    "le100z-200i" : {"minerva3"   : "-134.57",   #tgt2H1 = 99.57
+                                     "minerva12"  : "-134.17"},  #tgt2H1 = 99.17
+                    "le250z200i"  : {"minerva4"   : "-284.57",   #tgt2H1 = 249.57
+                                     "minerva8"   : "-285.09"}   #tgt2H1 = 250.09
+                  }
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-        
-    dowater='false'    
-    donewhorn1='false'    
-    watercm='3'
-    beamconfig='le010z185i'
-    outfile=''
-    seed=''
-    nametag=''
-    run='1'
-    pot='500000'    
-    templatefile=os.environ['BEAMSIM']+"/macros/template.mac"
-    doimpwt='true'
-    playlist='0'
+#Defaults
+HORN1_POSITION_X  = 0      #cm
+HORN1_POSITION_Y  = 0      #cm
+
+HORN2_POSITION_X  = 0      #cm
+
+BEAM_POSITION_X   = 0      #m
+BEAM_POSITION_Y   = 0      #m
+
+BEAM_SPOTSIZE_X   = 1.4    #mm (ME!)
+BEAM_SPOTSIZE_Y   = 1.4    #mm (ME!)
+
+TARGET_POSITION_X = 0.0    #cm
+TARGET_POSITION_Y = 0.0    #cm
+TARGET_POSITION_Z = -143.3 #cm (ME!)
+
+HORN_WATER_MM    = 1       #mm 
+POT              = 400000
+RUN              = 1
+TEMPLATE         = "{0}/macros/template_ME.mac".format(os.getenv("BEAMSIM"))
+
+TARGET_WATER_CM = 3      #cm
+BEAMCONFIG        = "me000z200i"
+PLAYLIST          = "minervame"
+
+def get_options():
+  parser        = optparse.OptionParser(usage="usage: %prog [options]")
+  horn_group    = optparse.OptionGroup(parser, "Horn Options")
+  target_group  = optparse.OptionGroup(parser, "Target Options")
+  beam_group    = optparse.OptionGroup(parser, "Beam Options")
+  job_group     = optparse.OptionGroup(parser, "Job Options")
+  old_group     = optparse.OptionGroup(parser, "Old Options")
+
+  horn_group.add_option('--do_horn1_old_geometry',   action="store_true", 
+        help="The 'old' horn1 geom (formerly known as 'alternate') is now default. " 
+             "Use this option to use the old geometry.")
+  horn_group.add_option('--do_horn1_fine_segmentation', action="store_true", 
+        help="Works for old and new horn1.")
+
+  horn_group.add_option('--horn1_position_X', 
+        help="horn 1 transverse offset (_X0 position). In cm.")
+  horn_group.add_option('--horn1_position_Y', 
+        help="horn 1 vertical offset (_Y0 position). In cm.")
+  horn_group.add_option('--horn2_position_X', 
+        help="horn 2 transverse offset (_X0 position). In cm.")
+
+  horn_group.add_option('--horn_water_mm', 
+        help="mm water layer on horn. ")
+
+  target_group.add_option('--target_position_X', 
+          help="target horizontal position.")
+  target_group.add_option('--target_position_Y', 
+          help="target vertical position.")
+  target_group.add_option('--target_position_Z', 
+          help="target longitudinal position."
+               "NOTE: this will overwrite target Z set by beamconfig.")
+
+  beam_group.add_option('--beam_position_X', 
+        help="beam horizontal position.")
+  beam_group.add_option('--beam_position_Y', 
+        help="beam vertical position.")
+  beam_group.add_option('--beam_spotsize_X', 
+        help="beam horizontal spot size.")
+  beam_group.add_option('--beam_spotsize_Y', 
+        help="beam vertical spot size.")
+
+  job_group.add_option('--pot',
+        help="default number of protons on target to simulate")
+  job_group.add_option('--run',
+        help="Run number.")
+  job_group.add_option('--template',
+        help='specify template macro')
+  job_group.add_option('--filetag',
+        help="doesn't come with the underscore")
+
+  old_group.add_option('--no_importance_weighting', action="store_true", 
+        help="No importance weighting." )
+  old_group.add_option('--seed',
+        help="Random seed used by g4numi.")
+  old_group.add_option('--target_water_cm',
+        help="simulate water in the target(cm)." )
+  old_group.add_option('--playlist',
+        help='correct the Z target posision per playlist (LE)')
+  old_group.add_option('--beamconfig', 
+        help="Configure the neutrino beam. "
+              "This sets the TargetZ0 and Baffle Z0 and HornCurrent. "
+              "Must be in the form 'LE#z#i' or 'le#z#i', where # is any number. "
+              "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc.")
+
+  parser.add_option_group(horn_group)
+  parser.add_option_group(beam_group)
+  parser.add_option_group(target_group)
+  parser.add_option_group(job_group)
+  parser.add_option_group(old_group)
+
+  options, remainder = parser.parse_args()
+  return options
+
+def main():
+  options = get_options()
+
+  #set defaults
+
+  #use beamconfig and playlist to make a first determination of target position and horn current
+  #at the moment, this is the only way to change horn current
+  #but the dedicated target z position option will overwrite this beamconfig option
+  beamconfig                 = BEAMCONFIG        if not options.beamconfig                 else options.beamconfig
+  playlist                   = PLAYLIST.lower()  if not options.playlist                   else options.playlist.lower()
+
+  # different beamconfig has been specified
+  if beamconfig != BEAMCONFIG:
     try:
-        opts, args = getopt.getopt(argv[1:], "hwmL:b:o:s:r:p:t:n:z:i", 
-                                   ["help","dowater","donewhorn1","watercm",
-                                    "beamconfig","outfile","seed","run","pot","template","nametag","playlist","noimpwt"])
-    except getopt.error, msg:
-        raise Usage(msg)
-    # more code, unchanged
-    for o,a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        if o in ("-w", "--dowater"):
-            dowater='true'
-        if o in ("-m", "--donewhorn1"):
-            donewhorn1='true'
-        if o in ("-L","--watercm"):
-            watercm=a
-        if o in ("-b", "--beamconfig"):
-            beamconfig=a
-        if o in ("-o", "--output"):
-            outfile = a
-            outfile.replace('.root','')
-        if o in ("-s","--seed"):
-            seed=a
-        if o in ("-r","--run"):
-            run=a
-        if o in ("-p","--pot"):
-            pot=a
-        if o in ("-t","--template"):
-            templatefile=a
-        if o in ("-n","--nametag"):
-            nametag=a
-        if o in ("-i","--noimpwt"):
-            doimpwt='false'
-        if o in ("-z","--playlist"):
-            playlist=a
+      target_position_Z  = beamconfig_dict[beamconfig][playlist] if not options.target_position_Z else options.target_position_Z
+    except:
+      print sys.exit("Error! beamconfig-playlist pair not found!")
+  else:
+    target_position_Z        = TARGET_POSITION_Z if not options.target_position_Z          else options.target_position_Z #cm
 
-# set seed to run if still null
-    if len(seed)==0: 
-        seed=run    
-    if len(outfile)==0:
-        outfile='g4numi%s_%s_%s'%(os.environ['G4NUMIVER'],playlist,beamconfig)
-        if len(nametag)>0:
-            outfile=outfile+'_'+nametag
-        tgtzpos=''
+  #horn
+  do_horn1_fine_segmentation = False             if not options.do_horn1_fine_segmentation else True
+  do_horn1_new_geometry      = True              if not options.do_horn1_old_geometry      else False
+  horn_water_mm              = HORN_WATER_MM     if not options.horn_water_mm              else options.horn_water_mm #mm
+  horn1_position_X           = HORN1_POSITION_X  if not options.horn1_position_X           else options.horn1_position_X #cm
+  horn1_position_Y           = HORN1_POSITION_Y  if not options.horn1_position_Y           else options.horn1_position_Y #cm
+  horn2_position_X           = HORN2_POSITION_X  if not options.horn2_position_X           else options.horn2_position_X #cm
 
-    if beamconfig == 'le010z185i' or beamconfig == 'LE010z185i':
-        if playlist=='minerva1':
-            tgtzpos="-44.50"   #tgt2H1 =  9.50
-        if playlist=='minerva7':
-	    tgtzpos="-44.18"   #tgt2H1 =  9.18
-        if playlist=='minerva9':
-	    tgtzpos="-45.4"    #tgt2H1 = 10.40
-        if playlist=='minerva13':
-            tgtzpos="-44.17"   #tgt2H1 =  9.17
-    if beamconfig == 'le010z-185i' or beamconfig == 'LE010z-185i':
-        if playlist=='downstream':
-            tgtzpos="-44.50"   #tgt2H1 = 9.50
-        if playlist=='minerva5':
-	    tgtzpos="-43.85"   #tgt2H1 = 8.85
-        if playlist=='minerva10':
-	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
-    if beamconfig == 'le010z000i' or beamconfig == 'LE010z000i':
-        if playlist=='minerva6':
-	    tgtzpos="-44.18"   #tgt2H1 = "9.18"
-    if beamconfig == 'le100z200i' or beamconfig == 'LE100z200i':
-        if playlist=='minerva2':
-            tgtzpos="-134.57"  #tgt2H1 = 99.57
-        if playlist=='minerva11':
-	    tgtzpos="-134.17"  #tgt2H1 = 99.17
-    if beamconfig == 'le100z-200i' or beamconfig == 'LE100z-200i':
-        if playlist=='minerva3':
-            tgtzpos="-134.57"  #tgt2H1 = 99.57
-        if playlist=='minerva12':
-	    tgtzpos="-134.17"  #tgt2H1 = 99.17
-    if beamconfig == 'le250z200i' or beamconfig == 'LE250z200i':
-        if playlist=='minerva4':
-            tgtzpos="-284.57"  #tgt2H1 =249.57
-        if playlist=='minerva8':
-            tgtzpos="-285.09"  #tgt2H1 =250.09
+  #beam size/position
+  beam_position_X            = BEAM_POSITION_X   if not options.beam_position_X            else options.beam_position_X #m
+  beam_position_Y            = BEAM_POSITION_Y   if not options.beam_position_Y            else options.beam_position_Y #m
+  beam_spotsize_X            = BEAM_SPOTSIZE_X   if not options.beam_spotsize_X            else options.beam_spotsize_X #mm
+  beam_spotsize_Y            = BEAM_SPOTSIZE_Y   if not options.beam_spotsize_Y            else options.beam_spotsize_Y #mm
 
-    filestring=open(templatefile,'r').read()
-    t=string.Template(filestring)
-    print t.substitute({'dowater':dowater,'donewhorn1':donewhorn1,'watercm':watercm,'beamconfig':beamconfig,'outfile':outfile,'seed':seed,'run':run,'pot':pot,'doimpwt':doimpwt,'tgtzpos':tgtzpos,'playlist':playlist})
-    
-    
+  #target
+  target_position_X          = TARGET_POSITION_X if not options.target_position_X          else options.target_position_X #cm
+  target_position_Y          = TARGET_POSITION_Y if not options.target_position_Y          else options.target_position_Y #cm
+  do_target_water            = False             if not options.target_water_cm            else True
+  target_water_cm            = TARGET_WATER_CM   if not options.target_water_cm            else options.target_water_cm 
+
+  #job
+  filetag                    = ""                if not options.filetag                    else '_'+options.filetag
+  pot                        = POT               if not options.pot                        else options.pot
+  run                        = RUN               if not options.run                        else options.run
+  template                   = TEMPLATE          if not options.template                   else options.template
+
+  #misc
+  do_importance_weighting    = True              if not options.no_importance_weighting    else False
+  seed                       = run               if not options.seed                       else options.seed 
+
+  outfile = "g4numi{0}_{1}_{2}".format(os.getenv("G4NUMIVER"), playlist, beamconfig)
+  outfile = outfile + filetag
+
+  filestring=open(template,'r').read()
+  t=string.Template(filestring)
+  print t.substitute({'do_horn1_new_geometry': do_horn1_new_geometry,
+                      'do_horn1_fine_segmentation': do_horn1_fine_segmentation,
+                      'horn1_position_X': horn1_position_X,
+                      'horn1_position_Y': horn1_position_Y,
+                      'horn2_position_X': horn2_position_X,
+                      'horn_water_mm': horn_water_mm,
+                      'beam_position_X': beam_position_X,
+                      'beam_position_Y': beam_position_Y,
+                      'beam_spotsize_X': beam_spotsize_X,
+                      'beam_spotsize_Y': beam_spotsize_Y,
+                      'target_position_X': target_position_X,
+                      'target_position_Y': target_position_Y,
+                      'target_position_Z': target_position_Z,
+                      'target_water_cm': target_water_cm,
+                      'do_target_water' : do_target_water,
+                      'pot':pot,
+                      'run':run,
+                      'beamconfig':beamconfig,
+                      'playlist': playlist,
+                      'do_importance_weighting': do_importance_weighting,
+                      'outfile':outfile,
+                      'seed':seed})
+
 if __name__ == "__main__":
-    sys.exit(main())
+  sys.exit(main())

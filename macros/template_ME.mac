@@ -1,70 +1,67 @@
 #This is an template macro to create ME G4numi files. 
-#The user needs to manually move the targets and horns. 
-#The program doesn't yet recognize the "ME" portion of the beam configuration. 
+#It contains all of the ME nominal params (B. Messerly 2017.06)
+#The "BeamConfig" option has been depreciated in the ME.
+#It can currently be used to change horn current 
+# (not target Z position. Use targetPosition for that).
+#See makemacro.py for full list of configurable parameters.
 
 /control/suppressAbortion 2
-
 /NuMI/run/DebugLevel 0 
-
 /NuMI/run/useNuBeam true
+/NuMI/run/useNImpWeight true
+/NuMI/det/RunPeriod 0
 
-#Beam spot size:
-/NuMI/Beam/SigmaX 1.3 mm
-/NuMI/Beam/SigmaY 1.3 mm
+# see comment above
+/NuMI/det/BeamConfig me000z200i
+
+#Beam spot size
+#ME nominal is 1.4 (B. Messerly 2017.06)
+/NuMI/Beam/SigmaX 1.4 mm
+/NuMI/Beam/SigmaY 1.4 mm
 
 #Beam position shift
 /NuMI/Beam/ShiftX 0.0 mm
 /NuMI/Beam/ShiftY 0.0 mm
 
 #Magnetic field in decay pipe
-/NuMI/det/applyDecayPipeMagneticField false
+#/NuMI/det/applyDecayPipeMagneticField false
 
-/NuMI/run/useWaterInTgt ${dowater}
+
+/NuMI/run/useWaterInTgt false
+/NuMI/det/LengthOfWaterInTgt ${target_water_cm} cm
+
+# 10/2016 default 0 0 -143.3 cm
+/NuMI/det/set/targetPosition 0 0 -143.3 cm
+
 
 #Switch to the alternate horn1
-/NuMI/det/Horn1IsAlternate ${donewhorn1}
+/NuMI/det/Horn1IsAlternate true
 
 #Use refined definition of horn1
-/NuMI/det/Horn1IsRefined true
-
-/NuMI/det/LengthOfWaterInTgt ${watercm} cm
+/NuMI/det/Horn1IsRefined false
 
 /NuMI/det/HornWaterLayerThickness 1 mm
 
-/NuMI/det/RunPeriod 0
-
 /NuMI/det/UseCorrHornCurrent false
 
-/NuMI/det/BeamConfig ${beamconfig}
-
-/NuMI/run/useNImpWeight ${doimpwt}
-
-/NuMI/det/set/horn1Position 0 0 3 cm
-#/NuMI/det/set/horn2Position 0 0 1900 cm
-# Updated by Paul Lebrun, Feb 7 2015, per directive of Jim Hylen,
-# talk given at the NumiX meeting, Aug. 2014. 
-# See also Minverva Docdb 10512 
+# see NumiX meeting 08/2014 and minerva docdb 10512
+#/NuMI/det/set/horn1Position 0 0 3 cm
+/NuMI/det/set/horn1Position ${horn1_position_X} ${horn1_position_Y} 3 cm
 /NuMI/det/set/horn2Position 0 0 1918.0 cm
-/NuMI/det/set/bafflePosition 0 0 -380 cm
-/NuMI/det/set/targetPosition 0 0 -143.3 cm  
-# nominal z is -143.3 cm
+
 
 /NuMI/det/set/deltaOuterThickness 0.9525 cm
 /NuMI/det/set/duratekShift 4.5 m
 /NuMI/det/set/thblockShift 4.5 m
 
+/NuMI/det/set/bafflePosition 0 0 -380 cm
 /NuMI/det/set/baffleInnerRadius 6.5 mm
 
 /NuMI/output/outputNuNtuple true
-
 /NuMI/output/setNuNtupleFile ${outfile}
 
 /NuMI/det/update
 
 /NuMI/rndm/setRndmSeed ${seed}
-
 /NuMI/run/setRunID ${run}
-
-
 /run/beamOn ${pot}
-

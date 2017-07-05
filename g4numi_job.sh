@@ -11,20 +11,32 @@ cd $CONDOR_DIR_G4NUMI
 echo "G4NUMIAREA = $G4NUMIAREA"
 WORKDIR=$G4NUMIAREA
 source $WORKDIR/setup_beamsim.sh
-export HOME=${TMPDIR} 
-setup_beamsim
+export HOME=${TMPDIR}
+
 #create the macro file
 
 echo "BEAMCONFIG=$BEAMCONFIG"
-echo "DOWATER=$DOWATER"
-echo "DONEWHORN1=$DONEWHORN1"
-echo "WATERCM=$WATERCM"
-echo "DOIMPWT=$DOIMPWT"
+echo "DO_TARGET_WATER=$DO_TARGET_WATER"
+echo "DO_HORN1_OLD_GEOMETRY=$DO_HORN1_OLD_GEOMETRY"
+echo "DO_HORN1_FINE_SEGMENTATION=$DO_HORN1_FINE_SEGMENTATION"
+echo "IMPORTANCE_WEIGHTING=$IMPORTANCE_WEIGHTING"
+echo "TARGET_WATER_CM=$TARGET_WATER_CM"
 echo "POT=$POT"
 echo "RUN=$RUN"
 echo "PROCESS=$PROCESS"
 SEED=$((RUN*10000+PROCESS))
 echo "SEED=$SEED"
+echo "HORN1_POSITION_X=$HORN1_POSITION_X"
+echo "HORN1_POSITION_Y=$HORN1_POSITION_Y"
+echo "HORN2_POSITION_X=$HORN2_POSITION_X"
+echo "TARGET_POSITION_X=$TARGET_POSITION_X"
+echo "TARGET_POSITION_Y=$TARGET_POSITION_Y"
+echo "TARGET_POSITION_Z=$TARGET_POSITION_Z"
+echo "HORN_WATER_MM=$HORN_WATER_MM"
+echo "BEAM_POSITION_X=$BEAM_POSITION_X"
+echo "BEAM_POSITION_Y=$BEAM_POSITION_Y"
+echo "BEAM_SPOTSIZE_X=$BEAM_SPOTSIZE_X"
+echo "BEAM_SPOTSIZE_Y=$BEAM_SPOTSIZE_Y"
 
 #check for ME input:
 metag1="me"
@@ -35,37 +47,68 @@ case $BEAMCONFIG in
     *"$metag2"*)templatename="template_ME.mac";;
 esac
 
+echo "templatename = $templatename"
+
 #check for LE target position input (all cases that it is applicable):
 
+#beamconfig setting discontinued in ME
+#target position is set manually in g4numi_grid_submit_ME.sh
 case $BEAMCONFIG in 
-    "le010z185i"|"LE010z185i")TGTPOS="-z $PLAYLIST";;
-    "le010z-185i"|"LE010z-185i")TGTPOS="-z $PLAYLIST";;
-    "le010z000i"|"LE010z000i")TGTPOS="$-z $PLAYLIST";;
-    "le100z200i"|"LE100z200i")TGTPOS="$-z $PLAYLIST";;
-    "le100z-200i"|"LE100z-200i")TGTPOS="-z $PLAYLIST";;
-    "le250z200i"|"LE250z200i")TGTPOS="-z $PLAYLIST";;
+    "le010z185i"|"LE010z185i")TGTPOS="--playlist $PLAYLIST";;
+    "le010z-185i"|"LE010z-185i")TGTPOS="--playlist $PLAYLIST";;
+    "le010z000i"|"LE010z000i")TGTPOS="$--playlist $PLAYLIST";;
+    "le100z200i"|"LE100z200i")TGTPOS="$--playlist $PLAYLIST";;
+    "le100z-200i"|"LE100z-200i")TGTPOS="--playlist $PLAYLIST";;
+    "le250z200i"|"LE250z200i")TGTPOS="--playlist $PLAYLIST";;
 esac
 echo "TGTPOS=$TGTPOS"
 
-IFLAG=""
-if [ "$DOIMPWT" = "false" ]; then
-    IFLAG="-i"
+# set some bool flags for the make macro py script
+DO_HORN1_OLD_GEOMETRY_FLAG=""
+if [ "$DO_HORN1_OLD_GEOMETRY" = "true" ]; then
+    DO_HORN1_OLD_GEOMETRY_FLAG="--do_horn1_old_geometry"
 fi
 
-MFLAG=""
-if [ "$DONEWHORN1" = "true" ]; then
-    MFLAG="-m"
+DO_HORN1_FINE_SEGMENTATION_FLAG=""
+if [ "$DO_HORN1_FINE_SEGMENTATION" = "true" ]; then
+    DO_HORN1_FINE_SEGMENTATION_FLAG="--do_horn1_fine_segmentation"
 fi
 
-if [ "$DOWATER" = "false" ]; then
-    
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG ${MFLAG} -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
-
-else 
-
-    $WORKDIR/makemacro.py -t $WORKDIR/macros/$templatename -b $BEAMCONFIG -w ${MFLAG} -L $WATERCM -p $POT -r $RUN -n $PROCESS -s $SEED -z $PLAYLIST $IFLAG > g4numi.mac
-	
+NO_IMPORTANCE_WEIGHTING_FLAG=""
+if [ "$IMPORTANCE_WEIGHTING" = "false" ]; then
+    NO_IMPORTANCE_WEIGHTING_FLAG="--no_importance_weighting "
 fi
+
+TARGET_WATER_FLAG=""
+if [ "$DO_TARGET_WATER" = "true" ]; then
+    TARGET_WATER_FLAG="--target_water_cm=$TARGET_WATER_CM"
+fi
+
+# make the macro
+$WORKDIR/makemacro.py \
+  $DO_HORN1_OLD_GEOMETRY_FLAG \
+  $DO_HORN1_FINE_SEGMENTATION_FLAG \
+  --horn1_position_X $HORN1_POSITION_X \
+  --horn1_position_Y $HORN1_POSITION_Y \
+  --horn2_position_X $HORN2_POSITION_X \
+  --horn_water_mm $HORN_WATER_MM \
+  --target_position_X $TARGET_POSITION_X \
+  --target_position_Y $TARGET_POSITION_Y \
+  --target_position_Z $TARGET_POSITION_Z \
+  --beam_position_X $BEAM_POSITION_X \
+  --beam_position_Y $BEAM_POSITION_Y \
+  --beam_spotsize_X $BEAM_SPOTSIZE_X \
+  --beam_spotsize_Y $BEAM_SPOTSIZE_Y \
+  --pot $POT \
+  --run $RUN \
+  --template $WORKDIR/macros/$templatename \
+  --filetag $PROCESS \
+  $NO_IMPORTANCE_WEIGHTING_FLAG \
+  --seed $SEED \
+  $TARGET_WATER_FLAG \
+  --playlist $PLAYLIST \
+  --beamconfig $BEAMCONFIG \
+  > g4numi.mac
 
 cat g4numi.mac
 $WORKDIR/g4numi g4numi.mac
