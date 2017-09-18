@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.14 2017/07/05 16:13:21 bmesserl Exp $
+#$Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/makemacro.py,v 1.1.2.15 2017/09/18 18:02:49 bmesserl Exp $
 
 import os, re, sys, getopt,string,optparse
 from string import Template
@@ -25,8 +25,10 @@ beamconfig_dict = { "le010z185i"  : {"minerva1"   : "-44.50",    #tgt2H1 = 9.50
 #Defaults
 HORN1_POSITION_X  = 0      #cm
 HORN1_POSITION_Y  = 0      #cm
+HORN1_POSITION_Z  = 3      #cm
 
 HORN2_POSITION_X  = 0      #cm
+HORN2_POSITION_Y  = 0      #cm
 
 BEAM_POSITION_X   = 0      #m
 BEAM_POSITION_Y   = 0      #m
@@ -65,8 +67,12 @@ def get_options():
         help="horn 1 transverse offset (_X0 position). In cm.")
   horn_group.add_option('--horn1_position_Y', 
         help="horn 1 vertical offset (_Y0 position). In cm.")
+  horn_group.add_option('--horn1_position_Z', 
+        help="horn 1 longitudinal offset (_Z0 position). In cm.")
   horn_group.add_option('--horn2_position_X', 
         help="horn 2 transverse offset (_X0 position). In cm.")
+  horn_group.add_option('--horn2_position_Y', 
+        help="horn 2 vertical offset (_Y0 position). In cm.")
 
   horn_group.add_option('--horn_water_mm', 
         help="mm water layer on horn. ")
@@ -146,7 +152,9 @@ def main():
   horn_water_mm              = HORN_WATER_MM     if not options.horn_water_mm              else options.horn_water_mm #mm
   horn1_position_X           = HORN1_POSITION_X  if not options.horn1_position_X           else options.horn1_position_X #cm
   horn1_position_Y           = HORN1_POSITION_Y  if not options.horn1_position_Y           else options.horn1_position_Y #cm
+  horn1_position_Z           = HORN1_POSITION_Z  if not options.horn1_position_Z           else options.horn1_position_Z #cm
   horn2_position_X           = HORN2_POSITION_X  if not options.horn2_position_X           else options.horn2_position_X #cm
+  horn2_position_Y           = HORN2_POSITION_Y  if not options.horn2_position_Y           else options.horn2_position_Y #cm
 
   #beam size/position
   beam_position_X            = BEAM_POSITION_X   if not options.beam_position_X            else options.beam_position_X #m
@@ -179,7 +187,9 @@ def main():
                       'do_horn1_fine_segmentation': do_horn1_fine_segmentation,
                       'horn1_position_X': horn1_position_X,
                       'horn1_position_Y': horn1_position_Y,
+                      'horn1_position_Z': horn1_position_Z,
                       'horn2_position_X': horn2_position_X,
+                      'horn2_position_Y': horn2_position_Y,
                       'horn_water_mm': horn_water_mm,
                       'beam_position_X': beam_position_X,
                       'beam_position_Y': beam_position_Y,
