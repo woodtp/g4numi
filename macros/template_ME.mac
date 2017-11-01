@@ -1,9 +1,9 @@
 #This is an template macro to create ME G4numi files. 
-#It contains all of the ME nominal params (B. Messerly 2017.06)
+#v1.1.2.7 of this file contains all of the ME defaults
+#as of 2017/11.
 #The "BeamConfig" option has been depreciated in the ME.
-#It can currently be used to change horn current 
+#It can/should be used to change horn current but not
 # (not target Z position. Use targetPosition for that).
-#See makemacro.py for full list of configurable parameters.
 
 /control/suppressAbortion 2
 /NuMI/run/DebugLevel 0 
@@ -12,42 +12,42 @@
 /NuMI/det/RunPeriod 0
 
 # see comment above
-/NuMI/det/BeamConfig me000z200i
+/NuMI/det/BeamConfig ${beamconfig}
 
 #Beam spot size
 #ME nominal is 1.4 (B. Messerly 2017.06)
-/NuMI/Beam/SigmaX 1.4 mm
-/NuMI/Beam/SigmaY 1.4 mm
+/NuMI/Beam/SigmaX ${beam_spotsize_X} mm
+/NuMI/Beam/SigmaY ${beam_spotsize_Y} mm
 
 #Beam position shift
-/NuMI/Beam/ShiftX 0.0 mm
-/NuMI/Beam/ShiftY 0.0 mm
+/NuMI/Beam/ShiftX ${beam_position_X} mm
+/NuMI/Beam/ShiftY ${beam_position_Y} mm
 
 #Magnetic field in decay pipe
 #/NuMI/det/applyDecayPipeMagneticField false
 
 
-/NuMI/run/useWaterInTgt false
+/NuMI/run/useWaterInTgt ${do_target_water}
 /NuMI/det/LengthOfWaterInTgt ${target_water_cm} cm
 
 # 10/2016 default 0 0 -143.3 cm
-/NuMI/det/set/targetPosition 0 0 -143.3 cm
+/NuMI/det/set/targetPosition ${target_position_X} ${target_position_Y} ${target_position_Z} cm
 
 
 #Switch to the alternate horn1
-/NuMI/det/Horn1IsAlternate true
+/NuMI/det/Horn1IsAlternate ${do_horn1_new_geometry}
 
 #Use refined definition of horn1
-/NuMI/det/Horn1IsRefined false
+/NuMI/det/Horn1IsRefined ${do_horn1_fine_segmentation}
 
-/NuMI/det/HornWaterLayerThickness 1 mm
+/NuMI/det/HornWaterLayerThickness ${horn_water_mm} mm
 
 /NuMI/det/UseCorrHornCurrent false
 
 # see NumiX meeting 08/2014 and minerva docdb 10512
 #/NuMI/det/set/horn1Position 0 0 3 cm
-/NuMI/det/set/horn1Position ${horn1_position_X} ${horn1_position_Y} 3 cm
-/NuMI/det/set/horn2Position 0 0 1918.0 cm
+/NuMI/det/set/horn1Position ${horn1_position_X} ${horn1_position_Y} ${horn1_position_Z} cm
+/NuMI/det/set/horn2Position ${horn2_position_X} ${horn2_position_Y} 1918.0 cm
 
 
 /NuMI/det/set/deltaOuterThickness 0.9525 cm
