@@ -228,6 +228,62 @@ private:
     // The Horn1 equation, implemented first for LBNE.. 
     //
     std::vector<LBNEHornRadialEquation> fHorn1Equations;
+    //
+    // September 2017: study of the sensitivity of the ME wiggle 
+    // to the field map... 
+    //
+    bool fIgnoreCEQBr;
+    double fHorn1FieldZCutUpstream;
+    double fHorn1FieldZCutDwnstream;
+    //
+    bool fHorn1UpstrIOisTorus;
+    double fHorn1CurrentEqualizerLongAbsLength;
+    double fHorn1CurrentEqualizerQuadAmpl;
+    double fHorn1CurrentEqualizerOctAmpl;
+    double fHorn2CurrentEqualizerLongAbsLength;
+    double fHorn2CurrentEqualizerQuadAmpl;
+    double fHorn2CurrentEqualizerOctAmpl;
+    
+    double fNovaTargetHTilt;
+    double fNovaTargetVTilt;
+    double fNovaTargetXOffset;
+    double fNovaTargetYOffset;
+    double fNovaTargetExtraFlangeThick;
+    double fHorn1StripLinesThick;
+    //
+    // Imperfect Current equalizer section support. 
+    // To generate the RZ map, one needs a the accurate position of the IC, + thickness. 
+    // Define a simple array.. 
+    //
+    std::vector<double> fEffectiveRadiiForFieldMap; 
+    std::vector<double> fEffectiveRadiiForFieldMapH2; 
+    
+    G4RotationMatrix fRotationMotherNovaTarget;
+    public:
+    
+    inline void SetIgnoreCEQBr(bool t) { fIgnoreCEQBr= t; }
+    inline void SetHorn1FieldZCutUpstream(double p) { fHorn1FieldZCutUpstream= p; }
+    inline void SetHorn1FieldZCutDwnstream(double p) { fHorn1FieldZCutDwnstream= p; }
+    inline void SetHorn1CurrentEqualizerLongAbsLength(double p) { fHorn1CurrentEqualizerLongAbsLength= p; }
+    inline void SetHorn1CurrentEqualizerQuadAmpl(double p) { fHorn1CurrentEqualizerQuadAmpl= p; }
+    inline void SetHorn1CurrentEqualizerOctAmpl(double p) { fHorn1CurrentEqualizerOctAmpl= p; }
+    inline void SetHorn2CurrentEqualizerLongAbsLength(double p) { fHorn2CurrentEqualizerLongAbsLength= p; }
+    inline void SetHorn2CurrentEqualizerQuadAmpl(double p) { fHorn2CurrentEqualizerQuadAmpl= p; }
+    inline void SetHorn2CurrentEqualizerOctAmpl(double p) { fHorn2CurrentEqualizerOctAmpl= p; }
+    inline void SetHorn1UpstrIOisTorus(bool isTorus) { fHorn1UpstrIOisTorus = isTorus; }
+    
+    inline void SetNovaTargetHTilt(double p) { fNovaTargetHTilt = p; }
+    inline void SetNovaTargetVTilt(double p) { fNovaTargetVTilt = p; }
+    inline void SetNovaTargetXOffset(double p) { fNovaTargetXOffset= p; }
+    inline void SetNovaTargetYOffset(double p) { fNovaTargetYOffset= p; }
+    inline void SetNovaTargetExtraFlangeThick(double p) 
+       { fNovaTargetExtraFlangeThick= p; }
+    inline void SetHorn1StripLinesThick(double p) 
+       { fHorn1StripLinesThick= p; }
+   
+    
+    
+    
 
 };
 class LBNEHornRadialEquation  {
