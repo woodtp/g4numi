@@ -312,7 +312,14 @@ void NumiDetectorConstruction::ConstructHorn1(G4ThreeVector hornpos, G4RotationM
   lvPHorn1F->SetOptimisation(false);
   //------ End of Modification -------------------------
   
-  G4FieldManager* FieldMgr3 = new G4FieldManager(numiMagField); //create a local field      
+  numiMagField->SetIgnoreCEQBr(fIgnoreCEQBr);;
+  numiMagField->SetHorn1FieldZCutUpstream(fHorn1FieldZCutUpstream);
+  numiMagField->SetHorn1FieldZCutDwnstream(fHorn1FieldZCutDwnstream);
+  numiMagField->SetHorn1CurrentEqualizerLongAbsLength(fHorn1CurrentEqualizerLongAbsLength);
+  numiMagField->SetHorn1CurrentEqualizerQuadAmpl(fHorn1CurrentEqualizerQuadAmpl); 
+  numiMagField->SetHorn1CurrentEqualizerOctAmpl(fHorn1CurrentEqualizerOctAmpl); 
+     
+  G4FieldManager* FieldMgr3 = new G4FieldManager(numiMagField); //create a local field 
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
   FieldMgr3->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
   //  FieldMgr3->GetChordFinder()->SetDeltaChord(.5*mm);
@@ -587,33 +594,67 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
   horn1IOTransThick[1] = (0.32*in)/std::cos(M_PI*60./180.);
   horn1IOTransThick[3] = (0.32*in)/std::cos(M_PI*60./180.);
   horn1IOTransThick[2] = horn1IOInnerRadsDownstr[2] - horn1IOInnerRadsUpstr[2];
-  horn1IOUpstrLengths[0] = 0.457*in;
+  //
+  // September 2017.  The Torus solution is better, more exact.  The solution of fined grained sectioning, 
+  // done in LBNF is also acceptable. However, this crude splitting has volume overlaps. 
+  // We want to do a material budget study in this region, so we keep this crude segmentation, but we correct the geometry and 
+  // make sure we do not have overlaps. 
+  //
+  const double theta2to3 = std::acos(2.226/2.436);
+  const double theta0to1 = 0.5*(M_PI/2.0 - theta2to3); // we split in only two pieces..
+  //
+  // October 2017: 
+  //
+  // Imperfect Current equalizer section support. 
+  // To generate the RZ map, one needs a the accurate position of the IC, + thickness. 
+  // Define a simple array.. 
+  fEffectiveRadiiForFieldMap.clear();
+  // fixed step size of 1 mm, over the entire length of the Horn1.
+  // Coordinate system is global., Z0 = Iz0 = 0. 
+  for (size_t k=0; k!= 3250; k++) fEffectiveRadiiForFieldMap.push_back(-1.);
+  
+  
+  horn1IOUpstrLengths[0] = 2.436*in*std::sin(theta0to1) - 0.050*CLHEP::mm;
   horn1IOUpstrLengths[4] = horn1IOUpstrLengths[0];
 //  horn1IOUpstrLengths[1] = 0.410*in;
 // Readjusting.. Study of G4Tubs vs Polycones.. November 2014 
-  horn1IOUpstrLengths[1] = 0.450*in;
+  horn1IOUpstrLengths[1] = 2.436*in - 2.436*in*std::sin(theta0to1) - 0.32*in - 0.050*CLHEP::mm;
+  horn1IOUpstrLengths[2] = 0.32*in - 0.050*CLHEP::mm;
   horn1IOUpstrLengths[3] = horn1IOUpstrLengths[1];
-//  horn1IOUpstrLengths[2] = 0.370*in; // Increase thickness 
-// Too much.. Study of G4Tubs vs Polycones.. November 2014 
-  horn1IOUpstrLengths[2] = 0.330*in; // Increase thickness 
-  const double aTotalPseudoTargetHorn1Length =  
-           horn1IOUpstrLengths[0] +  horn1IOUpstrLengths[1] + horn1IOUpstrLengths[2] + 0.05*mm;
-// With respecto the center of the container volume. (August 2014.. )   
-  horn1IOUpstrZPositions[0] = aTotalPseudoTargetHorn1Length/2. - horn1IOUpstrLengths[0]/2. - 0.005;
-  horn1IOUpstrZPositions[4] = horn1IOUpstrZPositions[0];
-  horn1IOUpstrZPositions[1] = -aTotalPseudoTargetHorn1Length/2. + horn1IOUpstrLengths[2] + horn1IOUpstrLengths[1]/2.;
-  horn1IOUpstrZPositions[3] = horn1IOUpstrZPositions[1];
-  horn1IOUpstrZPositions[2] = -aTotalPseudoTargetHorn1Length/2. + horn1IOUpstrLengths[2]/2 + 0.005*mm; // 
   
-  const double aHorn1IOTransLength = 3.0*cm + 3.316*in + 0.005*mm; 
+  horn1IOInnerRadsDownstr[0] = (3.763 - 2.436)*in;
+  horn1IOInnerRadsUpstr[0] = (3.763 - 2.436*std::cos(theta0to1))*in;
+  horn1IOInnerRadsDownstr[1] = horn1IOInnerRadsUpstr[0];
+  horn1IOInnerRadsUpstr[1] = (3.763 - 2.436*std::cos(2.0*theta0to1))*in;
+
+  horn1IOInnerRadsUpstr[2] = 3.763*in;
+  horn1IOInnerRadsDownstr[2] = 3.763*in; // Irrelevant, will use the tube. 
+  horn1IOInnerRadsDownstr[4] = (3.763 + 2.436)*in;
+  horn1IOInnerRadsUpstr[4] = (3.763 + 2.436*std::cos(theta0to1))*in;
+  horn1IOInnerRadsDownstr[3] = horn1IOInnerRadsUpstr[4];
+  horn1IOInnerRadsUpstr[3] = (3.763 + 2.436*std::cos(2.0*theta0to1))*in;
+  
+  
+//  horn1IOUpstrLengths[2] = 0.370*in; // Increase thickness 
+// Too much.. Study of G4Tubs vs Polycones.. November 2014, September 2017 
+  horn1IOUpstrLengths[2] = 0.32*in - 0.05*CLHEP::mm; // correct thickness., minus 50 microns  
+  const double aHorn1IOTransLength = 2.436*in + 3.316*in; // tight
+// With respecto the center of the container volume. (August 2014.. ), holding the 5 volunes (4 cons, 1 tube. )  
                           // Drawing 8875.112 -MD-363097 The 3 cm is the MCZERO offset, per verbal discussion 
-                              // with J. Hylen. The 5 microns if to avoid G4 volume overlaps.  
+// Corrected again, September 2017. for ME wiggle study. 
+// with respect to the center of the I/O cont. volume.  
+  horn1IOUpstrZPositions[0] = -aHorn1IOTransLength/2. + 2.436*in - horn1IOUpstrLengths[0]/2. ;
+  horn1IOUpstrZPositions[4] = horn1IOUpstrZPositions[0];
+  horn1IOUpstrZPositions[1] = horn1IOUpstrZPositions[0] - horn1IOUpstrLengths[0]/2. - horn1IOUpstrLengths[1]/2. - 0.005*CLHEP::mm;
+  horn1IOUpstrZPositions[3] = horn1IOUpstrZPositions[1];
+  horn1IOUpstrZPositions[2] = -aHorn1IOTransLength/2. + 0.32*in/2. + 0.005*CLHEP::mm; // 
+  
 			      
 //  aHorn1RadialSafetyMargin = 2.9*mm; // per agreement between Jim H. and Alberto M., Aug. 22 2013. 
   const double aHorn1RadialSafetyMargin = 2.5*mm; // per agreement between Jim H. and Alberto M., Oct 4 2013 
   
   const double aHorn1IOTransInnerRad = 2.520*in/2. - aHorn1RadialSafetyMargin/2. ; // last term is the 
-  const double aHorn1IOTransOuterRad = 16.250*in/2.;
+//  const double aHorn1IOTransOuterRad = 16.250*in/2.; No longer needed.. 
   
   std::vector<double> aHorn1UpstrInnerRadsUpstr(4, 0.);
   std::vector<double> aHorn1UpstrInnerRadsDownstr(4, 0.);
@@ -810,7 +851,16 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
 //
 // We prepare the field Maps.  Three of them, one for the mother volume
 //    (with check that we don't go below the inner radius of the inner conductor)
-
+  numiMagField->rotateHorns(); 
+  numiMagFieldIC->rotateHorns(); 
+  numiMagFieldOC->rotateHorns(); 
+  numiMagField->SetIgnoreCEQBr(fIgnoreCEQBr);;
+  numiMagField->SetHorn1FieldZCutUpstream(fHorn1FieldZCutUpstream);
+  numiMagField->SetHorn1FieldZCutDwnstream(fHorn1FieldZCutDwnstream);
+  numiMagField->SetHorn1CurrentEqualizerLongAbsLength(fHorn1CurrentEqualizerLongAbsLength);
+  numiMagField->SetHorn1CurrentEqualizerQuadAmpl(fHorn1CurrentEqualizerQuadAmpl); 
+  numiMagField->SetHorn1CurrentEqualizerOctAmpl(fHorn1CurrentEqualizerOctAmpl); 
+     
   G4FieldManager* FieldMgrMother = new G4FieldManager(numiMagField); //create a local field      
   FieldMgrMother->SetDetectorField(numiMagField); //set the field 
   FieldMgrMother->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
@@ -850,6 +900,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
    rotation=hornrot;
    translation=hornpos-TargetHallPosition; // Guess.. to be check with Geantinos
    translation[2] += maxLengthHorn1/2 - 61.84; // The way the G4Polycon is defined.. And the infamous MCZero with respect to the start of the Horn1.
+   const double theEndOfHorn1wrtTGAR = translation[2] + maxLengthHorn1/2;
    G4PVPlacement* motherTop = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn1Mother", aLogVolMother,TGAR,false,0, true);
    std::cerr << " Position for Horn1 Mother, Alternate version " << translation << std::endl;
    std::cerr << "  ......... hornPos " << hornpos[2] << " Tgt Hall Position " <<  TargetHallPosition[2] << std::endl;
@@ -857,8 +908,8 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
 // 
 // Start with upstream Inner to Out transition. Usptream means at Z MC (Z Geant4 world coord. ) Negative
 //
-//  const bool withTorus = true;
-  const bool withTorus = false;
+  const bool withTorus = fHorn1UpstrIOisTorus;
+//  const bool withTorus = false;
   if (withTorus) { // Fancier CGS construct, but geant4 seems to do this correctly. 
                    // Code stolen from old version, checked. 
 	// From Z drawing -2.436 inches to Z = 0, a Torus shell. Drawing 8875.112-MD-363097
@@ -913,19 +964,24 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
      translation=G4ThreeVector(0.,0., -maxLengthHorn1/2. + frontRmax + 0.001*mm + zLOuterCon + zLOuterFlange/2.);
      new G4PVPlacement(G4Transform3D(rotation,translation),"PHornIOOuterFlange",aLVolFl, motherTop, false,0, true);
      
-  } else {
+//  } else if (hornpos[2] < -1.e20) { // skip the I/O transition entirely, to check the geometry. 
+  } else { 
       G4String nameHorn1IO("UpstrHorn1TransInnerOuter");
       G4String nameHorn1IOCont(nameHorn1IO + G4String("Cont")); // Cont stand for container. 
 //      Create(nameHorn1IOCont);
-      const double aRmin = horn1IOInnerRadsDownstr[0] - 0.2*mm;
+      const double aRmin = 1.26*in - 0.250*CLHEP::mm;
       const double aRmax = horn1IOInnerRadsDownstr[4] + horn1IOTransThick[4] + 1.*mm; 
-      const double aLength = horn1IOUpstrLengths[0] +  horn1IOUpstrLengths[1] + horn1IOUpstrLengths[2] + 0.05*mm;; // few mm safety...
-      std::cerr << " Params for  UpstrHorn1TransInnerOuterCont rMin " << aRmin << "rmax " << aRmax << " aLength " << aLength << std::endl;
+      const double aLength = aHorn1IOTransLength; 
+      std::cerr << " Params for  UpstrHorn1TransInnerOuterCont rMin " << aRmin 
+                << " rmax " << aRmax << " aLength " << aLength << std::endl << " Length of pieces... " << std::endl;
+      for (size_t k=0; k != horn1IOUpstrLengths.size(); k++) {
+        std::cerr << "  .......... " << k << " " <<  horn1IOUpstrLengths[k] << std::endl;
+      }
       G4Tubs* aTubs = new G4Tubs(nameHorn1IO, aRmin, aRmax, aLength/2.,
 	                           0., 360.0*deg);
       G4LogicalVolume* aLVol = new G4LogicalVolume(aTubs, G4Material::GetMaterial(std::string("Air")), nameHorn1IO);
       G4ThreeVector aPosition(0., 0., 0.);
-      aPosition[2]=  -maxLengthHorn1/2. + aLength/2.; 
+      aPosition[2]=  -maxLengthHorn1/2. + aLength/2. + 0.005*CLHEP::mm; 
        std::cerr << " Setting position for UpstrHorn1TransInnerOuterCont, length " << aLength  
 	              << " length mother " << aLength << " zRel " << aPosition << std::endl;
       
@@ -947,9 +1003,9 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
            G4Cons* aCons = new G4Cons(nameStr, r0, r1, r2, r3, zL/2., 0., 360.0*deg);
            vlPartIO = new G4LogicalVolume(aCons, G4Material::GetMaterial(std::string("Aluminum")), nameStr);
 	} else { 
-           const double rMin = horn1IOInnerRadsUpstr[iPartIO];
-           const double rMax = horn1IOInnerRadsUpstr[iPartIO] + horn1IOTransThick[iPartIO];
-	   const double zL= horn1IOUpstrLengths[iPartIO];
+           const double rMin = horn1IOInnerRadsUpstr[1] + 0.16*in;
+           const double rMax = horn1IOInnerRadsUpstr[3] + 0.16*in;
+	   const double zL= 0.32*in - 0.050*CLHEP::mm;
            G4Tubs* aTubs = new G4Tubs(nameStr, rMin, rMax, zL/2., 0., 360.0*deg);
            vlPartIO = new G4LogicalVolume(aTubs, G4Material::GetMaterial(std::string("Aluminum")), nameStr);
 	}
@@ -962,6 +1018,10 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
       }
      // Now build the downstream part of the Inner Outer transition conductor, by downstream, we mean 
      // Z G4, world (MC on enginering drawing) > 0. Drawing  8875-112-MD-363097
+        //
+       // September 2017... This seesm to be duplicated code !...
+       //
+      /*
      {
        // Bad choice of variable names here, at the prefix "Upstr" appears.. Mean here upstream of the inner conductor 
        // per-se. We keep these variable names, for ease of maintenance of both g4lbne and g4numi. 
@@ -1002,7 +1062,51 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
                         vTrUpst->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);	      
        }
      }
+*/
+     // Install the section of the IC that connect the I/O/ transition to the IC itself  A straight CONS. 
+     //
+     G4String nameStrIOtoIC("UpstrHorn1TransInnerToIC");
+     const double r0tmp = fHorn1Equations[0].GetVal(0.);
+     const double r2tmp = (2.520/2.)*in; 
+     const double r1tmp = r0tmp + 0.32*in;
+     const double r3tmp = r2tmp + 0.25*in; // Approximation of the weld. !!!
+     // bug corrected on October 3.. No impact, we use the torus section.. 
+     const double zLtmp = 3.316*in - 0.050*CLHEP::mm;
+     G4Cons* aConsIOtoIC = new G4Cons(nameStrIOtoIC, r0tmp, r1tmp, r2tmp, r3tmp, zLtmp/2., 0., 360.0*deg);
+     G4LogicalVolume *vlPartIOtoIC = new G4LogicalVolume(aConsIOtoIC, G4Material::GetMaterial(std::string("Aluminum")), nameStrIOtoIC);
+     G4ThreeVector aPositionTmp(0., 0., 0.);
+     aPositionTmp[2] = -aHorn1IOTransLength/2. + 2.436*in + zLtmp/2. + 0.0125*CLHEP::mm;
+     std::cerr << " Z Position UpstrHorn1TransInnerToIC  = " << aPositionTmp[2] << std::endl;
+     new G4PVPlacement((G4RotationMatrix *) 0, aPositionTmp ,vlPartIOtoIC, 
+	                             std::string("pv")+nameStrIOtoIC, vHorn1IOCont->GetLogicalVolume(), 
+				     false, 0, aCheckVolumeOverLapWC);
+      //finally, completing the I/O section at large radius. 
+     G4String nameStrIOtoOC("UpstrHorn1TransInnerToOC");
+     const double rMinICtoOC = (2.520/2.)*in + 2.0*2.436*in;
+     const double rMaxICtoOC = rMinICtoOC + 0.32*in - 0.05*CLHEP::mm; 
+     const double zLICtoOC = 3.316*in - 1.510*in - 0.250*CLHEP::mm; // Approximation of notches, silver plating etc...  
+     G4Tubs* aTubsIOtoOC = new G4Tubs(nameStrIOtoOC, rMinICtoOC, rMaxICtoOC,  zLICtoOC/2., 0., 360.0*deg);
+     G4LogicalVolume *vlPartIOtoOC = new G4LogicalVolume(aTubsIOtoOC, G4Material::GetMaterial(std::string("Aluminum")), nameStrIOtoOC);
+     aPositionTmp[2] = -aHorn1IOTransLength/2. + 2.436*in + zLICtoOC/2. + 0.0125*CLHEP::mm;
+     std::cerr << " Z Position UpstrHorn1TransInnerToIC  = " << aPositionTmp[2] << std::endl;
+     new G4PVPlacement((G4RotationMatrix *) 0, aPositionTmp ,vlPartIOtoOC, 
+	                             std::string("pv")+nameStrIOtoOC, vHorn1IOCont->GetLogicalVolume(), 
+				     false, 0, aCheckVolumeOverLapWC);;	
+     
+     
+    
    } // multi cone decomposition, up to Z Drawing of z = 3.3157 inches. 
+    // RZ position for the Current Equalizer section map. 
+     // For the torus section, we cheat and set to the radius at Z = start of this section.. 
+     // Messy, we repeat the code above. 
+     const double r0tmpxx = fHorn1Equations[0].GetVal(0.);
+     const double r2tmpxx = (2.520/2.)*in; 
+     const double r1tmpxx = r0tmpxx + 0.32*in;
+     const double r3tmpxx = r2tmpxx + 0.125*in; // Approximation of the weld. 
+     for (size_t izz = 0; izz != 30; izz++) fEffectiveRadiiForFieldMap[izz] = r1tmpxx;
+     for (size_t izz = 30; izz != 30+84; izz++) fEffectiveRadiiForFieldMap[izz] = r1tmpxx + (izz-30)*(r3tmpxx - r1tmpxx)/84.;
+     std::cerr << " Store fEffectiveRadiiForFieldMap, radius at index 84 " << fEffectiveRadiiForFieldMap[84]
+               	<< " At 113 " << fEffectiveRadiiForFieldMap[113] << std::endl;	     	
    //
    // We place more volumes in the mother volume.. All individuals cones. 
    //
@@ -1057,7 +1161,13 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
 //	       
      G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);	
-			
+
+     size_t izzBegin = static_cast<size_t>(aZHorn1ACRNT1Shift + 30 + (iSub*deltaZ));			
+     fEffectiveRadiiForFieldMap[izzBegin] = rMax1;
+     size_t izzEnd = static_cast<size_t>(aZHorn1ACRNT1Shift + 30 + ((iSub+1)*deltaZ));			
+     fEffectiveRadiiForFieldMap[izzEnd] = rMax2;
+     std::cerr << " fEffectiveRadiiForFieldMap saga, indices " << izzBegin << " / " << izzEnd 
+               << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
     if (hornWaterLayerThick	> 0.002*mm) {
      std::ostringstream nameStrStr; nameStrStr << "Horn1UpstrSubSect" << iSub << "Water";
      G4String nameStr(nameStrStr.str());
@@ -1141,7 +1251,6 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
    new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStrOutFlUpstr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);
 			//
-   
    double lengthToTheNeck = (30.3150 - 21.088)*in; // Drawing 363105 
    
    // Downstream of the neck, we install everything in Horn1PolyM1.. Simpler.. 
@@ -1183,6 +1292,12 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
                  << " Rads " << rMin1 << " , " << rMin2 << " max " << rMax1 << " " << rMax2 << std::endl;
        G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, (aCheckVolumeOverLapWC));	
+       size_t izzBegin = static_cast<size_t>(z21p088 + 30 + (iSub*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzBegin] = rMax1;
+       size_t izzEnd = static_cast<size_t>(z21p088 + 30 + ((iSub+1)*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzEnd] = rMax2;
+       std::cerr << " fEffectiveRadiiForFieldMap, lengthToNeck, indices " << izzBegin << " / " << izzEnd 
+               << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
 			
       if (hornWaterLayerThick	> 0.002*mm) {
        std::ostringstream nameStrStr; nameStrStr << "Horn1ToNeckPartM0SubSect" << iSub << "Water";
@@ -1237,9 +1352,18 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
      pCurrent->SetFieldManager(FieldMgrIC,true); //attach the local field to logical volume
      G4ThreeVector posTmp; posTmp[0] = 0.; posTmp[1] = 0.;
      posTmp[2] = -1.0*(maxLengthHorn1)/2. + zNeckDrawing  + zShiftDrawingDownstr + length/2. + 0.025*mm;
-     			      
+     
      G4PVPlacement* vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);
+     
+      size_t izzBegin = static_cast<size_t>(zNeckDrawing + 30.);			
+      size_t izzEnd = 839; // to smooth out..			
+      for (size_t izzz = izzBegin-1; izzz != izzEnd; izzz++) fEffectiveRadiiForFieldMap[izzz] = rTmp2; // to smooth out.. 
+      // There is gap, and the smoothing algoirthm fails otherwise. 		
+      std::cerr << " fEffectiveRadiiForFieldMap, Neck, indices " << izzBegin << " / " << izzEnd 
+               << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
+     
+      		
      if (hornWaterLayerThick > 0.002*mm) {
        G4String nameStrW(nameStr); nameStrW += G4String("Water");
        G4Tubs *aTubsW = new G4Tubs(nameStrW, rTmp2-hornWaterLayerThick-0.012*mm, rTmp2-0.012*mm, 
@@ -1281,6 +1405,13 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
        std::cerr << " Placing " << nameStr << " at z " << posTmp[2] << std::endl;			      
        G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, (aCheckVolumeOverLapWC));	
+			
+       size_t izzBegin = static_cast<size_t>(zStartDrawing + 30 + (iSub*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzBegin] = rMax1;
+       size_t izzEnd = static_cast<size_t>(zStartDrawing + 30 + ((iSub+1)*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzEnd] = rMax2;
+       std::cerr << " fEffectiveRadiiForFieldMap, DwnToNeck, indices " << izzBegin << " / " << izzEnd 
+               << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
 			
       if (hornWaterLayerThick > 0.002*mm) {
        std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart1SubSect" << iSub << "Water";
@@ -1346,6 +1477,12 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
        G4PVPlacement *vSub = new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStr + std::string("_P"), 
                         motherTop->GetLogicalVolume(), false, 1, (aCheckVolumeOverLapWC));	
 			
+       size_t izzBegin = static_cast<size_t>(zStartDrawing + 30 + (iSub*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzBegin] = rMax1;
+       size_t izzEnd = static_cast<size_t>(zStartDrawing + 30 + ((iSub+1)*deltaZ));			
+       fEffectiveRadiiForFieldMap[izzEnd] = rMax2;
+       std::cerr << " fEffectiveRadiiForFieldMap Dwnstr.., indices " << izzBegin << " / " << izzEnd 
+               << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
       if (hornWaterLayerThick > 0.002*mm) {
        std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart1SubSect" << iSub << "Water";
        G4String nameStr(nameStrStr.str());
@@ -1455,7 +1592,50 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
                         motherTop->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);	
   }
  
+  // The strip lines connector plates, optionally.  
+   if (fHorn1StripLinesThick > 0.) {
+       G4String nameStr("Horn1StripLineConnection");// include Inner and Outer.. 
+       const double rTmp1 = (7.75/2)*in; // Drawing MD-363096
+       const double rTmp2 = 13.0*in; // Approximate.. 
+       const double length = fHorn1StripLinesThick; 
+       const double zDrawing =  theEndOfHorn1wrtTGAR + 5*CLHEP::mm; // Approximate.. 
+       for (int kPhi = 0; kPhi != 4; kPhi++) {
+         G4String nameStrPhi(nameStr); 
+	 std::ostringstream strstrPhi; strstrPhi << "Phi" << static_cast<int>(45+kPhi*90);
+	 nameStrPhi += strstrPhi.str();
+         G4Tubs *aTubs = new G4Tubs(nameStrPhi, rTmp1, rTmp2, length/2. , (33.75 + 90.0*kPhi)*deg, 22.5*deg);
+         G4LogicalVolume *pCurrent = new G4LogicalVolume(aTubs, G4Material::GetMaterial(std::string("Aluminum")), nameStrPhi);
+         G4ThreeVector posTmp; posTmp[0] = 0.; posTmp[1] = 0.; 
+         posTmp[2] = zDrawing + 0.5*length;
+         new G4PVPlacement((G4RotationMatrix *) 0, posTmp, pCurrent, nameStrPhi + std::string("_P"), 
+                        TGAR->GetLogicalVolume(), false, 1, aCheckVolumeOverLapWC);
+      }	
+  }
+ 
+  // 
+  // We now smooth out the fEffectiveRadiiForFieldMap
+  //
+  fEffectiveRadiiForFieldMap[fEffectiveRadiiForFieldMap.size() -1] = 4.25*25.4; // drawing 363093
+  for (size_t k=0; k !=  fEffectiveRadiiForFieldMap.size(); k++) {
+    if (fEffectiveRadiiForFieldMap[k] < 0.) {
+      size_t kk = k+1;
+      while ((fEffectiveRadiiForFieldMap[kk] < 0.) && (kk < fEffectiveRadiiForFieldMap.size())) kk++;
+      const double rLow = fEffectiveRadiiForFieldMap[k-1];
+      const double rHigh = fEffectiveRadiiForFieldMap[kk];
+      const double deltazkk = static_cast<double>( kk - k + 1); 
+      for (size_t kkk=k; kkk !=  kk; kkk++) 
+        fEffectiveRadiiForFieldMap[kkk] = rLow + (rHigh - rLow)*(kkk - k)/deltazkk;
+    }
+  }
+  // And load it up on the field map 
+  //
+  numiMagField->SetEffectiveRadiiForFieldMap(fEffectiveRadiiForFieldMap);
   
+//  std::ofstream fOutCheckEffectiveRadii ("./Horn1CheckEffectiveRadii.txt");
+////  fOutCheckEffectiveRadii  << " iz rr "<< std::endl;
+//  for (size_t k=0; k !=  fEffectiveRadiiForFieldMap.size(); k++) 
+//    fOutCheckEffectiveRadii << " " << k << " " << fEffectiveRadiiForFieldMap[k] << std::endl;
+//  fOutCheckEffectiveRadii.close();
 }
 //
 // Subdivide a conical section such that the radial equations are correct within a 

@@ -76,7 +76,18 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   if(ND->raytracing){
     MyLimits->SetMaxAllowedStep(1*cm);
   }
-
+  //
+  // Imperfect Current equalizer section support. 
+  // To generate the RZ map, one needs a the accurate position of the IC, + thickness. 
+  // Define a simple array.. 
+  fEffectiveRadiiForFieldMapH2.clear();
+  // fixed step size of 1 mm, over the entire length of the Horn1.
+  // Coordinate system is local to H2, Z0 = Iz0 = 0.
+   
+  for (size_t k=0; k!= static_cast<size_t>(142.91*in); k++) fEffectiveRadiiForFieldMapH2.push_back(-1.);
+  fEffectiveRadiiForFieldMapH2[0] = 10.8870*in; // Drawing 363385 
+  
+  
   G4double lastICzPos=ICzPos[0];
   G4double maxR,minR,endZ;
   maxR=ND->PHorn2EndRout[0]; minR=ND->PHorn2EndRin[0]; endZ=ND->PHorn2EndZ0[0]+ND->PHorn2EndLength[0];
@@ -85,7 +96,6 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
     if (minR<ND->PHorn2EndRin[ii]) minR=ND->PHorn2EndRin[ii];
     if (endZ<ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii]) endZ=ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii];
   }
-
   for (G4int ii=1;ii<nPoints;ii++){
     zPos=Horn2Z0+deltaZ*ii;
     if ((fabs(PHorn2OCRout(zPos)-(PHorn2OCRout(zPos-deltaZ)+PHorn2OCRout(zPos+deltaZ))/2.)>maxDev)||
@@ -138,7 +148,53 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 	  MVzPos.push_back(zPos); MVRout.push_back(PHorn2OCRout(zPos)+MVgap); MVRin.push_back(PHorn2ICRin(zPos)-MVgap);
 	}
       }
+      // October 2017: adding a simple array of radii fort the CEQ 3D field map. 
+      if ((zPos > 1.) && (zPos < 142.91*in))  {
+       size_t izzz = static_cast<size_t>(zPos);
+       if (izzz <  fEffectiveRadiiForFieldMapH2.size()) {
+         fEffectiveRadiiForFieldMapH2[izzz] = PHorn2ICRout(zPos);
+	 // This correction is also done for the field map array FRin, see below.. 
+         if ((zPos > 1500.) && (PHorn2ICRout(zPos) > 277.533*CLHEP::mm)) 
+	    fEffectiveRadiiForFieldMapH2[izzz]  = 277.533*CLHEP::mm; // 277.554 mm is 21.853 in/2. 
+       }
+//       std::cerr << " Adding Point at z " << zPos 
+//                 << " rIn " <<  MVRin[MVRin.size() -1] << " rOut " <<  MVRout[MVRin.size() -1] << std::endl;
+      }
   }
+  fEffectiveRadiiForFieldMapH2[fEffectiveRadiiForFieldMapH2.size()-1] = 277.7533*CLHEP::mm; // Drawing 363392
+  //
+  // We finish the mapp.. Linear interpolation. 
+  //
+  for (size_t k=0; k !=  fEffectiveRadiiForFieldMapH2.size(); k++) {
+    if (fEffectiveRadiiForFieldMapH2[k] < 0.) {
+      size_t kk = k+1;
+      while ((fEffectiveRadiiForFieldMapH2[kk] < 0.) && (kk < fEffectiveRadiiForFieldMapH2.size())) kk++;
+      const double rLow = fEffectiveRadiiForFieldMapH2[k-1];
+      const double rHigh = fEffectiveRadiiForFieldMapH2[kk];
+      const double deltazkk = static_cast<double>( kk - k + 1); 
+      for (size_t kkk=k; kkk !=  kk; kkk++) 
+        fEffectiveRadiiForFieldMapH2[kkk] = rLow + (rHigh - rLow)*(kkk - k)/deltazkk;
+    }
+  }
+//  std::ofstream fOutCheckEffectiveRadii ("./Horn2CheckEffectiveRadii.txt");
+//  fOutCheckEffectiveRadii  << " iz rr "<< std::endl;
+//  for (size_t k=0; k !=  fEffectiveRadiiForFieldMapH2.size(); k++) 
+//    fOutCheckEffectiveRadii << " " << k << " " << fEffectiveRadiiForFieldMapH2[k] << std::endl;
+//  fOutCheckEffectiveRadii.close();
+//  std::cerr << " And quit after dumping radii for Horn2 " << std::endl; exit(2);
+  // And load it up on the field map 
+  //
+  numiMagField->SetEffectiveRadiiForFieldMapH2(fEffectiveRadiiForFieldMapH2);
+  //
+  // We also need the Z offset corresponding to these radii with respect to the global coordinate 
+  // system. This is given by Hornpos, plus a shift of Z=0 local H2 coordinate system with respect to 
+  // the start if the IC, define here at the junction between the 1/2 torus of the I/O transition 
+  // and the linear portion of the I/O transition. On drawing 363385,  
+  numiMagField->SetField3DMapCurrentEqualizerZOffsetH2(hornpos[2] + (2.184 - 1.889)*in );
+  numiMagField->SetHorn2CurrentEqualizerLongAbsLength(fHorn2CurrentEqualizerLongAbsLength);
+  numiMagField->SetHorn2CurrentEqualizerQuadAmpl(fHorn2CurrentEqualizerQuadAmpl); 
+  numiMagField->SetHorn2CurrentEqualizerOctAmpl(fHorn2CurrentEqualizerOctAmpl); 
+
   
   nF++;
   FzPos.push_back(FZ1); FRin.push_back(PHorn2ICRout(FzPos[nF])+Fgap); FRout.push_back(PHorn2OCRin(FzPos[nF])-Fgap);
@@ -178,11 +234,11 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
       if (MVzPos[iSect] > 3000.) MVRin[iSect] -= 3.0*cm; // Again, air in air does not change things, and avoid the volume overlaps. 
   }
 // Dump the mother volume info to locate the overlap. 
-//  std::cerr << " Horn2 Polycone mother volume with " << nMV+1 << " sections " << std::endl;
-//  for (size_t iSect = 0; iSect != static_cast<size_t>(nMV+1); iSect++) {
-//    std::cerr << " Section " << iSect << " Zl " << MVzPos[iSect] 
-//	      << " Rin " << MVRin[iSect] << " R Out " << MVRout[iSect] << std::endl;
-//  }   
+  std::cerr << " Horn2 Polycone mother volume with " << nMV+1 << " sections " << std::endl;
+  for (size_t iSect = 0; iSect != static_cast<size_t>(nMV+1); iSect++) {
+    std::cerr << " Section " << iSect << " Zl " << MVzPos[iSect] 
+	      << " Rin " << MVRin[iSect] << " R Out " << MVRout[iSect] << std::endl;
+  }   
   sMHorn2= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn2 = new G4LogicalVolume(sMHorn2,material,"lvMHorn2",0,0,0);
   G4VisAttributes* invisible=new G4VisAttributes(false);
@@ -192,6 +248,8 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   }
   rotation=hornrot;
   translation=hornpos-TargetHallPosition;
+  std::cerr << " NumiDetectorConstruction::ConstructHorn2, hornPos " << hornpos << " trans " 
+            << translation << std::endl;
   G4VPhysicalVolume* pvMHorn2 = new G4PVPlacement(G4Transform3D(rotation,translation),"pvMHorn2Mother",lvMHorn2,TGAR,false,0);
   pvMHorn2 -> CheckOverlaps();
       
@@ -219,6 +277,36 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   translation=G4ThreeVector(0.,0.,0.)-MHorn2Origin;
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2OC",lvPHorn2OC,pvMHorn2,false,0, true);
 
+  // P.L., October 2017. 
+  // Geantino study: the IC radial function not quite right in the downstream part.. Check;
+  //
+//  std::ofstream fOutHorn2IC("./Horn2ICDims.txt");
+//  fOutHorn2IC << " zmm rInmm rOutmm zin rInin rOutin" << std::endl;  
+//  for (size_t ko = 0; ko != ICzPos.size(); ko++) 
+//    fOutHorn2IC << " " << ICzPos[ko] << " " << ICRin[ko] << " " << ICRout[ko] << 
+//                   " " << ICzPos[ko]/in << " " << ICRin[ko]/in << " " << ICRout[ko]/in << std::endl;
+//  fOutHorn2IC.close();
+  //
+  // O.K. Following 363392, Downstream Inner flang, the IC Inner radius is set to 21.103/2 inches. 
+  // Correct this.. This is an ugly patch, one should correct the functions below, but which one of them? 
+  //  This is a patch on top of a substantial correction. 
+  for (size_t ko = 0; ko != ICzPos.size(); ko++) {
+    if ((ICzPos[ko] > 3023.) && (ICzPos[ko] < 3450.)) {
+      ICRin[ko] = (21.103/2)*in;
+      ICRout[ko] = (21.853/2)*in;;
+    } else if  (ICzPos[ko] > 3450.) {
+      ICRin[ko] = (21.103/2)*in;
+      ICRout[ko] = (25.04/2)*in;
+    }
+    // And a small overlap.. 
+    ICzPos[ko] = std::min(ICzPos[ko], 3500.0); 
+  } 
+//  fOutHorn2IC.open("./Horn2ICDimsCorrected.txt");
+//  fOutHorn2IC << " zmm rInmm rOutmm zin rInin rOutin" << std::endl;  
+//  for (size_t ko = 0; ko != ICzPos.size(); ko++) 
+//    fOutHorn2IC << " " << ICzPos[ko] << " " << ICRin[ko] << " " << ICRout[ko] << 
+//                   " " << ICzPos[ko]/in << " " << ICRin[ko]/in << " " << ICRout[ko]/in << std::endl;
+//  fOutHorn2IC.close();
   //Inner Conductor
   G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,GetMaterial(ND->hrnmat),"lvPHorn2IC",0,0,0);
@@ -229,37 +317,24 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2IC",lvPHorn2IC,pvMHorn2,false,0, true);
-  
   // July 2014: Split this in 2 parts. 
   // Water and Air...
   //
-  G4LogicalVolume* lvPHorn2ICW = 0;
-  if (placeWaterLayer) {
-    if ((ICzPos.size()  != FRinW.size()) || (ICzPos.size()  != FRoutW.size()) || ((nIn) != static_cast<int>(FRoutW.size()))) {
-      std::cerr << " Inconsistent of number of section fors PHorn2ICWater , Z /R size  " << ICzPos.size()
-              << " / " <<  FRinW.size() << " / " << FRoutW.size() << " (nIn) " << (nIn) << std::endl;
-      std::cerr << " Probably O.K., take the minimum of these " << std::endl;
-    }
-    int numSectW = std::min(static_cast<int>(FRinW.size()), std::min(static_cast<int>(ICzPos.size()), (nIn+1)));
-    numSectW--; // take one out, volume overlap at the end. 
-    // Dump the mother volume info to locate the overlap. 
-//    std::cerr << " Horn2 Polycone IC volume with " << nMV+1 << " sections " << std::endl;
-//    for (size_t iSect = 0; iSect != numSectW; iSect++) {
-//       std::cerr << " Section " << iSect << " Zl " << ICzPos[iSect] 
-//	       << " Rin " << ICRin[iSect] << " R Out " << ICRout[iSect] << " Rin Water " 
-//	       << FRinW[iSect] << " ROutW " << FRoutW[iSect] <<  std::endl;
-//    }	
-    G4Polycone* sPHorn2ICW=new G4Polycone("sPHorn2ICWater",0.,360.*deg, numSectW, &ICzPos[0],&FRinW[0],&FRoutW[0]);
-    lvPHorn2ICW=new G4LogicalVolume(sPHorn2ICW, Water,"lvPHorn2ICWater",0,0,0);
-    ND->ApplyStepLimits(lvPHorn2ICW); // Limit Step Size
-    lvPHorn2ICW->SetFieldManager(FieldMgr,true); //attach the local field to logical volume
-    rotation=G4RotationMatrix(0.,0.,0.);
-    translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
-    new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2ICWater",lvPHorn2ICW,pvMHorn2,false,0, true);
-  }
-      
+  // October 2017: we laso have to patch the water layer. .. Same debatable idea: re-patch.
+  //  ..as well as the field region..  
+  // 
   //Field Part
-  G4Polycone* sPConeF=new G4Polycone("sPCone2F",0.,360.*deg,nF+1,&FzPos[0],&FRin[0],&FRout[0]);
+  // Again, patch.. 
+  const size_t numFieldSegment = 38;
+  for (size_t ko = 0; ko != FRin.size(); ko++) FRin[ko] = ICRout[ko] + epsilon;
+//  fOutHorn2IC.open("./Horn2ICDimsCorrectedField.txt");
+//  fOutHorn2IC << " zmm rInmm rOutmm zin rInin rOutin" << std::endl;  
+//  for (size_t ko = 0; ko !=numFieldSegment; ko++) 
+//    fOutHorn2IC << " " << ICzPos[ko] << " " << FRin[ko] << " " << FRout[ko] << 
+//  		 " " << ICzPos[ko]/in << " " << FRin[ko]/in << " " << FRout[ko]/in << std::endl;
+//  fOutHorn2IC.close();
+  // We don't 
+  G4Polycone* sPConeF=new G4Polycone("sPCone2F",0.,360.*deg,numFieldSegment,&FzPos[0],&FRin[0],&FRout[0]);
   G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn2Z0+frontRmax);
   G4UnionSolid *sPHorn2F=new G4UnionSolid("sPHorn2F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
@@ -273,10 +348,26 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   FieldMgr3->SetDetectorField(numiMagField); //set the field 
   FieldMgr3->CreateChordFinder(numiMagField); //create the objects which calculate the trajectory 
   lvPHorn2F->SetFieldManager(FieldMgr3,true); //attach the local field to logical volume
-  if (placeWaterLayer) lvPHorn2ICW->SetFieldManager(FieldMgr3,true); //attach the local field to logical volume
+  
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
   G4VPhysicalVolume *pvPHorn2F=new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2F",lvPHorn2F,pvMHorn2,false,0, true);
+  G4LogicalVolume* lvPHorn2ICW = 0;
+  // Placed the water layer in the field region defined above.  
+  if (placeWaterLayer) {
+    for (size_t ko = 0; ko != FRinW.size(); ko++) {
+        FRinW[ko] = ICRout[ko] + epsilon;
+        FRoutW[ko] = FRinW[ko] + hornWaterLayerThick + epsilon;
+    }
+    // We stop this water layer a bit upstream of the flange
+    G4Polycone* sPHorn2ICW=new G4Polycone("sPHorn2ICWater",0.,360.*deg, 37, &ICzPos[0],&FRinW[0],&FRoutW[0]);
+    lvPHorn2ICW=new G4LogicalVolume(sPHorn2ICW, Water,"lvPHorn2ICWater",0,0,0);
+    ND->ApplyStepLimits(lvPHorn2ICW); // Limit Step Size
+    rotation=G4RotationMatrix(0.,0.,0.);
+    translation=G4ThreeVector(0.,0.,0)-MHorn2Origin;
+    new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2ICWater",lvPHorn2ICW, pvPHorn2F,false,0, true);
+  }
+      
 
   //Spider support
   for (G4int ii=0;ii<G4int(ND->Horn2SS.size());ii++){
@@ -561,12 +652,14 @@ G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
   */
   //Flange inner downstream
  else if ((z>=118.156*in)&&(z<139.21*in)){
-   r=21.342/2.*in;
+//   r=21.342/2.*in;
+   r=21.103/2.*in; // P.L., October 2017.  See Drawing 363392 
   }
 
   //for mother volume i need r defined up to the end of horn
   else if (z>=139.21*in){
-    r=21.342/2.*in;
+//    r=21.342/2.*in;
+   r=21.103/2.*in; // P.L., October 2017.  See Drawing 363392 
   }
 return r;
 }
