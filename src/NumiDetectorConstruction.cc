@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// $Id: NumiDetectorConstruction.cc,v 1.13.4.10 2017/05/11 10:52:32 lcremone Exp $
+// $Id: NumiDetectorConstruction.cc,v 1.13.4.11 2017/11/02 21:49:03 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -44,7 +44,19 @@ NumiDetectorConstruction::NumiDetectorConstruction()
       fBaffleInnerRadius(5.5*mm),
       fBaffleLength(1.5*m),
       fForcedOldTarget(false),
-      fHorn1ExtraLayerAlum(0.)
+      fHorn1ExtraLayerAlum(0.),
+      fHorn1FieldZCutUpstream(-32.0),
+      fHorn1FieldZCutDwnstream(3277.),
+      fHorn1UpstrIOisTorus(true),
+      fHorn1CurrentEqualizerLongAbsLength(0.),
+      fHorn1CurrentEqualizerQuadAmpl(0.),
+      fHorn1CurrentEqualizerOctAmpl(0.),
+      fNovaTargetHTilt(0.),
+      fNovaTargetVTilt(0.),
+      fNovaTargetXOffset(0.),
+      fNovaTargetYOffset(0.),
+      fNovaTargetExtraFlangeThick(0.),
+      fHorn1StripLinesThick(0.)
       
 {
   //Scan the input file     
@@ -56,7 +68,13 @@ NumiDetectorConstruction::NumiDetectorConstruction()
   }
 
   // Pointers for magnetic fields ***    
-  numiMagField = new NumiMagneticField(); 
+  numiMagField = new NumiMagneticField();
+  numiMagField->SetIgnoreCEQBr(fIgnoreCEQBr);
+  numiMagField->SetHorn1FieldZCutUpstream(fHorn1FieldZCutUpstream); 
+  numiMagField->SetHorn1FieldZCutDwnstream(fHorn1FieldZCutDwnstream);
+  numiMagField->SetHorn1CurrentEqualizerLongAbsLength(fHorn1CurrentEqualizerLongAbsLength);
+  numiMagField->SetHorn1CurrentEqualizerQuadAmpl(fHorn1CurrentEqualizerQuadAmpl); 
+  numiMagField->SetHorn1CurrentEqualizerOctAmpl(fHorn1CurrentEqualizerOctAmpl); 
   numiMagFieldIC = new NumiMagneticFieldIC();
   numiMagFieldOC = new NumiMagneticFieldOC();
   numiDecayMagField = new NumiDecayPipeMagneticField();
@@ -117,6 +135,12 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
 
       // Pointers for magnetic fields ***    
       numiMagField = new NumiMagneticField(); 
+      numiMagField->SetIgnoreCEQBr(fIgnoreCEQBr);
+      numiMagField->SetHorn1FieldZCutUpstream(fHorn1FieldZCutUpstream); 
+      numiMagField->SetHorn1FieldZCutDwnstream(fHorn1FieldZCutDwnstream);
+      numiMagField->SetHorn1CurrentEqualizerLongAbsLength(fHorn1CurrentEqualizerLongAbsLength);
+      numiMagField->SetHorn1CurrentEqualizerQuadAmpl(fHorn1CurrentEqualizerQuadAmpl); 
+      numiMagField->SetHorn1CurrentEqualizerOctAmpl(fHorn1CurrentEqualizerOctAmpl); 
       numiMagFieldIC = new NumiMagneticFieldIC();
       numiMagFieldOC = new NumiMagneticFieldOC();
       numiDecayMagField = new NumiDecayPipeMagneticField();
