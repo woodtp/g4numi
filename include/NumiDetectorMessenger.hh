@@ -78,9 +78,31 @@ private:
     G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
     G4UIcmdWithABool* fHorn1IsAlternate;
     G4UIcmdWithABool* fHorn1IsRefined;
+    G4UIcmdWithABool* fHorn1UpstrIOisTorus;
     G4UIcmdWithADoubleAndUnit* fHorn1ExtraLayerAlum;
     G4UIcmdWithABool* fDumpBFieldPlease;
+    //
+    // New Data card to study sensitivity of the ME wiggle to the 
+    // field map and target geometry 
+    //
+    G4UIcmdWithABool* fIgnoreCEQBr;
+    G4UIcmdWithADoubleAndUnit* fHorn1FieldZCutUpstream;
+    G4UIcmdWithADoubleAndUnit* fHorn1FieldZCutDwnstream;
+    G4UIcmdWithADoubleAndUnit* fHorn1CurrentEqualizerLongAbsLength;
+    G4UIcmdWithADouble* fHorn1CurrentEqualizerQuadAmpl;
+    G4UIcmdWithADouble* fHorn1CurrentEqualizerOctAmpl;
+    G4UIcmdWithADoubleAndUnit* fHorn2CurrentEqualizerLongAbsLength;
+    G4UIcmdWithADouble* fHorn2CurrentEqualizerQuadAmpl;
+    G4UIcmdWithADouble* fHorn2CurrentEqualizerOctAmpl;
     
+    G4UIcmdWithADouble* fNovaTargetHTilt;
+    G4UIcmdWithADouble* fNovaTargetVTilt;
+    G4UIcmdWithADoubleAndUnit* fNovaTargetXOffset;
+    G4UIcmdWithADoubleAndUnit* fNovaTargetYOffset;
+    G4UIcmdWithADoubleAndUnit* fNovaTargetExtraFlangeThick;
+    G4UIcmdWithADoubleAndUnit* fHorn1StripLinesThick;
+    G4UIcmdWithABool* fUsePosLocalCoordInMagField;
+    G4UIcmdWithABool* fUseRotLocalCoordInMagField;
 
 #ifdef MODERN_G4
     G4UIcmdWithAString* fGDMLOutputCmd;
