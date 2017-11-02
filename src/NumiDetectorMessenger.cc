@@ -14,6 +14,7 @@
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UnitsTable.hh"
@@ -301,6 +302,14 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fHorn1IsRefined->SetDefaultValue(ND->GetHorn1IsRefined()); 
 	fHorn1IsRefined->AvailableForStates(G4State_PreInit, G4State_Idle);
         //
+	// September 2017, Paul Lebrun, just curious to see if the level of details matters for the ME running. 
+	//
+	fHorn1UpstrIOisTorus = new G4UIcmdWithABool("/NuMI/det/Horn1UpstrIOisTorus",this);
+        fHorn1UpstrIOisTorus->SetGuidance("Build the Horn 1 I/O transition of the CGS subtraction, box from a torus.  ");
+	fHorn1UpstrIOisTorus->SetParameterName("Horn1UpstrIOisTorus", true);
+        fHorn1UpstrIOisTorus->SetDefaultValue(true); 
+	fHorn1UpstrIOisTorus->AvailableForStates(G4State_PreInit, G4State_Idle);
+        //
 	// Back door to study the magnetic field maps. 
 	// 
 	fDumpBFieldPlease = new G4UIcmdWithABool("/NuMI/det/DumpBfieldPlease",this);
@@ -308,7 +317,148 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	fDumpBFieldPlease->SetParameterName("DumpBFieldPlease", true);
         fDumpBFieldPlease->SetDefaultValue(ND->GetDumpBFieldPlease()); 
 	fDumpBFieldPlease->AvailableForStates(G4State_PreInit, G4State_Idle);
-	// 
+	//
+	// September 2017... 
+	//
+        fIgnoreCEQBr = new G4UIcmdWithABool("/NuMI/det/Horn1FieldIgnoreCEQBr",this);
+	fIgnoreCEQBr->SetGuidance(
+	      "Set CEQ field as a just a perturbation of the main component of the field (default is false)  ");
+        fIgnoreCEQBr->SetParameterName("fIgnoreCEQBr",true); // in Detector data 
+        fIgnoreCEQBr->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+        fHorn1FieldZCutUpstream = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn1FieldZCutUpstream",this);
+	fHorn1FieldZCutUpstream->SetGuidance(
+	      "Set the upstream Z cut off coordinate.  Field is 0 upstream of this coord. ");
+        fHorn1FieldZCutUpstream->SetParameterName("fHorn1FieldZCutUpstream",true); // in Detector data 
+        fHorn1FieldZCutUpstream->SetUnitCategory("Length");
+	fHorn1FieldZCutUpstream->SetDefaultValue(-32.);  // in mm 
+        fHorn1FieldZCutUpstream->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn1FieldZCutDwnstream = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn1FieldZCutDwnstream",this);
+	fHorn1FieldZCutDwnstream->SetGuidance(
+	      "Set the downstream Z cut off coordinate.  Field is 0 downstream of this coord. ");
+        fHorn1FieldZCutDwnstream->SetParameterName("fHorn1FieldZCutDwnstream",true); // in Detector data 
+        fHorn1FieldZCutDwnstream->SetUnitCategory("Length");
+	fHorn1FieldZCutDwnstream->SetDefaultValue(3277.);
+	   // in mm // Value extracted from the code circa Aug 2107
+        fHorn1FieldZCutDwnstream->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn1CurrentEqualizerLongAbsLength = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn1CurrentEqualizerLongAbsLength",this);
+	fHorn1CurrentEqualizerLongAbsLength->SetGuidance(
+	      "Set the effective Current Equalizer abosrption length  ");
+        fHorn1CurrentEqualizerLongAbsLength->SetParameterName("fHorn1CurrentEqualizerLongAbsLength",true); // in Detector data 
+        fHorn1CurrentEqualizerLongAbsLength->SetUnitCategory("Length");
+	fHorn1CurrentEqualizerLongAbsLength->SetDefaultValue(0.);  
+	 // The current is instantenously phi symmetric
+        fHorn1CurrentEqualizerLongAbsLength->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn1CurrentEqualizerQuadAmpl = new G4UIcmdWithADouble("/NuMI/det/Horn1CurrentEqualizerQuadAmpl",this);
+	fHorn1CurrentEqualizerQuadAmpl->SetGuidance(
+	      "Set the Strip line induced quadrupole amplitude (%, at Z = Z Zend ");
+        fHorn1CurrentEqualizerQuadAmpl->SetParameterName("fHorn1CurrentEqualizerQuadAmpl",true); // in Detector data 
+	fHorn1CurrentEqualizerQuadAmpl->SetDefaultValue(0.);  
+	 // The current is perfectly phi symmetric
+        fHorn1CurrentEqualizerQuadAmpl->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn1CurrentEqualizerOctAmpl = new G4UIcmdWithADouble("/NuMI/det/Horn1CurrentEqualizerOctAmpl",this);
+	fHorn1CurrentEqualizerOctAmpl->SetGuidance(
+	      "Set the Strip line induced octupole amplitude (%, at Z = Z Zend ");
+        fHorn1CurrentEqualizerOctAmpl->SetParameterName("fHorn1CurrentEqualizerOctAmpl",true); // in Detector data 
+	fHorn1CurrentEqualizerOctAmpl->SetDefaultValue(0.);  
+	 // The current is instantenously phi symmetric
+        fHorn1CurrentEqualizerOctAmpl->AvailableForStates(G4State_PreInit, G4State_Idle);
+//
+// October 2017.. 
+// 	 
+        fHorn2CurrentEqualizerLongAbsLength = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn2CurrentEqualizerLongAbsLength",this);
+	fHorn2CurrentEqualizerLongAbsLength->SetGuidance(
+	      "Set the effective Current Equalizer abosrption length  ");
+        fHorn2CurrentEqualizerLongAbsLength->SetParameterName("fHorn2CurrentEqualizerLongAbsLength",true); // in Detector data 
+        fHorn2CurrentEqualizerLongAbsLength->SetUnitCategory("Length");
+	fHorn2CurrentEqualizerLongAbsLength->SetDefaultValue(0.);  
+	 // The current is instantenously phi symmetric
+        fHorn2CurrentEqualizerLongAbsLength->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn2CurrentEqualizerQuadAmpl = new G4UIcmdWithADouble("/NuMI/det/Horn2CurrentEqualizerQuadAmpl",this);
+	fHorn2CurrentEqualizerQuadAmpl->SetGuidance(
+	      "Set the Strip line induced quadrupole amplitude (%, at Z = Z Zend ");
+        fHorn2CurrentEqualizerQuadAmpl->SetParameterName("fHorn2CurrentEqualizerQuadAmpl",true); // in Detector data 
+	fHorn2CurrentEqualizerQuadAmpl->SetDefaultValue(0.);  
+	 // The current is perfectly phi symmetric
+        fHorn2CurrentEqualizerQuadAmpl->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn2CurrentEqualizerOctAmpl = new G4UIcmdWithADouble("/NuMI/det/Horn2CurrentEqualizerOctAmpl",this);
+	fHorn2CurrentEqualizerOctAmpl->SetGuidance(
+	      "Set the Strip line induced octupole amplitude (%, at Z = Z Zend ");
+        fHorn2CurrentEqualizerOctAmpl->SetParameterName("fHorn2CurrentEqualizerOctAmpl",true); // in Detector data 
+	fHorn2CurrentEqualizerOctAmpl->SetDefaultValue(0.);  
+	 // The current is instantenously phi symmetric
+        fHorn2CurrentEqualizerOctAmpl->AvailableForStates(G4State_PreInit, G4State_Idle);
+//	
+// Back to the data cards introduced for the ME studies, Sept. 2017. 
+//	
+        fNovaTargetHTilt = new G4UIcmdWithADouble("/NuMI/det/NovaTargetHTilt",this);
+	fNovaTargetHTilt->SetGuidance(
+	      "Set the tilt of the nova target, in the Horizontal plane  ");
+        fNovaTargetHTilt->SetParameterName("fNovaTargetHTilt",true); // in Detector data 
+	fNovaTargetHTilt->SetDefaultValue(0.);  // in radians 
+        fNovaTargetHTilt->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fNovaTargetVTilt = new G4UIcmdWithADouble("/NuMI/det/NovaTargetVTilt",this);
+	fNovaTargetVTilt->SetGuidance(
+	      "Set the tilt of the nova target, in the Vertical plane  ");
+        fNovaTargetVTilt->SetParameterName("fNovaTargetVTilt",true); // in Detector data 
+	fNovaTargetVTilt->SetDefaultValue(0.);  // in radians 
+        fNovaTargetVTilt->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fNovaTargetXOffset = new G4UIcmdWithADoubleAndUnit("/NuMI/det/NovaTargetXOffset",this);
+	fNovaTargetXOffset->SetGuidance(
+	      "Set the X-offset with respect to the beam & Horn 1 axis ");
+        fNovaTargetXOffset->SetParameterName("fNovaTargetXOffset",true); // in Detector data 
+        fNovaTargetXOffset->SetUnitCategory("Length");
+	fNovaTargetXOffset->SetDefaultValue(0.);  // in mm 
+        fNovaTargetXOffset->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fNovaTargetYOffset = new G4UIcmdWithADoubleAndUnit("/NuMI/det/NovaTargetYOffset",this);
+	fNovaTargetYOffset->SetGuidance(
+	      "Set the Y-offset with respect to the beam & Horn 1 axis ");
+        fNovaTargetYOffset->SetParameterName("fNovaTargetYOffset",true); // in Detector data 
+        fNovaTargetYOffset->SetUnitCategory("Length");
+	fNovaTargetYOffset->SetDefaultValue(0.);  // in mm 
+        fNovaTargetYOffset->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fNovaTargetExtraFlangeThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/NovaTargetExtraFlangeThick",this);
+	fNovaTargetExtraFlangeThick->SetGuidance(
+	      " Add a bit of material downstream of the flange to represent the bolts holding the flange ");
+        fNovaTargetExtraFlangeThick->SetParameterName("fNovaTargetExtraFlangeThick",true); // in Detector data 
+        fNovaTargetExtraFlangeThick->SetUnitCategory("Length");
+	fNovaTargetExtraFlangeThick->SetDefaultValue(0.);  // in mm 
+        fNovaTargetExtraFlangeThick->AvailableForStates(G4State_PreInit, G4State_Idle);
+	 
+        fHorn1StripLinesThick = new G4UIcmdWithADoubleAndUnit("/NuMI/det/Horn1StripLinesThick",this);
+	fHorn1StripLinesThick->SetGuidance(
+	      " Add a bit of material downstream of the flange to represent the strip lines connection plates. ");
+        fHorn1StripLinesThick->SetParameterName("fHorn1StripLinesThick",true); // in Detector data 
+        fHorn1StripLinesThick->SetUnitCategory("Length");
+	fHorn1StripLinesThick->SetDefaultValue(0.);  // in mm 
+        fHorn1StripLinesThick->AvailableForStates(G4State_PreInit, G4State_Idle);
+	//
+	// Flag to allow for the correction of the bug in coordinate systems in NumiMagneticField 
+	//  
+	fUsePosLocalCoordInMagField = new G4UIcmdWithABool("/NuMI/det/UsePosLocalCoordInMagField",this);
+        fUsePosLocalCoordInMagField->SetGuidance(
+	 "Default is true. We correct a bug in the coordinate transform. Transverse Position in local coord. is used ");
+	fUsePosLocalCoordInMagField->SetParameterName("UsePosLocalCoordInMagField", true);
+        fUsePosLocalCoordInMagField->SetDefaultValue(true); 
+	fUsePosLocalCoordInMagField->AvailableForStates(G4State_PreInit, G4State_Idle);
+        
+	fUseRotLocalCoordInMagField = new G4UIcmdWithABool("/NuMI/det/UseRotLocalCoordInMagField",this);
+        fUseRotLocalCoordInMagField->SetGuidance(
+	 "Default is true. We correct a bug in the coordinate transform. Transverse Position in local coord. is used ");
+	fUseRotLocalCoordInMagField->SetParameterName("UseRotLocalCoordInMagField", true);
+        fUseRotLocalCoordInMagField->SetDefaultValue(true); 
+	fUseRotLocalCoordInMagField->AvailableForStates(G4State_PreInit, G4State_Idle);
+        
 	
 #ifdef MODERN_G4
         fGDMLOutputCmd = new G4UIcmdWithAString("/NuMI/output/writeGDML",this);
@@ -367,8 +517,28 @@ NumiDetectorMessenger::~NumiDetectorMessenger() {
 	delete fHornWaterLayerThick;
 	delete fHorn1IsAlternate;
 	delete fHorn1IsRefined;
+	delete fHorn1UpstrIOisTorus;
 	delete fHorn1ExtraLayerAlum;
 	delete fDumpBFieldPlease;
+	delete fIgnoreCEQBr;
+        delete fHorn1FieldZCutUpstream;
+        delete fHorn1FieldZCutDwnstream;
+        delete fHorn1CurrentEqualizerLongAbsLength;
+        delete fHorn1CurrentEqualizerQuadAmpl;
+        delete fHorn1CurrentEqualizerOctAmpl;
+        delete fHorn2CurrentEqualizerLongAbsLength;
+        delete fHorn2CurrentEqualizerQuadAmpl;
+        delete fHorn2CurrentEqualizerOctAmpl;
+    
+        delete fNovaTargetHTilt;
+        delete fNovaTargetVTilt;
+        delete fNovaTargetXOffset;
+        delete fNovaTargetYOffset;
+        delete fNovaTargetExtraFlangeThick;
+        delete fHorn1StripLinesThick;
+
+        delete fUsePosLocalCoordInMagField;
+        delete fUseRotLocalCoordInMagField;
 
 #ifdef MODERN_G4
         delete fGDMLOutputCmd;
@@ -475,6 +645,7 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    
    if ( command == UpdateCmd ) {
 #ifndef FLUGG
+      std::cerr << " Updating the geometry, i.e., calling NimuDetector construction again.. " << std::endl;
       NumiDetector->UpdateGeometry();
 #endif
    }
@@ -542,6 +713,9 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHorn1IsRefined(fHorn1IsAlternate->GetNewBoolValue(newValue));
       std::cerr << " Using refined precision for  Horn1 " << std::endl;
+   }  else if (command == fHorn1UpstrIOisTorus) {
+       NumiDetector->SetHorn1UpstrIOisTorus(fHorn1UpstrIOisTorus->GetNewBoolValue(newValue));
+      std::cerr << " Using The Torus version of the I/O transition of Horn1 " << std::endl;
    }  else if (command == fDumpBFieldPlease) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetDumpBFieldPlease(fDumpBFieldPlease->GetNewBoolValue(newValue));
@@ -549,11 +723,55 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    }  else if (command == fHorn1ExtraLayerAlum) {
       NumiDataInput *NumiData=NumiDataInput::GetNumiDataInput();
       NumiData->SetHorn1ExtraLayerAlum(fHorn1ExtraLayerAlum->GetNewDoubleValue(newValue));
+   }  else if (command == fIgnoreCEQBr) {
+       const bool tt = fIgnoreCEQBr->GetNewBoolValue(newValue);
+       NumiDetector->SetIgnoreCEQBr(tt);
+       if (tt) std::cerr << " Ignoring the radial component of the CEQ field map   " << std::endl;
+       else std::cerr << " Full 2D map. Please use the file pointed by env CEQMAPFILE   " << std::endl;
+   }  else if (command == fHorn1FieldZCutUpstream) {
+       NumiDetector->SetHorn1FieldZCutUpstream(fHorn1FieldZCutUpstream->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn1FieldZCutDwnstream) {
+       NumiDetector->SetHorn1FieldZCutDwnstream(fHorn1FieldZCutDwnstream->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn1CurrentEqualizerLongAbsLength) {
+       NumiDetector->SetHorn1CurrentEqualizerLongAbsLength(fHorn1CurrentEqualizerLongAbsLength->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn1CurrentEqualizerQuadAmpl) {
+       NumiDetector->SetHorn1CurrentEqualizerQuadAmpl(fHorn1CurrentEqualizerQuadAmpl->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn1CurrentEqualizerOctAmpl) {
+       NumiDetector->SetHorn1CurrentEqualizerOctAmpl(fHorn1CurrentEqualizerOctAmpl->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn2CurrentEqualizerLongAbsLength) {
+       NumiDetector->SetHorn2CurrentEqualizerLongAbsLength(fHorn2CurrentEqualizerLongAbsLength->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn2CurrentEqualizerQuadAmpl) {
+       NumiDetector->SetHorn2CurrentEqualizerQuadAmpl(fHorn2CurrentEqualizerQuadAmpl->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn2CurrentEqualizerOctAmpl) {
+       NumiDetector->SetHorn2CurrentEqualizerOctAmpl(fHorn2CurrentEqualizerOctAmpl->GetNewDoubleValue(newValue));
+   }  else if (command == fNovaTargetHTilt) {
+       NumiDetector->SetNovaTargetHTilt(fNovaTargetHTilt->GetNewDoubleValue(newValue));
+   }  else if (command == fNovaTargetVTilt) {
+       NumiDetector->SetNovaTargetVTilt(fNovaTargetVTilt->GetNewDoubleValue(newValue));
+   }  else if (command == fNovaTargetXOffset) {
+       NumiDetector->SetNovaTargetXOffset(fNovaTargetXOffset->GetNewDoubleValue(newValue));
+   }  else if (command == fNovaTargetYOffset) {
+       NumiDetector->SetNovaTargetYOffset(fNovaTargetYOffset->GetNewDoubleValue(newValue));
+   }  else if (command == fNovaTargetExtraFlangeThick) {
+       NumiDetector->SetNovaTargetExtraFlangeThick(fNovaTargetExtraFlangeThick->GetNewDoubleValue(newValue));
+   }  else if (command == fHorn1StripLinesThick) {
+       NumiDetector->SetHorn1StripLinesThick(fHorn1StripLinesThick->GetNewDoubleValue(newValue));
+   }  else if (command == fUsePosLocalCoordInMagField) {
+       NumiData->usePosLocalCoordInMagField = fUsePosLocalCoordInMagField->GetNewBoolValue(newValue);
+       if (NumiData->usePosLocalCoordInMagField) std::cerr << " Bug in coord. transform Postion, fixed" << std::endl;
+       else std::cerr << " Bug in coord. transform Postion, NOT fixed" << std::endl;
+   }  else if (command == fUseRotLocalCoordInMagField) {
+       NumiData->useRotLocalCoordInMagField = fUseRotLocalCoordInMagField->GetNewBoolValue(newValue);
+       if (NumiData->useRotLocalCoordInMagField) 
+         std::cerr << " Bug in coord. transform field rotations, fixed" << std::endl;
+       else std::cerr << " Bug in coord. transform field rotations, NOT fixed" << std::endl;
    } else {
    
 //       std::cerr << " In messenger, Unknown Cmd " << (void *) (command) << " and I will quit " << std::endl;
 //      exit(2);
   }
+
+  
 
 #ifdef MODERN_G4      
    if ( command == fGDMLStoreRefCmd ) {
