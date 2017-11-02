@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.24 2017/02/15 21:15:47 laliaga Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.25 2017/11/02 21:58:44 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -69,8 +69,24 @@ NumiAnalysis::NumiAnalysis()
    :g4hmmdata(0),
     g4draydataMIB(0),
     g4draydataSPB(0),
-    g4absbkgdata(0)
+    g4absbkgdata(0),
+    energyBinSimpleHistoMinerva(-1.0e10)
+// The above histo must be of the same size..     
 {
+  // 
+  //  Simple histogram for quick study of the flux spectrum, Paul Lebrun, September/October 2017.  
+  // To turn on, simply uncomment the bin size. 
+  //
+  energyBinSimpleHistoMinerva = 0.1;
+  if (energyBinSimpleHistoMinerva > 0.) {  
+    MinervaNuMuHisto = std::vector<double>(250,0.);
+    MinervaNuMuBarHisto = std::vector<double>(250,0.); 
+    NovaNearNuMuHisto = std::vector<double>(100,0.);
+    NovaNearNuMuBarHisto = std::vector<double>(100,0.); 
+    NovaFarNuMuHisto = std::vector<double>(100,0.);
+    NovaFarNuMuBarHisto = std::vector<double>(100,0.);
+  }
+  
   NumiData = NumiDataInput::GetNumiDataInput();
 
   if(NumiData->GetDebugLevel() > 0)
@@ -115,7 +131,7 @@ NumiAnalysis::NumiAnalysis()
   code[3122]  = 17;
   code[3222]  = 21;
   code[3212]  = 22;
-  code[3112]  = 20;
+  code[3112]  = 20; 
 }
 //------------------------------------------------------------------------------------
 NumiAnalysis::~NumiAnalysis()
@@ -138,6 +154,14 @@ NumiAnalysis* NumiAnalysis::getInstance()
 //------------------------------------------------------------------------------------
 void NumiAnalysis::book()
 {
+  //
+  // Set the Minerva flux binning depending on the horn configuration. (le vs me ) 
+  //
+  if (NumiData->GetHornConfig() == G4String("le")) {
+    std::cerr << " Low energy config, Setting energyBinSimpleHistoMinerva to 0.02.. " << std::endl;
+    energyBinSimpleHistoMinerva = 0.02;
+  }  
+
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::book() called." << G4endl;}
 
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
@@ -397,10 +421,51 @@ std::string NumiAnalysis::GetOFileName(std::string ifilename)
 }
 
 //------------------------------------------------------------------------------------
-void NumiAnalysis::finish()
+void NumiAnalysis::finishPL()
 {
-   if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::finish() called." << G4endl;}
+  if (energyBinSimpleHistoMinerva < 0.) return;
+   G4cout << "NumiAnalysis::finishPL() called." << G4endl;
+   std::cerr << "NumiAnalysis::finishPL() called." << G4endl;
    
+  // Study of the inclusive  numu spectrum for various magnetic field 
+  // To speed the I/O and processing on the farm, we include here a fixed size
+  // weighted histogram 
+  std::string aDir("./");
+  const char* aDirGG = getenv("_CONDOR_SCRATCH_DIR");
+  if (aDirGG != 0) aDir = std::string(aDirGG);
+  {
+    std::string aNamePL(aDir); aNamePL += std::string("/FluxHistoPL.txt");
+    std::ofstream fOutPLHisto(aNamePL.c_str());
+    fOutPLHisto << " k e numu numub " << std::endl;
+    G4RunManager* pRunManager = G4RunManager::GetRunManager();
+     int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
+    for (size_t k=0; k != MinervaNuMuHisto.size();  k++) {
+       fOutPLHisto << " " << k << " " <<  (energyBinSimpleHistoMinerva/2. + energyBinSimpleHistoMinerva*k) 
+                << " " << MinervaNuMuHisto[k]/NPots << " " 
+		<< MinervaNuMuBarHisto[k]/NPots << std::endl;
+    }
+    fOutPLHisto.close();
+  }
+  {
+    std::string aNamePL(aDir); aNamePL += std::string("/FluxHistoNovaPL.txt");
+    std::ofstream fOutPLHisto(aNamePL.c_str());
+    fOutPLHisto << " k e numuN numubN numuF numubF " << std::endl;
+    G4RunManager* pRunManager = G4RunManager::GetRunManager();
+    int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
+    for (size_t k=0; k != NovaNearNuMuHisto.size();  k++) {
+      fOutPLHisto << " " << k << " " <<  (0.05 + 0.1*k) 
+                << " " << NovaNearNuMuHisto[k]/NPots << " "  << NovaNearNuMuBarHisto[k]/NPots
+		<< " " << NovaFarNuMuHisto[k]/NPots << " " 
+		<< NovaFarNuMuBarHisto[k]/NPots << std::endl;
+    }
+    fOutPLHisto.close();
+  }
+}
+void NumiAnalysis::finish() {
+
+   G4cout << "NumiAnalysis::finish() called." << G4endl;
+   std::cerr << "NumiAnalysis::finish() called." << G4endl;
+  
   if (NumiData->createNuNtuple){
     nuNtuple->cd();
     meta->Write(); //write dkmeta
@@ -1397,6 +1462,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   // (Leo Aliaga. Feb18, 2015)
 
   const int Nanc = NumiData->nGenAbs;
+//  std::cerr << " NumiAnalysis fill ntuple,  Nanc " << Nanc << std::endl;
 
   G4double fact_Al = (26.98) / (2.7); 
   G4double fact_Fe = (55.85) / (7.869990); 
@@ -1405,6 +1471,11 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4double dist_IC2[3];
   G4double dist_DPIP[3];
   G4double dist_DVOL[3];
+  
+  if (Nanc > 3) {
+    std::cerr << " NumiAnalysis::FillNeutrinoNtuple, Nanc greter than 3, Overwrite!... Quit here " << std::endl;
+    exit(2);
+  }
   
   //initializing:
   for(int ii=0; ii<Nanc;ii++){
@@ -1672,6 +1743,22 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
     bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
     vec_nuray.push_back(tmp_nuray);
+    if ((energyBinSimpleHistoMinerva > 0.) && 
+        (ii == 1) && (nu_energy > 0.)) { // 2nd detector is centered on axis. We
+      size_t iBin = nu_energy/energyBinSimpleHistoMinerva;
+      if ((iBin < MinervaNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
+        MinervaNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
+      if ((iBin < MinervaNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
+        MinervaNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
+    }	 	      
+    if ((energyBinSimpleHistoMinerva > 0.) && 
+        (ii == 2) && (nu_energy > 0.)) { // Nova Near Detector off axis.. 
+      size_t iBin = nu_energy/energyBinSimpleHistoMinerva;
+      if ((iBin < NovaNearNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
+        NovaNearNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
+      if ((iBin < NovaNearNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
+        NovaNearNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
+    }	 	      
   }
   //for far detectors: 
   for(G4int ii=0; ii<NumiData->nFar; ++ii){      
@@ -1689,6 +1776,14 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
       bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
       vec_nuray.push_back(tmp_nuray);      
+      if ((energyBinSimpleHistoMinerva > 0.) && 
+          (ii == 1) && (nu_energy > 0.)) { // Nova Near Detector off axis.. 
+        size_t iBin = nu_energy/0.1;
+        if ((iBin < NovaFarNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
+          NovaFarNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
+        if ((iBin < NovaFarNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
+          NovaFarNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
+      }	 	      
   }
   ////
   //6) Others:
