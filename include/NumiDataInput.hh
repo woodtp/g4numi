@@ -1,6 +1,6 @@
  //----------------------------------------------------------------------
 //
-// $Id: NumiDataInput.hh,v 1.23.2.19 2017/05/11 10:53:27 lcremone Exp $
+// $Id: NumiDataInput.hh,v 1.23.2.20 2017/11/02 21:41:56 lebrun Exp $
 //----------------------------------------------------------------------
 
 #ifndef NumiDataInput_h
@@ -448,6 +448,14 @@ public:
    //----------------
   //Horn1 rotation:
   G4double Horn1Phi, Horn1Theta, Horn1Psi;
+   
+  //
+  // Paul Lebrun, October 2017: supplement two boolean to quantify the effect of 
+  // the bug in coordinate transform, global to local, in computing the magnetic field 
+  //
+  bool usePosLocalCoordInMagField;
+  bool useRotLocalCoordInMagField;
+   
    
    G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
   
