@@ -56,6 +56,7 @@ public:
    
    void book();
    void finish();
+   void finishPL();
    void FillMeta(); //new function to fill dk2meta
    void FillNeutrinoNtuple(const G4Track& track,
                            const std::vector<G4VTrajectory*>& nuHistory);
@@ -146,7 +147,17 @@ private:
   std::vector<int> vec_int;
   std::vector<double> vec_dbl;
   //////////////////////////////////////////
-
+  // September 2017 Paul Lebrun.. 
+  // Study of the inclusive  numu spectrum for various magnetic field 
+  // To speed the I/O and processing on the farm, we include here a fixed size
+  // weighted histogram 
+  double energyBinSimpleHistoMinerva; // depend on the LE vs ME configuration.. 
+  std::vector<double> MinervaNuMuHisto;
+  std::vector<double> MinervaNuMuBarHisto;
+  std::vector<double> NovaFarNuMuHisto;
+  std::vector<double> NovaNearNuMuHisto;
+  std::vector<double> NovaFarNuMuBarHisto;
+  std::vector<double> NovaNearNuMuBarHisto;
 };
 
 #endif 
