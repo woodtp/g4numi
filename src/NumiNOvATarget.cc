@@ -62,15 +62,19 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4double mvGap=0.05*mm;
   G4ThreeVector TargetMVOrigin;
 
+  std::cerr << " Dump of Nova target parameters " << std::endl;
 
   rotation = G4RotationMatrix(0.,0.,0.);  
   TargetMVOrigin = G4ThreeVector(NumiData->TargetUpBeFlangeX0, 
 				 NumiData->TargetUpBeFlangeY0, 
 				 NumiData->TargetUpBeFlangeZ0 + NumiData->TargetUpBeFlangeLength/2.0);
   
+  std::cerr << " Target Origin " << TargetMVOrigin << std::endl;
   TargetMotherVolSolid = new G4Tubs("TargetMotherVolSolid", 0., NumiData->TargetUpBeFlangeOutRad+mvGap, 
 				    NumiData->TargetUpBeFlangeLength/2.0+mvGap, 0., 360.*deg);
 
+  std::cerr << " ... Usptream Flange... Radius   " << NumiData->TargetUpBeFlangeOutRad 
+                                               << " Length " << NumiData->TargetUpBeFlangeLength <<  std::endl;
 
   dummySolid = new G4Tubs("dummySolid",0.,NumiData->TargetUpFlangeOutRad+mvGap,
 			  NumiData->TargetUpFlangeLength/2.+mvGap,0.,360.*deg);
@@ -78,6 +82,8 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   translation=G4ThreeVector(NumiData->TargetUpFlangeX0, 
 			    NumiData->TargetUpFlangeY0, 
 			    NumiData->TargetUpFlangeZ0 + NumiData->TargetUpFlangeLength/2.0) - TargetMVOrigin;
+			    
+  std::cerr << " ... Translated by .. " << translation << std::endl;
 
   TargetMotherVolSolid = new G4UnionSolid("TargetMotherVolSolid",TargetMotherVolSolid,
 					  dummySolid,G4Transform3D(rotation,translation));
@@ -85,19 +91,32 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   dummySolid=new G4Tubs("dummySolid",0.,NumiData->TargetOutsideCasingOutRad+mvGap,
 			NumiData->TargetCasingLength/2.+mvGap,0.,360.*deg);
 
+  std::cerr << " ... Outsicasing Radius    " << NumiData->TargetOutsideCasingOutRad 
+                                               << " Length " << NumiData->TargetCasingLength <<  std::endl;
+					       
   translation=G4ThreeVector(NumiData->TargetCasingX0, 
 			    NumiData->TargetCasingY0, 
 			    NumiData->TargetCasingZ0 + NumiData->TargetCasingLength/2.0) - TargetMVOrigin;
   
+  std::cerr << " ... Translated by .. " << translation << std::endl;
   TargetMotherVolSolid = new G4UnionSolid("TargetMotherVolSolid",TargetMotherVolSolid,
 					  dummySolid,G4Transform3D(rotation,translation));
+  //
+  // September 2017.  P.L. Adding (optionally) a bit of material on the downstream flange, to simulate the bolds.. 
+  //
+  const double effTargetDnFlangeLength = NumiData->TargetDnFlangeLength + fNovaTargetExtraFlangeThick;
   
   dummySolid=new G4Tubs("dummySolid",0.,NumiData->TargetDnFlangeOutRad+mvGap,
-			NumiData->TargetDnFlangeLength/2.+mvGap,0.,360.*deg);
+			effTargetDnFlangeLength/2.+mvGap,0.,360.*deg);
 
+  std::cerr << " ... Dn Flange Radius    " << NumiData->TargetDnFlangeOutRad
+                                               << " Length " << effTargetDnFlangeLength<<  std::endl;
+					       
   translation=G4ThreeVector(NumiData->TargetDnFlangeX0, 
 			    NumiData->TargetDnFlangeY0, 
-			    NumiData->TargetDnFlangeZ0 + NumiData->TargetDnFlangeLength/2.0) - TargetMVOrigin;
+			    NumiData->TargetDnFlangeZ0 + effTargetDnFlangeLength/2.0) - TargetMVOrigin;
+  
+  std::cerr << " ... Translated by .. " << translation << std::endl;
   
   TargetMotherVolSolid = new G4UnionSolid("TargetMotherVolSolid",TargetMotherVolSolid,
 					  dummySolid,G4Transform3D(rotation,translation));
@@ -121,11 +140,24 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4ThreeVector TargetPosition=G4ThreeVector(NumiData->TargetX0,NumiData->TargetY0,NumiData->TargetZ0);
   G4ThreeVector TargetMotherVolPosition= TargetPosition + TargetMVOrigin - TargetHallPosition;
 
+  std::cerr << " ... TargetMotherVolPosition .. " << TargetMotherVolPosition << std::endl;
       //G4LogicalVolume* TargetMotherVolLV = new G4LogicalVolume(TargetMotherVolSolid, He, "lvTargetMother", 0, 0, 0);
   G4LogicalVolume* TargetMotherVolLV
       = new G4LogicalVolume(TargetMotherVolSolid, TargetHelium, "lvTargetMother", 0, 0, 0);
+  //
+  // P.L. Add systematic studies to understand the wiggle. September 2017
+  //
+  G4RotationMatrix *aMatMPtr = 0;
+  if ((std::abs(fNovaTargetHTilt) > 1.0e-10) || (std::abs(fNovaTargetVTilt) > 1.0e-10)) { 
+    aMatMPtr =  &fRotationMotherNovaTarget;
+    if (std::abs(fNovaTargetHTilt) > 1.0e-10) fRotationMotherNovaTarget.rotateY(fNovaTargetHTilt);
+    if (std::abs(fNovaTargetVTilt) > 1.0e-10) fRotationMotherNovaTarget.rotateX(fNovaTargetVTilt);
+  }
+  G4ThreeVector finalTargetMotherVolPosition (TargetMotherVolPosition);
+  finalTargetMotherVolPosition[0] += fNovaTargetXOffset;
+  finalTargetMotherVolPosition[1] += fNovaTargetYOffset;
   
-  G4VPhysicalVolume* pvTargetMotherVol = new G4PVPlacement(0,TargetMotherVolPosition,"TargetMotherVol",
+  G4VPhysicalVolume* pvTargetMotherVol = new G4PVPlacement(aMatMPtr, finalTargetMotherVolPosition,"TargetMotherVol",
 							   TargetMotherVolLV,TGAR,false,0,NumiData->pSurfChk);
 
 
@@ -210,16 +242,17 @@ void NumiDetectorConstruction::ConstructNOvATarget()
 //    std::cerr << " Translation for " << aNameTmpStr << " is " << translation << std::endl;
 //    new G4PVPlacement(G4Transform3D(rotation, translation), aNameTmpStr , LVTargetFin, pvTargetMotherVol, false, ii, NumiData->pSurfChk);
   }
-  
 
+//
+//   
   //Now create the bottom portion of the graphite target bewteen the pressing plate and cooling plate.
 
   G4VSolid* TargetBottomSolid;
   G4LogicalVolume* TargetBottomLV;
-
+  TGT_z = NumiData->TotalTargetLength/2.0 + fNovaTargetExtraFlangeThick/2. ;
   TargetBottomSolid = new G4Box("TargetBottomSolid",NumiData->TargetSegWidth/2.0,
 				(NumiData->TargetGraphiteHeight - NumiData->TargetSegHeight)/2.0, 
-				NumiData->TotalTargetLength/2.0);
+				NumiData->TotalTargetLength/2.);
 
   TargetBottomLV = new G4LogicalVolume(TargetBottomSolid,Target,"TargetBottomLV",0,0,0);
 
@@ -241,15 +274,25 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4LogicalVolume* OutsideCasingLV;
 
   OutsideCasingSolid = new G4Tubs("OutsideCasingSolid",
-				  NumiData->TargetOutsideCasingInRad,
-				  NumiData->TargetOutsideCasingOutRad,
-				  NumiData->TargetCasingLength/2.0,
+				  NumiData->TargetOutsideCasingInRad  - mvGap,
+				  NumiData->TargetOutsideCasingOutRad  - mvGap,
+				  NumiData->TargetCasingLength/2.0  - mvGap,
 				  0.0,360.*deg);
   translation=G4ThreeVector(0.,
 			    -NumiData->TargetSegHeight/2.0 + NumiData->TargetSegWidth/2.0,
 			    NumiData->TargetCasingZ0+NumiData->TargetCasingLength/2.0) - TargetMVOrigin;
+//  translation[1] -= 6.5*CLHEP::mm;
+  translation[1] = NumiData->TargetCasingY0;
+//  std::cerr << " Params for position Outside casing TargetSegHeight" << NumiData->TargetSegHeight <<
+//               " TargetSegWidth " << NumiData->TargetSegWidth/2.0  << 	" TargetCasingLength " 
+//	       << NumiData->TargetCasingLength << std::endl;		    
   OutsideCasingLV = new G4LogicalVolume(OutsideCasingSolid,Al,"OutsideCasingLV",0,0,0);
-  new G4PVPlacement(0,translation,"OutsideCasing",OutsideCasingLV,pvTargetMotherVol,false,0,NumiData->pSurfChk);
+  
+//   std::cerr << " ... No Z translation... Translated by .. " << translation 
+//             << " All dims - Gap L - 1 Z p0.0 Y p - TgtCasingY0" << std::endl;
+
+   std::cerr << " TargetCasingZ0 " << 	NumiData->TargetCasingZ0 << " TargetMVOrigin "  << TargetMVOrigin << std::endl;
+ new G4PVPlacement(0,translation,"OutsideCasing",OutsideCasingLV,pvTargetMotherVol,false,0,NumiData->pSurfChk);
 
 
   // Water channel of target container
@@ -257,9 +300,9 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4LogicalVolume* CasingWaterLV;
 
   CasingWaterSolid = new G4Tubs("CasingWaterSolid",
-				NumiData->TargetCasingWaterInRad,
-				NumiData->TargetCasingWaterOutRad,
-				NumiData->TargetCasingLength/2.0,
+				NumiData->TargetCasingWaterInRad - 2.0*mvGap,
+				NumiData->TargetCasingWaterOutRad - 2.0*mvGap,
+				NumiData->TargetCasingLength/2.0 - 2.0*mvGap,
 				0.0,360.*deg);
   translation = G4ThreeVector(NumiData->TargetCasingX0,
 			      NumiData->TargetCasingY0,
@@ -273,16 +316,16 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4LogicalVolume* InsideCasingLV;
 
   InsideCasingSolid = new G4Tubs("InsideCasingSolid",
-				  NumiData->TargetInsideCasingInRad,
-				  NumiData->TargetInsideCasingOutRad,
-				  NumiData->TargetCasingLength/2.0,
+				  NumiData->TargetInsideCasingInRad - 3.0*mvGap,
+				  NumiData->TargetInsideCasingOutRad - 3.0*mvGap,
+				  NumiData->TargetCasingLength/2.0 - 3.0*mvGap,
 				  0.0,360.*deg);
   translation  = G4ThreeVector(NumiData->TargetCasingX0,
 			       NumiData->TargetCasingY0,
 			       NumiData->TargetCasingZ0+NumiData->TargetCasingLength/2.0) - TargetMVOrigin;
   InsideCasingLV = new G4LogicalVolume(InsideCasingSolid,Al,"InsideCasingLV",0,0,0);
   new G4PVPlacement(0,translation,"InsideCasing",InsideCasingLV,pvTargetMotherVol,false,0,NumiData->pSurfChk);
-
+//
 //  std::cerr << " InsideCasingSolid rads...  .. " << 	NumiData->TargetInsideCasingInRad 
 //            << " " << NumiData->TargetInsideCasingOutRad << " Length " 
 //	    << NumiData->TargetCasingLength << " and quit ... " << std::endl; 
@@ -364,7 +407,7 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   G4LogicalVolume* TargetDnFlangeLV;
 
   TargetDnFlangeSolid = new G4Tubs("TargetDnFlangeSolid", 0., 
-				   NumiData->TargetDnFlangeOutRad, NumiData->TargetDnFlangeLength/2.0, 
+				   NumiData->TargetDnFlangeOutRad, effTargetDnFlangeLength/2.0, 
 				   0., 360.*deg);
 
   DnFlangeCutout = new G4Tubs("DnFlangeCutout", 0., 
@@ -372,12 +415,12 @@ void NumiDetectorConstruction::ConstructNOvATarget()
 			      0., 360.*deg);
   
   rotation=G4RotationMatrix(0,0,0);
-  translation=G4ThreeVector(0., 0., -(NumiData->TargetDnFlangeLength - NumiData->TargetDnFlangeCutoutLength)/2.0);
+  translation=G4ThreeVector(0., 0., -(effTargetDnFlangeLength - NumiData->TargetDnFlangeCutoutLength)/2.0);
   TargetDnFlangeSolid = new G4SubtractionSolid("TargetDnFlangeSolid", TargetDnFlangeSolid, 
 					       DnFlangeCutout, G4Transform3D(rotation, translation));
 
   DnFlangeHole = new G4Tubs("DnFlangeHole", 0., 
-			    NumiData->TargetDnBeWindowRadius, NumiData->TargetDnFlangeLength/2.0, 
+			    NumiData->TargetDnBeWindowRadius, effTargetDnFlangeLength/2.0, 
 			    0., 360.*deg);
 
   rotation=G4RotationMatrix(0,0,0);
@@ -388,7 +431,7 @@ void NumiDetectorConstruction::ConstructNOvATarget()
   TargetDnFlangeLV = new G4LogicalVolume(TargetDnFlangeSolid, Al, "TargetDnFlangeLV", 0, 0, 0);
   translation = G4ThreeVector(NumiData->TargetDnFlangeX0,
 			      NumiData->TargetDnFlangeY0,
-			      NumiData->TargetDnFlangeZ0 + NumiData->TargetDnFlangeLength/2.0) - TargetMVOrigin;
+			      NumiData->TargetDnFlangeZ0 + effTargetDnFlangeLength/2.0) - TargetMVOrigin;
 
   new G4PVPlacement(0, translation, "TargetDnFlange", TargetDnFlangeLV, pvTargetMotherVol, false, 0, NumiData->pSurfChk);
 
