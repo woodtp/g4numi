@@ -139,9 +139,11 @@ void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
 //            ((dPhi > (M_PI + M_PI/4.)) && (dPhi < (2.0*M_PI - M_PI/4.))))
 //        dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
 	
-    const double dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
-//    const double dPhi = -M_PI/2.; // Shooting up, test Hadron Absorber. 
-//   
+//    const double dPhi = 2.0*M_PI*CLHEP::RandFlat::shoot();
+//    const double dPhi = -M_PI/2. - 0.05 + 0.1*CLHEP::RandFlat::shoot(); 
+      // Shooting down, to study the lower portion of the nova target. 
+//
+     const double dPhi = 0.; // testing magnetic field rotation..  
     const double dx = dr*std::cos(dPhi);
 // Shoot downs to check the bottom plate.. 
 //    const double dx = 0.; 
@@ -158,7 +160,8 @@ void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
 //    const double x =  G4RandGauss::shoot(0.0, 1.3);  
 //    const double y =  G4RandGauss::shoot(0.0, 1.3);  
 // Back door to study tile of Horn1 via magentic effect. Take a point source at = 0.
-    const double x =  G4RandGauss::shoot(0.0, 1.3e-10);  
+//    const double x =  G4RandGauss::shoot(0.0, 1.3e-10);  
+    const double x =  90.0;  
     const double y =  G4RandGauss::shoot(0.0, 1.3e-10);  
 // Back door to study effect of overlap
 //    const double dPhiPos = 2.0*M_PI*CLHEP::RandFlat::shoot();
@@ -172,17 +175,24 @@ void NumiPrimaryGeneratorAction::Geantino(G4Event* anEvent)
        //
        // Go systematically in polar angle, event by event..  Phi fixed to 45 degrees.
        //
+
        const G4Run *mRun = G4RunManager::GetRunManager()->GetCurrentRun();
        const double frEvt = (double) anEvent->GetEventID()/((double) mRun->GetNumberOfEventToBeProcessed());
        const double dr = fPolarAngleGeantinoMin + (fPolarAngleGeantino - fPolarAngleGeantinoMin)*frEvt;
-       const double dx = std::sqrt(0.5)*dr;
-       const double dy = dx;
+//       const double dPhiGG = 0.17 + frEvt*(M_PI/2.)/5.; 
+       const double dPhiGG = 0. + frEvt*(M_PI/2.)/5.; 
+//       const double dx = std::cos(dPhiGG)*dr;
+//       const double dy = std::sin(dPhiGG)*dr;
+       const double dy = 0.;
+       const double dx = dr;
        const double dz = sqrt(1.0 - (dx*dx + dy*dy));
        G4ThreeVector direction(dx, dy, dz);
-       fParticleGun->SetParticlePosition(G4ThreeVector(0., 37.,  fZOriginGeantino));
+//       fParticleGun->SetParticlePosition(G4ThreeVector(0., 0.,  fZOriginGeantino));
+       fParticleGun->SetParticlePosition(G4ThreeVector(65., 0.,  fZOriginGeantino)); // Testing horn 1 shifts. 
        fParticleGun->SetParticleMomentumDirection(direction);
-       fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(-13)); // mu + 
-       fParticleGun->SetParticleEnergy(fND->protonKineticEnergy); // back door use of the proton momentum data card. 
+//       fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(-13)); // mu + 
+       fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("chargedgeantino")); // geantino
+       fParticleGun->SetParticleEnergy(8.0*CLHEP::GeV); // explicit, we'll keep re-linking.   
     }
     fParticleGun->GeneratePrimaryVertex(anEvent);
     fCurrentPrimaryNo++;
