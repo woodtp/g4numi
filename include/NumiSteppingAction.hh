@@ -69,6 +69,7 @@ private:
   void StudyPropagation(const G4Step*); 
   void StudyCheckOverlap(const G4Step*);
   void StudyBFieldWithMuons(const G4Step*);
+  void dumpStepCheckVolumeAndFields(const G4Step*);
    
 public:
 
