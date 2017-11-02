@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.25 2017/11/02 21:58:44 lebrun Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.26 2017/11/02 22:08:00 lebrun Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -77,7 +77,7 @@ NumiAnalysis::NumiAnalysis()
   //  Simple histogram for quick study of the flux spectrum, Paul Lebrun, September/October 2017.  
   // To turn on, simply uncomment the bin size. 
   //
-  energyBinSimpleHistoMinerva = 0.1;
+//  energyBinSimpleHistoMinerva = 0.1;
   if (energyBinSimpleHistoMinerva > 0.) {  
     MinervaNuMuHisto = std::vector<double>(250,0.);
     MinervaNuMuBarHisto = std::vector<double>(250,0.); 
