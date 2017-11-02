@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.23 2017/05/11 10:52:32 lcremone Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.24 2017/11/02 21:54:42 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -1219,7 +1219,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   NumiDataInput::Print();
 
-
+  usePosLocalCoordInMagField = true;
+  useRotLocalCoordInMagField = true;
 
   if(fPrintInfo > 0 || debugOn)
   {
@@ -1546,7 +1547,6 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
       }
    }
   
-
    if(fUseCorrHornCurrent && fHornConfig == "le")
    {
       //
@@ -1597,7 +1597,6 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
    G4double ihorn;
    std::istringstream ihornstrm(ihornstr);
    ihornstrm >> ihorn;
-
    //
    //note the horn current must be stored in amps
    //
