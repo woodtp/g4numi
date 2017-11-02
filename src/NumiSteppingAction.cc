@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // NumiSteppingAction.cc
-// $Id: NumiSteppingAction.cc,v 1.16.4.11 2015/02/17 16:53:22 lebrun Exp $
+// $Id: NumiSteppingAction.cc,v 1.16.4.12 2017/11/02 21:47:34 lebrun Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -29,6 +29,8 @@
 #include "G4EventManager.hh"
 #include "NumiEventAction.hh"
 #include "NumiRunManager.hh"
+#include "G4FieldManager.hh"
+#include "G4MagneticField.hh"
 
 NumiSteppingAction::NumiSteppingAction()
    :fPrintAllSteps(false),
@@ -64,16 +66,39 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
    {
       G4int evtno = pRunManager->GetCurrentEvent()->GetEventID();
       std::cout << "Event " << evtno << ": NumiSteppingAction::UserSteppingAction() Called." << std::endl;
-   }
+   }     
 
    NumiAnalysis* analysis = NumiAnalysis::getInstance();
    analysis->FillBXDRAW(theStep);
    
    G4Track * theTrack = theStep->GetTrack();
+//
+//  Suspect that we can not handle very long track (i.e., loopers) at high magnetic field, near Z= 3150 
+//  
+   G4StepPoint* prePtr =theStep->GetPreStepPoint(); 
    G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
+   if ((particleDefinition->GetPDGEncoding() != 2212) && 
+       (theTrack->GetTrackLength() > 6000.0*CLHEP::mm) && (prePtr != 0) 
+         && (prePtr->GetPosition()[2] < 3300.*CLHEP::mm)) {
+        G4ThreeVector pMom = prePtr->GetMomentum();
+        if (pMom[2] < 500.0) {
+           std::cerr << " Suspect looper, long track, L= " << theTrack->GetTrackLength() << " at XYZ = " 
+               << prePtr->GetPosition()[0] << " / " << prePtr->GetPosition()[1] 
+               << " / " << prePtr->GetPosition()[2] << std::endl
+               << " ....... Momentum " << pMom[0] << " / " << pMom[1] << " / " << pMom[2] << " Id " << 
+               particleDefinition->GetPDGEncoding() << " ...killing this track " << std::endl;
+            theTrack->SetTrackStatus(fStopAndKill);
+            return;
+     }
+  } 
    G4String particleType = particleDefinition -> GetParticleType();
+   NumiRunManager* aRunManager = reinterpret_cast<NumiRunManager*>(NumiRunManager::GetRunManager());
    
    
+   if  ((fGeantinoStudyName.find("Mag") != std::string::npos) 
+       && (aRunManager->GetCurrentEvent()->GetEventID() < 5)) 
+        this->dumpStepCheckVolumeAndFields(theStep); 
+
    
    
    // Check if the Pi+, Pi-, K+, K-, K0L, mu+ or mu- decayed and set Ndecay code:
@@ -1245,4 +1270,75 @@ bool NumiSteppingAction::EscapingTarget(const G4String &preVolName, const G4Stri
    }
    return false;	         
 
+}
+void NumiSteppingAction::dumpStepCheckVolumeAndFields(const G4Step * theStep) {
+
+  const NumiRunManager* aRunManager = (NumiRunManager*) NumiRunManager::GetRunManager();
+  int idEvt = aRunManager->GetCurrentEvent()->GetEventID();
+  if (fEvtIdPrevious != idEvt) {
+      if (fOutStudyGeantino.is_open()) fOutStudyGeantino.close();
+      std::ostringstream fNameStrStr; fNameStrStr << "./StepSudiesMagn_Evt" << idEvt << ".txt";
+      std::string fNameStr(fNameStrStr.str());
+      fOutStudyGeantino.open(fNameStr.c_str());
+      fOutStudyGeantino 
+       << " x0 y0 z0 bx0 by0 bz0 x1 y1 z1 bx1 by1 bz1 xp0 yp0 xp1 yp1 dpt vName0 vName1 " << std::endl;
+      fEvtIdPrevious = idEvt;
+  }
+  G4StepPoint* prePtr = theStep->GetPreStepPoint();
+  if (theStep->GetPreStepPoint()->GetPhysicalVolume() == 0) return;
+  if (prePtr == 0) return;
+  G4Track * theTrack = theStep->GetTrack();
+  if ( theTrack->GetNextVolume() == 0 ) {
+    if (fOutStudyGeantino.is_open()) fOutStudyGeantino.close();
+    return;
+  }
+  G4StepPoint* postPtr = theStep->GetPostStepPoint();
+  if (postPtr == 0) {
+    if (fOutStudyGeantino.is_open()) fOutStudyGeantino.close();
+    return;
+  } 
+  for (size_t k=0; k !=3; k++) fOutStudyGeantino << " " << prePtr->GetPosition()[k];
+  G4FieldManager *aFieldMgrPre = prePtr->GetPhysicalVolume()->GetLogicalVolume()->GetFieldManager();
+  if (aFieldMgrPre == 0) {
+   fOutStudyGeantino << " 0. 0. 0. ";
+  } else {
+    G4MagneticField *aField = (G4MagneticField *) aFieldMgrPre->GetDetectorField();
+    if ( aField == 0) {
+       fOutStudyGeantino << " 0. 0. 0. ";
+    } else {
+       double xxx[3]; for (size_t k=0; k!=3; k++) xxx[k] =  prePtr->GetPosition()[k];
+       double bfxxx[3]; 
+       aField->GetFieldValue(xxx, bfxxx); 
+       fOutStudyGeantino << " " << bfxxx[0]/CLHEP::tesla << " " 
+                         << bfxxx[1]/CLHEP::tesla << " " << bfxxx[2]/CLHEP::tesla;
+    }
+  }
+  for (size_t k=0; k !=3; k++) fOutStudyGeantino << " " << postPtr->GetPosition()[k];
+  G4FieldManager *aFieldMgrpost = postPtr->GetPhysicalVolume()->GetLogicalVolume()->GetFieldManager();
+  if (aFieldMgrpost == 0) {
+   fOutStudyGeantino << " 0. 0. 0. ";
+  } else {
+    G4MagneticField *aField = (G4MagneticField *) aFieldMgrpost->GetDetectorField();
+    if ( aField == 0) {
+       fOutStudyGeantino << " 0. 0. 0. ";
+    } else {
+       double xxx[3]; for (size_t k=0; k!=3; k++) xxx[k] =  postPtr->GetPosition()[k];
+       double bfxxx[3]; 
+       aField->GetFieldValue(xxx, bfxxx); 
+       fOutStudyGeantino << " " << bfxxx[0]/CLHEP::tesla << " " 
+                         << bfxxx[1]/CLHEP::tesla << " " << bfxxx[2]/CLHEP::tesla;
+    }
+  }
+  G4ThreeVector postVec = postPtr->GetMomentum();
+  G4ThreeVector preVec = prePtr->GetMomentum();
+  fOutStudyGeantino << " " << preVec[0]/preVec[2];
+  fOutStudyGeantino << " " << preVec[1]/preVec[2];
+  fOutStudyGeantino << " " << postVec[0]/postVec[2];
+  fOutStudyGeantino << " " << postVec[1]/postVec[2];
+  const double ptPre = std::sqrt(preVec[0]*preVec[0] + preVec[1]*preVec[1])/CLHEP::GeV;
+  const double ptPost = std::sqrt(postVec[0]*postVec[0] + postVec[1]*postVec[1])/CLHEP::GeV;
+  fOutStudyGeantino << " " << ptPost - ptPre;
+  fOutStudyGeantino << " "  << theStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+  fOutStudyGeantino << " "  << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+  fOutStudyGeantino << " " << std::endl;
 }
