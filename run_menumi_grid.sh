@@ -38,7 +38,7 @@ for (( i=0; i<len; i++ ))
 do
   export BEAMCONFIG=${BEAMS[${i}]}
   export PLAYLIST=${MODES[${i}]}
-  export OUTDIR="/minerva/data/users/$USER/test_g4numi/${BEAMCONFIG}/${PLAYLIST}"
+  export OUTDIR="/pnfs/nova/scratch/users/$USER/test_g4numi/${BEAMCONFIG}/${PLAYLIST}"
   export LOGDIR="${OUTDIR}/log"
   export LOGFILE="${LOGDIR}/g4numi_${BEAMCONFIG}_${PLAYLIST}_${RUN}_\${PROCESS}.log"
   mkdir -p $OUTDIR
