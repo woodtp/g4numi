@@ -1,7 +1,7 @@
 #!/bin/bash
 #-*-Shell-Script-*- #
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.16 2017/11/01 17:33:41 bmesserl Exp $
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/setup_beamsim.sh,v 1.1.2.17 2018/01/11 01:24:57 bmesserl Exp $
 
 
 setup_beamsim(){
@@ -14,14 +14,15 @@ setup_beamsim(){
     # We use a modified version "that contains a class to store hadronic 
     #   interaction kinematics. The version is geant4.9.2.p03, which is now
     #   setup with /grid/fermiapp/minerva/beamsim/x86_64/geant4/env.sh
-    source /grid/fermiapp/minerva/beamsim/x86_64/geant4/env.sh
+    source /cvmfs/minerva.opensciencegrid.org/minerva/beamsim/x86_64/geant4/env.sh
 
-    source /grid/fermiapp/minerva/beamsim/x86_64/root/bin/thisroot.sh
+    #root 
+    source /cvmfs/minerva.opensciencegrid.org/minerva/beamsim/x86_64/root/bin/thisroot.sh
 
     # setup for jobsub client
     # according to the prescription in Mike Kirby's talk
     # minerva doc-10551, Dec 2014    
-    source /grid/fermiapp/products/common/etc/setups.sh
+    source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups.sh
     setup jobsub_client
     setup ifdhc
     export IFDH_GRIDFTP_EXTRA="-st 10"
