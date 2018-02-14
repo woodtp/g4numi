@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ##################################################
 # g4numi grid job submitter
 # Replacing g4numi_grid_submit.sh.
@@ -7,7 +9,7 @@
 import os, optparse, random, shutil, tarfile, sys
 import subprocess, string
 
-CACHE_PNFS_AREA = "/pnfs/minerva/scratch/users/{USER}/grid_cache/".format(USER = os.getenv("USER"))
+CACHE_PNFS_AREA = "/pnfs/nova/scratch/users/{USER}/grid_cache/".format(USER = os.getenv("USER"))
 PWD = os.getenv("PWD")
 
 ##################################################
@@ -103,7 +105,7 @@ def main():
       "file://{CACHE}/g4numi_job.sh".format(
       GRID       = ("--environment=LD_LIBRARY_PATH --OS=SL6 -g "
                     "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
-                    "--role=Analysis -G minerva "),
+                    "--role=Analysis -G nova "),
       MEMORY     = "--memory 200MB ",
       NJOBS      = options.n_jobs,
       OUTDIR     = options.outdir,
