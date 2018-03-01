@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //
-// $Id: NumiMaterials.cc,v 1.11.4.6 2014/01/22 22:31:07 kordosky Exp $
+// $Id: NumiMaterials.cc,v 1.11.4.7 2018/03/01 03:37:05 kordosky Exp $
 //----------------------------------------------------------------------
 
 #include "NumiDetectorConstruction.hh"
@@ -161,10 +161,14 @@ void NumiDetectorConstruction::DefineMaterials()
   DecayPipeVacuum-> AddMaterial(Air, 1.);
 
   //other materials  
+  // M. Kordosky 10/14/16
+  // Update helium densities according to advice from A. Holin
+  // Suggested densities come from Jim Hylen and Phil Adamson
   SecMonitorHelium = new G4Material("SecMonitorHelium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
-  TargetHelium = new G4Material("TargetHelium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
-
-  DecayPipeHelium = new G4Material("DecayPipeHelium", 0.145*kg/m3, 1, 
+  // 0.1785*kg/m3 --> 0.1946 kg/m3.  2.55atm --> 1.27 atm
+  TargetHelium = new G4Material("TargetHelium", Z=2., A=4.0026*g/mole, density= 0.1946*kg/m3,kStateGas,300*kelvin,1.27*atmosphere);
+  // 0.145*kg/m3 --> 0.1498 kg/m3, 
+  DecayPipeHelium = new G4Material("DecayPipeHelium", 0.1498*kg/m3, 1, 
 				   kStateGas,300*kelvin,0.9*atmosphere);
   DecayPipeHelium->AddElement(elHe,1.0);
   

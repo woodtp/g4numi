@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.10 2017/09/18 18:02:49 bmesserl Exp $
+
+# $Header: /cvs/projects/numi-beam-sim/numi-beam-sim/g4numi/Attic/g4numi_grid_submit.sh,v 1.1.2.11 2018/03/01 03:37:05 kordosky Exp $
 
 export GRID="--environment=LD_LIBRARY_PATH --OS=SL6 -g --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC --role=Analysis -G minerva "
 export MEMORY="--memory 500MB "
 
 ########################### g4numi configuration ###########################
+
 export DO_HORN1_OLD_GEOMETRY="false"       #"false" the new horn is considered default (01/2016)
 export DO_HORN1_FINE_SEGMENTATION="false"  #"false" works for both old and new horn geometry
 export DO_TARGET_WATER_LAYER="false"       #"false" TARGET water layer
@@ -40,4 +42,6 @@ echo "Will use code and scripts from $G4NUMIAREA"
 
 ############################### submit the job #############################
 
+
 jobsub_submit $GRID $MEMORY -N $NJOBS -dG4NUMI $OUTDIR -e G4NUMIAREA  -e BEAMCONFIG -e DO_TARGET_WATER_LAYER -e TARGET_WATER_CM -e HORN1_POSITION_X -e HORN1_POSITION_Y -e HORN1_POSITION_Z -e HORN2_POSITION_X -e HORN2_POSITION_Y -e TARGET_POSITION_X -e TARGET_POSITION_Y -e TARGET_POSITION_Z -e HORN_WATER_MM -e BEAM_POSITION_X -e BEAM_POSITION_Y -e BEAM_SPOTSIZE_X -e BEAM_SPOTSIZE_Y -e DO_HORN1_OLD_GEOMETRY -e DO_HORN1_FINE_SEGMENTATION -e POT -e RUN -e IMPORTANCE_WEIGHTING -e PLAYLIST -L $LOGFILE file://$BEAMSIM/g4numi_job.sh
+

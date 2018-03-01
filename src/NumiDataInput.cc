@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------
 //
 //
-// $Id: NumiDataInput.cc,v 1.32.2.24 2017/11/02 21:54:42 lebrun Exp $
+// $Id: NumiDataInput.cc,v 1.32.2.25 2018/03/01 03:37:05 kordosky Exp $
 //----------------------------------------------------------------------
 
 //C++
@@ -340,8 +340,12 @@ if(!vacuumworld && !airhrn){
   */
 
   protonMomentum = 120.*GeV;  
-  beamSigmaY     = 1.1*mm;//1.25*mm;
-  beamSigmaX     = 1.1*mm;//1.1*mm;
+  //  beamSigmaY     = 1.1*mm;//1.25*mm;
+  //  beamSigmaX     = 1.1*mm;//1.1*mm;
+  // MAK 10/14/16 - hack in a wider ME beam
+  beamSigmaY     = 1.4*mm;//1.25*mm;
+  beamSigmaX     = 1.4*mm;//1.1*mm;
+
   beamDirection  = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
   beamPosition  = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
 
