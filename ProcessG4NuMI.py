@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 ##################################################
 # g4numi grid job submitter
 # Replacing g4numi_grid_submit.sh.
@@ -9,7 +8,8 @@
 import os, optparse, random, shutil, tarfile, sys
 import subprocess, string
 
-CACHE_PNFS_AREA = "/pnfs/nova/scratch/users/{USER}/grid_cache/".format(USER = os.getenv("USER"))
+CACHE_PNFS_AREA = "/pnfs/{EXPERIMENT}/scratch/users/{USER}/grid_cache/".format(EXPERIMENT = os.getenv("EXPERIMENT"),
+                                                                               USER = os.getenv("USER"))
 PWD = os.getenv("PWD")
 
 ##################################################
@@ -18,7 +18,8 @@ PWD = os.getenv("PWD")
 POT                   = 400000
 N_JOBS                = 1
 RUN_NUMBER            = 1
-OUTDIR                = "/pnfs/minerva/persistent/users/{USER}/flux/test/".format(USER = os.getenv("USER"))
+OUTDIR                = "/pnfs/{EXPERIMENT}/persistent/users/{USER}/flux/test/".format(EXPERIMENT = os.getenv("EXPERIMENT"),
+                                                                                       USER = os.getenv("USER"))
 TEMPLATE              = "{0}/macros/template_ME.mac".format(PWD)
 FILETAG               = ""
 TARFILE_NAME          = "local_install.tar.gz"
@@ -97,18 +98,20 @@ def main():
   print "\nOutput logfile(s):",logfile
 
   submit_command = ("jobsub_submit {GRID} {MEMORY} -N {NJOBS} -dG4NUMI {OUTDIR} "
+      "-G {EXPERIMENT} "
       "-e BEAMCONFIG={BEAMCONFIG} " 
       "-e PLAYLIST={PLAYLIST} "
       "-e RUN={RUN} "
       "-f {TARFILE} "
       "-L {LOGFILE} "
       "file://{CACHE}/g4numi_job.sh".format(
-      GRID       = ("--environment=LD_LIBRARY_PATH --OS=SL6 -g "
+      GRID       = ("--OS=SL6 -g "
                     "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
-                    "--role=Analysis -G nova "),
+                    "--role=Analysis "),
       MEMORY     = "--memory 200MB ",
       NJOBS      = options.n_jobs,
       OUTDIR     = options.outdir,
+      EXPERIMENT = os.getenv("EXPERIMENT"),
       BEAMCONFIG = options.beamconfig,
       PLAYLIST   = options.playlist,
       RUN        = options.run_number,
