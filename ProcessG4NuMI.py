@@ -242,6 +242,16 @@ def finalize_options(options):
   if options.filetag != FILETAG:
     options.filetag = options.filetag if options.filetag[:1] == '_' else '_'+options.filetag
 
+  #POT warning
+  if options.pot > 500000: 
+    print("!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!")
+    print("You're requesting a LOT of POT per job.\n"
+      "The grid is optimized for many small jobs instead of a few big ones.\n"
+      "Your jobs may timeout. Use at most 500K POT to be safe. \n"
+      "If you still want to proceed, I recommend you use the --timeout or\n"
+      "--expected-lifetime in the jobsub_submit command.")
+    print("!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!")
+
   return options
 
 def make_macro(options):
