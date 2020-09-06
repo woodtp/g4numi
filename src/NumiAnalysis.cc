@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.26 2017/11/02 22:08:00 lebrun Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.27 2020/09/06 22:55:12 tcarroll Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1738,6 +1738,9 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     r_det.push_back(NumiData->zdet_near[ii]/cm);
     nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
     G4double mom_nu[3];
+    double rad = sqrt((r_det[0]- g4data->Vx)*(r_det[0]- g4data->Vx) +
+		      (r_det[1]- g4data->Vy)*(r_det[1]- g4data->Vy) +
+		      (r_det[2]- g4data->Vz)*(r_det[2]- g4data->Vz));
     mom_nu[0] = (r_det[0]- g4data->Vx) * nu_energy / rad;
     mom_nu[1] = (r_det[1]- g4data->Vy) * nu_energy / rad;
     mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
