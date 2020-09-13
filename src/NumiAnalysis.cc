@@ -1,7 +1,7 @@
  //----------------------------------------------------------------------
 // NumiAnalysis.cc
 //
-// $Id: NumiAnalysis.cc,v 1.26.4.27 2020/09/06 22:55:12 tcarroll Exp $
+// $Id: NumiAnalysis.cc,v 1.26.4.28 2020/09/13 20:35:59 laliaga Exp $
 //----------------------------------------------------------------------
 
 #include <vector>
@@ -1268,7 +1268,11 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   
   G4bool wasInHorn1 = false;
   G4bool wasInHorn2 = false;
-   
+
+  G4String sconf = NumiData->GetBeamConfig();
+  G4bool is_me   = sconf.contains("me") || sconf.contains("ME");
+  //std::cout<<"=> (check) Beam Configuration: "<< (NumiData->GetBeamConfig()) <<" "<< is_me <<std::endl;
+  
   for (G4int ii=0; ii<point_no-1; ++ii){ 
       ParentMomentum = NuParentTrack->GetMomentum(ii);
       ParentPosition = (NuParentTrack->GetPoint(ii)->GetPosition()/m)*m;
@@ -1348,6 +1352,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     // check if the particle passes through the neck of the horn
     // if yes then set the trk_ to +999999
     // need to make this work for arbitrary horn position!!
+    //LE:
     if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*m)&&  // horn 1 position 0-3m
 	(sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
 	(g4data->trkx[2]==-999999. || g4data->trkx[2]==999999.))
@@ -1356,14 +1361,28 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 	g4data->trky[2] = 999999.;
 	g4data->trkz[2] = 999999.;  
     }
-    if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
-	(sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
-	(g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
-    {
-	g4data->trkx[4] = 999999.;
-	g4data->trky[4] = 999999.;
-	g4data->trkz[4] = 999999.;  
+    //Different Horn2 positions between LE and ME (Leo, Sept 13, 2020)
+    if(!is_me){
+      if ((ParentPosition[2]>10.*m&&ParentPosition[2]<13.*m)&&  //horn 2 position 10-13m
+	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
+	  (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
+	{
+	  g4data->trkx[4] = 999999.;
+	  g4data->trky[4] = 999999.;
+	  g4data->trkz[4] = 999999.;  
+	}
     }
+    //ME
+    else if(is_me){
+      if ((ParentPosition[2]>19.*m&&ParentPosition[2]<22.*m)&&  //horn 2 position 19-22m
+	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*cm)&&
+	  (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
+	{
+	  g4data->trkx[4] = 999999.;
+	  g4data->trky[4] = 999999.;
+	  g4data->trkz[4] = 999999.;  
+	}
+    } 
   }
   
   ParentMomentum = NuParentTrack->GetMomentum(point_no-1);
