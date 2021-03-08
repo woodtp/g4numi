@@ -10,7 +10,11 @@ setup_beamsim(){
     export G4WORKDIR="${TOP}"
     export BEAMSIM="${TOP}"
     export G4NUMIVER="v6"
-    export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++:${G4WORKDIR}/tmp/Linux-g++/g4numi"
+
+    source /cvmfs/nova.opensciencegrid.org/externals/setup
+    setup library_shim v04.00
+
+    export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$G4LIB/plists/Linux-g++:${G4WORKDIR}/tmp/Linux-g++/g4numi:${LIBRARY_SHIM_SL6_LIB_PATH}"
 
     echo "G4WORKDIR=${G4WORKDIR}"
 
