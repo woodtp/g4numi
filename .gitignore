@@ -1,0 +1,18 @@
+.svn
+CVS
+*~
+*.makesav
+*.lock
+.gdb*
+*.pyc
+*\#*
+*.root
+*_C.*
+*.pcm
+*.d
+*.o
+*.so
+# specifics including executable
+g4numi
+g4numiCint.o
+libg4numiDict.so
