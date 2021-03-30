@@ -1,0 +1,51 @@
+<lcgdict>
+  
+  <class name="Edep_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="ProdTuple_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="TrackInfo_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="absbkgtuple_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="data_t" ClassVersion="10">
+    
+  </class>
+  
+  <class name="draytupleMIB_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="draytupleMIB_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="draytupleMIB_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="draytupleSPB_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="hadmmtuple_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="target_exit_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="zptuple_t" ClassVersion="10">
+    
+  </class>
+
+</lcgdict>
