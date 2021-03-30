@@ -13,7 +13,9 @@
 #include "globals.hh"
 #include "G4Transform3D.hh"
 #include "G4RotationMatrix.hh"
-#include "NumiDataInput.hh" 
+#include "NumiDataInput.hh"
+
+#include "CLHEP/Units/PhysicalConstants.h"
 
 void NumiDetectorConstruction::ConstructTargetHall()
 {
@@ -23,9 +25,9 @@ void NumiDetectorConstruction::ConstructTargetHall()
         // not in the constructor, to make sure /det/update work properly
         // Mike Martens (Need to move Horn 2 by 9 meters downstream)
     if (NumiData->THBlockNblock >=23) {
-        NumiData->THBlockZ0.at(21) =  1.15*m + fTHBlockShift;
-        NumiData->THBlockZ0.at(22) = 30.34*m + fTHBlockShift;
-        NumiData->THBlockZ0.at(23) = 12.00*m + fTHBlockShift*2;
+        NumiData->THBlockZ0.at(21) =  1.15*CLHEP::m + fTHBlockShift;
+        NumiData->THBlockZ0.at(22) = 30.34*CLHEP::m + fTHBlockShift;
+        NumiData->THBlockZ0.at(23) = 12.00*CLHEP::m + fTHBlockShift*2;
     }
     
 //TGAR
@@ -98,14 +100,14 @@ void NumiDetectorConstruction::ConstructTargetHall()
     
     G4RotationMatrix *tallrotation;
     rotation = G4RotationMatrix(0.,0.,0.);
-    tallrotation = new G4RotationMatrix(0.0, 0.0,90.0*deg);
+    tallrotation = new G4RotationMatrix(0.0, 0.0,90.0*CLHEP::deg);
   
     tempDuratekBlock = new G4Box("sDuratekBlock", NumiData->THBlockHdx[0], NumiData->THBlockHdy[0], NumiData->THBlockLength[0]/2.0);
     G4LogicalVolume *lvDuratekBlock = new G4LogicalVolume(tempDuratekBlock, Fe, "lvDuratekBlock",0,0,0);
     
     // tempCovering is a Duratek Block with slightly modified dimensions.  Two of these form the topmost Duratek covering
     // the tempCovering dimensions are set in the following line
-    tempCovering = new G4Box("sDuratekBlockCovering", (1.3554/2.0)*m, (0.665/2.0)*m, NumiData->THBlockLength[0]/2.0);
+    tempCovering = new G4Box("sDuratekBlockCovering", (1.3554/2.0)*CLHEP::m, (0.665/2.0)*CLHEP::m, NumiData->THBlockLength[0]/2.0);
     G4LogicalVolume *lvDuratekBlockCovering = new G4LogicalVolume(tempCovering, Fe, "lvDuratekBlockCovering",0,0,0);
 
     //
@@ -117,18 +119,18 @@ void NumiDetectorConstruction::ConstructTargetHall()
     G4VSolid* tempgnumiD; //before
     G4VSolid* tempgnumiD2; // after
     G4VSolid* tempgnumiD3; // above horn 2
-    tempgnumiA = new G4Box("sDuratekgnumiA", 0.5842*m , 0.0407125*m , NumiData->THBlockLength[0]/2);
+    tempgnumiA = new G4Box("sDuratekgnumiA", 0.5842*CLHEP::m , 0.0407125*CLHEP::m , NumiData->THBlockLength[0]/2);
     G4LogicalVolume *lvDuratekBlockgnumiA  = new G4LogicalVolume(tempgnumiA, Fe, "lvDuratekBlockgnumiA", 0, 0, 0);
     
-    tempgnumiBC = new G4Box("sDuratekgnumiBC", 0.0531*m ,0.99625*m, NumiData->THBlockLength[0]/2);
+    tempgnumiBC = new G4Box("sDuratekgnumiBC", 0.0531*CLHEP::m ,0.99625*CLHEP::m, NumiData->THBlockLength[0]/2);
     G4LogicalVolume *lvDuratekBlockgnumiBC = new G4LogicalVolume(tempgnumiBC, Fe, "lvDuratekBlockgnumiBC", 0, 0, 0);
 
       // Mike Martens (Need to move Horn 2 by 9 meters downstream)
-    tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*m,0.301475*m, 7.85*m + fDuratekShift);
+    tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*CLHEP::m,0.301475*CLHEP::m, 7.85*CLHEP::m + fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD = new G4LogicalVolume(tempgnumiD, Fe, "lvDuratekBlockgnumiD", 0, 0,0);
-    tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*m, 0.286475*m, (6/2)*m);
+    tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*CLHEP::m, 0.286475*CLHEP::m, (6/2)*CLHEP::m);
     G4LogicalVolume *lvDuratekBlockgnumiD3 = new G4LogicalVolume(tempgnumiD3, Fe, "lvDuratekBlockgnumiD3",0,0,0);
-    tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*m, 0.301475*m,15.349*m - fDuratekShift);
+    tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*CLHEP::m, 0.301475*CLHEP::m,15.349*CLHEP::m - fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD2 = new G4LogicalVolume(tempgnumiD2, Fe, "lvDuratekBlockgnumiD2",0,0,0);
 
 

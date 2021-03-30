@@ -141,8 +141,10 @@ class data_t
    Double_t trkpz[10];
    
 private:
+
+#ifndef CMAKEBUILD
    ClassDef(data_t ,1) // data_t
-      
+#endif      
        };
 
 #endif 

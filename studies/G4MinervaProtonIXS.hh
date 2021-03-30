@@ -4,8 +4,11 @@
 
 #include "globals.hh"
 #include "G4Proton.hh"
-
+#include "G4DynamicParticle.hh"
 #include "G4VCrossSectionDataSet.hh"
+
+
+#include "CLHEP/Units/PhysicalConstants.h"
 
 class G4MinervaProtonIXS : public G4VCrossSectionDataSet
 {
@@ -16,7 +19,7 @@ class G4MinervaProtonIXS : public G4VCrossSectionDataSet
    {
      G4bool result = false;
      if(( aPart->GetDefinition()==G4Proton::Proton()) &&
-        ( aPart->GetKineticEnergy()<1*TeV) ) result = true;
+        ( aPart->GetKineticEnergy()<1*CLHEP::TeV) ) result = true;
      if(aEle->GetZ()<3) result = false;
      return result;
    }
@@ -26,7 +29,7 @@ class G4MinervaProtonIXS : public G4VCrossSectionDataSet
    {
      G4bool result = false;
      if (( aParticle->GetDefinition() == G4Proton::Proton()) &&
-         ( aParticle->GetKineticEnergy() < 1*TeV) ) result = true;
+         ( aParticle->GetKineticEnergy() < 1*CLHEP::TeV) ) result = true;
      if (ZZ < 3) result = false;
      return result;
    }

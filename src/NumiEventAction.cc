@@ -17,13 +17,6 @@
 #include "G4Trajectory.hh"
 #include "G4ios.hh"
 
-#define USEMODGEANT4
-#ifdef USEMODGEANT4 
-
-#include "MinervaElementInter.hh"
-
-#endif
-
 //------------------------------------------------------------------------------------- 
 NumiEventAction::NumiEventAction()
    :fTrajectoryContainer(0),

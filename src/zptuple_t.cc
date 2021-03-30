@@ -8,7 +8,9 @@
 
 #include "zptuple_t.hh"
 
+#ifndef CMAKEBUILD
 ClassImp(zptuple_t)
+#endif
 
   zptuple_t::zptuple_t():
   run(-1),

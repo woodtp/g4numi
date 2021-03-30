@@ -1,190 +1,178 @@
-#
-# source /nusoft/app/externals/setup
-# setup cmake
-# setup geant4 v4_9_6_p01a -q debug:e2
-# setup root   v5_34_05    -q debug:e2
-#
-# cd /nova/app/users/$USER
-#
-# mkdir cmakebuild
-# cd    cmakebuild
-#
-# WHICH_G4=`ls -d ${GEANT4_FQ_DIR}/lib64/Geant4-*`
-# WHICH_CLHEP=`ls -d ${CLHEP_LIB_DIR}/CLHEP-*`
-# 
-# cmake -DGeant4_DIR=${WHICH_G4} -DCLHEP_DIR=${WHICH_CLHEP}  
-#    [ -DWITH_G4NU=ON ] [ -DWITH_DK2NU=ON ] /path/to/source/g4numi
-#
-#
-# Required environment variables:
-#    ROOTSYS    e.g. /nusoft/app/externals/root/v5_34_05/Linux64bit+2.6-2.5-e2-debug
-#    XERCESROOT e.g. /nusoft/app/externals/xerces_c/v3_1_1/Linux64bit+2.6-2.5-e2-debug
-#
-#----------------------------------------------------------------------------
-# Setup the project
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(g4numi)
+# use cmake 2.8 or later
+cmake_minimum_required (VERSION 3.2)
 
-option(WITH_MODERN_G4 "not building against old G4 w/ 1-arg exception" ON)
-option(WITH_DK2NU     "build against Dk2Nu" ON)
-option(WITH_G4NU      "build against G4NuPhysicsLists" OFF)
+project(numi-beam-sim-g4numi)
 
-#----------------------------------------------------------------------------
-# Find Geant4 package, activating all available UI and Vis drivers by default
-# You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
-# to build a batch mode only executable
-#
-option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
-if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
-else()
-  find_package(Geant4 REQUIRED)
+# cetbuildtools contains our cmake modules
+SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
+if (NOT CETBUILDTOOLS_VERSION)
+    MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
 endif()
 
-find_package(CLHEP REQUIRED)
-
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake
-                      $ENV{ROOTSYS}/cmake/modules
-                      $ENV{ROOTSYS}/../source/root/cmake/modules
-                      $ENV{ROOTSYS}/etc/cmake
+set(CMAKE_MODULE_PATH $ENV{CANVAS_DIR}/Modules
+                      $ENV{CETBUILDTOOLS_DIR}/Modules
                       ${CMAKE_MODULE_PATH})
 
-find_package(ROOT REQUIRED)
-#----------------------------------------------------------------------------
-# Setup Geant4 include directories and compile definitions
-# Setup include directory for this project
-#
-include(${Geant4_USE_FILE})
+include(CetCMakeEnv)
+cet_cmake_env()
 
-include_directories(${PROJECT_SOURCE_DIR}/include
-                    / ) # add abs path for find_file() in FindROOT.cmake
-                        # to avoid linkFile-NOTFOUND issue
+set_install_root()
 
-# Geant4_INCLUDE_DIR --->  /path/to/version/include/Geant4 
-#        ... but also want /path/to/version/include
-# INCLUDE_DIRS also includes paths for CLHEP and XERCES_C
-include_directories(${Geant4_INCLUDE_DIR}/..)  # #include "Geant4/file.h"
-include_directories(${Geant4_INCLUDE_DIRS})    # all the standard paths
-include_directories($ENV{ROOTSYS}/include)
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
-set(_root_internal_libraries
-    Core
-    Cint
-    RIO
-    Net
-    Hist
-    Graf
-    Graf3d
-    Gpad
-    Tree
-    Rint
-    Postscript
-    Matrix
-    Physics
-    MathCore
-    Thread
-    EG
+cet_set_compiler_flags(DIAGS CAUTIOUS
+  #WERROR
+  NO_UNDEFINED
+  EXTRA_FLAGS -Wno-pedantic -Wno-unused-local-typedefs -Wno-narrowing -Wno-deprecated-declarations -Wno-unused-variable -Wno-missing-braces -Wno-undefined-var-template
+  EXTRA_CXX_FLAGS
 )
-set(Root_LIBRARIES ${_root_internal_libraries})
 
-link_directories($ENV{ROOTSYS}/lib)
+cet_enable_asserts()
 
-if(WITH_DK2NU)
-  # rwh for Minerva + dk2nu
-  set(DK2NU $ENV{DK2NU})
-  include_directories(${DK2NU}/include/dk2nu/tree)
-  link_directories(${DK2NU}/lib)
-  set(DK2NU_LIBRARIES dk2nuTree)
+# issue 5589: if we are not in a debugging build, disable the dispatch of debug messages in messagefacility
+string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
+if( ${BTYPE_UC} STREQUAL "OPT" OR
+    ${BTYPE_UC} STREQUAL "PROF" OR
+    ${BTYPE_UC} STREQUAL "RELEASE" OR
+    ${BTYPE_UC} STREQUAL "MINSIZEREL" )
+  message ( STATUS "Disabling LOG_DEBUG from messagefacility library" )
+  add_definitions(-DML_NDEBUG)
 endif()
 
-if(WITH_G4NU)
-   set(G4NU $ENV{G4NU})
-   include_directories(${G4NU}/include)
-   link_directories(${G4NU}/lib)
-   set(G4NU_LIBRARIES g4nupl)
-endif()
+add_definitions( -DCMAKEBUILD )
 
-#----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# NB: headers are included so they will show up in IDEs
-#
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
-file(GLOB cintheaders ${PROJECT_SOURCE_DIR}/include/*_t.hh)
+cet_report_compiler_flags()
 
-# RWH weed out some stuff that really shouldn't be in this branch
-file(GLOB rmsources1 ${PROJECT_SOURCE_DIR}/src/NA49*)
-file(GLOB rmsources2 ${PROJECT_SOURCE_DIR}/src/dk*)
-file(GLOB rmsources3 ${PROJECT_SOURCE_DIR}/src/g4numiCint*)
-file(GLOB rmheaders1 ${PROJECT_SOURCE_DIR}/include/NA49*)
-file(GLOB rmheaders2 ${PROJECT_SOURCE_DIR}/include/dk*)
-file(GLOB rmheaders3 ${PROJECT_SOURCE_DIR}/include/g4numiCint*)
+# these are minimum required versions, not the actual product versions
+# put products in this list that you want to have set up with
+# their environment by ups
+find_ups_product( geant4 v4_10_4 )
+find_ups_product( root   v6_16_00 )
 
-LIST(REMOVE_ITEM sources ${rmsources1} ${rmsources2} ${rmsources3} )
-LIST(REMOVE_ITEM headers ${rmheaders1} ${rmheaders2} ${rmheaders3} )
+#find_ups_root( root v6_00_00 )
 
-#----------------------------------------------------------------------------
-# Create the ROOT dictionary for the data classes
-# no more need to do that by hand
-#
-if(EXISTS ${PROJECT_SOURCE_DIR}/LinkdefModern.h)
-  # hack because minerva branch has BadThings in Linkdef.h
-  set(g4numi_LINKDEF ${PROJECT_SOURCE_DIR}/LinkdefModern.h)
-else()
-  set(g4numi_LINKDEF ${PROJECT_SOURCE_DIR}/Linkdef.h)
-endif()
-# MESSAGE("RWH g4numi_LINKDEF ${g4numi_LINKDEF}")
-# MESSAGE("RWH headers ${headers}")
-set(g4numi_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/g4numiDict)
-# MESSAGE("RWH g4numi_DICTIONARY ${g4numi_DICTIONARY}")
-ROOT_GENERATE_DICTIONARY(${g4numi_DICTIONARY} ${cintheaders} LINKDEF ${g4numi_LINKDEF})
-# MESSAGE("RWH generated g4numi_DICTIONARY ")
-set(sources ${sources} ${g4numi_DICTIONARY})
+#include(BuildDictionary)
 
-#----------------------------------------------------------------------------
-# Add the executable, and link it to the Geant4 libraries
-#
-add_executable(g4numi g4numi.cc ${sources} ${headers})
-target_link_libraries(g4numi ${Geant4_LIBRARIES} ${Root_LIBRARIES} ${DK2NU_LIBRARIES} ${G4NU_LIBRARIES})
+# collect the G4 libraries
+set( ENV{GEANT4_LIB} $ENV{GEANT4_FQ_DIR}/lib )
+#MESSAGE( "Geant4 libraries are in $ENV{GEANT4_LIB}" )
+cet_find_library( G4ANALYSIS           NAMES G4analysis          PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4DIGITS_HITS        NAMES G4digits_hits       PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4ERROR_PROPAGATION  NAMES G4error_propagation PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4EVENT              NAMES G4event             PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4FR                 NAMES G4FR                PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4GEOMETRY           NAMES G4geometry          PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4GL2PS              NAMES G4gl2ps             PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4GLOBAL             NAMES G4global            PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4GMOCREN            NAMES G4GMocren           PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4GRAPHICS_REPS      NAMES G4graphics_reps     PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4INTERCOMS          NAMES G4intercoms         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4INTERFACES         NAMES G4interfaces        PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4MATERIALS          NAMES G4materials         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4MODELING           NAMES G4modeling          PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4OPENGL             NAMES G4OpenGL            PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4PARMODELS          NAMES G4parmodels         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4PARTICLES          NAMES G4particles         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4PERSISTENCY        NAMES G4persistency       PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4PHYSICSLISTS       NAMES G4physicslists      PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4PROCESSES          NAMES G4processes         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4RAYTRACER          NAMES G4RayTracer         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4READOUT            NAMES G4readout           PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4RUN                NAMES G4run               PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4TRACKING           NAMES G4tracking          PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4TRACK              NAMES G4track             PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4TREE               NAMES G4Tree              PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4VISHEPREP          NAMES G4visHepRep         PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4VIS_MANAGEMENT     NAMES G4vis_management    PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4VISXXX             NAMES G4visXXX            PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4VRML               NAMES G4VRML              PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+cet_find_library( G4ZLIM               NAMES G4zlib              PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
 
-if(WITH_DK2NU)
-  SET_TARGET_PROPERTIES(g4numi PROPERTIES COMPILE_FLAGS -DWITH_DK2NU )
-endif()
+set( G4_LIB_LIST ${G4ANALYSIS}          
+		 ${G4DIGITS_HITS}       
+		 ${G4ERROR_PROPAGATION} 
+		 ${G4EVENT}             
+		 ${G4FR}                
+		 ${G4GEOMETRY}          
+		 ${G4GL2PS}             
+		 ${G4GLOBAL}            
+		 ${G4GMOCREN}           
+		 ${G4GRAPHICS_REPS}     
+		 ${G4INTERCOMS}         
+		 ${G4INTERFACES}        
+		 ${G4MATERIALS}         
+		 ${G4MODELING}          
+		 ${G4OPENGL}            
+		 ${G4PARMODELS}         
+		 ${G4PARTICLES}         
+		 ${G4PERSISTENCY}       
+		 ${G4PHYSICSLISTS}      
+		 ${G4PROCESSES}         
+		 ${G4RAYTRACER}         
+		 ${G4READOUT}           
+		 ${G4RUN}               
+		 ${G4TRACKING}          
+		 ${G4TRACK}             
+		 ${G4TREE}              
+		 ${G4VISHEPREP}         
+		 ${G4VIS_MANAGEMENT}    
+		 ${G4VISXXX}            
+		 ${G4VRML}              
+		 ${G4ZLIM}              
+   )
 
-if(WITH_G4NU)
-  SET_TARGET_PROPERTIES(g4numi PROPERTIES COMPILE_FLAGS -DWITH_G4NU )
-endif()
+#MESSAGE("Geant4 library list is ${G4_LIB_LIST}" )	       
 
-if(WITH_MODERN_G4)
-  SET_TARGET_PROPERTIES(g4numi PROPERTIES COMPILE_FLAGS -DMODERN_G4 )
-endif()
+# ROOT libraries
+set( ENV{ROOTLIB} $ENV{ROOTSYS}/lib )
+cet_find_library( ROOTCORE       NAMES  Core       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTCINT       NAMES  Cling      PATHS ENV ROOTLIB NO_DEFAULT_PATH ) 
+cet_find_library( ROOTRIO        NAMES  RIO        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTNET        NAMES  Net        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTIMT        NAMES  Imt        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTHIST       NAMES  Hist       PATHS ENV ROOTLIB NO_DEFAULT_PATH ) 
+cet_find_library( ROOTGRAF       NAMES  Graf       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTGRAF3D     NAMES  Graf3d     PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTGPAD       NAMES  Gpad       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTTREE       NAMES  Tree       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTRINT       NAMES  Rint       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTPOSTSCRIPT NAMES  Postscript PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTMATRIX     NAMES  Matrix     PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTPHYSICS    NAMES  Physics    PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTMATHCORE   NAMES  MathCore   PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+cet_find_library( ROOTTHREAD     NAMES  Thread     PATHS ENV ROOTLIB NO_DEFAULT_PATH )
+set(ROOT_BASIC_LIB_LIST ${ROOTCORE}
+                        ${ROOTCINT} 
+                        ${ROOTRIO}
+                        ${ROOTNET}
+                        ${ROOTIMT}
+                        ${ROOTHIST} 
+                        ${ROOTGRAF}
+                        ${ROOTGRAF3D}
+                        ${ROOTGPAD}
+                        ${ROOTTREE}
+                        ${ROOTRINT}
+                        ${ROOTPOSTSCRIPT}
+                        ${ROOTMATRIX}
+                        ${ROOTPHYSICS}
+                        ${ROOTMATHCORE}
+                        ${ROOTTHREAD}
+)
+# source
 
-#----------------------------------------------------------------------------
-# Copy all scripts to the build directory, i.e. the directory in which we
-# build B1. This is so that we can run the executable directly because it
-# relies on these scripts being in the current working directory.
-#
-set(EXAMPLEG4NUMI_SCRIPTS
-# me000z200i3.mac
-  )
+#add_subdirectory(include)
+add_subdirectory(macros)
+#add_subdirectory(rndm) # nothing in this directory to do
+add_subdirectory(plot)
+add_subdirectory(src)
+add_subdirectory(studies)
 
-foreach(_script ${EXAMPLEG4NUMI_SCRIPTS})
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/${_script}
-    ${PROJECT_BINARY_DIR}/${_script}
-    COPYONLY
-    )
-endforeach()
+# ups - table and config files
+add_subdirectory(ups)
 
-#----------------------------------------------------------------------------
-# For internal Geant4 use - but has no effect if you build this
-# example standalone
-#
-add_custom_target(G4NUMI DEPENDS g4numi)
+# packaging utility
+include(UseCPack)
 
-#----------------------------------------------------------------------------
-# Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
-#
-install(TARGETS g4numi DESTINATION bin)
+install_scripts()
+
+# install root macros into the ups product
+file(GLOB root_macros *.C)
+install( FILES ${root_macros} DESTINATION ${product}/${version}/macros/root )

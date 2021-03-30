@@ -43,8 +43,10 @@ public:
 
       
 private:
+
+#ifndef CMAKEBUILD
    ClassDef(Edep_t , 1)
-      
+#endif      
       
       };
 #endif 

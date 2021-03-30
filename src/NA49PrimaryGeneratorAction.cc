@@ -1,4 +1,5 @@
 
+#include "CLHEP/Units/PhysicalConstants.h"
 #include "NA49PrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "Randomize.hh"
@@ -24,7 +25,7 @@ NA49PrimaryGeneratorAction::~NA49PrimaryGeneratorAction()
 
 void NA49PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  G4double zVertex = -6.5*mm;
+  G4double zVertex = -6.5*CLHEP::mm;
   particleGun->SetParticlePosition(G4ThreeVector(0.,0.,zVertex));
   particleGun->GeneratePrimaryVertex(anEvent);
 

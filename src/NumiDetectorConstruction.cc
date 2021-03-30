@@ -35,14 +35,16 @@
 #include "G4RunManager.hh"
 #endif
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 NumiDetectorConstruction::NumiDetectorConstruction()
     : fBeamType("Unknown"),
       fDuratekShift(0.0),
       fTHBlockShift(0.0),
       fDeltaOuterThickness(0.0),
-      fBaffleOuterRadius(3.0*cm),
-      fBaffleInnerRadius(5.5*mm),
-      fBaffleLength(1.5*m),
+      fBaffleOuterRadius(3.0*CLHEP::cm),
+      fBaffleInnerRadius(5.5*CLHEP::mm),
+      fBaffleLength(1.5*CLHEP::m),
       fForcedOldTarget(false),
       fHorn1ExtraLayerAlum(0.),
       fHorn1FieldZCutUpstream(-32.0),
@@ -168,7 +170,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   ConstructHorn1(horn1pos,horn1rot);
   // Okay this is confusing. move horn 1 back by 3cm to match position in gnumi (and in drawings)
   // but horn 2 stays i the same place. If you want to make a 'gnumi-like' horn1 you need to go (in horn1 coordinates)
-  // from -3*cm to 2.97m  (the -3 cm probably doesnt matter since not many particles will make it through there anyway)
+  // from -3*CLHEP::cm to 2.97m  (the -3 cm probably doesnt matter since not many particles will make it through there anyway)
 
   G4ThreeVector horn2pos(NumiData->Horn2X0, NumiData->Horn2Y0, NumiData->Horn2Z0);
   G4RotationMatrix horn2rot(NumiData->Horn2Phi, NumiData->Horn2Theta, NumiData->Horn2Psi);
@@ -176,7 +178,7 @@ G4VPhysicalVolume* NumiDetectorConstruction::Construct()
   {
      horn2pos[0] = 0.0;
      horn2pos[1] = 0.0;
-     horn2pos[2] = 10.03*m;
+     horn2pos[2] = 10.03*CLHEP::m;
 
   }
 

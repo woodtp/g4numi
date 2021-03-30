@@ -48,7 +48,7 @@ G4TrackVector* secondaries = fpTrackingManager->GimmeSecondaries();
 	// pizero, eta, eta' and sigma_0 which G4 explicitly produces
 	// but no hadron production experiment explicitly measures
 	bool quick=false;
-	const G4double quick_lifetime=1e-16*second;
+	const G4double quick_lifetime=1e-16*CLHEP::second;
 	const G4ParticleDefinition* pd = secondary->GetDefinition();	
 	G4double lifetime=pd->GetPDGLifeTime();
 	if(!pd->GetPDGStable() &&  lifetime<quick_lifetime) {

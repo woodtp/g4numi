@@ -8,7 +8,10 @@
 //------------------
 
 #include "absbkgtuple_t.hh"
+
+#ifndef CMAKEBUILD
 ClassImp(absbkgtuple_t)
+#endif
 
 //-----------------------------------------------------------------------------------
 absbkgtuple_t::absbkgtuple_t():

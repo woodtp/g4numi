@@ -26,6 +26,8 @@
 #include "G4RunManager.hh"
 #include "G4Run.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 #include "TROOT.h"
 #include <TFile.h>
 #include <TTree.h>
@@ -100,7 +102,7 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
   G4double mass = particleTable->FindParticle("mu+")->GetPDGMass();
   G4double mom = fND->GetMuonBeamMomentum();
   fParticleGun->SetParticleEnergy( sqrt(mass*mass+mom*mom)-mass );
-  fParticleMomentum=G4ThreeVector(0.0*MeV, 0.0*MeV, mom);
+  fParticleMomentum=G4ThreeVector(0.0, 0.0, mom);
      
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1)); // straight down the pipe
 
@@ -114,7 +116,7 @@ void NumiPrimaryGeneratorAction::SetMuonBeam()
   G4ThreeVector muonBeamDirection = G4ThreeVector(0, 0, 1); // straight down the pipe
 
   fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
-  //  fParticleGun->SetParticleEnergy(80*GeV);// just a guess right now
+  //  fParticleGun->SetParticleEnergy(80*CLHEP::GeV);// just a guess right now
   fParticleGun->SetParticlePosition(muonBeamPos);
   fParticleGun->SetParticleMomentumDirection(muonBeamDirection);
   */
@@ -328,7 +330,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {
      G4double x0 = 0.0;
      G4double y0 = 0.0;
-     G4double z0 = fND->DecayPipeLength + fND->TunnelZ0 - 7*mm;// just before the endcap account for DP window
+     G4double z0 = fND->DecayPipeLength + fND->TunnelZ0 - 7*CLHEP::mm;// just before the endcap account for DP window
      
      if(fND->GetMuonBeamShape() == "circle")
      {
@@ -401,7 +403,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //
      if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
      fParticleGun = new G4ParticleGun(1);
-     fParticleGun->SetParticleEnergy(0.0*GeV);
+     fParticleGun->SetParticleEnergy(0.0*CLHEP::GeV);
 
     G4String particleName;
 
@@ -418,11 +420,11 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fevtno = fMuon->evtno;
     fmuweight = fMuon->muweight;
 
-    fMuTParentMomentum = G4ThreeVector(fMuon->tpx*GeV,fMuon->tpy*GeV,fMuon->tpz*GeV);
-    fMuTParentPosition = G4ThreeVector(fMuon->tvx*cm,fMuon->tvy*cm,fMuon->tvz*cm);
-    fMuParentMomentum = G4ThreeVector(fMuon->pdpx*GeV,fMuon->pdpy*GeV,fMuon->pdpz*GeV);
-    fMuParentPosition = G4ThreeVector(fMuon->pdvx*cm,fMuon->pdvy*cm,fMuon->pdvz*cm);
-    fMuParentProdPosition = G4ThreeVector(fMuon->ppvx*cm,fMuon->ppvy*cm,fMuon->ppvz*cm);
+    fMuTParentMomentum = G4ThreeVector(fMuon->tpx*CLHEP::GeV,fMuon->tpy*CLHEP::GeV,fMuon->tpz*CLHEP::GeV);
+    fMuTParentPosition = G4ThreeVector(fMuon->tvx*CLHEP::cm,fMuon->tvy*CLHEP::cm,fMuon->tvz*CLHEP::cm);
+    fMuParentMomentum = G4ThreeVector(fMuon->pdpx*CLHEP::GeV,fMuon->pdpy*CLHEP::GeV,fMuon->pdpz*CLHEP::GeV);
+    fMuParentPosition = G4ThreeVector(fMuon->pdvx*CLHEP::cm,fMuon->pdvy*CLHEP::cm,fMuon->pdvz*CLHEP::cm);
+    fMuParentProdPosition = G4ThreeVector(fMuon->ppvx*CLHEP::cm,fMuon->ppvy*CLHEP::cm,fMuon->ppvz*CLHEP::cm);
     ftpptype = fMuon->tptype;
     fnimpwt = fMuon->nimpwt;
     fpptype = fMuon->ptype;
@@ -450,17 +452,17 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //z0 = fND->DecayPipeLength + fND->TunnelZ0 - 1;// just before the endcap this is what Jason uses.
     //z0 =        676681        + 45698.5       - 1 = 722378.5 mm
     //which means the endcap is at 722379.5 mm
-    //fMuon->muvz*cm = 722380, so subtract 1mm to get 722379 just to be safe
+    //fMuon->muvz*CLHEP::cm = 722380, so subtract 1mm to get 722379 just to be safe
     //
 
     //
     //need to account for DP window thinkness so subtract 7mm
     //
-    G4double z0 = fMuon->muvz*cm - 7*mm; //this is - 7 mm.
+    G4double z0 = fMuon->muvz*CLHEP::cm - 7*CLHEP::mm; //this is - 7 mm.
     
-    fParticlePosition=G4ThreeVector(fMuon->muvx*cm,fMuon->muvy*cm,z0);
+    fParticlePosition=G4ThreeVector(fMuon->muvx*CLHEP::cm,fMuon->muvy*CLHEP::cm,z0);
     //fParticlePosition=G4ThreeVector(0.0,0.0,737000.);
-    fParticleMomentum=G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
+    fParticleMomentum=G4ThreeVector(fMuon->mupx*CLHEP::GeV,fMuon->mupy*CLHEP::GeV,fMuon->mupz*CLHEP::GeV);
        
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     fParticleGun->SetParticleDefinition(particleTable->FindParticle(muon_type));
@@ -475,13 +477,13 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     if(fMuon->mupz < 1.0)
     {
-      flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.0*GeV);
-      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*GeV+0.0*0.0*GeV+0.0*GeV*0.0*GeV)-mass);
+      flocalParticleMomentum = G4ThreeVector(0.0,0.0,0.0*CLHEP::GeV);
+      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+0.0*0.0*CLHEP::GeV+0.0*0.0*CLHEP::GeV+0.0*CLHEP::GeV*0.0*CLHEP::GeV)-mass);
     }
     else
     {
-      flocalParticleMomentum = G4ThreeVector(fMuon->mupx*GeV,fMuon->mupy*GeV,fMuon->mupz*GeV);
-      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*GeV*fMuon->mupx*GeV+fMuon->mupy*GeV*fMuon->mupy*GeV+fMuon->mupz*GeV*fMuon->mupz*GeV)-mass);
+      flocalParticleMomentum = G4ThreeVector(fMuon->mupx*CLHEP::GeV,fMuon->mupy*CLHEP::GeV,fMuon->mupz*CLHEP::GeV);
+      //fParticleGun->SetParticleEnergy(sqrt(mass*mass+fMuon->mupx*CLHEP::GeV*fMuon->mupx*CLHEP::GeV+fMuon->mupy*CLHEP::GeV*fMuon->mupy*CLHEP::GeV+fMuon->mupz*CLHEP::GeV*fMuon->mupz*CLHEP::GeV)-mass);
     }
 
     fParticleGun->SetParticlePosition(fParticlePosition);
@@ -562,18 +564,18 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //
      if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
      fParticleGun = new G4ParticleGun(1);
-     fParticleGun->SetParticleEnergy(0.0*GeV);
+     fParticleGun->SetParticleEnergy(0.0*CLHEP::GeV);
     
     G4double x0,y0,z0,px,py,pz;
     G4String particleName;
     fPrimaryNtuple->GetEntry(fCurrentPrimaryNo);
     
-    x0 = fPrimaryNtuple->GetLeaf("x")->GetValue()*cm;
-    y0 = fPrimaryNtuple->GetLeaf("y")->GetValue()*cm;
-    z0 = fPrimaryNtuple->GetLeaf("z")->GetValue()*cm+fND->TargetZ0+35*cm;
-    px = fPrimaryNtuple->GetLeaf("px")->GetValue()*GeV;
-    py = fPrimaryNtuple->GetLeaf("py")->GetValue()*GeV;
-    pz = fPrimaryNtuple->GetLeaf("pz")->GetValue()*GeV;
+    x0 = fPrimaryNtuple->GetLeaf("x")->GetValue()*CLHEP::cm;
+    y0 = fPrimaryNtuple->GetLeaf("y")->GetValue()*CLHEP::cm;
+    z0 = fPrimaryNtuple->GetLeaf("z")->GetValue()*CLHEP::cm+fND->TargetZ0+35*CLHEP::cm;
+    px = fPrimaryNtuple->GetLeaf("px")->GetValue()*CLHEP::GeV;
+    py = fPrimaryNtuple->GetLeaf("py")->GetValue()*CLHEP::GeV;
+    pz = fPrimaryNtuple->GetLeaf("pz")->GetValue()*CLHEP::GeV;
     
     fParticlePosition=G4ThreeVector(x0,y0,z0);
     fParticleMomentum=G4ThreeVector(px,py,pz);
@@ -582,22 +584,22 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fType = G4int(fPrimaryNtuple->GetLeaf("type")->GetValue());
     fTgen = G4int(fPrimaryNtuple->GetLeaf("gener")->GetValue());
     particleName=NumiParticleCode::AsString(NumiParticleCode::IntToEnum(fType));
-    fProtonOrigin   = G4ThreeVector(fPrimaryNtuple->GetLeaf("protx")->GetValue()*cm,
-                                    fPrimaryNtuple->GetLeaf("proty")->GetValue()*cm,
-                                    fPrimaryNtuple->GetLeaf("protz")->GetValue()*cm);
-    fProtonMomentum = G4ThreeVector(fPrimaryNtuple->GetLeaf("protpx")->GetValue()*cm,
-                                    fPrimaryNtuple->GetLeaf("protpy")->GetValue()*cm,
-                                    fPrimaryNtuple->GetLeaf("protpz")->GetValue()*cm);
+    fProtonOrigin   = G4ThreeVector(fPrimaryNtuple->GetLeaf("protx")->GetValue()*CLHEP::cm,
+                                    fPrimaryNtuple->GetLeaf("proty")->GetValue()*CLHEP::cm,
+                                    fPrimaryNtuple->GetLeaf("protz")->GetValue()*CLHEP::cm);
+    fProtonMomentum = G4ThreeVector(fPrimaryNtuple->GetLeaf("protpx")->GetValue()*CLHEP::cm,
+                                    fPrimaryNtuple->GetLeaf("protpy")->GetValue()*CLHEP::cm,
+                                    fPrimaryNtuple->GetLeaf("protpz")->GetValue()*CLHEP::cm);
     
     if (fND->useMarsInput){
-      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("pvtxx")->GetValue()*cm,
-                                       fPrimaryNtuple->GetLeaf("pvtxy")->GetValue()*cm,
-                                       fPrimaryNtuple->GetLeaf("pvtxz")->GetValue()*cm);
+      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("pvtxx")->GetValue()*CLHEP::cm,
+                                       fPrimaryNtuple->GetLeaf("pvtxy")->GetValue()*CLHEP::cm,
+                                       fPrimaryNtuple->GetLeaf("pvtxz")->GetValue()*CLHEP::cm);
     }
     else if (fND->useFlukaInput){
-      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("protvx")->GetValue()*cm,
-                                       fPrimaryNtuple->GetLeaf("protvy")->GetValue()*cm,
-                                       fPrimaryNtuple->GetLeaf("protvz")->GetValue()*cm);
+      fProtonIntVertex = G4ThreeVector(fPrimaryNtuple->GetLeaf("protvx")->GetValue()*CLHEP::cm,
+                                       fPrimaryNtuple->GetLeaf("protvy")->GetValue()*CLHEP::cm,
+                                       fPrimaryNtuple->GetLeaf("protvz")->GetValue()*CLHEP::cm);
     }
     
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -620,7 +622,7 @@ void NumiPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
      //
      if(fParticleGun){ delete fParticleGun; fParticleGun = 0;}
      fParticleGun = new G4ParticleGun(1);
-     fParticleGun->SetParticleEnergy(0.0*GeV);
+     fParticleGun->SetParticleEnergy(0.0*CLHEP::GeV);
 
      //
      // THIS NEEDS TO BE CHECKED!

@@ -8,7 +8,10 @@
 //------------------
 
 #include "target_exit_t.hh"
+
+#ifndef CMAKEBUILD
 ClassImp(target_exit_t)
+#endif
 
 target_exit_t::target_exit_t():
   

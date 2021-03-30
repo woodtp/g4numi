@@ -13,6 +13,8 @@
 #include "NumiDataInput.hh"
 #include "NumiDetectorConstruction.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 //magnetic field between conductors ====================================================
 NumiMagneticField::NumiMagneticField():
       fHorn1FieldZCutUpstream(-32.0),
@@ -109,19 +111,19 @@ void NumiMagneticField::GetFieldValue(const double PointGlobal[3],double *Bfield
    
   }
   
-  G4double current = NumiData->HornCurrent/ampere/1000.;
+  G4double current = NumiData->HornCurrent/CLHEP::ampere/1000.;
   
-  //G4cout << "NumiData->HornCurrent = " << NumiData->HornCurrent/ampere << " A" << G4endl;
+  //G4cout << "NumiData->HornCurrent = " << NumiData->HornCurrent/CLHEP::ampere << " A" << G4endl;
   //G4cout << "current = " << current << G4endl;
 
 //  std::cerr  << "  NumiMagneticField::GetFieldValue, Point " 
 //             << Point[0] << " / " << Point[1] << " / " << Point[2] << G4endl;
-//  std::cerr  << "NumiData->HornCurrent = " << NumiData->HornCurrent/ampere << " A" << G4endl;
+//  std::cerr  << "NumiData->HornCurrent = " << NumiData->HornCurrent/CLHEP::ampere << " A" << G4endl;
 //  std::cerr  << "current = " << current << G4endl;
 
   
   G4double radius = sqrt(Point[0]*Point[0]+Point[1]*Point[1]);    
-  G4double B = current / (5.*radius/cm)/10*tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+  G4double B = current / (5.*radius/CLHEP::cm)/10*CLHEP::tesla;  //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
   //
   // Check that we are indeed in the field region.. 
   //
@@ -224,7 +226,7 @@ void NumiMagneticField::GetFieldValue(const double PointGlobal[3],double *Bfield
     delete numinavigator;
     
     
-    if(localPosition.z()>3*m || localPosition.z()<0*m)  {
+    if(localPosition.z()>3*CLHEP::m || localPosition.z()<0*CLHEP::m)  {
       if (first) {
         G4cout << "Applying jCompare in NumiMagneticField." << G4endl;
         first = false;
@@ -1440,7 +1442,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double PointGlobal[3],double *Bfie
     fSteppingStream << " id x y z Bx By Bz " << std::endl;
   }
 
-  G4double current = NumiData->HornCurrent/ampere/1000.;
+  G4double current = NumiData->HornCurrent/CLHEP::ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
@@ -1489,9 +1491,9 @@ void NumiMagneticFieldIC::GetFieldValue(const double PointGlobal[3],double *Bfie
 //	          << " z " << Point[2] <<  " solid Ptr " << solid << std::endl;
         dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
         dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
-        if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 
+        if (dOut<1.*CLHEP::m&&dIn<1.*CLHEP::m&&(dOut!=0.&&dIn!=0.)) 
          {
-	  magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+	  magBField = current / (5.*radius/CLHEP::cm)/10*CLHEP::tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
 	
 	  magBField=magBField*((radius*radius-(radius-dIn)*(radius-dIn))/((radius+dOut)*(radius+dOut)-(radius-dIn)*(radius-dIn)));// linear distribution of current
          }
@@ -1499,7 +1501,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double PointGlobal[3],double *Bfie
     } // solid exists 
   }// volume Ptr o.k. 
   /*
-  if (Point[2]>92*cm&&Point[2]<92.1*cm) {
+  if (Point[2]>92*CLHEP::cm&&Point[2]<92.1*CLHEP::cm) {
      G4cout<<"ICMag: "<<myVolume->GetName()<<" "
 	<<Point[0]<<" "
 	<<Point[1]<<" "
@@ -1518,7 +1520,7 @@ void NumiMagneticFieldIC::GetFieldValue(const double PointGlobal[3],double *Bfie
     Bfield[2] = 0.; 
   }
 
-    if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+    if(NumiData->jCompare &&(localPosition.z()>3*CLHEP::m || localPosition.z()<0*CLHEP::m)) // Make gnumi like horns - this is for validation
     {  
       if (first) {
         G4cout << "Applying jCompare in NumiMagneticFieldIC." << G4endl;
@@ -1603,7 +1605,7 @@ void NumiMagneticFieldOC::GetFieldValue(const double PointGlobal[3],double *Bfie
     fSteppingStream << " id x y z Bx By Bz " << std::endl;
   }
 
-  G4double current = NumiData->HornCurrent/ampere/1000.;
+  G4double current = NumiData->HornCurrent/CLHEP::ampere/1000.;
   G4Navigator* numinavigator=new G4Navigator(); //geometry navigator
   G4Navigator* theNavigator=G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   numinavigator->SetWorldVolume(theNavigator->GetWorldVolume());
@@ -1626,9 +1628,9 @@ void NumiMagneticFieldOC::GetFieldValue(const double PointGlobal[3],double *Bfie
   if (myVolume->GetName().contains("OC")){
   dOut=solid->DistanceToOut(localPosition,G4ThreeVector(Point[0]/radius,Point[1]/radius,0)); //distance to outer boundary
   dIn=solid->DistanceToOut(localPosition,G4ThreeVector(-Point[0]/radius,-Point[1]/radius,0));//distance to inner boundary
-  if (dOut<1.*m&&dIn<1.*m&&(dOut!=0.&&dIn!=0.)) 
+  if (dOut<1.*CLHEP::m&&dIn<1.*CLHEP::m&&(dOut!=0.&&dIn!=0.)) 
     {
-      magBField = current / (5.*radius/cm)/10*tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
+      magBField = current / (5.*radius/CLHEP::cm)/10*CLHEP::tesla; //B(kG)=i(kA)/[5*r(cm)], 1T=10kG
       G4double rIn=radius-dIn;
       G4double rOut=radius+dOut;
       magBField=magBField*(1-(radius*radius-rIn*rIn)/(rOut*rOut-rIn*rIn)); // linear distribution of current
@@ -1646,7 +1648,7 @@ void NumiMagneticFieldOC::GetFieldValue(const double PointGlobal[3],double *Bfie
     Bfield[2] = 0.;
   }
   
-  if(NumiData->jCompare &&(localPosition.z()>3*m || localPosition.z()<0*m)) // Make gnumi like horns - this is for validation
+  if(NumiData->jCompare &&(localPosition.z()>3*CLHEP::m || localPosition.z()<0*CLHEP::m)) // Make gnumi like horns - this is for validation
     {
       if (first) {
         G4cout << "Applying jCompare in NumiMagneticFieldOC." << G4endl;

@@ -9,6 +9,8 @@
 #include "globals.hh"
 #include "NumiDataInput.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 void NumiDetectorConstruction::DefineMaterials()
 {  
 
@@ -24,116 +26,116 @@ void NumiDetectorConstruction::DefineMaterials()
   G4String symbol,name;
   G4double density, mass_percent;
 
-  G4double rock_density_offset     = 0.04*g/cm3 * NumiData->GetMaterialSigma();
-  G4double BluBlock_density_offset = 0.16*g/cm3 * NumiData->GetMaterialSigma();
+  G4double rock_density_offset     = 0.04*CLHEP::g/CLHEP::cm3 * NumiData->GetMaterialSigma();
+  G4double BluBlock_density_offset = 0.16*CLHEP::g/CLHEP::cm3 * NumiData->GetMaterialSigma();
 
   // Air and Vacuum
-  A = 1.01*g/mole;
+  A = 1.01*CLHEP::g/CLHEP::mole;
   G4Element* elH  = new G4Element(name="Hydrogen",symbol="H" , Z= 1, A);
 
-  A = 4.003*g/mole; 
+  A = 4.003*CLHEP::g/CLHEP::mole; 
   G4Element* elHe  = new G4Element(name="Helium",symbol="He" , Z= 2, A);
 
-  A = 12.01*g/mole;
+  A = 12.01*CLHEP::g/CLHEP::mole;
   G4Element* elC  = new G4Element(name="Carbon"  ,symbol="C" , Z = 6, A);
 
-  A = 14.01*g/mole;
+  A = 14.01*CLHEP::g/CLHEP::mole;
   G4Element* elN = new G4Element(name="Nitrogen", symbol="N", Z=7.,A);
 
-  A = 16.00*g/mole;
+  A = 16.00*CLHEP::g/CLHEP::mole;
   G4Element* elO  = new G4Element(name="Oxygen"  ,symbol="O" , Z= 8, A);
 
-  A = 22.99*g/mole; 
+  A = 22.99*CLHEP::g/CLHEP::mole; 
 #ifdef FLUGG
   G4Element* elNa  = new G4Element(name="Sodium"  ,symbol="Na" , Z=11 , A);
 #else
   G4Element* elNa  = new G4Element(name="Natrium"  ,symbol="Na" , Z=11 , A);
 #endif
   
-  A = 24.305*g/mole;  
+  A = 24.305*CLHEP::g/CLHEP::mole;  
   G4Element* elMg  = new G4Element(name="Magnesium"  ,symbol="Mg" , Z=12 , A); 
 
-  A = 26.98*g/mole; 
+  A = 26.98*CLHEP::g/CLHEP::mole; 
   G4Element* elAl  = new G4Element(name="Aluminum"  ,symbol="Al" , Z=13, A);
 
-  A = 28.09*g/mole;
+  A = 28.09*CLHEP::g/CLHEP::mole;
   G4Element* elSi  = new G4Element(name="Silicon", symbol="Si", Z=14, A);
 
-  A = 30.974*g/mole; 
+  A = 30.974*CLHEP::g/CLHEP::mole; 
 #ifdef FLUGG
   G4Element* elP  = new G4Element(name="Phospho"  ,symbol="P" , Z=15 , A);
 #else
   G4Element* elP  = new G4Element(name="Phosphorus"  ,symbol="P" , Z=15 , A);
 #endif
   
-  A = 32.065*g/mole; 
+  A = 32.065*CLHEP::g/CLHEP::mole; 
   G4Element* elS  = new G4Element(name="Sulfur"  ,symbol="S" , Z=16 , A);
 
-  //A = 39.948*g/mole;
+  //A = 39.948*CLHEP::g/CLHEP::mole;
   //G4Element* elAr = new G4Element(name="Argon" , symbol="Ar", Z=18, A);
 
-  A = 39.1*g/mole; 
+  A = 39.1*CLHEP::g/CLHEP::mole; 
   G4Element* elK  = new G4Element(name="Potassium"  ,symbol="K" , Z=19 , A);
 
-  A = 40.09*g/mole; 
+  A = 40.09*CLHEP::g/CLHEP::mole; 
   G4Element* elCa  = new G4Element(name="Calcium"  ,symbol="Ca" , Z=20 , A);
 
-  A = 47.867*g/mole; 
+  A = 47.867*CLHEP::g/CLHEP::mole; 
   G4Element* elTi  = new G4Element(name="Titanium"  ,symbol="Ti" , Z=22 , A);
 
-  A = 51.9961*g/mole; 
+  A = 51.9961*CLHEP::g/CLHEP::mole; 
   G4Element* elCr  = new G4Element(name="Chromium"  ,symbol="Cr" , Z=24 , A);
 
-  A = 54.938*g/mole; 
+  A = 54.938*CLHEP::g/CLHEP::mole; 
   G4Element* elMn  = new G4Element(name="Manganese"  ,symbol="Mn" , Z=25 , A);
 
-  A = 55.85*g/mole;
+  A = 55.85*CLHEP::g/CLHEP::mole;
   G4Element* elFe = new G4Element(name="Iron"    ,symbol="Fe", Z=26, A);
 
-  A = 58.6934*g/mole;
+  A = 58.6934*CLHEP::g/CLHEP::mole;
   G4Element* elNi = new G4Element(name="Nickel"    ,symbol="Ni", Z=28, A);
 
-  A = 63.546*g/mole;
+  A = 63.546*CLHEP::g/CLHEP::mole;
   G4Element* elCu = new G4Element(name="Copper"    ,symbol="Cu", Z=29, A);
 
-  //A = 69.72*g/mole; 
+  //A = 69.72*CLHEP::g/CLHEP::mole; 
   //G4Element* elGa  = new G4Element(name="Gallium"  ,symbol="Ga" , Z=31 , A);
 
-  A = 200.59*g/mole; 
+  A = 200.59*CLHEP::g/CLHEP::mole; 
   G4Element* elHg  = new G4Element(name="Mercury"  ,symbol="Hg" , Z=80, A);
 
-  density = 1.29*mg/cm3; 
+  density = 1.29*CLHEP::mg/CLHEP::cm3; 
   Air = new G4Material("Air", density, 2); // number of components =2
-  Air->AddElement(elN, 70*perCent); // mass fraction =70%
-  Air->AddElement(elO, 30*perCent); // 30%
+  Air->AddElement(elN, 70*CLHEP::perCent); // mass fraction =70%
+  Air->AddElement(elO, 30*CLHEP::perCent); // 30%
 
-  density = 7.75*g/cm3;  
+  density = 7.75*CLHEP::g/CLHEP::cm3;  
   CT852 = new G4Material("CT852", density, 10); 
-  CT852->AddElement(elC,  0.1*perCent); 
-  CT852->AddElement(elSi, 0.8*perCent); 
-  CT852->AddElement(elMn, 0.8*perCent); 
-  CT852->AddElement(elCr, 13*perCent); 
-  CT852->AddElement(elS,  0.025*perCent); 
-  CT852->AddElement(elP,  0.03*perCent); 
-  CT852->AddElement(elTi, 0.2*perCent); 
-  CT852->AddElement(elCu, 0.3*perCent); 
-  CT852->AddElement(elNi, 0.6*perCent); 
-  CT852->AddElement(elFe, 84.145*perCent); 
+  CT852->AddElement(elC,  0.1*CLHEP::perCent); 
+  CT852->AddElement(elSi, 0.8*CLHEP::perCent); 
+  CT852->AddElement(elMn, 0.8*CLHEP::perCent); 
+  CT852->AddElement(elCr, 13*CLHEP::perCent); 
+  CT852->AddElement(elS,  0.025*CLHEP::perCent); 
+  CT852->AddElement(elP,  0.03*CLHEP::perCent); 
+  CT852->AddElement(elTi, 0.2*CLHEP::perCent); 
+  CT852->AddElement(elCu, 0.3*CLHEP::perCent); 
+  CT852->AddElement(elNi, 0.6*CLHEP::perCent); 
+  CT852->AddElement(elFe, 84.145*CLHEP::perCent); 
 
-  density = 7.8416*g/cm3;// ASTM836 steel is the closest
+  density = 7.8416*CLHEP::g/CLHEP::cm3;// ASTM836 steel is the closest
   Slab_Stl = new G4Material("Slab_Stl",density,6);
-  Slab_Stl->AddElement(elC,  0.1*perCent);
-  Slab_Stl->AddElement(elSi, 0.1*perCent);
-  Slab_Stl->AddElement(elMn, 0.4*perCent);
-  Slab_Stl->AddElement(elFe, 98.2*perCent);
-  Slab_Stl->AddElement(elNi, 1.0*perCent);
-  Slab_Stl->AddElement(elCu, 0.2*perCent);
+  Slab_Stl->AddElement(elC,  0.1*CLHEP::perCent);
+  Slab_Stl->AddElement(elSi, 0.1*CLHEP::perCent);
+  Slab_Stl->AddElement(elMn, 0.4*CLHEP::perCent);
+  Slab_Stl->AddElement(elFe, 98.2*CLHEP::perCent);
+  Slab_Stl->AddElement(elNi, 1.0*CLHEP::perCent);
+  Slab_Stl->AddElement(elCu, 0.2*CLHEP::perCent);
 
-  density = 7.25*g/cm3 + BluBlock_density_offset;// BluBlock steel
+  density = 7.25*CLHEP::g/CLHEP::cm3 + BluBlock_density_offset;// BluBlock steel
   Blu_Stl = new G4Material("Blu_Stl",density,1);
-  Blu_Stl->AddElement(elFe, 100*perCent);
+  Blu_Stl->AddElement(elFe, 100*CLHEP::perCent);
 
-  density = 1.*g/cm3; 
+  density = 1.*CLHEP::g/CLHEP::cm3; 
   G4int natoms;
   G4int nel;
   Water = new G4Material("Water", density, 2); //number of components =2
@@ -148,15 +150,15 @@ void NumiDetectorConstruction::DefineMaterials()
   Pyrite->AddElement(elFe, natoms=1);
   Pyrite->AddElement(elS, natoms=2);
 
-  density = 2.376e-15*g/cm3;
-  G4double temperature=300.*kelvin;
-  G4double pressure=2.0e-7*bar;
+  density = 2.376e-15*CLHEP::g/CLHEP::cm3;
+  G4double temperature=300.*CLHEP::kelvin;
+  G4double pressure=2.0e-7*CLHEP::bar;
   Vacuum = new G4Material("Vacuum", density, 1, kStateGas,temperature,pressure);
   Vacuum-> AddMaterial(Air, 1.);
 
-  density = 1.29/760.*mg/cm3*0.4;
-  temperature=300.*kelvin;
-  pressure=atmosphere/760.*0.4; //Decay Pipe Vacuum is ~0.4Torr
+  density = 1.29/760.*CLHEP::mg/CLHEP::cm3*0.4;
+  temperature=300.*CLHEP::kelvin;
+  pressure=CLHEP::atmosphere/760.*0.4; //Decay Pipe Vacuum is ~0.4Torr
   DecayPipeVacuum = new G4Material("DecayPipeVacuum", density, 1, kStateGas,temperature,pressure);
   DecayPipeVacuum-> AddMaterial(Air, 1.);
 
@@ -164,30 +166,30 @@ void NumiDetectorConstruction::DefineMaterials()
   // M. Kordosky 10/14/16
   // Update helium densities according to advice from A. Holin
   // Suggested densities come from Jim Hylen and Phil Adamson
-  SecMonitorHelium = new G4Material("SecMonitorHelium", Z=2., A=4.0026*g/mole, density= 0.1785*kg/m3,kStateGas,300*kelvin,2.55*atmosphere);
-  // 0.1785*kg/m3 --> 0.1946 kg/m3.  2.55atm --> 1.27 atm
-  TargetHelium = new G4Material("TargetHelium", Z=2., A=4.0026*g/mole, density= 0.1946*kg/m3,kStateGas,300*kelvin,1.27*atmosphere);
-  // 0.145*kg/m3 --> 0.1498 kg/m3, 
-  DecayPipeHelium = new G4Material("DecayPipeHelium", 0.1498*kg/m3, 1, 
-				   kStateGas,300*kelvin,0.9*atmosphere);
+  SecMonitorHelium = new G4Material("SecMonitorHelium", Z=2., A=4.0026*CLHEP::g/CLHEP::mole, density= 0.1785*CLHEP::kg/CLHEP::m3,kStateGas,300*CLHEP::kelvin,2.55*CLHEP::atmosphere);
+  // 0.1785*CLHEP::kg/CLHEP::m3 --> 0.1946 CLHEP::kg/CLHEP::m3.  2.55atm --> 1.27 atm
+  TargetHelium = new G4Material("TargetHelium", Z=2., A=4.0026*CLHEP::g/CLHEP::mole, density= 0.1946*CLHEP::kg/CLHEP::m3,kStateGas,300*CLHEP::kelvin,1.27*CLHEP::atmosphere);
+  // 0.145*CLHEP::kg/CLHEP::m3 --> 0.1498 CLHEP::kg/CLHEP::m3, 
+  DecayPipeHelium = new G4Material("DecayPipeHelium", 0.1498*CLHEP::kg/CLHEP::m3, 1, 
+				   kStateGas,300*CLHEP::kelvin,0.9*CLHEP::atmosphere);
   DecayPipeHelium->AddElement(elHe,1.0);
   
 
 #ifdef FLUGG
-  Be = new G4Material("Berylliu", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
+  Be = new G4Material("Berylliu", Z=4.,A=9.01*CLHEP::g/CLHEP::mole, density=1.848*CLHEP::g/CLHEP::cm3);
   Target =  new G4Material("Carbon", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
 #else
-  Be = new G4Material("Berillium", Z=4.,A=9.01*g/mole, density=1.848*g/cm3);
-  C =  new G4Material("Carbon", Z=6., A=12.01*g/mole, density= 1.83*g/cm3);
+  Be = new G4Material("Berillium", Z=4.,A=9.01*CLHEP::g/CLHEP::mole, density=1.848*CLHEP::g/CLHEP::cm3);
+  C =  new G4Material("Carbon", Z=6., A=12.01*CLHEP::g/CLHEP::mole, density= 1.83*CLHEP::g/CLHEP::cm3);
   Target =  new G4Material("Target", Z=NumiData->TargetZ, A=NumiData->TargetA, density= NumiData->TargetDensity);
 #endif
-  Al = new G4Material("Aluminum", Z= 13., A= 26.98*g/mole, density= 2.7*g/cm3);
-  Ar = new G4Material("Argon", Z= 18, A=39.948*g/mole,1.784*kg/m3,kStateGas,300*kelvin,atmosphere);
-  Pb = new G4Material("Lead", Z= 82., A= 207.19*g/mole, density= 11.35*g/cm3);
-  Fe = new G4Material("Iron", Z= 26., A=55.85*g/mole, density= 7.86999*g/cm3);
+  Al = new G4Material("Aluminum", Z= 13., A= 26.98*CLHEP::g/CLHEP::mole, density= 2.7*CLHEP::g/CLHEP::cm3);
+  Ar = new G4Material("Argon", Z= 18, A=39.948*CLHEP::g/CLHEP::mole,1.784*CLHEP::kg/CLHEP::m3,kStateGas,300*CLHEP::kelvin,CLHEP::atmosphere);
+  Pb = new G4Material("Lead", Z= 82., A= 207.19*CLHEP::g/CLHEP::mole, density= 11.35*CLHEP::g/CLHEP::cm3);
+  Fe = new G4Material("Iron", Z= 26., A=55.85*CLHEP::g/CLHEP::mole, density= 7.86999*CLHEP::g/CLHEP::cm3);
 
 
-  density = 2.03*g/cm3;
+  density = 2.03*CLHEP::g/CLHEP::cm3;
   G4double fractionmass;
   Concrete = new G4Material("Concrete", density, 10);
   Concrete->AddElement( elH,  fractionmass = 0.01);
@@ -203,7 +205,7 @@ void NumiDetectorConstruction::DefineMaterials()
 
   // This comes from the MARS simulation courtesy of 
   // Nancy Grossman
-  density = 2.09*g/cm3;
+  density = 2.09*CLHEP::g/CLHEP::cm3;
   Shotcrete = new G4Material( "Shotcrete", density, 7 );
   Shotcrete->AddElement( elO,  fractionmass = 0.361747 );
   Shotcrete->AddElement( elSi, fractionmass = 0.100031 );
@@ -217,7 +219,7 @@ void NumiDetectorConstruction::DefineMaterials()
   // & Weight" rev. 1988. Which puts the weight at 10150 +/- 50 
   // pounds
 
-  density = 2.61*g/cm3;
+  density = 2.61*CLHEP::g/CLHEP::cm3;
   Rebar_Concrete = new G4Material("Rebar_Concrete", density, 10);
   Rebar_Concrete->AddElement( elH,  fractionmass = 0.01 );
   Rebar_Concrete->AddElement( elO,  fractionmass = 0.529 );
@@ -232,7 +234,7 @@ void NumiDetectorConstruction::DefineMaterials()
 
   // Dolomite
 
-  density = 2.78*g/cm3 + rock_density_offset;
+  density = 2.78*CLHEP::g/CLHEP::cm3 + rock_density_offset;
   G4Material *rockMat = new G4Material( "rockMat", density, 4 ); //CaMg(CO3)2
   rockMat->AddElement( elCa, natoms = 1 );
   rockMat->AddElement( elMg, natoms = 1 ); 
@@ -241,7 +243,7 @@ void NumiDetectorConstruction::DefineMaterials()
   
   // Maquoketa Shale
 
-  density = 2.78*g/cm3 + rock_density_offset;
+  density = 2.78*CLHEP::g/CLHEP::cm3 + rock_density_offset;
   MaqShale = new G4Material("MaqShale",density,5);
   mass_percent = 25.4/384.75;
   MaqShale->AddElement( elK, fractionmass = mass_percent );
@@ -258,7 +260,7 @@ void NumiDetectorConstruction::DefineMaterials()
   // nominally 44.2/52/3.8 Dolomite/Shale/Water
   // for 3.8% water the density of water needs to be added
 
-  density = 2.828*g/cm3 + rock_density_offset;
+  density = 2.828*CLHEP::g/CLHEP::cm3 + rock_density_offset;
   DoloStone = new G4Material( "DoloStone", density, 3 );
   DoloStone->AddMaterial( rockMat, fractionmass = 0.30 );
   DoloStone->AddMaterial( MaqShale, fractionmass = 0.662 );
@@ -269,30 +271,30 @@ void NumiDetectorConstruction::DefineMaterials()
   // difference between water and steel that is being ignored 
   // in these approximations. -DJK
 
-  density = 2.45*g/cm3;
+  density = 2.45*CLHEP::g/CLHEP::cm3;
   var_Al = new G4Material( "VariableDensityAluminum", density, 3 );
   var_Al->AddElement( elAl, fractionmass = .891 );
   var_Al->AddMaterial( Water, fractionmass = .044 );
   var_Al->AddMaterial( Air, fractionmass = .065 );
 
-  density = 6.836*g/cm3;
+  density = 6.836*CLHEP::g/CLHEP::cm3;
   var_Stl = new G4Material("VariableDensitySteel", density, 2);
   var_Stl->AddElement( elFe,   fractionmass = .853);
   var_Stl->AddMaterial( Water, fractionmass = .147);
 
-  density = 7.8*g/cm3;
+  density = 7.8*CLHEP::g/CLHEP::cm3;
   n1018_Stl = new G4Material( "1018Steel", density, 3 );
   n1018_Stl->AddElement( elFe, fractionmass = .989 );
   n1018_Stl->AddElement( elMn, fractionmass = .009 );
   n1018_Stl->AddElement( elC,  fractionmass = .002 );
 
-  density = 7.8*g/cm3;
+  density = 7.8*CLHEP::g/CLHEP::cm3;
   A500_Stl = new G4Material( "A500Steel", density, 3 );
   A500_Stl->AddElement( elFe, fractionmass = .995 );
   A500_Stl->AddElement( elCu, fractionmass = .002 );
   A500_Stl->AddElement( elC,  fractionmass = .003 );
 
-  density = 7.8*g/cm3;
+  density = 7.8*CLHEP::g/CLHEP::cm3;
   M1018_Stl = new G4Material( "M1018Steel", density, 5 );
   M1018_Stl->AddElement( elFe, fractionmass = .9901 );
   M1018_Stl->AddElement( elMn, fractionmass = .007 );
@@ -312,16 +314,16 @@ void NumiDetectorConstruction::DefineMaterials()
   //
   //Parallel plates of the ionization chamber
   //
-  Alumina = new G4Material("Alumina",density= 3.97*g/cm3, nel=2);
+  Alumina = new G4Material("Alumina",density= 3.97*CLHEP::g/CLHEP::cm3, nel=2);
   Alumina->AddElement(elAl, natoms=2);
   Alumina->AddElement(elO, natoms=3);
 
   //
   //Helium in muon chambers (at NTP)
   //
-  HeGas = new G4Material("HeGas", Z=2., A=4.0026*g/mole, 0.1663*kg/m3,
-                                     kStateGas, temperature= 293.15*kelvin,
-                                     pressure= 1*atmosphere);
+  HeGas = new G4Material("HeGas", Z=2., A=4.0026*CLHEP::g/CLHEP::mole, 0.1663*CLHEP::kg/CLHEP::m3,
+                                     kStateGas, temperature= 293.15*CLHEP::kelvin,
+                                     pressure= 1*CLHEP::atmosphere);
 
   //
   // Material for delta Ray absorbers 
@@ -330,7 +332,7 @@ void NumiDetectorConstruction::DefineMaterials()
   //
   //Dry wall (CaSO4·2H2O)
   //
-  Drywall = new G4Material("Drywall", density=2.32*g/cm3, nel=4);
+  Drywall = new G4Material("Drywall", density=2.32*CLHEP::g/CLHEP::cm3, nel=4);
   Drywall->AddElement(elCa, natoms=1);
   Drywall->AddElement(elS,  natoms=1);
   Drywall->AddElement(elO,  natoms=6);
@@ -339,7 +341,7 @@ void NumiDetectorConstruction::DefineMaterials()
   //
   //Paraffin Wax (assuming a composition, although that can vary)
   //
-  Paraffin = new G4Material("Paraffin",density= 0.93*g/cm3,nel=2);
+  Paraffin = new G4Material("Paraffin",density= 0.93*CLHEP::g/CLHEP::cm3,nel=2);
   Paraffin->AddElement(elC, natoms=25);
   Paraffin->AddElement(elH, natoms=52);
 
@@ -347,7 +349,7 @@ void NumiDetectorConstruction::DefineMaterials()
   //wood?
   //
   /*
-  G4Material* wood = new G4Material("Wood", density=0.9*g/cm3, nel=3);
+  G4Material* wood = new G4Material("Wood", density=0.9*CLHEP::g/CLHEP::cm3, nel=3);
   wood->AddElement(H , 4);
   wood->AddElement(O , 1);
   wood->AddElement(C , 2);

@@ -21,6 +21,8 @@
 
 #include "G4NistManager.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -31,10 +33,10 @@ NA49DetectorConstruction::NA49DetectorConstruction(const Target &t)
   detectorMessenger = new NA49DetectorMessenger(this);
 
   TargetZ = t.Z;
-  TargetA = t.A*g/mole;
-  TargetDensity = t.density*g/cm3;
+  TargetA = t.A*CLHEP::g/CLHEP::mole;
+  TargetDensity = t.density*CLHEP::g/CLHEP::cm3;
 
-  radius = t.radius*cm;
+  radius = t.radius*CLHEP::cm;
 
   targetMaterial = new G4Material(t.name,TargetZ, TargetA, TargetDensity);
   worldMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
@@ -58,19 +60,19 @@ G4VPhysicalVolume* NA49DetectorConstruction::Construct()
   G4SolidStore::GetInstance()->Clean();
 
   // Sizes
-  G4double worldR  = radius + cm;
-  G4double targetLenght = 0.7*cm*0.5; 
-  G4double worldZ  = targetLenght + cm;
+  G4double worldR  = radius + CLHEP::cm;
+  G4double targetLenght = 0.7*CLHEP::cm*0.5; 
+  G4double worldZ  = targetLenght + CLHEP::cm;
 
   // World
   //
-  G4Tubs* solidW = new G4Tubs("World",0.,worldR,worldZ,0.,twopi);
+  G4Tubs* solidW = new G4Tubs("World",0.,worldR,worldZ,0.,CLHEP::twopi);
   logicWorld = new G4LogicalVolume( solidW,worldMaterial,"World");
   G4VPhysicalVolume* world = new G4PVPlacement(0,G4ThreeVector(),
                                        logicWorld,"World",0,false,0);
   // Target volume
   //
-  G4Tubs* solidT = new G4Tubs("Target",0.,radius,targetLenght,0.,twopi);
+  G4Tubs* solidT = new G4Tubs("Target",0.,radius,targetLenght,0.,CLHEP::twopi);
   logicTarget = new G4LogicalVolume( solidT,targetMaterial,"Target");
   new G4PVPlacement(0,G4ThreeVector(),logicTarget,"Target",logicWorld,false,0);
 

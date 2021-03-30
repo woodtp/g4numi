@@ -12,6 +12,9 @@
 #include "NumiDataInput.hh"
 #include "Randomize.hh"
 #include "NumiRunManager.hh"
+
+#include "CLHEP/Units/PhysicalConstants.h"
+
 //------------------------------------------------------------------------------
 NumiRunAction::NumiRunAction()
 {
@@ -90,11 +93,11 @@ void NumiRunAction::BeginOfRunAction(const G4Run* aRun)
    else
    {
       G4cout << "  Using the Simple Proton beam:"<<G4endl;
-      G4cout << "     Momentum: "<<fNDI->protonMomentum/GeV << "GeV" <<G4endl;
-      G4cout << "     Kinetic Energy: "<<fNDI->protonKineticEnergy/GeV<<"GeV" <<G4endl;
-      G4cout << "     Position "<<fNDI->beamPosition/m<<" m"<<G4endl;
-      G4cout << "     SigmaX = "<<fNDI->beamSigmaX/mm<<" mm"<<G4endl;
-      G4cout << "     SigmaY = "<<fNDI->beamSigmaY/mm<<" mm"<<G4endl;
+      G4cout << "     Momentum: "<<fNDI->protonMomentum/CLHEP::GeV << "GeV" <<G4endl;
+      G4cout << "     Kinetic Energy: "<<fNDI->protonKineticEnergy/CLHEP::GeV<<"GeV" <<G4endl;
+      G4cout << "     Position "<<fNDI->beamPosition/CLHEP::m<<" m"<<G4endl;
+      G4cout << "     SigmaX = "<<fNDI->beamSigmaX/CLHEP::mm<<" mm"<<G4endl;
+      G4cout << "     SigmaY = "<<fNDI->beamSigmaY/CLHEP::mm<<" mm"<<G4endl;
    }
    
    

@@ -17,7 +17,10 @@
 #include "NumiMagneticField.hh"
 #include "G4FieldManager.hh"
 #include "G4UserLimits.hh"
-static const G4double in=2.54*cm;
+
+#include "CLHEP/Units/PhysicalConstants.h"
+
+static const G4double in=2.54*CLHEP::cm;
 
 void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationMatrix hornrot)
 {
@@ -29,18 +32,13 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
      if ( hornWaterLayerThick > 10.) {
      std::ostringstream messageOStr; messageOStr << " Unreasonable amount of water " << hornWaterLayerThick;
      std::string message(messageOStr.str());
-#ifndef MODERN_G4
-     G4Exception("NumiDetectorConstruction::ConstructLHorn2");
-#else
-     G4Exception("numiHorn1","NumiHorn1",FatalException,"NumiDetectorConstruction::ConstructHorn2");
-#endif
-     exit(2); // only under 4.9.2 .. not reachable under 4.9.5 
+     G4Exception("numiHorn2","NumiHorn2",FatalException,"NumiDetectorConstruction::ConstructHorn2");
    }
-   const bool placeWaterLayer = (hornWaterLayerThick > 0.001*mm);
+   const bool placeWaterLayer = (hornWaterLayerThick > 0.001*CLHEP::mm);
 
   // subtract TargetHallPosition to get origin at the face of Horn2
   G4ThreeVector TargetHallPosition=G4ThreeVector(0,0,NumiData->TargetAreaLength/2.+NumiData->TargetAreaZ0);
-  //G4double MHorn2Length=133.966*2.54*cm+3.938*in+1.75*in+2.5*in;
+  //G4double MHorn2Length=133.966*2.54*CLHEP::cm+3.938*in+1.75*in+2.5*in;
   G4double Horn2Z0=-1.889*in;// HornZ0 in Horn coordinate system
   //G4double Horn2Z1=
   G4double OCZ0=0.295*in;
@@ -50,15 +48,15 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   G4double frontRmin=1.859*in; // Drawing ME - 363385 says this is 1.869 inches... 
   G4double frontRmax=2.184*in;
   G4double frontRtor=12.756*in;
-  G4double MVgap=0.1*mm;
-  G4double Fgap=0.5*mm;
+  G4double MVgap=0.1*CLHEP::mm;
+  G4double Fgap=0.5*CLHEP::mm;
   G4ThreeVector MHorn2Origin=G4ThreeVector(0,0,0);
   G4double FZ0=0.*in;
   G4double FZ1=137.96*in-Fgap;
-  G4double epsilon=.0000001*mm;
-  G4double maxDev=0.5*mm;
+  G4double epsilon=.0000001*CLHEP::mm;
+  G4double maxDev=0.5*CLHEP::mm;
   
-  G4int nPoints=G4int((ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+ND->PHorn2EndLength[ND->NPHorn2EndN-1]+frontRmax)/(.05*mm));
+  G4int nPoints=G4int((ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+ND->PHorn2EndLength[ND->NPHorn2EndN-1]+frontRmax)/(.05*CLHEP::mm));
   G4double deltaZ=(ND->PHorn2EndZ0[ND->NPHorn2EndN-1]+frontRmax)/nPoints;
   
   G4int nOut(0),nIn(0),nMV(0),nF(0);
@@ -74,7 +72,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 
   G4UserLimits *MyLimits = new G4UserLimits();
   if(ND->raytracing){
-    MyLimits->SetMaxAllowedStep(1*cm);
+    MyLimits->SetMaxAllowedStep(1*CLHEP::cm);
   }
   //
   // Imperfect Current equalizer section support. 
@@ -229,9 +227,9 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   // Volume overlap detected, July 2014, minor, < 1 mm 
   // It does not hurt to reduce RIn by one mm .. P.L., July 2014. 
   for (size_t iSect = 0; iSect != static_cast<size_t>(nMV+1); iSect++) {
-      MVRin[iSect] -= 1.0*mm;
-      if (MVzPos[iSect] > 2500.) MVRin[iSect] -= 2.0*mm;
-      if (MVzPos[iSect] > 3000.) MVRin[iSect] -= 3.0*cm; // Again, air in air does not change things, and avoid the volume overlaps. 
+      MVRin[iSect] -= 1.0*CLHEP::mm;
+      if (MVzPos[iSect] > 2500.) MVRin[iSect] -= 2.0*CLHEP::mm;
+      if (MVzPos[iSect] > 3000.) MVRin[iSect] -= 3.0*CLHEP::cm; // Again, air in air does not change things, and avoid the volume overlaps. 
   }
 // Dump the mother volume info to locate the overlap. 
   std::cerr << " Horn2 Polycone mother volume with " << nMV+1 << " sections " << std::endl;
@@ -239,7 +237,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
     std::cerr << " Section " << iSect << " Zl " << MVzPos[iSect] 
 	      << " Rin " << MVRin[iSect] << " R Out " << MVRout[iSect] << std::endl;
   }   
-  sMHorn2= new G4Polycone("sMH",0.,360.*deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
+  sMHorn2= new G4Polycone("sMH",0.,360.*CLHEP::deg,nMV+1,&MVzPos[0],&MVRin[0],&MVRout[0]);
   G4LogicalVolume *lvMHorn2 = new G4LogicalVolume(sMHorn2,material,"lvMHorn2",0,0,0);
   G4VisAttributes* invisible=new G4VisAttributes(false);
   lvMHorn2->SetVisAttributes(invisible);
@@ -255,7 +253,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
       
   //Front part
   G4VSolid* sHorn2Front;
-  G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*deg);
+  G4Torus* sFrontTorus=new G4Torus("sFrontTorus",frontRmin,frontRmax,frontRtor,0,360.*CLHEP::deg);
   G4Box* sBox=new G4Box("sBox",frontRtor*2.,frontRtor*2.,frontRmax*2.);
   rotation=G4RotationMatrix(0.,0.,0.);
   translation=G4ThreeVector(0.,0.,frontRmax*2);
@@ -267,7 +265,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   new G4PVPlacement(G4Transform3D(rotation,translation),"PHorn2Front",lvHorn2Front,pvMHorn2,false,0, true);
     
   //Outer Conductor
-  G4Polycone* sPHorn2OC=new G4Polycone("sPHorn2OC",0.,360.*deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
+  G4Polycone* sPHorn2OC=new G4Polycone("sPHorn2OC",0.,360.*CLHEP::deg,nOut+1,&OCzPos[0],&OCRin[0],&OCRout[0]);
   G4LogicalVolume* lvPHorn2OC=new G4LogicalVolume(sPHorn2OC,GetMaterial(ND->hrnmat),"lvPHorn2OC",0,0,0);
   G4FieldManager* FieldMgr2 = new G4FieldManager(numiMagFieldOC); //create a local field
   FieldMgr2->SetDetectorField(numiMagFieldOC); //set the field 
@@ -308,7 +306,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 //                   " " << ICzPos[ko]/in << " " << ICRin[ko]/in << " " << ICRout[ko]/in << std::endl;
 //  fOutHorn2IC.close();
   //Inner Conductor
-  G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
+  G4Polycone* sPHorn2IC=new G4Polycone("sPHorn2IC",0.,360.*CLHEP::deg,nIn+1,&ICzPos[0],&ICRin[0],&ICRout[0]);
   G4LogicalVolume* lvPHorn2IC=new G4LogicalVolume(sPHorn2IC,GetMaterial(ND->hrnmat),"lvPHorn2IC",0,0,0);
   G4FieldManager* FieldMgr = new G4FieldManager(numiMagFieldIC); //create a local field		 
   FieldMgr->SetDetectorField(numiMagFieldIC); //set the field 
@@ -334,8 +332,8 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
 //  		 " " << ICzPos[ko]/in << " " << FRin[ko]/in << " " << FRout[ko]/in << std::endl;
 //  fOutHorn2IC.close();
   // We don't 
-  G4Polycone* sPConeF=new G4Polycone("sPCone2F",0.,360.*deg,numFieldSegment,&FzPos[0],&FRin[0],&FRout[0]);
-  G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*deg);
+  G4Polycone* sPConeF=new G4Polycone("sPCone2F",0.,360.*CLHEP::deg,numFieldSegment,&FzPos[0],&FRin[0],&FRout[0]);
+  G4Torus* sTorusF=new G4Torus("sTorusF",0.,frontRmin-Fgap,frontRtor,0,360.*CLHEP::deg);
   rotation=G4RotationMatrix(0.,0.,0.); translation =G4ThreeVector(0.,0.,Horn2Z0+frontRmax);
   G4UnionSolid *sPHorn2F=new G4UnionSolid("sPHorn2F",sPConeF,sTorusF,G4Transform3D(rotation,translation));
   //  G4LogicalVolume* lvPHorn2F=new G4LogicalVolume(sPHorn2F,Ar,"lvPHorn2F",0,0,0);
@@ -360,7 +358,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
         FRoutW[ko] = FRinW[ko] + hornWaterLayerThick + epsilon;
     }
     // We stop this water layer a bit upstream of the flange
-    G4Polycone* sPHorn2ICW=new G4Polycone("sPHorn2ICWater",0.,360.*deg, 37, &ICzPos[0],&FRinW[0],&FRoutW[0]);
+    G4Polycone* sPHorn2ICW=new G4Polycone("sPHorn2ICWater",0.,360.*CLHEP::deg, 37, &ICzPos[0],&FRinW[0],&FRoutW[0]);
     lvPHorn2ICW=new G4LogicalVolume(sPHorn2ICW, Water,"lvPHorn2ICWater",0,0,0);
     ND->ApplyStepLimits(lvPHorn2ICW); // Limit Step Size
     rotation=G4RotationMatrix(0.,0.,0.);
@@ -372,7 +370,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
   //Spider support
   for (G4int ii=0;ii<G4int(ND->Horn2SS.size());ii++){
     for (G4int jj=0;jj<ND->NHorn2SpidersPerPlaneN;jj++){
-      G4double angle=G4double(360.*deg*jj/ND->NHorn2SpidersPerPlaneN);
+      G4double angle=G4double(360.*CLHEP::deg*jj/ND->NHorn2SpidersPerPlaneN);
       G4double rIn=PHorn2ICRout(ND->Horn2SpiderSupportZ0[ii])+Fgap;//
       G4double rOut=PHorn2OCRin(ND->Horn2SpiderSupportZ0[ii])-Fgap;//In and out radius of mother vol.
       // Avoid a volume overlap P.L. July 2014. 
@@ -393,7 +391,7 @@ void NumiDetectorConstruction::ConstructHorn2(G4ThreeVector hornpos, G4RotationM
       G4String volName=ND->PHorn2EndVolName[ii];
 //      std::cerr << " Horn2 End section " << volName << " RIn " << ND->PHorn2EndRin[ii] << 
 //                    " Rout " <<  ND->PHorn2EndRout[ii] << " length " << ND->PHorn2EndLength[ii] << std::endl;
-      sPHorn2End=new G4Tubs(volName.append("s"),ND->PHorn2EndRin[ii],ND->PHorn2EndRout[ii],ND->PHorn2EndLength[ii]/2.,0.,360.*deg);
+      sPHorn2End=new G4Tubs(volName.append("s"),ND->PHorn2EndRin[ii],ND->PHorn2EndRout[ii],ND->PHorn2EndLength[ii]/2.,0.,360.*CLHEP::deg);
       G4LogicalVolume* lvPHorn2End=new G4LogicalVolume(sPHorn2End,GetMaterial(ND->PHorn2EndGeantMat[ii]),volName.append("lv"),0,0,0);
       rotation=G4RotationMatrix(0.,0.,0.);
       translation=G4ThreeVector(0.,0.,ND->PHorn2EndZ0[ii]+ND->PHorn2EndLength[ii]/2.)-MHorn2Origin;
@@ -486,17 +484,17 @@ G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
   } 
 
   //IC from gnumi
-  else if((z/cm)>=-0.00840   && (z/cm)< 97.617)
+  else if((z/CLHEP::cm)>=-0.00840   && (z/CLHEP::cm)< 97.617)
   {
-    r= (sqrt((100-(z/cm))/0.1351))*cm;
+    r= (sqrt((100-(z/CLHEP::cm))/0.1351))*CLHEP::cm;
   }
-  else if( (z/cm)>=97.617 && (z/cm)<104.803)
+  else if( (z/CLHEP::cm)>=97.617 && (z/CLHEP::cm)<104.803)
   { // Neck
-    r = 4.2*cm;
+    r = 4.2*CLHEP::cm;
   }
-  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+  else if((z/CLHEP::cm)>=104.803 && (z/CLHEP::cm)<118.156*in)
   {
-    r= (sqrt(((z/cm)-100)/0.2723))*cm ;
+    r= (sqrt(((z/CLHEP::cm)-100)/0.2723))*CLHEP::cm ;
   }
   
   //IC from drawings
@@ -515,7 +513,7 @@ G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
     r=sqrt(114.73006-(2.91414)*(z/in))*in;
   }
   //else if ((z>=29.4686*in)&&(z<30.3611*in)){
-  //  r=sqrt(114.73006-(2.91414)*(z/in))*in+1.*mm; //! this is not from eq.
+  //  r=sqrt(114.73006-(2.91414)*(z/in))*in+1.*CLHEP::mm; //! this is not from eq.
   //}
   else if ((z>=30.3611*in)&&(z<36.8888*in)){
     r=sqrt(114.73006-(2.91414)*(z/in))*in;
@@ -602,17 +600,17 @@ G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
   }
 
   // These are equations from gnumi
-  else if(z/cm>=0.0 && (z/cm)< 97.617)
+  else if(z/CLHEP::cm>=0.0 && (z/CLHEP::cm)< 97.617)
   {
-  r= (sqrt((100-(z/cm))/0.1351)-0.2)*cm;
+  r= (sqrt((100-(z/CLHEP::cm))/0.1351)-0.2)*CLHEP::cm;
   }
-  else if( (z/cm)>=97.617 && (z/cm)<104.803)
+  else if( (z/CLHEP::cm)>=97.617 && (z/CLHEP::cm)<104.803)
   { // Neck
-    r = 4*cm;
+    r = 4*CLHEP::cm;
   }
-  else if((z/cm)>=104.803 && (z/cm)<118.156*in)
+  else if((z/CLHEP::cm)>=104.803 && (z/CLHEP::cm)<118.156*in)
   {
-    r= (sqrt(((z/cm)-100)/0.2723)-0.2)*cm ;
+    r= (sqrt(((z/CLHEP::cm)-100)/0.2723)-0.2)*CLHEP::cm ;
   }
   // IC from drawings
   // This is from Zarko's drawings

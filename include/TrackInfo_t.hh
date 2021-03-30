@@ -20,7 +20,11 @@ class TrackInfo_t
   Int_t PDGcode;
   Bool_t FromFast;
  private:
+
+#ifndef CMAKEBUILD
   ClassDef(TrackInfo_t ,1)
+#endif
+  
 };
 #endif 
 

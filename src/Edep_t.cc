@@ -11,7 +11,9 @@
 
 #include "Edep_t.hh"
 
+#ifndef CMAKEBUILD
 ClassImp(Edep_t)
+#endif
 
 //-----------------------------------------------------------------------------------
    Edep_t::Edep_t()

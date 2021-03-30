@@ -127,8 +127,10 @@ private:
    
    
 private:
+
+#ifndef CMAKEBUILD
    ClassDef(draytupleMIB_t , 1)
-      
+#endif
       
       };
 #endif 

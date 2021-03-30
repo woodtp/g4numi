@@ -25,8 +25,11 @@ class ProdTuple_t
   Double_t PT[maxPart];
   Bool_t FF[maxPart];// true if particle was produced by a quickly decaying particle which G4 explicitly produces (tau<1e-16 sec: pi0, eta, eta', sigma0)
  private:
+
+#ifndef CMAKEBUILD
    ClassDef(ProdTuple_t , 1)
-    
+#endif
+   
     };
 #endif 
 

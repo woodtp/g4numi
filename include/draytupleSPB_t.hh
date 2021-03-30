@@ -72,8 +72,11 @@ class  draytupleSPB_t
    Float_t ext_edep[3];
    
 private:
+
+#ifndef CMAKEBUILD
    ClassDef(draytupleSPB_t , 1)
-      
+#endif
+   
       };
 #endif 
 

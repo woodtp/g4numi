@@ -20,7 +20,9 @@
 #include "G4PVPlacement.hh"
 #include <math.h>
 
-static const G4double in = 2.54*cm;
+#include "CLHEP/Units/PhysicalConstants.h"
+
+static const G4double in = 2.54*CLHEP::cm;
 static const G4double ft = 12.*in;
 
 void NumiDetectorConstruction::ConstructSecMonitors()
@@ -113,20 +115,20 @@ void NumiDetectorConstruction::ConstructSecMonitors()
   // otherwise the particle doesn't exit to the pvTUNE volume and
   // tunnels past the monitor.
 
-  G4Box *Shadmon = new G4Box("SHadMon", 1.1*m, 1.1*m, 5*mm);
+  G4Box *Shadmon = new G4Box("SHadMon", 1.1*CLHEP::m, 1.1*CLHEP::m, 5*CLHEP::mm);
   G4LogicalVolume *LVhadmon = new G4LogicalVolume(Shadmon, Air, "LVHadMon", 0, 0, 0);
-  G4ThreeVector hadmon_pos = G4ThreeVector(0., 0.2*m, 0.2*m);
+  G4ThreeVector hadmon_pos = G4ThreeVector(0., 0.2*CLHEP::m, 0.2*CLHEP::m);
   
   G4PVPlacement *HadMon = new G4PVPlacement(0, hadmon_pos, "PVHadMon", LVhadmon, ShldBox, false, 0);
   
-  G4Box *SHadCell = new G4Box( "SHadCell", 3*in/2.0, 3*in/2.0, 1*mm/2.0 );
+  G4Box *SHadCell = new G4Box( "SHadCell", 3*in/2.0, 3*in/2.0, 1*CLHEP::mm/2.0 );
   G4LogicalVolume *LVHadCell = new G4LogicalVolume(SHadCell, SecMonitorHelium, "LVHadCell", 0, 0, 0);
   G4ThreeVector cellPos;
   G4String volName = "HadCell";
 
   for( int i = 0; i < 9; ++i ){
     for( int j = 0; j < 9; ++j ){
-      cellPos = G4ThreeVector( (i-4)*11.4*cm, (j-4)*11.4*cm, 0 );
+      cellPos = G4ThreeVector( (i-4)*11.4*CLHEP::cm, (j-4)*11.4*CLHEP::cm, 0 );
       new G4PVPlacement( 0, cellPos, volName, LVHadCell, HadMon, false, i*9+j ); 
     }
   }
@@ -190,34 +192,34 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      //
      //chamber dimensions
      //
-     G4double ChamberWidth   = 7.62*cm;   
-     G4double ChamberHeight  = 7.62*cm;
-     G4double ChamberLength  = 3.0*mm;
-     G4double ChamberSpacing = 25.4*cm;
+     G4double ChamberWidth   = 7.62*CLHEP::cm;   
+     G4double ChamberHeight  = 7.62*CLHEP::cm;
+     G4double ChamberLength  = 3.0*CLHEP::mm;
+     G4double ChamberSpacing = 25.4*CLHEP::cm;
 
 
      //
      //Ion chamber plate spacing
      //
-     G4double IonChamberPlateWidth  = 10.16*cm;
-     G4double IonChamberPlateHeight = 10.16*cm;
-     G4double IonChamberPlateLength = 0.1*cm;
+     G4double IonChamberPlateWidth  = 10.16*CLHEP::cm;
+     G4double IonChamberPlateHeight = 10.16*CLHEP::cm;
+     G4double IonChamberPlateLength = 0.1*CLHEP::cm;
 
      //
      //Plate Geometry (this is the Al casing of the muon monitor tubes)
      //
-     G4double PlateWidth  = 15.24*cm;
-     G4double PlateHeight = 228.6*cm;
-     G4double PlateLength = 0.3175*cm;
+     G4double PlateWidth  = 15.24*CLHEP::cm;
+     G4double PlateHeight = 228.6*CLHEP::cm;
+     G4double PlateLength = 0.3175*CLHEP::cm;
      G4double SidePlateWidth = PlateLength;
      G4double SidePlateHeight = PlateHeight;
-     G4double ionPlateCasingWallSpacing = 1.9725*cm;
+     G4double ionPlateCasingWallSpacing = 1.9725*CLHEP::cm;
 
      //
      //Monitor dimensions
      //
      G4double MonWidth = (ChamberSpacing*4.0 + 0.5*PlateWidth)*2.0;
-     G4double MonHeight = 228.6*cm;
+     G4double MonHeight = 228.6*CLHEP::cm;
      G4double MonLength = PlateLength*2 + ionPlateCasingWallSpacing*2 
         + IonChamberPlateLength*2 + ChamberLength;
      
@@ -271,8 +273,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
 
            G4cout << "Alcove 1 Absorber:" << G4endl
                   << "  Material = " << Mon0AbsMaterial->GetName() << G4endl
-                  << "  Thickness = " <<  Mon0AbsLength/cm << " cm" << G4endl
-                  << "  Distance from Mon = " <<  AbsMon0Dist/cm << " cm" << G4endl;
+                  << "  Thickness = " <<  Mon0AbsLength/CLHEP::cm << " cm" << G4endl
+                  << "  Distance from Mon = " <<  AbsMon0Dist/CLHEP::cm << " cm" << G4endl;
            
            G4Box *SMon0Abs = new G4Box("SMon0Abs", Mon0AbsWidth/2.0, Mon0AbsHeight/2.0, Mon0AbsLength/2.0);
            G4LogicalVolume *LVMon0Abs = new G4LogicalVolume(SMon0Abs, Mon0AbsMaterial, "LVMon0Abs", 0, 0, 0);
@@ -309,8 +311,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
            
            G4cout << "Alcove 2 Absorber:" << G4endl
                   << "  Material = " << Mon1AbsMaterial->GetName() << G4endl
-                  << "  Thickness = " <<  Mon1AbsLength/cm << " cm" << G4endl
-                  << "  Distance from Mon = " <<  AbsMon1Dist/cm << " cm" << G4endl;
+                  << "  Thickness = " <<  Mon1AbsLength/CLHEP::cm << " cm" << G4endl
+                  << "  Distance from Mon = " <<  AbsMon1Dist/CLHEP::cm << " cm" << G4endl;
            
            G4Box *SMon1Abs = new G4Box("SMon1Abs", Mon1AbsWidth/2.0, Mon1AbsHeight/2.0, Mon1AbsLength/2.0);
            G4LogicalVolume *LVMon1Abs = new G4LogicalVolume(SMon1Abs, Mon1AbsMaterial, "LVMon1Abs", 0, 0, 0);
@@ -347,8 +349,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
            
            G4cout << "Alcove 3 Absorber:" << G4endl
                   << "  Material = " << Mon2AbsMaterial->GetName() << G4endl
-                  << "  Thickness = " <<  Mon2AbsLength/cm << " cm" << G4endl
-                  << "  Distance from Mon = " <<  AbsMon2Dist/cm << " cm" << G4endl;
+                  << "  Thickness = " <<  Mon2AbsLength/CLHEP::cm << " cm" << G4endl
+                  << "  Distance from Mon = " <<  AbsMon2Dist/CLHEP::cm << " cm" << G4endl;
            
         
            G4Box *SMon2Abs = new G4Box("SMon2Abs", Mon2AbsWidth/2.0, Mon2AbsHeight/2.0, Mon2AbsLength/2.0);
@@ -386,21 +388,21 @@ void NumiDetectorConstruction::ConstructSecMonitors()
         
         G4double MonAbsWidth     = 6.0*in;
         G4double MonAbsHeight    = 6.0*in;
-        G4double MonAbsLength    = 2.54*cm;
-        G4double AbsMonDistClose = 24.13*cm; //for closest(downstream) panel from the monitor
-        G4double AbsMonDistFar   = 24.13*cm + 8.17*in; //for farthest(upstream) panel from the monitor
+        G4double MonAbsLength    = 2.54*CLHEP::cm;
+        G4double AbsMonDistClose = 24.13*CLHEP::cm; //for closest(downstream) panel from the monitor
+        G4double AbsMonDistFar   = 24.13*CLHEP::cm + 8.17*in; //for farthest(upstream) panel from the monitor
 
-        G4double BarThickness = 2.0*mm;
+        G4double BarThickness = 2.0*CLHEP::mm;
         
         G4double AbsPanelWidth  = 4.0*ChamberSpacing + MonAbsWidth + 2.0*BarThickness;
         G4double AbsPanelHeight = 8.0*ChamberSpacing + MonAbsHeight + 2.0*BarThickness;
         G4double AbsPanelLength = MonAbsLength;
 
-        G4double ConnectorInnerRadius = 0*cm;
-        G4double ConnectorOuterRadius = 0.8*cm;
+        G4double ConnectorInnerRadius = 0*CLHEP::cm;
+        G4double ConnectorOuterRadius = 0.8*CLHEP::cm;
         G4double ConnectorHalfHeight  = (ChamberSpacing - MonAbsHeight)/2.0;
-        G4double ConnectorStartAngle  = 0*deg;
-        G4double ConnectorSpanAngle   = 360*deg;
+        G4double ConnectorStartAngle  = 0*CLHEP::deg;
+        G4double ConnectorSpanAngle   = 360*CLHEP::deg;
 
         G4double BarWidth = AbsPanelWidth - 2.0*BarThickness;
         G4double BarHeight = BarThickness;
@@ -411,9 +413,9 @@ void NumiDetectorConstruction::ConstructSecMonitors()
         
         G4cout << "All Alcoves Absorber Configuration \"" << AbsConfig << "\" :" << G4endl
                << "  Material                   = " << MonAbsMaterial->GetName() << G4endl
-               << "  Thickness                  = " <<  MonAbsLength/cm    << " cm" << G4endl
-               << "  Distance Closest to Mon    = " <<  AbsMonDistClose/cm << " cm" << G4endl
-               << "  Distance Farthest from Mon = " <<  AbsMonDistFar/cm   << " cm" << G4endl;
+               << "  Thickness                  = " <<  MonAbsLength/CLHEP::cm    << " cm" << G4endl
+               << "  Distance Closest to Mon    = " <<  AbsMonDistClose/CLHEP::cm << " cm" << G4endl
+               << "  Distance Farthest from Mon = " <<  AbsMonDistFar/CLHEP::cm   << " cm" << G4endl;
         
         
   
@@ -440,7 +442,7 @@ void NumiDetectorConstruction::ConstructSecMonitors()
         // rotate the tube to "vertical" position
         //
         G4RotationMatrix *xrot = new G4RotationMatrix();
-        xrot->rotateX(90*deg);
+        xrot->rotateX(90*CLHEP::deg);
                  
 
 
@@ -795,8 +797,8 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      // NumiSteppingAction.cc tracking a particle through 
      // the monitor. 
      
-     G4double MuMon_x = 2.2*m;
-     G4double MuMon_y = 2.2*m;
+     G4double MuMon_x = 2.2*CLHEP::m;
+     G4double MuMon_y = 2.2*CLHEP::m;
      G4double MuMon_z = 2.25*in;
      
      G4Box *SMuMon = new G4Box("SMuMon", MuMon_x/2.0, MuMon_y/2.0, MuMon_z/2.0);
@@ -817,12 +819,12 @@ void NumiDetectorConstruction::ConstructSecMonitors()
      //
      G4double ChamberWidth   = 3*in;   
      G4double ChamberHeight  = 3*in;
-     G4double ChamberLength  = 1.0*mm;
+     G4double ChamberLength  = 1.0*CLHEP::mm;
      G4double ChamberSpacing = 10*in;
      //
      //Chamber Layer 
      //
-     G4double LayerWidth = 0.01*mm;
+     G4double LayerWidth = 0.01*CLHEP::mm;
 
      //------------------------------ 
      // Chamber Layer
@@ -867,7 +869,7 @@ void NumiDetectorConstruction::ConstructSecMonitors()
                        false,                   // no boolean operations
                        0);                      // copy number 
      /*
-     G4Box *SMuCell = new G4Box( "SMuCell", 3*in/2.0, 3*in/2.0, 1*mm/2.0 );
+     G4Box *SMuCell = new G4Box( "SMuCell", 3*in/2.0, 3*in/2.0, 1*CLHEP::mm/2.0 );
      G4LogicalVolume *LVMuCell = new G4LogicalVolume(SMuCell, He, "LVMuCell", 0, 0, 0);  
      volName = "MuCell";
      

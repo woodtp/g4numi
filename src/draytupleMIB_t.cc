@@ -11,8 +11,9 @@
 
 #include "draytupleMIB_t.hh"
 
+#ifndef CMAKEBUILD
 ClassImp(draytupleMIB_t)
-   
+#endif   
    
    draytupleMIB_t::draytupleMIB_t()
       :muvx(-99999.),

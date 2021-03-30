@@ -37,8 +37,11 @@ class absbkgtuple_t
    
     
  private:
+
+#ifndef CMAKEBUILD
   ClassDef(absbkgtuple_t ,1) // absbkgtuple_t
-    
+#endif
+  
     };
 
 #endif 

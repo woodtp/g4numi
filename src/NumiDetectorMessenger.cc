@@ -19,6 +19,8 @@
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UnitsTable.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 #ifndef FLUGG
   #ifdef MODERN_G4
     #include "G4GDMLParser.hh"
@@ -80,7 +82,7 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	//TargetZ0Cmd->SetUnitCategory("Length");
 	//TargetZ0Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-	new G4UnitDefinition("kiloampere" , "kA", "Electric current", 1000.*ampere);
+	new G4UnitDefinition("kiloampere" , "kA", "Electric current", 1000.*CLHEP::ampere);
         //HornCurrentCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/setHornCurrent",this);
 	//HornCurrentCmd->SetGuidance("Set horn current");
 	//HornCurrentCmd->SetParameterName("current",false);
@@ -202,12 +204,12 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
         fDuratekShiftCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/duratekShift",this);
         fDuratekShiftCmd->SetParameterName("DuratekShift",false);
         fDuratekShiftCmd->SetGuidance("Set the change to the Duratek block for ME target");
-        fDuratekShiftCmd->SetDefaultValue(0.0*m);
+        fDuratekShiftCmd->SetDefaultValue(0.0*CLHEP::m);
         
         fTHBlockShiftCmd = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/thblockShift",this);
         fTHBlockShiftCmd->SetParameterName("THBlockShift",false);
         fTHBlockShiftCmd->SetGuidance("Set the change to the z positions of T.H blocks for ME target");
-        fTHBlockShiftCmd->SetDefaultValue(0.0*m);
+        fTHBlockShiftCmd->SetDefaultValue(0.0*CLHEP::m);
 
         fDeltaOuterThicknessCmd
             = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/deltaOuterThickness",this);
@@ -235,30 +237,30 @@ NumiDetectorMessenger::NumiDetectorMessenger( NumiDetectorConstruction* NumiDet)
 	fHorn1RotationCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn1Rotation", this);
         fHorn1RotationCmd->SetParameterName("Horn1RotationPhi", "Horn1RotationTheta", "Horn1RotationPsi", false);
         fHorn1RotationCmd->SetGuidance("Set the horn1 rotation");
-	fHorn1RotationCmd->SetDefaultValue(0.0*rad);
+	fHorn1RotationCmd->SetDefaultValue(G4ThreeVector(0.0*CLHEP::rad));
 
 	fHorn2RotationCmd = new G4UIcmdWith3VectorAndUnit("/NuMI/det/set/horn2Rotation", this);
         fHorn2RotationCmd->SetParameterName("Horn2RotationPhi", "Horn2RotationTheta", "Horn2RotationPsi", false);
         fHorn2RotationCmd->SetGuidance("Set the horn2 rotation");
-	fHorn2RotationCmd->SetDefaultValue(0.0*rad);
+	fHorn2RotationCmd->SetDefaultValue(G4ThreeVector(0.0*CLHEP::rad));
 
         fBaffleOuterRadiusCmd
             = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleOuterRadius",this);
         fBaffleOuterRadiusCmd->SetParameterName("BaffleOuterRadius",false);
         fBaffleOuterRadiusCmd->SetGuidance("Set baffle outer radius");
-        fBaffleOuterRadiusCmd->SetDefaultValue(3.0*cm);
+        fBaffleOuterRadiusCmd->SetDefaultValue(3.0*CLHEP::cm);
         
         fBaffleInnerRadiusCmd
             = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleInnerRadius",this);
         fBaffleInnerRadiusCmd->SetParameterName("BaffleInnerRadius",false);
         fBaffleInnerRadiusCmd->SetGuidance("Set baffle inner radius");
-        fBaffleInnerRadiusCmd->SetDefaultValue(5.5*mm);
+        fBaffleInnerRadiusCmd->SetDefaultValue(5.5*CLHEP::mm);
         
         fBaffleLengthCmd
             = new G4UIcmdWithADoubleAndUnit("/NuMI/det/set/baffleLength",this);
         fBaffleLengthCmd->SetParameterName("BaffleLength",false);
         fBaffleLengthCmd->SetGuidance("Set baffle length");
-        fBaffleLengthCmd->SetDefaultValue(1.5*m);
+        fBaffleLengthCmd->SetDefaultValue(1.5*CLHEP::m);
         
 	fForcedOldTargetCmd = new G4UIcmdWithABool("/NuMI/det/set/forceOldTarget",this); 
 	fForcedOldTargetCmd->SetGuidance("Force to use the old target"); 

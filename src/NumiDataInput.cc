@@ -21,12 +21,12 @@
 #include "G4Material.hh"
 #include "G4UnitsTable.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
 
-
-static const G4double in = 2.54*cm;
-static const G4double fTargetZ0_ref   = -0.35*m; //LE000 position
-static const G4double fHPBaffleZ0_ref = -2.53*m; //LE000 position
-static const G4double fBeamZ0_ref     = -4.0*m; //this is arbitrary right now
+static const G4double in = 2.54*CLHEP::cm;
+static const G4double fTargetZ0_ref   = -0.35*CLHEP::m; //LE000 position
+static const G4double fHPBaffleZ0_ref = -2.53*CLHEP::m; //LE000 position
+static const G4double fBeamZ0_ref     = -4.0*CLHEP::m; //this is arbitrary right now
 //Note: The baffle LE000 position was -3.04m. This doesn't make sense. if the baffle
 //is at -3.04 then the distance between the DS edge of the
 //baffle and the US edge of the first Vertical target fin is 1.19m. The Documentation,
@@ -74,7 +74,7 @@ NumiDataInput::NumiDataInput()
     fProton_cosx(-999.0),
     fProton_cosy(-999.0),
 
-    fLengthOfWaterInTgt(4.0*cm),
+    fLengthOfWaterInTgt(4.0*CLHEP::cm),
 
     fPrintInfo(1)
     
@@ -84,11 +84,7 @@ NumiDataInput::NumiDataInput()
    if(fPrintInfo > 0 || debugOn) G4cout << "NumiDataInput Constructor Called" << G4endl;
 
    if (fNumiDataInput)
-#ifndef MODERN_G4
-    { G4Exception("NumiDataInput constructed twice.");}
-#else
    { G4Exception("NumiDataInput","NumiDataInput",FatalException,"NumiDataInput constructed twice"); }
-#endif
 
 //  fNumiDataInput = this;
 
@@ -168,11 +164,11 @@ NumiDataInput::NumiDataInput()
   absbkgNtupleDir = "./";
   simDRays = false;
   useZPosCut = false;
-  muonBeamMomentum = 10.0*GeV;
+  muonBeamMomentum = 10.0*CLHEP::GeV;
   muonBeamShape = "";
-  muonBeamZPos = -1.0*mm;
-  muonBeamGaussXsig = 0.0*mm;
-  muonBeamGaussYsig = 0.0*mm;
+  muonBeamZPos = -1.0*CLHEP::mm;
+  muonBeamGaussXsig = 0.0*CLHEP::mm;
+  muonBeamGaussYsig = 0.0*CLHEP::mm;
 
   useTestBeam = false;   
   useDecayPipeSelect = false;
@@ -180,12 +176,12 @@ NumiDataInput::NumiDataInput()
   testTheta = M_PI/6.;
   
    StepLimit = 0.0; 
-   TimeLimit = 60.0*s;
+   TimeLimit = 60.0*CLHEP::s;
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
-   KillTrackingThreshold = 0.05*GeV; //for defaut neutrino MC g4numi 
-   //KillTrackingThreshold = 0.001*GeV; //for muon beam MC
+   KillTrackingThreshold = 0.05*CLHEP::GeV; //for defaut neutrino MC g4numi 
+   //KillTrackingThreshold = 0.001*CLHEP::GeV; //for muon beam MC
 
 
    //base name for output files:
@@ -252,55 +248,55 @@ if(!vacuumworld && !airhrn){
  
  //initialize zpoints
  NZpoint=48;
- Zpoint.push_back(0*m); //1
- Zpoint.push_back(0.5*m); //2
- Zpoint.push_back(0.7*m); //3
- Zpoint.push_back(0.75*m); //4
- Zpoint.push_back(0.8*m); //5
- Zpoint.push_back(0.85*m); //6
- Zpoint.push_back(0.9*m); //7
- Zpoint.push_back(1*m); //8
- Zpoint.push_back(1.25*m); //9
- Zpoint.push_back(1.5*m); //10
- Zpoint.push_back(1.75*m); //11
- Zpoint.push_back(2*m);//12
- Zpoint.push_back(2.25*m);//13
- Zpoint.push_back(2.5*m);//14
- Zpoint.push_back(2.75*m); //15
- Zpoint.push_back(3*m);//16
- Zpoint.push_back(3.25*m);//17
- Zpoint.push_back(3.5*m);//18
- Zpoint.push_back(4*m);//19
- Zpoint.push_back(6*m);//20
- Zpoint.push_back(9*m);//21
- Zpoint.push_back(9.5*m); //22
- Zpoint.push_back(9.25*m); //23
- Zpoint.push_back(10*m);//24
- Zpoint.push_back(10.25*m);//25
- Zpoint.push_back(10.5*m);//26
- Zpoint.push_back(10.75*m);//27
- Zpoint.push_back(11.80*m);//28
- Zpoint.push_back(11.9*m);//29
- Zpoint.push_back(11*m);//30
- Zpoint.push_back(11.1*m);//31
- Zpoint.push_back(11.2*m);//32
- Zpoint.push_back(11.25*m);//33
- Zpoint.push_back(11.5*m);//34
- Zpoint.push_back(11.75*m);//35
- Zpoint.push_back(12*m);//36
- Zpoint.push_back(12.25*m);//37
- Zpoint.push_back(12.5*m);//38
- Zpoint.push_back(12.75*m);//39
- Zpoint.push_back(13*m);//40
- Zpoint.push_back(13.25*m);//41
- Zpoint.push_back(13.5*m);//42
- Zpoint.push_back(13.75*m);//43
- Zpoint.push_back(14*m);//43
- Zpoint.push_back(14.5*m);//44
- Zpoint.push_back(15.*m);//45
- Zpoint.push_back(16.*m);//46
- Zpoint.push_back(20*m);//47
- Zpoint.push_back(45.7*m);//48
+ Zpoint.push_back(0*CLHEP::m); //1
+ Zpoint.push_back(0.5*CLHEP::m); //2
+ Zpoint.push_back(0.7*CLHEP::m); //3
+ Zpoint.push_back(0.75*CLHEP::m); //4
+ Zpoint.push_back(0.8*CLHEP::m); //5
+ Zpoint.push_back(0.85*CLHEP::m); //6
+ Zpoint.push_back(0.9*CLHEP::m); //7
+ Zpoint.push_back(1*CLHEP::m); //8
+ Zpoint.push_back(1.25*CLHEP::m); //9
+ Zpoint.push_back(1.5*CLHEP::m); //10
+ Zpoint.push_back(1.75*CLHEP::m); //11
+ Zpoint.push_back(2*CLHEP::m);//12
+ Zpoint.push_back(2.25*CLHEP::m);//13
+ Zpoint.push_back(2.5*CLHEP::m);//14
+ Zpoint.push_back(2.75*CLHEP::m); //15
+ Zpoint.push_back(3*CLHEP::m);//16
+ Zpoint.push_back(3.25*CLHEP::m);//17
+ Zpoint.push_back(3.5*CLHEP::m);//18
+ Zpoint.push_back(4*CLHEP::m);//19
+ Zpoint.push_back(6*CLHEP::m);//20
+ Zpoint.push_back(9*CLHEP::m);//21
+ Zpoint.push_back(9.5*CLHEP::m); //22
+ Zpoint.push_back(9.25*CLHEP::m); //23
+ Zpoint.push_back(10*CLHEP::m);//24
+ Zpoint.push_back(10.25*CLHEP::m);//25
+ Zpoint.push_back(10.5*CLHEP::m);//26
+ Zpoint.push_back(10.75*CLHEP::m);//27
+ Zpoint.push_back(11.80*CLHEP::m);//28
+ Zpoint.push_back(11.9*CLHEP::m);//29
+ Zpoint.push_back(11*CLHEP::m);//30
+ Zpoint.push_back(11.1*CLHEP::m);//31
+ Zpoint.push_back(11.2*CLHEP::m);//32
+ Zpoint.push_back(11.25*CLHEP::m);//33
+ Zpoint.push_back(11.5*CLHEP::m);//34
+ Zpoint.push_back(11.75*CLHEP::m);//35
+ Zpoint.push_back(12*CLHEP::m);//36
+ Zpoint.push_back(12.25*CLHEP::m);//37
+ Zpoint.push_back(12.5*CLHEP::m);//38
+ Zpoint.push_back(12.75*CLHEP::m);//39
+ Zpoint.push_back(13*CLHEP::m);//40
+ Zpoint.push_back(13.25*CLHEP::m);//41
+ Zpoint.push_back(13.5*CLHEP::m);//42
+ Zpoint.push_back(13.75*CLHEP::m);//43
+ Zpoint.push_back(14*CLHEP::m);//43
+ Zpoint.push_back(14.5*CLHEP::m);//44
+ Zpoint.push_back(15.*CLHEP::m);//45
+ Zpoint.push_back(16.*CLHEP::m);//46
+ Zpoint.push_back(20*CLHEP::m);//47
+ Zpoint.push_back(45.7*CLHEP::m);//48
  createZpNtuple=false;
  zpNtupleName="zpNtuple";
 
@@ -310,12 +306,12 @@ if(!vacuumworld && !airhrn){
   //Target Configuration (LE010 = -10.0, LE100 = -100.0, etc.)
   // runPeriod corresponds to Runs I, II, III, IV
   //=======================================================================
-  double TargetConfigZ = -10.0*cm;
+  double TargetConfigZ = -10.0*CLHEP::cm;
   int runPeriod = 0;
    
   if (useFile) {
       runPeriod = runPeriodFile;
-      TargetConfigZ = -1*targetZFile*cm;
+      TargetConfigZ = -1*targetZFile*CLHEP::cm;
   }
 */
 
@@ -328,34 +324,34 @@ if(!vacuumworld && !airhrn){
   G4float beam_z_pos = fBeamZ0_ref;
 
 /*
-  G4float beam_z_pos = -4.0*m;
+  G4float beam_z_pos = -4.0*CLHEP::m;
   This is wrong somehow. If running G4NuMI with a proton beam
   need the beam to start before the baffle to get the effect of protons
   interacting with the baffle. - Laura
   
-//G4float beam_z_pos = -4.0*m+ TargetConfigZ;
+//G4float beam_z_pos = -4.0*CLHEP::m+ TargetConfigZ;
   // the reason for the beam_z_pos change was to move the beam to start
   // immediately before the target so that the beam spot interaction point
   // would remain constant, but the angle would change.
   */
 
-  protonMomentum = 120.*GeV;  
-  //  beamSigmaY     = 1.1*mm;//1.25*mm;
-  //  beamSigmaX     = 1.1*mm;//1.1*mm;
+  protonMomentum = 120.*CLHEP::GeV;  
+  //  beamSigmaY     = 1.1*CLHEP::mm;//1.25*CLHEP::mm;
+  //  beamSigmaX     = 1.1*CLHEP::mm;//1.1*CLHEP::mm;
   // MAK 10/14/16 - hack in a wider ME beam
-  beamSigmaY     = 1.4*mm;//1.25*mm;
-  beamSigmaX     = 1.4*mm;//1.1*mm;
+  beamSigmaY     = 1.4*CLHEP::mm;//1.25*CLHEP::mm;
+  beamSigmaX     = 1.4*CLHEP::mm;//1.1*CLHEP::mm;
 
   beamDirection  = G4ThreeVector(beam_x_dir,beam_y_dir,beam_z_dir);
   beamPosition  = G4ThreeVector(beam_x_pos,beam_y_pos,beam_z_pos);
 
-  protonKineticEnergy = sqrt(pow((.938*GeV),2)+pow(protonMomentum,2))-0.938*GeV;
+  protonKineticEnergy = sqrt(pow((.938*CLHEP::GeV),2)+pow(protonMomentum,2))-0.938*CLHEP::GeV;
 
     //Rock        1
   //=======================================================================
-  RockRadius  = 10.0*m;
-  RockHalfLen = 1200.0*m;
-  RockDensity = 2.41*g/cm3; // not
+  RockRadius  = 10.0*CLHEP::m;
+  RockHalfLen = 1200.0*CLHEP::m;
+  RockDensity = 2.41*CLHEP::g/CLHEP::cm3; // not
   RockRadLen  = 0.0;        // used
 
 
@@ -364,15 +360,15 @@ if(!vacuumworld && !airhrn){
   constructTarget = true;
   //TargetArea          1
   //=======================================================================
-  TargetAreaZ0       = -6.7*m;  //was -4.0*m (08/09/05);
-  TargetAreaLength   = 52.398*m;//was 49.28*m (08/09/05);
+  TargetAreaZ0       = -6.7*CLHEP::m;  //was -4.0*m (08/09/05);
+  TargetAreaLength   = 52.398*CLHEP::m;//was 49.28*m (08/09/05);
 
   // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version, 
   // but I had to extend them by 1 m to fit the concrete chase in TGAR 
   // (working from dimensions and placement given in the Numi Technical Design Handbook)
   // I (Zarko) had to add 1.5m more to fit all blocks
-  TargetAreaHeight   = 8.5*m;
-  TargetAreaWidth    = 8.5*m;
+  TargetAreaHeight   = 8.5*CLHEP::m;
+  TargetAreaWidth    = 8.5*CLHEP::m;
   TargetAreaGEANTmat = 15;
   
   // Target   1
@@ -383,17 +379,17 @@ if(!vacuumworld && !airhrn){
   TargetZ0           = fTargetZ0_ref; // this is LE000 position
   TargetDxdz         = 0.0; // doesn't
   TargetDydz         = 0.0; // work properly yet
-  TargetSLength      = 20.*mm;
-  TargetSWidth       = 6.40E-03*m;
-  TargetSHeight      = 18.0E-03*m;
-  TargetCPGRadius    = 3.2*mm; // Cooling pipe groove
-  TargetCPGPosition  = 10.7*mm;
+  TargetSLength      = 20.*CLHEP::mm;
+  TargetSWidth       = 6.40E-03*CLHEP::m;
+  TargetSHeight      = 18.0E-03*CLHEP::m;
+  TargetCPGRadius    = 3.2*CLHEP::mm; // Cooling pipe groove
+  TargetCPGPosition  = 10.7*CLHEP::mm;
   TargetEndRounded   = true;
   TargetSegmentNo    = 47;
-  TargetSegmentPitch = 0.3*mm;
-  TargetA            = 12.01*g/mole;
+  TargetSegmentPitch = 0.3*CLHEP::mm;
+  TargetA            = 12.01*CLHEP::g/CLHEP::mole;
   TargetZ            = 6.;
-  TargetDensity      = 1.78*g/cm3; //1.815*g/cm3;//1.754*g/cm3;
+  TargetDensity      = 1.78*CLHEP::g/CLHEP::cm3; //1.815*CLHEP::g/CLHEP::cm3;//1.754*CLHEP::g/CLHEP::cm3;
   TargetRL           = 25.692;
   TargetGEANTmat     = 18;
 
@@ -402,7 +398,7 @@ if(!vacuumworld && !airhrn){
   //
   BudalX0 = 0.0;
   BudalY0 = 0.0;
-  BudalZ0 = -16.72*cm;
+  BudalZ0 = -16.72*CLHEP::cm;
   BudalDxdz = 0.0;
   BudalDydz = 0.0;
 
@@ -422,8 +418,8 @@ if(!vacuumworld && !airhrn){
 	
   if (runPeriod == 2 || runPeriod == 3) {
     // Change LE010 to LE009
-    if (TargetConfigZ == -10.0*cm) {
-        TargetZ0 += 1.1*cm;
+    if (TargetConfigZ == -10.0*CLHEP::cm) {
+        TargetZ0 += 1.1*CLHEP::cm;
     }
   }
   */
@@ -441,9 +437,9 @@ if(!vacuumworld && !airhrn){
   HPBaffleDXDZ       =  0.0;
   HPBaffleDYDZ       =  0.0;
 //  HPBaffleLength     =  1.20*m;
-  HPBaffleLength     =  1.50*m; //Why was this 1.2m?!
-  HPBaffleRin        =  5.5*mm;
-  HPBaffleRout       =  3.*cm;
+  HPBaffleLength     =  1.50*CLHEP::m; //Why was this 1.2m?!
+  HPBaffleRin        =  5.5*CLHEP::mm;
+  HPBaffleRout       =  3.*CLHEP::cm;
  
   //Cooling pipes
   NCPipeN = 19;
@@ -475,18 +471,18 @@ if(!vacuumworld && !airhrn){
     CPGeantMat.push_back(CPGeantMat_[ii]);
     }
     CPipeFilledWater.push_back(CPipeFilledWater_[ii]);
-    CPipeX0.push_back(CPipeX0_[ii]*m);
-    CPipeY0.push_back(CPipeY0_[ii]*m);    
-    CPipeZ0.push_back(CPipeZ0_[ii]*m);
+    CPipeX0.push_back(CPipeX0_[ii]*CLHEP::m);
+    CPipeY0.push_back(CPipeY0_[ii]*CLHEP::m);    
+    CPipeZ0.push_back(CPipeZ0_[ii]*CLHEP::m);
     CPipeDXDZ.push_back(CPipeDXDZ_[ii]);
     CPipeDYDZ.push_back(CPipeDYDZ_[ii]);
-    CPipeLength.push_back(CPipeLength_[ii]*m);
-    CPipeRadiusOut.push_back(CPipeRadiusOut_[ii]*m);
-    CPipeRadiusIn.push_back(CPipeRadiusIn_[ii]*m);
-    CPipeWallThick.push_back(CPipeWallThick_[ii]*m);
-    CPipeCurvRad.push_back(CPipeCurvRad_[ii]*m);
-    CPipeOpenAng.push_back(CPipeOpenAng_[ii]*deg);
-    CPipeCloseAng.push_back(CPipeCloseAng_[ii]*deg);
+    CPipeLength.push_back(CPipeLength_[ii]*CLHEP::m);
+    CPipeRadiusOut.push_back(CPipeRadiusOut_[ii]*CLHEP::m);
+    CPipeRadiusIn.push_back(CPipeRadiusIn_[ii]*CLHEP::m);
+    CPipeWallThick.push_back(CPipeWallThick_[ii]*CLHEP::m);
+    CPipeCurvRad.push_back(CPipeCurvRad_[ii]*CLHEP::m);
+    CPipeOpenAng.push_back(CPipeOpenAng_[ii]*CLHEP::deg);
+    CPipeCloseAng.push_back(CPipeCloseAng_[ii]*CLHEP::deg);
     CPipeVolName.push_back(CPipeVolName_[ii]);
   }
   
@@ -502,14 +498,14 @@ if(!vacuumworld && !airhrn){
   G4int CTubeGeantMat_[]  ={   5   ,  10     ,   10   , 10      , 10      , 10    , 10    ,  31     , 10     , 10    , 10     ,  10    , 10    ,10     , 10       , 9        , 9        ,15           ,  15         ,  5     ,  15};
   G4String CTubeVolName_[]={"BeUp1", "BeUp2" , "Added", "BeUp3" , "BFront", "Body", "BEnd","CerTube", "Conn1","CLid1", "CLid2", "Conn2","Conn3","Tube1a" ,"Tube1b", "AlTube1", "AlTube2","TGTExitCyl1","TGTExitCyl2", "BeDW" ,"TGTExitTop"};
 
- TargetVirtualCanisterHeight = 63.0*mm + 0.075*mm; // Sett Mova Target Heigth... 
- TargetVirtualCanisterWidth = 13.75*mm; // a bit bigger than LE as well, 
+ TargetVirtualCanisterHeight = 63.0*CLHEP::mm + 0.075*CLHEP::mm; // Sett Mova Target Heigth... 
+ TargetVirtualCanisterWidth = 13.75*CLHEP::mm; // a bit bigger than LE as well, 
 
  for (G4int ii=0;ii<NContainerN;ii++){
-    CTubeZ0.push_back(CTubeZ0_[ii]*m);
-    CTubeLength.push_back(CTubeLength_[ii]*m);
-    CTubeRin.push_back(CTubeRin_[ii]*m);
-    CTubeRout.push_back(CTubeRout_[ii]*m);
+    CTubeZ0.push_back(CTubeZ0_[ii]*CLHEP::m);
+    CTubeLength.push_back(CTubeLength_[ii]*CLHEP::m);
+    CTubeRin.push_back(CTubeRin_[ii]*CLHEP::m);
+    CTubeRout.push_back(CTubeRout_[ii]*CLHEP::m);
     CTubeGeantMat.push_back(CTubeGeantMat_[ii]);
     CTubeVolName.push_back(CTubeVolName_[ii]);
  }
@@ -523,19 +519,19 @@ if(!vacuumworld && !airhrn){
  G4String TgtRingVolName_[]    = {"Ring1" , "Ring2"  , "Ring3"  , "Ring4" , "Ring5" };
 
 for (G4int ii=0;ii<NTgtRingN;ii++){
-    TgtRingZ0.push_back(TgtRingZ0_[ii]*m);
-    TgtRingLength.push_back(TgtRingLength_[ii]*m);
-    TgtRingRin.push_back(TgtRingRin_[ii]*m);
-    TgtRingRout.push_back(TgtRingRout_[ii]*m);
+    TgtRingZ0.push_back(TgtRingZ0_[ii]*CLHEP::m);
+    TgtRingLength.push_back(TgtRingLength_[ii]*CLHEP::m);
+    TgtRingRin.push_back(TgtRingRin_[ii]*CLHEP::m);
+    TgtRingRout.push_back(TgtRingRout_[ii]*CLHEP::m);
     TgtRingGeantMaterial.push_back(TgtRingGeantMaterial_[ii]);
     TgtRingVolName.push_back(TgtRingVolName_[ii]);
  }
 
   //Tunnel         1
   //=======================================================================
-  TunnelZ0       = 45.6985*m; //was 45.28*m (08/09/05);
-  TunnelRadius   = 3.3*m+.5*m; //added .5m because hadron absorber does not fit entirely inside 3.3
-  TunnelLength   = 693.4415*m; //was 693.86*m (08/09/05);
+  TunnelZ0       = 45.6985*CLHEP::m; //was 45.28*m (08/09/05);
+  TunnelRadius   = 3.3*CLHEP::m+.5*CLHEP::m; //added .5m because hadron absorber does not fit entirely inside 3.3
+  TunnelLength   = 693.4415*CLHEP::m; //was 693.86*m (08/09/05);
   TunnelA        = 0.0;
   TunnelZ        = 0.0;
   TunnelGEANTmat = 15;
@@ -545,23 +541,23 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //======================================================================= 
   ShieldX0       = 0.0; 
   ShieldY0       = 0.0; 
-  ShieldZ0       = 45.699*m; //was 45.28*m (08/09/05);   
+  ShieldZ0       = 45.699*CLHEP::m; //was 45.28*m (08/09/05);   
   ShieldDxdz     = 0.0; // not 
   ShieldDydz     = 0.0; // used
-  ShieldLength   = 676.681*m; //was 677.1*m (08/09/05);  
-  ShieldRout     = 2.23*m; 
-  ShieldRin      = 1.0097*m; 
+  ShieldLength   = 676.681*CLHEP::m; //was 677.1*m (08/09/05);  
+  ShieldRout     = 2.23*CLHEP::m; 
+  ShieldRin      = 1.0097*CLHEP::m; 
   ShieldGEANTmat = 17;
   
   //DecayPipe          1    
   //=======================================================================
-  DecayPipeZ0        = 45.699*m; //was 45.28*m (08/09/05);
-  //DecayPipeRadius    = 0.9716*m; // was 0.9906 but doesnt correlate w gnumi
-  DecayPipeRadius    = 0.9906*m;
-  DecayPipeLength    = 676.681*m; //was 677.1*m (08/09/05);
-  DecayPipeFWinThick = 1.60E-3*m;
-  DecayPipeEWinThick = 4.76E-3*m;
-  DecayPipeWallThick = 1.905E-2*m;
+  DecayPipeZ0        = 45.699*CLHEP::m; //was 45.28*CLHEP::m (08/09/05);
+  //DecayPipeRadius    = 0.9716*CLHEP::m; // was 0.9906 but doesnt correlate w gnumi
+  DecayPipeRadius    = 0.9906*CLHEP::m;
+  DecayPipeLength    = 676.681*CLHEP::m; //was 677.1*CLHEP::m (08/09/05);
+  DecayPipeFWinThick = 1.60E-3*CLHEP::m;
+  DecayPipeEWinThick = 4.76E-3*CLHEP::m;
+  DecayPipeWallThick = 1.905E-2*CLHEP::m;
   DecayPipeA         = 55.85;
   DecayPipeZ         = 26.0;
   DecayPipeGEANTmat  = 10;
@@ -590,14 +586,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   G4String THConcreteName_[]={"Section1","Section2","Section3","Section4","Section5","Section6(lid)"};
 
   for (G4int ii=0;ii<NTHConcreteSectionsN;ii++){
-	  THConcreteX0.push_back(THConcreteX0_[ii]*m);
-	  THConcreteY0.push_back(THConcreteY0_[ii]*m);
-	  THConcreteZ0.push_back(THConcreteZ0_[ii]*m);
-	  THConcreteDxdz.push_back(THConcreteDxdz_[ii]*m);
-	  THConcreteDydz.push_back(THConcreteDydz_[ii]*m);
-	  THConcreteLength.push_back(THConcreteLength_[ii]*m);
-	  THConcreteHdx.push_back(THConcreteHdx_[ii]*m);
-	  THConcreteHdy.push_back(THConcreteHdy_[ii]*m);
+	  THConcreteX0.push_back(THConcreteX0_[ii]*CLHEP::m);
+	  THConcreteY0.push_back(THConcreteY0_[ii]*CLHEP::m);
+	  THConcreteZ0.push_back(THConcreteZ0_[ii]*CLHEP::m);
+	  THConcreteDxdz.push_back(THConcreteDxdz_[ii]*CLHEP::m);
+	  THConcreteDydz.push_back(THConcreteDydz_[ii]*CLHEP::m);
+	  THConcreteLength.push_back(THConcreteLength_[ii]*CLHEP::m);
+	  THConcreteHdx.push_back(THConcreteHdx_[ii]*CLHEP::m);
+	  THConcreteHdy.push_back(THConcreteHdy_[ii]*CLHEP::m);
 	  THConcreteGeantMaterial.push_back(THConcreteGeantMaterial_[ii]);
 	  THConcreteName.push_back(THConcreteName_[ii]);
   }
@@ -790,19 +786,19 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //This next block puts all the block coordinates into vectors and assigns the unit "meters" to the values.
 
   for (G4int ii=0;ii<THBlockNblock;ii++){
-    THBlockX0.push_back(THBlockX0_[ii]*m);
-    THBlockY0.push_back(THBlockY0_[ii]*m);
+    THBlockX0.push_back(THBlockX0_[ii]*CLHEP::m);
+    THBlockY0.push_back(THBlockY0_[ii]*CLHEP::m);
     if(ii==21){
-      THBlockZ0.push_back(1.15*m);
+      THBlockZ0.push_back(1.15*CLHEP::m);
     }
-    else if(ii==22) THBlockZ0.push_back(30.34*m);
-    else if(ii==23) THBlockZ0.push_back(12*m);
-    else    THBlockZ0.push_back(THBlockZ0_[0]*m);
-    THBlockDxdz.push_back(THBlockDxdz_[0]*m);
-    THBlockDydz.push_back(THBlockDydz_[0]*m);
-    THBlockLength.push_back(THBlockLength_[0]*m);
-    THBlockHdx.push_back(THBlockHdx_[0]*m);
-    THBlockHdy.push_back(THBlockHdy_[0]*m);
+    else if(ii==22) THBlockZ0.push_back(30.34*CLHEP::m);
+    else if(ii==23) THBlockZ0.push_back(12*CLHEP::m);
+    else    THBlockZ0.push_back(THBlockZ0_[0]*CLHEP::m);
+    THBlockDxdz.push_back(THBlockDxdz_[0]*CLHEP::m);
+    THBlockDydz.push_back(THBlockDydz_[0]*CLHEP::m);
+    THBlockLength.push_back(THBlockLength_[0]*CLHEP::m);
+    THBlockHdx.push_back(THBlockHdx_[0]*CLHEP::m);
+    THBlockHdy.push_back(THBlockHdy_[0]*CLHEP::m);
     THBlockGeantMaterial.push_back(THBlockGeantMaterial_[0]);
     THBlockName.push_back(THBlockName_[ii]);
   }
@@ -812,8 +808,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   // 55.75' is the surveyed distance between the
   // downstream wall of Muon Alcove 1 and the
   // nominal center of the Decay Pipe.
-  HadrBox_width = 324*.0254*m;
-  HadrBox_height = 6.6294*m;
+  HadrBox_width = 324*.0254*CLHEP::m;
+  HadrBox_height = 6.6294*CLHEP::m;
   HadrBox_length = 55.75*12*in-(4*12*in+2.24*in+9*12*in+9*in);
 
   /*
@@ -823,10 +819,10 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     //it is horrible!
     //
   
-  HornCurrent=182100.*ampere; 
+  HornCurrent=182100.*CLHEP::ampere; 
   if (useFile) {
-    HornCurrent = hornCurrentFile*ampere;
-    if (HornCurrent < 250*ampere) HornCurrent *= 1000.; // Convert to kA
+    HornCurrent = hornCurrentFile*CLHEP::ampere;
+    if (HornCurrent < 250*CLHEP::ampere) HornCurrent *= 1000.; // Convert to kA
   }
   
   if (runPeriod == 4) {
@@ -836,35 +832,35 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   
   G4cout << "Running with: " << G4endl
        << "  Run Period = " << runPeriod << G4endl
-       << "  Target Z = " << TargetConfigZ/cm << " cm" << G4endl
-       << "  Horn Current = " << HornCurrent/ampere/1000. << " kA" << G4endl;
+       << "  Target Z = " << TargetConfigZ/CLHEP::cm << " cm" << G4endl
+       << "  Horn Current = " << HornCurrent/CLHEP::ampere/1000. << " kA" << G4endl;
   */
 
 
   //
   //Horns
   //
-  Horn1X0 = 0.0*cm;
-  Horn1Y0 = 0.0*cm;
-  Horn1Z0 = 3.0*cm;
+  Horn1X0 = 0.0*CLHEP::cm;
+  Horn1Y0 = 0.0*CLHEP::cm;
+  Horn1Z0 = 3.0*CLHEP::cm;
 
-  Horn2X0 = 0.0*cm;
-  Horn2Y0 = 0.0*cm;
-  Horn2Z0 = 10.0*m;
+  Horn2X0 = 0.0*CLHEP::cm;
+  Horn2Y0 = 0.0*CLHEP::cm;
+  Horn2Z0 = 10.0*CLHEP::m;
   
-  Horn1Phi   = 0.0*rad;
-  Horn1Theta = 0.0*rad;
-  Horn1Psi   = 0.0*rad;
+  Horn1Phi   = 0.0*CLHEP::rad;
+  Horn1Theta = 0.0*CLHEP::rad;
+  Horn1Psi   = 0.0*CLHEP::rad;
 
-  Horn2Phi   = 0.0*rad;
-  Horn2Theta = 0.0*rad;
-  Horn2Psi   = 0.0*rad;
+  Horn2Phi   = 0.0*CLHEP::rad;
+  Horn2Theta = 0.0*CLHEP::rad;
+  Horn2Psi   = 0.0*CLHEP::rad;
 
-//  fHornWaterLayerThick = 0.0*mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
-  fHornWaterLayerThick = 1.0*mm; // Oct 18 2014, Based on studies done
+//  fHornWaterLayerThick = 0.0*CLHEP::mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
+  fHornWaterLayerThick = 1.0*CLHEP::mm; // Oct 18 2014, Based on studies done
 //  mid-October, after fixing bug in the Magnetic field pointer assignments,
 //  default is now what it should be 
-  fHorn1ExtraLayerAlum = 0.0*mm;
+  fHorn1ExtraLayerAlum = 0.0*CLHEP::mm;
   fDumpBFieldPlease = false;
 //  fDumpBFieldPlease = true;// To get enhanced field.. Dirty back door... 
 
@@ -1025,15 +1021,15 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   G4String detNameFar[]  = {"MINOS FarDet", "Nova FarDet"};
 
   for(G4int ii=0;ii<nNear;ii++){
-    xdet_near.push_back(xdetNear[ii]*m);
-    ydet_near.push_back(ydetNear[ii]*m);
-    zdet_near.push_back(zdetNear[ii]*m);
+    xdet_near.push_back(xdetNear[ii]*CLHEP::m);
+    ydet_near.push_back(ydetNear[ii]*CLHEP::m);
+    zdet_near.push_back(zdetNear[ii]*CLHEP::m);
     det_near_name.push_back(detNameNear[ii]);
   }
   for(G4int ii=0;ii<nFar;ii++){
-    xdet_far.push_back(xdetFar[ii]*m);
-    ydet_far.push_back(ydetFar[ii]*m);
-    zdet_far.push_back(zdetFar[ii]*m);
+    xdet_far.push_back(xdetFar[ii]*CLHEP::m);
+    ydet_far.push_back(ydetFar[ii]*CLHEP::m);
+    zdet_far.push_back(zdetFar[ii]*CLHEP::m);
     det_far_name.push_back(detNameFar[ii]);
   }
 
@@ -1083,37 +1079,37 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   pSurfChk = true;
   // TargetDxdz           = 0.0; // doesn't
   // TargetDydz           = 0.0; // work properly yet
-  TargetSegLength      = 24.0*mm;
-  TargetSegWidth       = 7.4*mm;
-  TargetSegHeight      = 63.0*mm;
-  TargetSegPitch       = 0.5*mm;
-  TargetGraphiteHeight = 150.0*mm;
+  TargetSegLength      = 24.0*CLHEP::mm;
+  TargetSegWidth       = 7.4*CLHEP::mm;
+  TargetSegHeight      = 63.0*CLHEP::mm;
+  TargetSegPitch       = 0.5*CLHEP::mm;
+  TargetGraphiteHeight = 150.0*CLHEP::mm;
   // TargetEndRounded     = true;
   // TargetSegmentNo      = 48;
 
   BudalVFHSLength      = TargetSegLength;
   BudalVFHSWidth       = TargetSegWidth;
   BudalVFHSHeight      = TargetSegHeight;
-  BudalVFHSPitch       = 4.5*mm;
+  BudalVFHSPitch       = 4.5*CLHEP::mm;
   BudalVFHSEndRounded  = TargetEndRounded;
 
   BudalHFVSLength      = TargetSegLength;
   BudalHFVSWidth       = TargetSegWidth;
   BudalHFVSHeight      = TargetSegHeight;
-  BudalHFVSPitch       = 5.0*mm;
+  BudalHFVSPitch       = 5.0*CLHEP::mm;
   BudalHFVSEndRounded  = TargetEndRounded;
 
   // The material "Target" is defined in NumiMaterials.cc
   // using these properties
-  // TargetA              = 12.01*g/mole;
+  // TargetA              = 12.01*CLHEP::g/mole;
   // TargetZ              = 6.0;
-  // TargetDensity        = 1.78*g/cm3;
+  // TargetDensity        = 1.78*CLHEP::g/CLHEP::cm3;
 
-  //  Z=4.,A=9.01*g/mole, density=1.848*g/cm3
+  //  Z=4.,A=9.01*CLHEP::g/mole, density=1.848*CLHEP::g/CLHEP::cm3
   //Be Target 
-  //TargetA              = 9.01*g/mole;
+  //TargetA              = 9.01*CLHEP::g/mole;
   //TargetZ              = 4.0;
-  //TargetDensity        = 1.848*g/cm3;
+  //TargetDensity        = 1.848*CLHEP::g/CLHEP::cm3;
 
   // Default location of the Target wrt the MCZERO location
   // Downstream end of target is fixed at -20 cm with respect to MCZERO
@@ -1126,87 +1122,87 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     + BudalHFVSLength + BudalHFVSPitch;
   // TargetX0           = 0.0;
   // TargetY0           = 0.0;
-  // TargetZ0           = (-20*cm - TotalTargetLength) + TargetConfigZ;
+  // TargetZ0           = (-20*CLHEP::cm - TotalTargetLength) + TargetConfigZ;
   // Allows TARGETZ to shift position of the target
 
-  G4cout << "TargetZ0 = " << TargetZ0/cm << " cm. (Should be equal to -143.3 cm for the NOvA design.)" << G4endl;;
+  G4cout << "TargetZ0 = " << TargetZ0/CLHEP::cm << " cm. (Should be equal to -143.3 cm for the NOvA design.)" << G4endl;;
 
 
   // The distance between the downstream end of the target and the
   // downstream canister flange is 8 cm.
   // The centerline of the target canister is 4.15 cm below the beamline 
-  TargetEndtoDnFlange = 8.0*cm;
-  TargetCanisterCenterOffset = -4.15*cm;
+  TargetEndtoDnFlange = 8.0*CLHEP::cm;
+  TargetCanisterCenterOffset = -4.15*CLHEP::cm;
 
   // The X0, YO, and Z0 for the flanges and cansiter are with respect to the
   // the canister center for X0 and Y0 and the start of the target material for Z0 
   // X0 and Y0 are the locations of the center of the volume, and Z0 is the location of the upstream end.
-  TargetDnFlangeLength = 2.5*cm;
-  TargetDnFlangeOutRad = 15.0*cm;
+  TargetDnFlangeLength = 2.5*CLHEP::cm;
+  TargetDnFlangeOutRad = 15.0*CLHEP::cm;
   TargetDnFlangeX0     = 0.0;
   TargetDnFlangeY0     = TargetCanisterCenterOffset;
   TargetDnFlangeZ0     = TotalTargetLength + TargetEndtoDnFlange;
 
   // Part of downstream flange is cutout to remove material
   // Part of downstream flange is cutout for the Be window
-  TargetDnFlangeCutoutLength = 1.75*cm;
-  TargetDnBeWindowRadius     = 60*mm;
-  TargetDnBeWindowLength     = 1*mm;
+  TargetDnFlangeCutoutLength = 1.75*CLHEP::cm;
+  TargetDnBeWindowRadius     = 60*CLHEP::mm;
+  TargetDnBeWindowLength     = 1*CLHEP::mm;
 
 
   // The body of the target canister is modeled with three layers 
   // to approximate the actual geometry given in nova-doc 3681-v3 :
   //   The outer shell is 3mm thick aluminum
-  TargetOutsideCasingOutRad = 15.0*cm;
-  TargetOutsideCasingInRad  = 14.7*cm;
+  TargetOutsideCasingOutRad = 15.0*CLHEP::cm;
+  TargetOutsideCasingInRad  = 14.7*CLHEP::cm;
   TargetCasingWaterOutRad   = TargetOutsideCasingInRad;
-  TargetCasingWaterInRad    = 13.37*cm;
+  TargetCasingWaterInRad    = 13.37*CLHEP::cm;
   TargetInsideCasingOutRad  = TargetCasingWaterInRad;
-  TargetInsideCasingInRad   = 12.3*cm;
+  TargetInsideCasingInRad   = 12.3*CLHEP::cm;
 
-  TargetCasingLength = 145*cm;
+  TargetCasingLength = 145*CLHEP::cm;
   TargetCasingX0     = 0.0;
   TargetCasingY0     = TargetCanisterCenterOffset;
   TargetCasingZ0     = TargetDnFlangeZ0 - TargetCasingLength;
 
 
   // Upstream flange
-  TargetUpFlangeLength = 2.5 * cm;
-  TargetUpFlangeOutRad = 15.0 * cm;
+  TargetUpFlangeLength = 2.5 * CLHEP::cm;
+  TargetUpFlangeOutRad = 15.0 * CLHEP::cm;
   TargetUpFlangeX0     = 0.0;
   TargetUpFlangeY0     = TargetCanisterCenterOffset;
   TargetUpFlangeZ0     = TargetCasingZ0 - TargetUpFlangeLength;
 
 
   // Upstream Be window flange
-  TargetUpBeFlangeLength = 0.5*in ;
-  TargetUpBeFlangeOutRad = 2.73*in / 2.0;
+  TargetUpBeFlangeLength = 0.5*(CLHEP::cm * 2.54) ;
+  TargetUpBeFlangeOutRad = 2.73*(CLHEP::cm * 2.54) / 2.0;
   TargetUpBeFlangeX0 = 0.0;
   TargetUpBeFlangeY0 = 0.0; 
   TargetUpBeFlangeZ0 =  TargetUpFlangeZ0 - TargetUpBeFlangeLength;
 
-  TargetUpBeFlangeCutoutLength = 0.25*in;
-  TargetUpBeFlangeCutoutRadius = 1.75/2.0*in;
+  TargetUpBeFlangeCutoutLength = 0.25*(CLHEP::cm * 2.54);
+  TargetUpBeFlangeCutoutRadius = 1.75/2.0*(CLHEP::cm * 2.54);
 
-  TargetUpBeWindowRadius = 0.5*in;
-  TargetUpBeWindowLength = 0.01*in;
+  TargetUpBeWindowRadius = 0.5*(CLHEP::cm * 2.54);
+  TargetUpBeWindowLength = 0.01*(CLHEP::cm * 2.54);
 
   // The target graphite material is clamped between the pressing plate and cooling plate 
   // Pressing plate 
   PressingPlateLength = TotalTargetLength;
   PressingPlateHeight = TargetGraphiteHeight - TargetSegHeight;
-  PressingPlateWidth  = 20.0*mm;
+  PressingPlateWidth  = 20.0*CLHEP::mm;
   PressingPlateX0     = -PressingPlateWidth/2.0 - TargetSegWidth/2.0;
   PressingPlateY0     = -PressingPlateHeight/2.0 -TargetSegHeight + TargetSegWidth/2.0;
   PressingPlateZ0     = 0.0;
 
-  PressingPlateCutoutWidth  = 5.0*mm;
-  PressingPlateCutoutHeight = 60.0*mm;
+  PressingPlateCutoutWidth  = 5.0*CLHEP::mm;
+  PressingPlateCutoutHeight = 60.0*CLHEP::mm;
 
   // Cooling plate
   CoolingPlateLength = TotalTargetLength;
   CoolingPlateHeight = PressingPlateHeight;
-  CoolingPlateWidth  = 20.0*mm;
+  CoolingPlateWidth  = 20.0*CLHEP::mm;
   CoolingPlateX0     = CoolingPlateWidth/2.0 + TargetSegWidth/2.0;
   CoolingPlateY0     = -CoolingPlateHeight/2.0 - TargetSegHeight + TargetSegWidth/2.0;
   CoolingPlateZ0     = 0.0;
@@ -1215,8 +1211,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   CoolingPlateCutoutHeight = PressingPlateCutoutHeight;
 
   // The water cooling runs through the cooling plate
-  CoolingWaterPipeOutRad = 5.0*mm;
-  CoolingWaterPipeX0     = 0.0*mm;
+  CoolingWaterPipeOutRad = 5.0*CLHEP::mm;
+  CoolingWaterPipeX0     = 0.0*CLHEP::mm;
   CoolingWaterPipeY0     = CoolingPlateCutoutHeight/2.0 + (CoolingPlateHeight - CoolingPlateCutoutHeight)/4.0;
 
 
@@ -1253,7 +1249,7 @@ void NumiDataInput::Print()
       if(fUseWaterInTgt)
       {
          G4cout << " SUBSIMULATION                               = " << fSubSimulation << G4endl;
-         G4cout << "    Simulating " << fLengthOfWaterInTgt/cm << " cm of water filling the "
+         G4cout << "    Simulating " << fLengthOfWaterInTgt/CLHEP::cm << " cm of water filling the "
                 << "target starting from the downstream tip." << G4endl;
 
       }
@@ -1263,26 +1259,26 @@ void NumiDataInput::Print()
              << " Horn Configuration                          = " << fHornConfig << G4endl
              << " Target Configuration                        = " << fTargetConfig << G4endl
              << " Horn Current Configuration                  = " << fIHornConfig << G4endl
-             << " Target               (X0, Y0, Z0) m         = (" << TargetX0/m << ", " << TargetY0/m << ", " << TargetZ0/m << ") m" << G4endl
-             << " Baffle               (X0, Y0, Z0) m         = (" << HPBaffleX0/m << ", " << HPBaffleY0/m << ", " << HPBaffleZ0/m << ") m" << G4endl
-             << " Horizontal Fin w.r.t. Target (X0, Y0, Z0) m = (" << BudalX0/m << ", " << BudalY0/m << ", " << BudalZ0/m << ") m" << G4endl
-             << " Horn Current                                = " << HornCurrent/ampere << " A" << G4endl
-             << " Horn 1               (X0, Y0, Z0) m         = (" << Horn1X0/m << ", " << Horn1Y0/m << ", " << Horn1Z0/m << ") m" << G4endl
-	     << " Horn 1               (Phi, Theta, Psi) rad  = (" << Horn1Phi/rad << ", " << Horn1Theta/rad << ", " << Horn1Psi/rad << ") rad" << G4endl
-             << " Horn 2               (X0, Y0, Z0) m         = (" << Horn2X0/m << ", " << Horn2Y0/m << ", " << Horn2Z0/m << ") m" << G4endl
-	     << " Horn 2               (Phi, Theta, Psi) rad  = (" << Horn2Phi/rad << ", " << Horn2Theta/rad << ", " << Horn2Psi/rad << ") rad" << G4endl
-             << " Target Density                              = " << TargetDensity/g*cm3 << " g/cm^3" << G4endl
-             << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/m << ", " << beamPosition[1]/m << ", " << beamPosition[2]/m << ") m" << G4endl
-             << " Proton Beam Momentum                        = " << protonMomentum/GeV << " GeV/c" << G4endl
-             << " Proton Beam X-Sigma                         = " << beamSigmaX/mm << " mm" << G4endl
-             << " Proton Beam Y-Sigma                         = " << beamSigmaY/mm << " mm" << G4endl
+             << " Target               (X0, Y0, Z0) m         = (" << TargetX0/CLHEP::m << ", " << TargetY0/CLHEP::m << ", " << TargetZ0/CLHEP::m << ") m" << G4endl
+             << " Baffle               (X0, Y0, Z0) m         = (" << HPBaffleX0/CLHEP::m << ", " << HPBaffleY0/CLHEP::m << ", " << HPBaffleZ0/CLHEP::m << ") m" << G4endl
+             << " Horizontal Fin w.r.t. Target (X0, Y0, Z0) m = (" << BudalX0/CLHEP::m << ", " << BudalY0/CLHEP::m << ", " << BudalZ0/CLHEP::m << ") m" << G4endl
+             << " Horn Current                                = " << HornCurrent/CLHEP::ampere << " A" << G4endl
+             << " Horn 1               (X0, Y0, Z0) m         = (" << Horn1X0/CLHEP::m << ", " << Horn1Y0/CLHEP::m << ", " << Horn1Z0/CLHEP::m << ") m" << G4endl
+	     << " Horn 1               (Phi, Theta, Psi) rad  = (" << Horn1Phi/CLHEP::rad << ", " << Horn1Theta/CLHEP::rad << ", " << Horn1Psi/CLHEP::rad << ") rad" << G4endl
+             << " Horn 2               (X0, Y0, Z0) m         = (" << Horn2X0/CLHEP::m << ", " << Horn2Y0/CLHEP::m << ", " << Horn2Z0/CLHEP::m << ") m" << G4endl
+	     << " Horn 2               (Phi, Theta, Psi) rad  = (" << Horn2Phi/CLHEP::rad << ", " << Horn2Theta/CLHEP::rad << ", " << Horn2Psi/CLHEP::rad << ") rad" << G4endl
+             << " Target Density                              = " << TargetDensity/CLHEP::g*CLHEP::cm3 << " g/CLHEP::cm^3" << G4endl
+             << " Proton Beam Position (X0, Y0, Z0) m         = (" << beamPosition[0]/CLHEP::m << ", " << beamPosition[1]/CLHEP::m << ", " << beamPosition[2]/CLHEP::m << ") m" << G4endl
+             << " Proton Beam Momentum                        = " << protonMomentum/CLHEP::GeV << " GeV/c" << G4endl
+             << " Proton Beam X-Sigma                         = " << beamSigmaX/CLHEP::mm << " mm" << G4endl
+             << " Proton Beam Y-Sigma                         = " << beamSigmaY/CLHEP::mm << " mm" << G4endl
 	     << " Decay Pipe Helium                           = " << std::boolalpha << HeInDecayPipe<<G4endl
 	     << " Decay Pipe Magnetic Field                   = " << std::boolalpha << applyDecayPipeMagneticField << G4endl;
       
       if(fUseDetailedProtonBeam)
       {
          G4cout << " Using Detailed Proton Beam with parameters..." << G4endl
-                << "    Proton Beam Mean Momentum = " << protonMomentum/GeV << " GeV/c" << G4endl
+                << "    Proton Beam Mean Momentum = " << protonMomentum/CLHEP::GeV << " GeV/c" << G4endl
                 << "    Proton out_R              = " << fProton_outR << " probably mm " << G4endl
                 << "    Proton in_R               = " << fProton_inR << " probably mm " << G4endl
                 << "    Proton Divergence         = " << fProtonDiv << " probably rad " << G4endl
@@ -1425,7 +1421,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
 
       if(end_loc_tgd==std::string::npos)
       {
-         G4cout << "\n\n\n\n\n TARGET DENSITY NOT PROPERLY ENTERED!! MUST ENTER AS #######tgd, in ug/cm3. PROGRAM ABORTED." <<G4endl;
+         G4cout << "\n\n\n\n\n TARGET DENSITY NOT PROPERLY ENTERED!! MUST ENTER AS #######tgd, in ug/CLHEP::cm3. PROGRAM ABORTED." <<G4endl;
          std::exit (EXIT_FAILURE);
       }
 
@@ -1434,7 +1430,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    }
    if(!fUseTgtDensity)
    {
-      TargetDensity=1.78*g/cm3;
+      TargetDensity=1.78*CLHEP::g/CLHEP::cm3;
    }
 //--------------------------------------------------------------------------------------------------------------
 
@@ -1502,9 +1498,9 @@ G4bool NumiDataInput::SetTargetConfig(G4String config)
    std::istringstream tgtzstrm(tgtzstr);
    tgtzstrm >> tgtz;
 
-   NumiDataInput::SetTargetZ0(fTargetZ0_ref   - tgtz*cm);
-   NumiDataInput::SetBaffleZ0(fHPBaffleZ0_ref - tgtz*cm);
-   NumiDataInput::SetBeamZ0  (fBeamZ0_ref     - tgtz*cm);
+   NumiDataInput::SetTargetZ0(fTargetZ0_ref   - tgtz*CLHEP::cm);
+   NumiDataInput::SetBaffleZ0(fHPBaffleZ0_ref - tgtz*CLHEP::cm);
+   NumiDataInput::SetBeamZ0  (fBeamZ0_ref     - tgtz*CLHEP::cm);
 
    fTargetConfig = config;
 
@@ -1605,12 +1601,12 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
    //note the horn current must be stored in amps
    //
 
-   NumiDataInput::SetHornCurrent(ihorn*1000.*ampere);
+   NumiDataInput::SetHornCurrent(ihorn*1000.*CLHEP::ampere);
    //
    // Do something naughty: Multiply by 1000 for BFieldMu geantino analysis. 
    //
    if (fDumpBFieldPlease) {
-       NumiDataInput::SetHornCurrent(ihorn*1.e6*ampere);
+       NumiDataInput::SetHornCurrent(ihorn*1.e6*CLHEP::ampere);
        std::cerr << " Horn Current has been multiplied by 1 e3 for Muon Geantino use, Hor Current is now  " 
                  << this->HornCurrent << std::endl;
 //       exit(2);
@@ -1627,7 +1623,7 @@ G4bool NumiDataInput::SetHornOnePos(G4String config)
    std::istringstream posstream(config);
    posstream >> hornpos;
 
-   NumiDataInput::SetHorn1X0((hornpos/10.)*cm); //Input as mm but we want cm
+   NumiDataInput::SetHorn1X0((hornpos/10.)*CLHEP::cm); //Input as mm but we want cm
 
    return true;
 }
@@ -1640,7 +1636,7 @@ G4bool NumiDataInput::SetHornTwoPos(G4String config)
 
    std::cerr << " Setting Horn2 position at " << hornpos << std::endl; 
 
-   NumiDataInput::SetHorn2X0((hornpos/10.)*cm); //Input as mm, but we want cm
+   NumiDataInput::SetHorn2X0((hornpos/10.)*CLHEP::cm); //Input as mm, but we want cm
 
    return true;   
 }
@@ -1651,7 +1647,7 @@ G4bool NumiDataInput::SetTargetDensity(G4String config)
    std::istringstream posstream(config);
    posstream >> targetdensity;
 
-   NumiDataInput::SetTargetDensityVal((targetdensity/1000000.)*g/cm3);
+   NumiDataInput::SetTargetDensityVal((targetdensity/1000000.)*CLHEP::g/CLHEP::cm3);
 
    return true;
 }
@@ -1693,8 +1689,8 @@ G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
          return false;
       }
       
-      TargetY0 = -1.1*mm;
-      BudalY0  = 2.26*mm;
+      TargetY0 = -1.1*CLHEP::mm;
+      BudalY0  = 2.26*CLHEP::mm;
 
       return true;
    }
@@ -1768,7 +1764,7 @@ void NumiDataInput::SetDetailedProtonBeam(G4bool val)
       //
       //These values are in g4numi_flugg/scripts/g4numi_fluka.sh
       //      
-      //protonMomentum = 120.0*GeV;
+      //protonMomentum = 120.0*CLHEP::GeV;
       fProton_outR  = -0.26350;  //this is probably mm
       fProton_inR   = -0.26139; //this is probably mm
       fProtonDiv    = -0.02355; //this is probably rads
@@ -1787,11 +1783,11 @@ void NumiDataInput::SetDetailedProtonBeam(G4bool val)
 //---------------------------------------------------------------------------------
 void NumiDataInput::SetLengthOfWaterInTgt(G4double val)
 {
-   if(val < 3.0*cm)
+   if(val < 3.0*CLHEP::cm)
    {
       G4cout << " NumiDataInput::SetLengthOfWaterInTgt() - PROBLEM: Can't have less than "
              << "3 cm of water filling the end of the target. Setting water length to 3 cm" << G4endl;
-      fLengthOfWaterInTgt = 3.0*cm;
+      fLengthOfWaterInTgt = 3.0*CLHEP::cm;
    }
    else
       fLengthOfWaterInTgt = val;
@@ -1866,9 +1862,9 @@ void NumiDataInput::SetAbsorberMonDist(G4double val, G4int mon)
    {
       G4cout << "******Problem : NumiDataInput::SetAbsorberMonDist - Invalid Monitor number " << mon
              << " Setting absorber distance to 1 m" << G4endl;
-      Mon1AbsorberDist = 1.0*m;
-      Mon2AbsorberDist = 1.0*m;
-      Mon3AbsorberDist = 1.0*m;
+      Mon1AbsorberDist = 1.0*CLHEP::m;
+      Mon2AbsorberDist = 1.0*CLHEP::m;
+      Mon3AbsorberDist = 1.0*CLHEP::m;
    }
 
 }
@@ -1914,7 +1910,7 @@ G4double NumiDataInput::GetAbsorberMonDist(G4int mon)
    {
       G4cout << "******Problem : NumiDataInput::GetAbsorberMonDist - Invalid Monitor number " << mon
              << " returning  1 m" << G4endl;
-      return 1.0*m;
+      return 1.0*CLHEP::m;
    }
 
 }

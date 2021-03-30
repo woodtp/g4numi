@@ -1,6 +1,7 @@
 
 #include "G4MinervaProtonIXS.hh"
 #include "globals.hh"
+#include "G4DynamicParticle.hh"
 
 G4MinervaProtonIXS::G4MinervaProtonIXS(){
   scaleVal = 1.;
@@ -40,12 +41,12 @@ G4double G4MinervaProtonIXS::
 GetCrossSection(G4double kineticEnergy, G4double atomicNumber, G4double nOfProtons)
 {   
 
-  if (kineticEnergy > 19.9*GeV ) 
+  if (kineticEnergy > 19.9*CLHEP::GeV ) 
   { // constant cross section above ~20GeV.
-    return  GetCrossSection(19.8*GeV,atomicNumber,nOfProtons);
+    return  GetCrossSection(19.8*CLHEP::GeV,atomicNumber,nOfProtons);
   } 
   G4double nOfNeutrons = atomicNumber-nOfProtons;
-  kineticEnergy /=GeV;
+  kineticEnergy /=CLHEP::GeV;
   G4double a = atomicNumber;
   const G4double nuleonRadius=1.36E-15;
   const G4double pi=3.14159265;
@@ -80,6 +81,6 @@ GetCrossSection(G4double kineticEnergy, G4double atomicNumber, G4double nOfProto
   }
   crossSection = crossSection*fac;
   //  G4cout<<"scaleVal prt IXS "<<scaleVal<<" "<<scaleVal*crossSection<<G4endl;
-  return scaleVal*crossSection*millibarn;
+  return scaleVal*crossSection*CLHEP::millibarn;
 }
 

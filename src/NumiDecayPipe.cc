@@ -25,7 +25,9 @@
 #include "NumiDecayPipeMagneticField.hh"
 #include "G4FieldManager.hh"
 
-static G4double in=2.54*cm;
+#include "CLHEP/Units/PhysicalConstants.h"
+
+static G4double in=2.54*CLHEP::cm;
 
 void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool applyDecayPipeMagneticField)
 {
@@ -37,7 +39,7 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   G4double r=NumiData->TunnelRadius;
   G4ThreeVector tunnelPosition=G4ThreeVector(0,0,l+NumiData->TunnelZ0);
  
-  G4Tubs* sTUNE = new G4Tubs("TUNE_S",0.,r,l,0,360.*deg);
+  G4Tubs* sTUNE = new G4Tubs("TUNE_S",0.,r,l,0,360.*CLHEP::deg);
   G4LogicalVolume* lvTUNE = new G4LogicalVolume(sTUNE,GetMaterial(NumiData->TunnelGEANTmat),"TUNE_log",0,0,0); 
   lvTUNE->SetVisAttributes(G4VisAttributes::Invisible);
   pvTUNE = new G4PVPlacement(0,tunnelPosition,"TUNE",lvTUNE,ROCK,false,0);
@@ -48,18 +50,18 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   G4double rOut=NumiData->ShieldRout;
   G4ThreeVector sc01Position=G4ThreeVector(NumiData->ShieldX0,NumiData->ShieldY0,NumiData->ShieldZ0+l)-tunnelPosition;
 
-  G4Tubs* sSC01 = new G4Tubs("SC01_solid",rIn,rOut,l,0,360.*deg);
+  G4Tubs* sSC01 = new G4Tubs("SC01_solid",rIn,rOut,l,0,360.*CLHEP::deg);
   G4LogicalVolume* lvSC01 = new G4LogicalVolume(sSC01,GetMaterial(NumiData->ShieldGEANTmat),"SC01_log",0,0,0); 
   new G4PVPlacement(0,sc01Position,"SC01",lvSC01,pvTUNE,false,0);
 
   //****************************************************
   //outer DP tracking volume
-  G4Tubs* sDPOuterTrackerTube = new G4Tubs("sDPOuterTrackerTube",rOut,rOut+(0.001*mm),l+(0.001*mm),0,360.*deg);
+  G4Tubs* sDPOuterTrackerTube = new G4Tubs("sDPOuterTrackerTube",rOut,rOut+(0.001*CLHEP::mm),l+(0.001*CLHEP::mm),0,360.*CLHEP::deg);
   G4LogicalVolume* lvDPOuterTrackerTube = new G4LogicalVolume(sDPOuterTrackerTube,DecayPipeVacuum,"lvDPOuterTrackerTube",0,0,0); 
 
-  G4Tubs* sDPOuterTrackerEnd = new G4Tubs("sDPOuterTrackerEnd",0.0,rOut,(0.001*mm),0,360.*deg);
+  G4Tubs* sDPOuterTrackerEnd = new G4Tubs("sDPOuterTrackerEnd",0.0,rOut,(0.001*CLHEP::mm),0,360.*CLHEP::deg);
   G4LogicalVolume* lvDPOuterTrackerEnd = new G4LogicalVolume(sDPOuterTrackerEnd,DecayPipeVacuum,"lvDPOuterTrackerEnd",0,0,0); 
-  G4ThreeVector DPOuterTrackerEndPosition=G4ThreeVector(NumiData->ShieldX0,NumiData->ShieldY0,NumiData->ShieldZ0+(l*2.0)+(0.001*mm/2.0)*2.0)-tunnelPosition;
+  G4ThreeVector DPOuterTrackerEndPosition=G4ThreeVector(NumiData->ShieldX0,NumiData->ShieldY0,NumiData->ShieldZ0+(l*2.0)+(0.001*CLHEP::mm/2.0)*2.0)-tunnelPosition;
 
     
   //****************************************************
@@ -70,7 +72,7 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   r=NumiData->DecayPipeRadius+NumiData->DecayPipeWallThick;
   G4ThreeVector decayPipePosition=G4ThreeVector(0,0,NumiData->DecayPipeZ0+l)-tunnelPosition;
 
-  G4Tubs* sDPIP = new G4Tubs("sDPIP",0.,r,l,0,360.*deg);
+  G4Tubs* sDPIP = new G4Tubs("sDPIP",0.,r,l,0,360.*CLHEP::deg);
   G4LogicalVolume* lvDPIP = new G4LogicalVolume(sDPIP,GetMaterial(NumiData->DecayPipeGEANTmat),"lvDPIP",0,0,0); 
   G4VPhysicalVolume* pvDPIP = new G4PVPlacement(0,decayPipePosition,"DPIP",lvDPIP,pvTUNE,false,0);
  
@@ -80,7 +82,7 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   G4ThreeVector decayVolumePosition=G4ThreeVector(0,0,(NumiData->DecayPipeFWinThick-NumiData->DecayPipeEWinThick)/2.);
   decayVolumePosition=G4ThreeVector(0,0,(-NumiData->DecayPipeEWinThick)/2.);//for non flat window
 
-  G4Tubs* sDVOL = new G4Tubs("DVOL_solid",0.,r,l,0,360.*deg);
+  G4Tubs* sDVOL = new G4Tubs("DVOL_solid",0.,r,l,0,360.*CLHEP::deg);
   G4Material* decayVolMaterial=DecayPipeVacuum;
   if(heInDecayPipe) decayVolMaterial=DecayPipeHelium;
   G4LogicalVolume* lvDVOL = new G4LogicalVolume(sDVOL,decayVolMaterial,"DVOL_log",0,0,0); 
@@ -100,12 +102,12 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
 
   //****************************************************
   //inner DP tracking volume
-  G4Tubs* sDPInnerTrackerTube = new G4Tubs("sDPInnerTrackerTube",r-(0.001*mm),r,l-(0.001*mm*2.0),0,360.*deg);
+  G4Tubs* sDPInnerTrackerTube = new G4Tubs("sDPInnerTrackerTube",r-(0.001*CLHEP::mm),r,l-(0.001*CLHEP::mm*2.0),0,360.*CLHEP::deg);
   G4LogicalVolume* lvDPInnerTrackerTube = new G4LogicalVolume(sDPInnerTrackerTube,decayVolMaterial,"lvDPInnerTrackerTube",0,0,0); 
 
-  G4Tubs* sDPInnerTrackerEnd = new G4Tubs("sDPInnerTrackerEnd",0.0,r-(0.001*mm),(0.001*mm),0,360.*deg);
+  G4Tubs* sDPInnerTrackerEnd = new G4Tubs("sDPInnerTrackerEnd",0.0,r-(0.001*CLHEP::mm),(0.001*CLHEP::mm),0,360.*CLHEP::deg);
   G4LogicalVolume* lvDPInnerTrackerEnd = new G4LogicalVolume(sDPInnerTrackerEnd,decayVolMaterial,"lvDPInnerTrackerEnd",0,0,0); 
-  G4ThreeVector DPInnerTrackerEndPosition=decayVolumePosition + G4ThreeVector(0,0,l+(0.001*mm/2.0));
+  G4ThreeVector DPInnerTrackerEndPosition=decayVolumePosition + G4ThreeVector(0,0,l+(0.001*CLHEP::mm/2.0));
   
   //****************************************************
 
@@ -113,11 +115,11 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   //couple of tubes and spheres and a polycone
   //for tubes we need Rin, Rout, material,volName,Z0,length
   G4int NUpWnTubesN=5;
-  //G4double UpWnTubeZ0[]      ={45.28*m  ,45.3054*m , 45.4578*m , 45.4769*m, 45.496*m};
-  G4double UpWnTubeZ0[]      ={2.295*in   , 3.295*in  ,  9.295*in  ,  10.045*in ,  10.795*in}; //Distance from beginning of decay pipe
-  G4double UpWnTubeLength[]  ={1.*in    ,6.*in     , .75*in    , .75*in   , 6.*in    };
-  G4double UpWnTubeRin[]     ={19.5*in  ,20.8125*in,19.5*in    , 19.5*in  , 20.8125*in };
-  G4double UpWnTubeRout[]    ={22.*in   ,21.*in    ,22.*in     , 22.*in   , 21.*in};
+  //G4double UpWnTubeZ0[]      ={45.28*CLHEP::m  ,45.3054*CLHEP::m , 45.4578*CLHEP::m , 45.4769*CLHEP::m, 45.496*CLHEP::m};
+  G4double UpWnTubeZ0[]      ={2.295*(CLHEP::cm * 2.54)   , 3.295*(CLHEP::cm * 2.54)  ,  9.295*(CLHEP::cm * 2.54)  ,  10.045*(CLHEP::cm * 2.54) ,  10.795*(CLHEP::cm * 2.54)}; //Distance from beginning of decay pipe
+  G4double UpWnTubeLength[]  ={1.*(CLHEP::cm * 2.54)    ,6.*(CLHEP::cm * 2.54)     , .75*(CLHEP::cm * 2.54)    , .75*(CLHEP::cm * 2.54)   , 6.*(CLHEP::cm * 2.54)    };
+  G4double UpWnTubeRin[]     ={19.5*(CLHEP::cm * 2.54)  ,20.8125*(CLHEP::cm * 2.54),19.5*(CLHEP::cm * 2.54)    , 19.5*(CLHEP::cm * 2.54)  , 20.8125*(CLHEP::cm * 2.54) };
+  G4double UpWnTubeRout[]    ={22.*(CLHEP::cm * 2.54)   ,21.*(CLHEP::cm * 2.54)    ,22.*(CLHEP::cm * 2.54)     , 22.*(CLHEP::cm * 2.54)   , 21.*(CLHEP::cm * 2.54)};
   G4int UpWnTubeVolMaterial[]={9       , 9       ,  9       ,    10      , 10};
   G4String UpWnTubeVolName[] ={"UpWnAl1","UpWnAl2" ,"UpWnAl3"  ,"UpWnFe1" ,"UpWnFe2" };
   // for (G4int ii=0;ii<NUpWnTubesN;ii++){
@@ -126,7 +128,7 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   G4VSolid *sUpWnTube;
   G4LogicalVolume *lvUpWnTube;
   for(G4int ii=0;ii<NUpWnTubesN;ii++){
-    sUpWnTube=new G4Tubs(UpWnTubeVolName[ii].append("S"),UpWnTubeRin[ii],UpWnTubeRout[ii],UpWnTubeLength[ii]/2.,0.,360.*deg);
+    sUpWnTube=new G4Tubs(UpWnTubeVolName[ii].append("S"),UpWnTubeRin[ii],UpWnTubeRout[ii],UpWnTubeLength[ii]/2.,0.,360.*CLHEP::deg);
     lvUpWnTube=new G4LogicalVolume(sUpWnTube,GetMaterial(UpWnTubeVolMaterial[ii]),UpWnTubeVolName[ii].append("LV"),0,0,0);
     
     G4ThreeVector translation=G4ThreeVector(0.,0.,UpWnTubeZ0[ii]+UpWnTubeLength[ii]/2.)-G4ThreeVector(0,0,(-NumiData->DecayPipeEWinThick+NumiData->DecayPipeLength)/2.);
@@ -137,15 +139,15 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   //Spherical Al part
   l=NumiData->DecayPipeFWinThick/2.;
   r=NumiData->DecayPipeRadius;
-  G4double rAlWinCurv=70.*in;  //curvature of Al window
-  G4double thickAlWin=0.063*in; //thickness of Al window
-  G4double angleAlWin=16.175*deg; 
+  G4double rAlWinCurv=70.*(CLHEP::cm * 2.54);  //curvature of Al window
+  G4double thickAlWin=0.063*(CLHEP::cm * 2.54); //thickness of Al window
+  G4double angleAlWin=16.175*CLHEP::deg; 
 
   G4ThreeVector sphereAlPos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.-rAlWinCurv*cos(angleAlWin)+UpWnTubeZ0[0]+UpWnTubeLength[0]);
   G4Sphere *sUpWnSteelSphere1=new G4Sphere("UpWnSph1",
 					 rAlWinCurv,rAlWinCurv+thickAlWin,
-					 0.*deg,360.*deg,
-					 0.*deg,angleAlWin);
+					 0.*CLHEP::deg,360.*CLHEP::deg,
+					 0.*CLHEP::deg,angleAlWin);
   G4LogicalVolume *upwnSteelSphere1=new G4LogicalVolume(sUpWnSteelSphere1,
 						       Al,
 						       "lvAlUpWn",
@@ -153,11 +155,11 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   new G4PVPlacement(0,sphereAlPos,"UpWn1",upwnSteelSphere1,pvDVOL,false,0);
 
   //Spherical Fe part
-  G4ThreeVector sphereFePos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.-69.3*in+19.303*in-3./8.*in);
+  G4ThreeVector sphereFePos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.-69.3*(CLHEP::cm * 2.54)+19.303*(CLHEP::cm * 2.54)-3./8.*(CLHEP::cm * 2.54));
   G4Sphere *sUpWnSteelSphere2=new G4Sphere("upwnSph2",
-					   69.3*in,69.675*in,
-					   0.*deg,360.*deg,
-					   17.64*deg,8.748*deg);
+					   69.3*(CLHEP::cm * 2.54),69.675*(CLHEP::cm * 2.54),
+					   0.*CLHEP::deg,360.*CLHEP::deg,
+					   17.64*CLHEP::deg,8.748*CLHEP::deg);
   G4LogicalVolume *upwnSteelSphere2=new G4LogicalVolume(sUpWnSteelSphere2,
 						       Fe,
 						       "lvFeUpWn",
@@ -165,20 +167,20 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   new G4PVPlacement(0,sphereFePos,"UpWn2",upwnSteelSphere2,pvDVOL,false,0);
   
   G4ThreeVector upwnPos=G4ThreeVector(0,0,(NumiData->DecayPipeEWinThick-NumiData->DecayPipeLength)/2.);
-  //G4double polyConeZ0=45.28*m;
-  G4double polyConeLength=11.707*in;
-  G4double polyConeR0in=13.321*in-3./8.*in;
-  G4double polyConeThick=3./8.*in;
+  //G4double polyConeZ0=45.28*CLHEP::m;
+  G4double polyConeLength=11.707*(CLHEP::cm * 2.54);
+  G4double polyConeR0in=13.321*(CLHEP::cm * 2.54)-3./8.*(CLHEP::cm * 2.54);
+  G4double polyConeThick=3./8.*(CLHEP::cm * 2.54);
   G4int NpolyConeDivN=10;
 
   G4double z[11],Rin[11],Rout[11];
   for (G4int ii=0;ii<NpolyConeDivN;ii++){
     z[ii]=polyConeLength/(NpolyConeDivN-1)*ii;
-    Rin[ii]=25.179*in+sqrt(polyConeR0in*polyConeR0in-z[ii]*z[ii]);
-    Rout[ii]=25.179*in+sqrt((polyConeR0in+polyConeThick)*(polyConeR0in+polyConeThick)-z[ii]*z[ii]);    
+    Rin[ii]=25.179*(CLHEP::cm * 2.54)+sqrt(polyConeR0in*polyConeR0in-z[ii]*z[ii]);
+    Rout[ii]=25.179*(CLHEP::cm * 2.54)+sqrt((polyConeR0in+polyConeThick)*(polyConeR0in+polyConeThick)-z[ii]*z[ii]);    
   }
   G4Polycone *sPolyCone=new G4Polycone("sUpWnPolyCone",
-				       0.,360.*deg,
+				       0.,360.*CLHEP::deg,
 				       NpolyConeDivN,z,Rin,Rout);
   G4LogicalVolume *lvPolyCone=new G4LogicalVolume(sPolyCone,Fe,"lvUpWnPolyCone",0,0,0);
   new G4PVPlacement(0,upwnPos,"UpWnPolyCone",lvPolyCone,pvDVOL,false,0);
@@ -188,7 +190,7 @@ void NumiDetectorConstruction::ConstructDecayPipe(bool heInDecayPipe, bool apply
   r=NumiData->DecayPipeRadius;
   G4ThreeVector dnwnPos=G4ThreeVector(0,0,NumiData->DecayPipeLength/2.-l);
 
-  G4Tubs* sDNWN = new G4Tubs("sDNWN",0.,r,l,0,360.*deg);
+  G4Tubs* sDNWN = new G4Tubs("sDNWN",0.,r,l,0,360.*CLHEP::deg);
   G4LogicalVolume* lvDNWN = new G4LogicalVolume(sDNWN,GetMaterial(NumiData->DecayPipeEWinmat),"lvDNWN",0,0,0); 
   new G4PVPlacement(0,dnwnPos,"DNWN",lvDNWN,pvDPIP,false,0);
 

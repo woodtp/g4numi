@@ -20,6 +20,8 @@
 #include "NumiAnalysis.hh"
 #include "NumiRunManager.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 NumiStackingAction::NumiStackingAction()
 { 
   NumiData = NumiDataInput::GetNumiDataInput();
@@ -110,8 +112,8 @@ G4ClassificationOfNewTrack NumiStackingAction::ClassifyNewTrack(const G4Track * 
         G4cout <<"NumiStackingAction: Killing Out of World Particle" <<G4endl;
         G4cout << "   Particle type: "<<aTrack->GetDefinition()->GetParticleName()
                << " ; Parent ID: "<<aTrack->GetParentID()
-               << " ;  Kinetic Energy = "<<aTrack->GetKineticEnergy()/GeV<<" GeV"<<G4endl;
-        G4cout << "   Position (m) = "<<position/m<<G4endl;
+               << " ;  Kinetic Energy = "<<aTrack->GetKineticEnergy()/CLHEP::GeV<<" GeV"<<G4endl;
+        G4cout << "   Position (m) = "<<position/CLHEP::m<<G4endl;
      }
      
      classification =fKill;

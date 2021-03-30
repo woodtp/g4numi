@@ -36,8 +36,11 @@ class zptuple_t
   Int_t pidtype;
   Double_t zpoint;
  private:
+
+#ifndef CMAKEBUILD
   ClassDef(zptuple_t , 1)
-    
+#endif
+  
     };
 #endif // admmtuple_t_h
 

@@ -7,7 +7,9 @@
 
 #include "draytupleSPB_t.hh"
 
+#ifndef CMAKEBUILD
 ClassImp(draytupleSPB_t)
+#endif
 
 draytupleSPB_t::draytupleSPB_t()
   :muvx(-99999.),

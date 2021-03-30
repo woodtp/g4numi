@@ -107,7 +107,10 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const;
     
   private:
+
+#ifndef CMAKEBUILD
     ClassDef(bsim::NuRay,DK2NUVER)
+#endif
   };  // end-of-class bsim::NuRay
 
   ///---------------------------------------------------------------------------
@@ -160,7 +163,10 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const;
     
   private:
+
+#ifndef CMAKEBUILD
     ClassDef(bsim::Decay,DK2NUVER)
+#endif
   };  // end-of-class bsim::Decay
 
   ///---------------------------------------------------------------------------
@@ -225,7 +231,9 @@ namespace bsim {
     Double_t    pprodp() const;
 
   private:
+#ifndef CMAKEBUILD
     ClassDef(bsim::Ancestor,DK2NUVER)
+#endif
   };  // end-of-class bsim::Ancestor
 
   ///---------------------------------------------------------------------------
@@ -256,7 +264,9 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const;
     
   private:
+#ifndef CMAKEBUILD
     ClassDef(bsim::TgtExit,DK2NUVER)
+#endif
   };  // end-of-class TgtExit
   
   ///---------------------------------------------------------------------------
@@ -281,7 +291,9 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const;
     
   private:
+#ifndef CMAKEBUILD
     ClassDef(bsim::Traj,DK2NUVER)
+#endif
   };  // end-of-class bsim::Traj
   
   ///---------------------------------------------------------------------------
@@ -334,7 +346,9 @@ namespace bsim {
     bool        overflow() const;  ///< ancestor list is incomplete (g4 minerva overflow)
 
   private:
+#ifndef CMAKEBUILD
     ClassDef(bsim::Dk2Nu,DK2NUVER)
+#endif
    
  };
 

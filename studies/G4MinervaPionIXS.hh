@@ -9,6 +9,8 @@
 #include "G4PionPlus.hh"
 #include "G4PiData.hh"
 #include "G4HadTmpUtil.hh"
+#include "G4DynamicParticle.hh"
+#include "CLHEP/Units/PhysicalConstants.h"
 
 class G4MinervaPionIXS : public G4VCrossSectionDataSet
 {
@@ -23,7 +25,7 @@ class G4MinervaPionIXS : public G4VCrossSectionDataSet
     if(aParticle->GetDefinition() == G4PionMinus::PionMinus()) result=true;
     if(aParticle->GetDefinition() == G4PionPlus::PionPlus())   result=true;
     if(G4lrint(anElement->GetZ()) == 1) result = false;
-    if(aParticle->GetKineticEnergy() > 999.9*GeV) result=false;
+    if(aParticle->GetKineticEnergy() > 999.9*CLHEP::GeV) result=false;
     return result;
   }
 
@@ -34,7 +36,7 @@ class G4MinervaPionIXS : public G4VCrossSectionDataSet
     if(particle->GetDefinition() == G4PionMinus::PionMinus()) result=true;
     if(particle->GetDefinition() == G4PionPlus::PionPlus())   result=true;
     if(G4lrint(ZZ) == 1) result = false;
-    if(particle->GetKineticEnergy() > 999.9*GeV) result=false;
+    if(particle->GetKineticEnergy() > 999.9*CLHEP::GeV) result=false;
     return result;
   }
 

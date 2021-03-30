@@ -2,8 +2,10 @@
 #include "dkmeta.h"
 #include "iostream"
 
+#ifndef CMAKEBUILD
 ClassImp(bsim::Location)
 ClassImp(bsim::DkMeta)
+#endif
 
 namespace bsim{
 

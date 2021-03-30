@@ -14,6 +14,8 @@
 #include "Randomize.hh"
 #include "G4RunManager.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   :PrimaryAction (RA)
 {
@@ -119,10 +121,10 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
 
 
   //PrimaryAction->PG_Z(-36079.0*cm);
-  PrimaryAction->PG_Z(-70*cm);
-  PrimaryAction->PG_Momentum(10.0*GeV);
+  PrimaryAction->PG_Z(-70*CLHEP::cm);
+  PrimaryAction->PG_Momentum(10.0*CLHEP::GeV);
   PrimaryAction->PG_Spread(0.0);
-  PrimaryAction->PG_Divergence(20*mrad);
+  PrimaryAction->PG_Divergence(20*CLHEP::mrad);
   PrimaryAction->PG_InnerR(0.0);
   PrimaryAction->PG_OuterR(0.0);
   PrimaryAction->PG_Particle(particleTable->FindParticle("pi+"));
@@ -139,7 +141,7 @@ NumiPrimaryMessenger::NumiPrimaryMessenger(NumiPrimaryGeneratorAction* RA)
   fGeantinoOpeningAngle  = new G4UIcmdWithADoubleAndUnit("/NuMI/primary/geantinoOpeningAngle",this);
   fGeantinoOpeningAngle->SetGuidance("Polar angle generating the geantino (or mu geantino)  ");
   fGeantinoOpeningAngle->SetParameterName("GeantinoOpeningAngle",true);
-  fGeantinoOpeningAngle->SetDefaultValue (0.005*radian);
+  fGeantinoOpeningAngle->SetDefaultValue (0.005*CLHEP::radian);
   fGeantinoOpeningAngle->SetDefaultUnit("radian");
   fGeantinoOpeningAngle->SetUnitCandidates("radian");
   fGeantinoOpeningAngle->AvailableForStates(G4State_Idle);

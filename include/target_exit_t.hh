@@ -94,8 +94,11 @@ class target_exit_t
   Double_t trkpz[10];
   */ 
  private:
+
+#ifndef CMAKEBUILD
   ClassDef(target_exit_t ,1) // target_exit_t
-    
+#endif
+  
     };
 
 #endif 

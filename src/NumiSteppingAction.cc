@@ -32,6 +32,8 @@
 #include "G4FieldManager.hh"
 #include "G4MagneticField.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 NumiSteppingAction::NumiSteppingAction()
    :fPrintAllSteps(false),
     fPrintSplitting(false),
@@ -1092,7 +1094,7 @@ void NumiSteppingAction::StudyAbsorption(const G4Step * theStep) {
    }
    if (!fGoneThroughHorn2Entr) {
      fTotalAbsHorn2Entr += ll/material->GetNuclearInterLength();
-//     if (theTrack->GetTrackLength() < (6000.0*mm)) 
+//     if (theTrack->GetTrackLength() < (6000.0*CLHEP::mm)) 
 //       std::cerr << " trackLength = " << theTrack->GetTrackLength() << " Z = " << postPtr->GetPosition()[2] << 
 //         " Abs L " << totalAbsHorn2Entr << std::endl;
      
@@ -1127,7 +1129,7 @@ void NumiSteppingAction::StudyPropagation(const G4Step * theStep) {
    if (prePtr == 0) return;
    G4StepPoint* postPtr = theStep->GetPostStepPoint();
    if (postPtr == 0) return;
-   if (theStep->GetStepLength() < 0.1*mm) return;
+   if (theStep->GetStepLength() < 0.1*CLHEP::mm) return;
    G4LogicalVolume *volPost = postPtr->GetPhysicalVolume()->GetLogicalVolume();
    G4LogicalVolume *volPre = prePtr->GetPhysicalVolume()->GetLogicalVolume();
    std::string volNamePost(volPost->GetName());

@@ -153,8 +153,11 @@ class  hadmmtuple_t
    */  
    
 private:
+
+#ifndef CMAKEBUILD
    ClassDef(hadmmtuple_t , 1)
-      
+#endif
+   
       };
 #endif // admmtuple_t_h
 

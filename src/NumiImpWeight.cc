@@ -16,6 +16,8 @@
 #include "G4TrajectoryContainer.hh"
 #include "Randomize.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 NumiImpWeight::NumiImpWeight()
 { 
 }
@@ -39,7 +41,7 @@ G4double NumiImpWeight::CalculateImpWeight(const G4Track *aTrack)
     G4int IMPWEIGHT_NBINS=40;
     G4double psave; 
     G4ParticleDefinition * particleType = aTrack->GetDefinition();
-    G4double totE=aTrack->GetTotalEnergy()/GeV;
+    G4double totE=aTrack->GetTotalEnergy()/CLHEP::GeV;
   
     //first find the importance weight of the parent
     G4TrajectoryContainer* container = 

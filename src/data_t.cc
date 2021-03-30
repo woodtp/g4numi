@@ -8,7 +8,10 @@
 //------------------
 
 #include "data_t.hh"
+
+#ifndef CMAKEBUILD
 ClassImp(data_t)
+#endif
 
    using namespace std;
 

@@ -67,7 +67,9 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const;
     
   private:
+#ifndef CMAKEBUILD
     ClassDef(bsim::Location,DKMETAVER)
+#endif
   };  // end-of-class bsim::Location
 
   ///---------------------------------------------------------------------------
@@ -136,7 +138,10 @@ namespace bsim {
     std::string AsString(const std::string& opt = "") const; ///< output as a string
     
   private:
+
+#ifndef CMAKEBUILD
     ClassDef(bsim::DkMeta,DKMETAVER)
+#endif
     
   }; // end-of-class bsim::DkMeta
 

@@ -10,6 +10,8 @@
 #include "NumiNuWeight.hh"
 #include "NumiParticleCode.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 const double rdet = 100.; //in cm
 
 using namespace std;
@@ -31,7 +33,7 @@ double NumiNuWeight::GetWeight(const data_t* nudata, const vector<double> xdet,
   G4ParticleTable* pTable=G4ParticleTable::GetParticleTable();
   string parent_name = 
     NumiParticleCode::AsString(NumiParticleCode::IntToEnum(nudata->ptype));
-  parent_mass=pTable->FindParticle(parent_name)->GetPDGMass()/GeV;
+  parent_mass=pTable->FindParticle(parent_name)->GetPDGMass()/CLHEP::GeV;
 
   double parent_energy = sqrt(nudata->pdPx*nudata->pdPx +
 			      nudata->pdPy*nudata->pdPy +
@@ -78,9 +80,9 @@ double NumiNuWeight::GetWeight(const data_t* nudata, const vector<double> xdet,
       beta[1]=nudata->pdPy / parent_energy;
       beta[2]=nudata->pdPz / parent_energy;
 
-      p_nu[0] = (xdet[0]- nudata->Vx) * nu_energy / rad;
-      p_nu[1] = (xdet[1]- nudata->Vy) * nu_energy / rad;
-      p_nu[2] = (xdet[2]- nudata->Vz) * nu_energy / rad;
+      p_nu[0] = (xdet[0]- nudata->Vx) * nu_energy / CLHEP::rad;
+      p_nu[1] = (xdet[1]- nudata->Vy) * nu_energy / CLHEP::rad;
+      p_nu[2] = (xdet[2]- nudata->Vz) * nu_energy / CLHEP::rad;
 
       double partial = gamma*(beta[0]*p_nu[0]+
 			      beta[1]*p_nu[1]+
@@ -127,7 +129,7 @@ double NumiNuWeight::GetWeight(const data_t* nudata, const vector<double> xdet,
 	  wt_ratio = 1.-costh;
 	else if (nudata->Ntype == NumiParticleCode::kMuonNeutrino || 
 		 nudata->Ntype == NumiParticleCode::kMuonAntiNeutrino) {
-	  double mumass = pTable->FindParticle("mu+")->GetPDGMass()/GeV;
+	  double mumass = pTable->FindParticle("mu+")->GetPDGMass()/CLHEP::GeV;
 	  double xnu = 2.* enuzr / mumass;
 	  wt_ratio = ( (3.-2.*xnu) - (1.-2.*xnu)*costh ) / (3.-2.*xnu);
 	} else {

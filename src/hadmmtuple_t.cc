@@ -7,7 +7,9 @@
 
 #include "hadmmtuple_t.hh"
 
+#ifndef CMAKEBUILD
 ClassImp(hadmmtuple_t)
+#endif
 
 hadmmtuple_t::hadmmtuple_t()
   :evtno(65535), 
