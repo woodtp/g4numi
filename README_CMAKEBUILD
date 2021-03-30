@@ -1,0 +1,27 @@
+To build this code with CMake follow these steps:
+
+1) log into a Fermilab gpvm node of your choice
+2) establish a ups development environment by doing
+   source /cvmfs/nova.opensciencegrid.org/externals/setups
+3) create a development area, ie
+   mkdir numi-beam-sim-g4numi-development; cd numi-beam-sim-g4numi-development
+4) check out the code with git, ie
+   git clone ssh://p-numi-beam-sim@cdcvs.fnal.gov/cvs/projects/numi-beam-sim-g4numi
+5) move the source code to a better named directory
+   mv numi-beam-sim-g4numi srcs
+6) create a build directory that is *separate* from the source code
+   mkdir build_numi-beam-sim-g4numi; cd build_numi-beam-sim-g4numi
+7) setup up the build environment
+   source ../srcs/ups/setup_for_development -<d,p> [d for debug, p for profile]
+8) [optional] setup ninja as the build generator
+   setup ninja v1_8_2
+9) create the build files (buildtool -h prints help for buildtool, part of the cetbuildtools package)
+   buildtool --generator ninja
+10) create a local ups product if desired
+   cd ../
+   mkdir local_products
+   cd build_numi-beam-sim-g4numi
+   buildtool -i -I ../local_products --generator ninja
+11) create a tarball of the ups product for general users
+   buildtool -p --generator ninja
+12) put the tarball in cvmfs - see your experiment's cvmfs librarian
