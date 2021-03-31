@@ -19,7 +19,7 @@ To build this code with CMake follow these steps:
    buildtool --generator ninja
 10) create a local ups product if desired
    cd ../
-   mkdir local_products
+   mkdir local_products (add this directory to the PRODUCTS environmental variable)
    cd build_numi-beam-sim-g4numi
    buildtool -i -I ../local_products --generator ninja
 11) create a tarball of the ups product for general users
