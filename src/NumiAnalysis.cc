@@ -11,10 +11,10 @@
 #include <stdlib.h>
 
 //Root 
-#include <TSystem.h>        // ROOT head file for a generic interface to the OS
-#include <TStopwatch.h>     // ROOT head file for stopwatch for real and cpu time
-#include <TFile.h>          
-#include <TTree.h>
+#include "TSystem.h"        // ROOT head file for a generic interface to the OS
+#include "TStopwatch.h"     // ROOT head file for stopwatch for real and cpu time
+#include "TFile.h"          
+#include "TTree.h"
 
 //GEANT4 
 #include "globals.hh"
@@ -33,13 +33,13 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 
 //g4numi 
-#include "data_t.hh"
-#include "hadmmtuple_t.hh"
-#include "draytupleMIB_t.hh"
-#include "draytupleSPB_t.hh"
-#include "absbkgtuple_t.hh"
-#include "zptuple_t.hh" // for raytracing
-#include "target_exit_t.hh"// for hadron production studies
+#include "dataProducts/data_t.hh"
+#include "dataProducts/hadmmtuple_t.hh"
+#include "dataProducts/draytupleMIB_t.hh"
+#include "dataProducts/draytupleSPB_t.hh"
+#include "dataProducts/absbkgtuple_t.hh"
+#include "dataProducts/zptuple_t.hh" // for raytracing
+#include "dataProducts/target_exit_t.hh"// for hadron production studies
 #include "NumiParticleCode.hh"
 #include "NumiAnalysis.hh"
 #include "NumiTrackInformation.hh"
@@ -1253,9 +1253,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4ThreeVector ParentMomentum;
   G4ThreeVector ParentPosition;
   
-  G4bool wasInHorn1 = false;
-  G4bool wasInHorn2 = false;
-
   G4String sconf = NumiData->GetBeamConfig();
   G4bool is_me   = sconf.contains("me") || sconf.contains("ME");
   //std::cout<<"=> (check) Beam Configuration: "<< (NumiData->GetBeamConfig()) <<" "<< is_me <<std::endl;
@@ -1295,7 +1292,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
           g4data->trkpx[2] = ParentMomentum[0]/CLHEP::GeV;
           g4data->trkpy[2] = ParentMomentum[1]/CLHEP::GeV;
           g4data->trkpz[2] = ParentMomentum[2]/CLHEP::GeV;
-          wasInHorn1 = true;
       }
           //exit horn1
       if (prevolname.contains("Horn1") && postvolname.contains("TGAR")){
@@ -1314,7 +1310,6 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
           g4data->trkpx[4] = ParentMomentum[0]/CLHEP::GeV;
           g4data->trkpy[4] = ParentMomentum[1]/CLHEP::GeV;
           g4data->trkpz[4] = ParentMomentum[2]/CLHEP::GeV;
-          wasInHorn2 = true;
       }
           //exit horn2
     if (prevolname.contains("Horn2") && postvolname.contains("TGAR")){

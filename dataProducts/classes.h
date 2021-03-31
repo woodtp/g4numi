@@ -2,7 +2,7 @@
 #include "data_t.hh"
 #include "draytupleMIB_t.hh"
 #include "draytupleSPB_t.hh"
-#include "Edept_t.hh"
+#include "Edep_t.hh"
 #include "hadmmtuple_t.hh"
 #include "ProdTuple_t.hh"
 #include "target_exit_t.hh"

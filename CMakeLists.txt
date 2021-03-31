@@ -44,12 +44,12 @@ cet_report_compiler_flags()
 # these are minimum required versions, not the actual product versions
 # put products in this list that you want to have set up with
 # their environment by ups
-find_ups_product( geant4 v4_10_4 )
-find_ups_product( root   v6_16_00 )
+find_ups_product( geant4         v4_10_4  )
+find_ups_product( canvas_root_io v1_01_00 )
 
-#find_ups_root( root v6_00_00 )
+find_ups_root( root v6_00_00 )
 
-#include(BuildDictionary)
+include(ArtDictionary)
 
 # collect the G4 libraries
 set( ENV{GEANT4_LIB} $ENV{GEANT4_FQ_DIR}/lib )
@@ -121,6 +121,8 @@ set( G4_LIB_LIST ${G4ANALYSIS}
 
 #MESSAGE("Geant4 library list is ${G4_LIB_LIST}" )	       
 
+cet_find_library( CLHEPLIB NAMES CLHEP PATHS ENV CLHEP_LIB_DIR NO_DEFAULT_PATH )
+
 # ROOT libraries
 set( ENV{ROOTLIB} $ENV{ROOTSYS}/lib )
 cet_find_library( ROOTCORE       NAMES  Core       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
@@ -158,7 +160,9 @@ set(ROOT_BASIC_LIB_LIST ${ROOTCORE}
 )
 # source
 
-#add_subdirectory(include)
+add_subdirectory(dataProducts)
+add_subdirectory(exec)
+add_subdirectory(include)
 add_subdirectory(macros)
 #add_subdirectory(rndm) # nothing in this directory to do
 add_subdirectory(plot)
@@ -176,3 +180,4 @@ install_scripts()
 # install root macros into the ups product
 file(GLOB root_macros *.C)
 install( FILES ${root_macros} DESTINATION ${product}/${version}/macros/root )
+

@@ -47,12 +47,10 @@ G4TrackVector* secondaries = fpTrackingManager->GimmeSecondaries();
 	// quick is defined as <1e-16 sec, so as to catch
 	// pizero, eta, eta' and sigma_0 which G4 explicitly produces
 	// but no hadron production experiment explicitly measures
-	bool quick=false;
 	const G4double quick_lifetime=1e-16*CLHEP::second;
 	const G4ParticleDefinition* pd = secondary->GetDefinition();	
 	G4double lifetime=pd->GetPDGLifeTime();
 	if(!pd->GetPDGStable() &&  lifetime<quick_lifetime) {
-	  quick=true;
 	  // add user info recording this as a quickly decaying particle
 	  infoNew->fast_decay=true;	  
 #ifdef DEBUG

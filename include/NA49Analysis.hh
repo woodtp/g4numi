@@ -16,8 +16,8 @@
 #include <map>
 #include <vector>
 
-#include "ProdTuple_t.hh"
-#include "TrackInfo_t.hh"
+#include "dataProducts/ProdTuple_t.hh"
+#include "dataProducts/TrackInfo_t.hh"
 #include "NA49Config.hh"
 
 class G4ParticleDefinition;

@@ -4,7 +4,7 @@
 #define NUMINUWEIGHT_H 1
 
 #include "Rtypes.h"
-#include "data_t.hh"
+#include "dataProducts/data_t.hh"
 #include <vector>
 
 class NumiNuWeight

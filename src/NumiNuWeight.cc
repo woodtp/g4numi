@@ -6,7 +6,6 @@
 
 #include "G4ParticleTable.hh"
 
-#include "data_t.hh"
 #include "NumiNuWeight.hh"
 #include "NumiParticleCode.hh"
 

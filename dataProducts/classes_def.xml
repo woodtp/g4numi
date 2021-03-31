@@ -1,17 +1,5 @@
 <lcgdict>
   
-  <class name="Edep_t" ClassVersion="10">
-    
-  </class>
-
-  <class name="ProdTuple_t" ClassVersion="10">
-    
-  </class>
-
-  <class name="TrackInfo_t" ClassVersion="10">
-    
-  </class>
-
   <class name="absbkgtuple_t" ClassVersion="10">
     
   </class>
@@ -24,15 +12,11 @@
     
   </class>
 
-  <class name="draytupleMIB_t" ClassVersion="10">
-    
-  </class>
-
-  <class name="draytupleMIB_t" ClassVersion="10">
-    
-  </class>
-
   <class name="draytupleSPB_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="Edep_t" ClassVersion="10">
     
   </class>
 
@@ -40,7 +24,15 @@
     
   </class>
 
+  <class name="ProdTuple_t" ClassVersion="10">
+    
+  </class>
+
   <class name="target_exit_t" ClassVersion="10">
+    
+  </class>
+
+  <class name="TrackInfo_t" ClassVersion="10">
     
   </class>
 

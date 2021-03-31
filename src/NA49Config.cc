@@ -3,7 +3,7 @@
 #include <iostream>
 
 NA49Config :: NA49Config (int argc, char **argv) : 
-                          runNumber("1"), nEvents("100000"), isConfirmed(false)
+                          nEvents("100000"), runNumber("1"), isConfirmed(false)
 {
   if (argc == 1) usage();
   

@@ -5,7 +5,7 @@
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 #include <vector>
-#include "TrackInfo_t.hh"
+#include "dataProducts/TrackInfo_t.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 class G4Event;
