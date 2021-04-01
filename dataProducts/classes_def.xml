@@ -1,42 +1,52 @@
 <lcgdict>
   
   <class name="absbkgtuple_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="423992478"/>
     
   </class>
 
   <class name="data_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="1275949513"/>
     
   </class>
   
   <class name="draytupleMIB_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="2710565909"/>
     
   </class>
 
   <class name="draytupleSPB_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="1392120478"/>
     
   </class>
 
   <class name="Edep_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="3226634905"/>
     
   </class>
 
   <class name="hadmmtuple_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="1726663711"/>
     
   </class>
 
   <class name="ProdTuple_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="4056551007"/>
     
   </class>
 
   <class name="target_exit_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="613873665"/>
     
   </class>
 
   <class name="TrackInfo_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="2546722277"/>
     
   </class>
 
   <class name="zptuple_t" ClassVersion="10">
+   <version ClassVersion="10" checksum="216253830"/>
     
   </class>
 
