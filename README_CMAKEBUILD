@@ -1,6 +1,7 @@
 To build this code with CMake follow these steps:
 
-1) log into a Fermilab gpvm node of your choice
+1) log into a Fermilab gpvm node of your choice - do not set up any software.
+   If you automatically setup some software in a .bash_profile or .bash_login file disable it
 2) establish a ups development environment by doing
    source /cvmfs/nova.opensciencegrid.org/externals/setups
 3) create a development area, ie
