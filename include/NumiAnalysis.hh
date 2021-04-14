@@ -35,8 +35,8 @@ class zptuple_t;
 class target_exit_t;
 
 //New for DK2NU:///
-#include "dkmeta.h"
-#include "dk2nu.h"
+#include "dataProducts/dkmeta.h"
+#include "dataProducts/dk2nu.h"
 class bsim::Location;
 class bsim::DkMeta;
 class bsim::NuRay;
