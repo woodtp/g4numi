@@ -8,5 +8,3 @@
 #include "dataProducts/target_exit_t.hh"
 #include "dataProducts/TrackInfo_t.hh"
 #include "dataProducts/zptuple_t.hh"
-#include "dataProducts/dk2nu.h"
-#include "dataProducts/dkmeta.h"

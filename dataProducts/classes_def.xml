@@ -50,40 +50,5 @@
     
   </class>
 
-  <class name="bsim::DkMeta" ClassVersion="8">
-   <version ClassVersion="8" checksum="3839230353"/>
-
-  </class>
-
-  <class name="bsim::NuRay" ClassVersion="8">
-   <version ClassVersion="8" checksum="4270333115"/>
-
-  </class>
-
-  <class name="bsim::Decay" ClassVersion="8">
-   <version ClassVersion="8" checksum="1671362717"/>
-
-  </class>
-
-  <class name="bsim::Ancestor" ClassVersion="8">
-   <version ClassVersion="8" checksum="186930655"/>
-
-  </class>
-
-  <class name="bsim::TgtExit" ClassVersion="8">
-   <version ClassVersion="8" checksum="974993758"/>
-
-  </class>
-
-  <class name="bsim::Traj" ClassVersion="8">
-   <version ClassVersion="8" checksum="522614760"/>
-
-  </class>
-
-  <class name="bsim::Dk2Nu" ClassVersion="8">
-   <version ClassVersion="8" checksum="3087784277"/>
-
-  </class>
-
 
 </lcgdict>
