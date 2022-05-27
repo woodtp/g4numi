@@ -23,16 +23,17 @@ product          version
 
 geant4           v4_10_4_p02b
 canvas_root_io   v1_01_11
+dk2nudata        v01_08_00a
 
 cetbuildtools    v7_13_02 - only_for_build
 end_product_list
 
 # -nq- here means there is no qualifier
 # a - here means the dependent product is not required by the parent and will not be setup
-qualifier   geant4     canvas_root_io
+qualifier   geant4     canvas_root_io dk2nudata
 
-e17:debug   e17:debug  e17:debug
-e17:prof    e17:prof   e17:prof
+e17:debug   e17:debug  e17:debug      e17:debug
+e17:prof    e17:prof   e17:prof       d17:prof
 
 end_qualifier_list
 

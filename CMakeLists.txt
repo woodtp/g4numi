@@ -46,6 +46,7 @@ cet_report_compiler_flags()
 # their environment by ups
 find_ups_product( geant4         v4_10_4  )
 find_ups_product( canvas_root_io v1_01_00 )
+find_ups_product( dk2nudata      v01_08_00a )
 
 find_ups_root( root v6_00_00 )
 

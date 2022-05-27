@@ -35,16 +35,16 @@ class zptuple_t;
 class target_exit_t;
 
 //New for DK2NU:///
-#include "dataProducts/dkmeta.h"
-#include "dataProducts/dk2nu.h"
-class bsim::Location;
-class bsim::DkMeta;
-class bsim::NuRay;
-class bsim::Decay;
-class bsim::Ancestor;
-class bsim::TgtExit;
-class bsim::Traj;
-class bsim::Dk2Nu;
+#include "dk2nu/tree/dkmeta.h"
+#include "dk2nu/tree/dk2nu.h"
+//class bsim::Location;
+//class bsim::DkMeta;
+//class bsim::NuRay;
+//class bsim::Decay;
+//class bsim::Ancestor;
+//class bsim::TgtExit;
+//class bsim::Traj;
+//class bsim::Dk2Nu;
 ///////////////////
 
 class NumiAnalysis
