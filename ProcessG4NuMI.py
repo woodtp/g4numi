@@ -105,7 +105,7 @@ def main():
       "-f {TARFILE} "
       "-L {LOGFILE} "
       "file://{CACHE}/g4numi_job.sh".format(
-      GRID       = ("--OS=SL6 -g "
+      GRID       = ("--OS=SL7 -g "
                     "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
                     "--role=Analysis "),
       MEMORY     = "--memory 200MB ",
@@ -243,8 +243,9 @@ def finalize_options(options):
     options.filetag = options.filetag if options.filetag[:1] == '_' else '_'+options.filetag
 
   #POT warning
-  if options.pot > 500000: 
+  if int(options.pot) > 500000: 
     print("!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!")
+    print "options.pot = ",options.pot
     print("You're requesting a LOT of POT per job.\n"
       "The grid is optimized for many small jobs instead of a few big ones.\n"
       "Your jobs may timeout. Use at most 500K POT to be safe. \n"
