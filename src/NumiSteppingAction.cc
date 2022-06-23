@@ -79,7 +79,22 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
 //  
    G4StepPoint* prePtr =theStep->GetPreStepPoint(); 
    G4ParticleDefinition * particleDefinition = theTrack->GetDefinition();
-   if ((particleDefinition->GetPDGEncoding() != 2212) && 
+#define KILL_LOOPER
+#ifdef KILL_LOOPER
+   // rhatcher - 2022-06-15
+   // this is a bunch of special numbers [ugh] but mostly seems to catch
+   // pdg = +/-14 (nu_mu) ... which aren't going to "loop" ... they're just long
+   // sometimes pdg = +/- 12 (nu_e)
+   // sometimes pdg = 2112 (neutron)
+   //was:// if ((particleDefinition->GetPDGEncoding() != 2212) && 
+   //          (theTrack->GetTrackLength() > 6000.0*CLHEP::mm) && (prePtr != 0) 
+   //            && (prePtr->GetPosition()[2] < 3300.*CLHEP::mm)) {
+   // kill track that reach > 6m long if they're still z < 3m
+   // and pz < 500 MeV
+   G4int pdg = particleDefinition->GetPDGEncoding();
+   bool loopable_pdg = (    pdg  != 2212) && (    pdg  != 2112) && 
+                       (abs(pdg) != 12  ) && (abs(pdg) != 14  );
+   if ( loopable_pdg &&
        (theTrack->GetTrackLength() > 6000.0*CLHEP::mm) && (prePtr != 0) 
          && (prePtr->GetPosition()[2] < 3300.*CLHEP::mm)) {
         G4ThreeVector pMom = prePtr->GetMomentum();
@@ -93,6 +108,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
             return;
      }
   } 
+#endif
    G4String particleType = particleDefinition -> GetParticleType();
    NumiRunManager* aRunManager = reinterpret_cast<NumiRunManager*>(NumiRunManager::GetRunManager());
    
