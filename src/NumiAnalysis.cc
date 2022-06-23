@@ -9,14 +9,19 @@
 #include <iomanip>
 #include <algorithm>
 #include <stdlib.h>
+#include <typeinfo>
+#if defined(__clang__) || defined(__GNUC__)
+  // C++ name mangling
+  #include <cxxabi.h>
+#endif
 
-//Root 
+//Root
 #include "TSystem.h"        // ROOT head file for a generic interface to the OS
 #include "TStopwatch.h"     // ROOT head file for stopwatch for real and cpu time
-#include "TFile.h"          
+#include "TFile.h"
 #include "TTree.h"
 
-//GEANT4 
+//GEANT4
 #include "globals.hh"
 #include "G4ios.hh"
 #include "G4Track.hh"
@@ -30,9 +35,13 @@
 #include "G4TransportationManager.hh"
 #include "G4Run.hh"
 
+#include "G4VUserPhysicsList.hh"
+#include "G4Version.hh"
+
+
 #include "CLHEP/Units/PhysicalConstants.h"
 
-//g4numi 
+//g4numi
 #include "dataProducts/data_t.hh"
 #include "dataProducts/hadmmtuple_t.hh"
 #include "dataProducts/draytupleMIB_t.hh"
@@ -66,22 +75,22 @@ NumiAnalysis::NumiAnalysis()
     g4draydataSPB(0),
     g4absbkgdata(0),
     energyBinSimpleHistoMinerva(-1.0e10)
-// The above histo must be of the same size..     
+// The above histo must be of the same size..
 {
-  // 
-  //  Simple histogram for quick study of the flux spectrum, Paul Lebrun, September/October 2017.  
-  // To turn on, simply uncomment the bin size. 
+  //
+  //  Simple histogram for quick study of the flux spectrum, Paul Lebrun, September/October 2017.
+  // To turn on, simply uncomment the bin size.
   //
 //  energyBinSimpleHistoMinerva = 0.1;
-  if (energyBinSimpleHistoMinerva > 0.) {  
+  if (energyBinSimpleHistoMinerva > 0.) {
     MinervaNuMuHisto = std::vector<double>(250,0.);
-    MinervaNuMuBarHisto = std::vector<double>(250,0.); 
+    MinervaNuMuBarHisto = std::vector<double>(250,0.);
     NovaNearNuMuHisto = std::vector<double>(100,0.);
-    NovaNearNuMuBarHisto = std::vector<double>(100,0.); 
+    NovaNearNuMuBarHisto = std::vector<double>(100,0.);
     NovaFarNuMuHisto = std::vector<double>(100,0.);
     NovaFarNuMuBarHisto = std::vector<double>(100,0.);
   }
-  
+
   NumiData = NumiDataInput::GetNumiDataInput();
 
   if(NumiData->GetDebugLevel() > 0)
@@ -92,13 +101,13 @@ NumiAnalysis::NumiAnalysis()
 #ifdef G4ANALYSIS_USE
 #endif
 
-  
+
    G4cout << "NumiAnalysis" << G4endl;
 
   g4data = new data_t();
   g4zpdata = new zptuple_t();
   g4tardata = new target_exit_t();
-  
+
   //New for DK2NU:
   this_meta  = new bsim::DkMeta();
   this_dk2nu = new bsim::Dk2Nu();
@@ -110,7 +119,7 @@ NumiAnalysis::NumiAnalysis()
      fAlcEdep_called.push_back(false);
      fMuInAlc.push_back(false);
   }
-  
+
   code[-13]   = 10;
   code[13]    = 11;
   code[111]   = 23;
@@ -126,11 +135,11 @@ NumiAnalysis::NumiAnalysis()
   code[3122]  = 17;
   code[3222]  = 21;
   code[3212]  = 22;
-  code[3112]  = 20; 
+  code[3112]  = 20;
 }
 //------------------------------------------------------------------------------------
 NumiAnalysis::~NumiAnalysis()
-{ 
+{
    if(NumiData->GetDebugLevel() > 0)
    {
       std::cout << "NumiAnalysis Destructor Called." << std::endl;
@@ -150,12 +159,12 @@ NumiAnalysis* NumiAnalysis::getInstance()
 void NumiAnalysis::book()
 {
   //
-  // Set the Minerva flux binning depending on the horn configuration. (le vs me ) 
+  // Set the Minerva flux binning depending on the horn configuration. (le vs me )
   //
   if (NumiData->GetHornConfig() == G4String("le")) {
     std::cerr << " Low energy config, Setting energyBinSimpleHistoMinerva to 0.02.. " << std::endl;
     energyBinSimpleHistoMinerva = 0.02;
-  }  
+  }
 
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::book() called." << G4endl;}
 
@@ -200,7 +209,7 @@ void NumiAnalysis::book()
         FileNameStr = NumiData->GetAbsBkgNtupleDir() + "/AbsBkg.root";
      }
      else FileNameStr = NumiData->GetAbsBkgNtupleDir() + "/" + NumiData->GetAbsBkgNtupleName();
-     
+
      G4cout << "Creating absorber backgrounds ntuple: "<< FileNameStr.c_str()<<G4endl;
 
      g4absbkgdata = new absbkgtuple_t();
@@ -210,7 +219,7 @@ void NumiAnalysis::book()
      absbkgtree->Branch("AbsBkgData","absbkgtuple_t",&g4absbkgdata,32000,1);
      g4absbkgdata->Clear();
   }
-  
+
 //////////////////////////////////////////////////////////////////
   /*
   if (NumiData->createHadmmNtuple && NumiData->useMuonInput)
@@ -219,41 +228,41 @@ void NumiAnalysis::book()
      if((NumiData->GetHadmmNtupleName()).empty())
         hadmmNtupleFileNameStr = GetOFileName(NumiData->GetExtNtupleFileName());
      else hadmmNtupleFileNameStr = NumiData->GetHadmmNtupleDir() + "/" + NumiData->GetHadmmNtupleName();
-     
+
      G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileNameStr.c_str()<<G4endl;
-   
+
      g4hmmdata = new hadmmtuple_t();
      //
      //Create ntuple for mu just getting into mons
      //
-     
+
      hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","hadmm ntuple");
      if(!hadmmNtuple) G4cout << "Failed to create file" << G4endl;
      hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
      hadmmtree->Branch("hadmmdata","hadmmtuple_t",&g4hmmdata,32000,1);
      g4hmmdata->Clear();
-        
-  
+
+
   }
   */
   /////////////////////////////////////////////////
-  
+
   if (NumiData->createHadmmNtuple && NumiData->useMuonInput)
   {
      std::string hadmmNtupleFileNameStr;
      if((NumiData->GetHadmmNtupleName()).empty())
         hadmmNtupleFileNameStr = GetOFileName(NumiData->GetExtNtupleFileName());
      else hadmmNtupleFileNameStr = NumiData->GetHadmmNtupleDir() + "/" + NumiData->GetHadmmNtupleName();
-     
+
      G4cout << "Creating hadron and muon monitors ntuple: "<<hadmmNtupleFileNameStr.c_str()<<G4endl;
-     
+
      if(!NumiData->GetSimDRays())
      {
         g4hmmdata = new hadmmtuple_t();
         //
         //Create ntuple for mu just getting into mons
         //
-                
+
         hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","hadmm ntuple");
         if(!hadmmNtuple) G4cout << "Failed to create file" << G4endl;
         hadmmtree = new TTree("hadmm","g4numi Hadron and muon monitor ntuple");
@@ -264,7 +273,7 @@ void NumiAnalysis::book()
      else if(NumiData->GetSimDRays())
      {
         g4draydataMIB = new draytupleMIB_t();
-        
+
         hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","dray ntuple");
         if(!hadmmNtuple) G4cout << "Failed to create file" << G4endl;
         hadmmtree = new TTree("dRay","g4numi Hadron and muon monitor ntuple");
@@ -294,7 +303,7 @@ void NumiAnalysis::book()
      if(NumiData->GetSimDRays())
      {
         g4draydataSPB = new draytupleSPB_t();
-        
+
         hadmmNtuple = new TFile(hadmmNtupleFileNameStr.c_str(), "RECREATE","dray ntuple");
         if(!hadmmNtuple) G4cout << "Failed to create file" << G4endl;
         hadmmtree = new TTree("dRay","g4numi Hadron and muon monitor ntuple");
@@ -338,7 +347,7 @@ void NumiAnalysis::book()
 std::string NumiAnalysis::GetOFileName(std::string ifilename)
 {
    std::string filestart = ifilename;
-   
+
    string::size_type slash_pos = ifilename.find_last_of('/');
    if(slash_pos == string::npos)
    {
@@ -347,7 +356,7 @@ std::string NumiAnalysis::GetOFileName(std::string ifilename)
    }
 
    ifilename.erase(0, slash_pos+1);
- 
+
    filestart.erase(slash_pos+1);
 
    string::size_type loc_underscore = ifilename.find("_", 0);
@@ -368,10 +377,10 @@ std::string NumiAnalysis::GetOFileName(std::string ifilename)
 
    string filePrefix = "";
    ///////////////////////////////////////////////////////////////////////////////////////
-   
+
    if(NumiData->GetSimDRays()) filePrefix = "dRayNtuple";
    else filePrefix = "hadmmNtuple";
-   
+
 ///////////////////////////////////////////////////////////////////////////////////////
    /*
    filePrefix = "hadmmNtuple";
@@ -398,11 +407,11 @@ std::string NumiAnalysis::GetOFileName(std::string ifilename)
    else if(NInputPart == 18)  ifilename.insert(dot_pos, "r");
    else if(NInputPart == 19)  ifilename.insert(dot_pos, "s");
    else if(NInputPart == 20)  ifilename.insert(dot_pos, "t");
-        
+
 
    stringstream ofilename;
    ofilename << NumiData->GetHadmmNtupleDir() << "/" << filePrefix << ifilename;
-      
+
 
    return ofilename.str();
 }
@@ -413,10 +422,10 @@ void NumiAnalysis::finishPL()
   if (energyBinSimpleHistoMinerva < 0.) return;
    G4cout << "NumiAnalysis::finishPL() called." << G4endl;
    std::cerr << "NumiAnalysis::finishPL() called." << G4endl;
-   
-  // Study of the inclusive  numu spectrum for various magnetic field 
+
+  // Study of the inclusive  numu spectrum for various magnetic field
   // To speed the I/O and processing on the farm, we include here a fixed size
-  // weighted histogram 
+  // weighted histogram
   std::string aDir("./");
   const char* aDirGG = getenv("_CONDOR_SCRATCH_DIR");
   if (aDirGG != 0) aDir = std::string(aDirGG);
@@ -427,9 +436,9 @@ void NumiAnalysis::finishPL()
     G4RunManager* pRunManager = G4RunManager::GetRunManager();
      int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
     for (size_t k=0; k != MinervaNuMuHisto.size();  k++) {
-       fOutPLHisto << " " << k << " " <<  (energyBinSimpleHistoMinerva/2. + energyBinSimpleHistoMinerva*k) 
-                << " " << MinervaNuMuHisto[k]/NPots << " " 
-		<< MinervaNuMuBarHisto[k]/NPots << std::endl;
+       fOutPLHisto << " " << k << " " <<  (energyBinSimpleHistoMinerva/2. + energyBinSimpleHistoMinerva*k)
+                << " " << MinervaNuMuHisto[k]/NPots << " "
+                << MinervaNuMuBarHisto[k]/NPots << std::endl;
     }
     fOutPLHisto.close();
   }
@@ -440,10 +449,10 @@ void NumiAnalysis::finishPL()
     G4RunManager* pRunManager = G4RunManager::GetRunManager();
     int NPots = pRunManager->GetCurrentRun()->GetNumberOfEventToBeProcessed();
     for (size_t k=0; k != NovaNearNuMuHisto.size();  k++) {
-      fOutPLHisto << " " << k << " " <<  (0.05 + 0.1*k) 
+      fOutPLHisto << " " << k << " " <<  (0.05 + 0.1*k)
                 << " " << NovaNearNuMuHisto[k]/NPots << " "  << NovaNearNuMuBarHisto[k]/NPots
-		<< " " << NovaFarNuMuHisto[k]/NPots << " " 
-		<< NovaFarNuMuBarHisto[k]/NPots << std::endl;
+                << " " << NovaFarNuMuHisto[k]/NPots << " "
+                << NovaFarNuMuBarHisto[k]/NPots << std::endl;
     }
     fOutPLHisto.close();
   }
@@ -452,7 +461,7 @@ void NumiAnalysis::finish() {
 
    G4cout << "NumiAnalysis::finish() called." << G4endl;
    std::cerr << "NumiAnalysis::finish() called." << G4endl;
-  
+
   if (NumiData->createNuNtuple){
     nuNtuple->cd();
     meta->Write(); //write dkmeta
@@ -474,7 +483,7 @@ void NumiAnalysis::finish() {
     absbkgNtuple->Close();
     delete absbkgNtuple;
   }
-  
+
   if (NumiData->createZpNtuple){
     zpNtuple->cd();
     zptree->Write();
@@ -508,7 +517,7 @@ void NumiAnalysis::FillMeta(){
   if(valjob<0 || valjob>=1000)valjob=-1;
 
   NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
- 
+
   this_meta->job  = valjob;
   this_meta->pots = NPots;
 
@@ -516,12 +525,28 @@ void NumiAnalysis::FillMeta(){
   //Perhaps should be part of NumiDataInput??
 
 #ifdef USEMODGEANT4
-  this_meta->beamsim = "g4numi_v6_MODGEANT4"; 
-#else 
-  this_meta->beamsim = "g4numi_v6";   
+  this_meta->beamsim = "g4numi_v6_MODGEANT4";
+#else
+  this_meta->beamsim = "g4numi_v6";
 #endif
 
-  this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0"; 
+  // try to get the version of Geant4
+  /// static const G4String G4Version = "$Name: geant4-10-04-patch-02b $";
+  G4String version = G4Version.substr(7,string::npos);
+  // get the physics list as used
+  const G4VUserPhysicsList* pl = pRunManager->GetUserPhysicsList();
+  const std::type_info& ti = typeid(*pl);
+  G4String mangled = ti.name();
+#if defined(HAVE_CXA_DEMANGLE) || defined(__clang__) || defined(__GNUC__)
+  int status;
+  char *realname = abi::__cxa_demangle(ti.name(),0,0,&status);
+  G4String demangled = realname;
+  free(realname);
+#else
+  G4String demangled = mangled;  // will have to do
+#endif
+  //this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0";
+  this_meta->physics = version + demangled;
   this_meta->physcuts = "nofillyet";
 
   G4String hornC = NumiData->GetBeamConfig();
@@ -530,15 +555,15 @@ void NumiAnalysis::FillMeta(){
   hornC.remove(0,6);
   tgtC.remove(6,confsize);
   G4String playlist  = NumiData->GetPlaylist();
-  
+
   G4bool isHe = NumiData->HeInDecayPipe;
   std::string decayVolMat = "vacuum";
   if(isHe)decayVolMat = "helium";
-  this_meta->tgtcfg = std::string(tgtC+"_"+playlist);  
-  this_meta->horncfg = std::string(hornC);  
+  this_meta->tgtcfg = std::string(tgtC+"_"+playlist);
+  this_meta->horncfg = std::string(hornC);
   this_meta->dkvolcfg = decayVolMat;
   //////////////////////////////////////////
-  
+
   this_meta->beam0x = NumiData->beamPosition[0]/CLHEP::cm;
   this_meta->beam0y = NumiData->beamPosition[1]/CLHEP::cm;
   this_meta->beam0z = NumiData->beamPosition[2]/CLHEP::cm;
@@ -557,15 +582,15 @@ void NumiAnalysis::FillMeta(){
     G4double zzdet = mm2cm*(NumiData->zdet_near[ii]);
     vec_loc.push_back(bsim::Location(xxdet,yydet,zzdet,NumiData->det_near_name[ii]));
   }
-  for (G4int ii=0; ii<NumiData->nFar; ++ii){ 
+  for (G4int ii=0; ii<NumiData->nFar; ++ii){
     G4double xxdet = mm2cm*(NumiData->xdet_far[ii]);
     G4double yydet = mm2cm*(NumiData->ydet_far[ii]);
     G4double zzdet = mm2cm*(NumiData->zdet_far[ii]);
     vec_loc.push_back(bsim::Location(xxdet,yydet,zzdet,NumiData->det_far_name[ii]));
   }
-		    
+
   this_meta->location = vec_loc;
-  
+
   for(int ii=0;ii<NumiData->nVintTot;ii++){
     (this_meta->vintnames).push_back(NumiData->VolVintName[ii]);
   }
@@ -573,18 +598,18 @@ void NumiAnalysis::FillMeta(){
     (this_meta->vdblnames).push_back(NumiData->VolVdblName[ii]);
   }
   if (NumiData->createNuNtuple) meta->Fill(); // If we don't have the Ntuple properly open, won't work.
-  
+
 }
 
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t cellNum)
 {
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillHadmmNtuple() called." << G4endl;}
-   
+
    if (!NumiData->createHadmmNtuple) return;
-         
+
    G4ParticleDefinition* particleDefinition = track.GetDefinition();
-   
+
    if ( track.GetTrackID() != 1 ||
         (particleDefinition != G4MuonPlus::MuonPlusDefinition()
          && particleDefinition != G4MuonMinus::MuonMinusDefinition()) )
@@ -602,7 +627,7 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
       if(!(NumiData->useMuonInput))
       {
          //g4hmmdata->hmmenergy = track.GetTotalEnergy();
-         
+
          if(hmm_num == 4)
          {
             /*g4hmmdata->hmmxpos = track.GetPosition()[0];
@@ -610,12 +635,12 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
               g4hmmdata->hmmzpos = track.GetPosition()[2];
               g4hmmdata->hmmpx = track.GetMomentum()[0];
               g4hmmdata->hmmpy = track.GetMomentum()[1];
-              g4hmmdata->hmmpz = track.GetMomentum()[2]; 
+              g4hmmdata->hmmpz = track.GetMomentum()[2];
             */
          }
       }
       if(hmm_num != 4)
-      {  
+      {
          if(fMuInAlc[hmm_num] == true) return;
 
          if( !(NumiData->GetMaterialSigma() < 0) && !(NumiData->GetMaterialSigma() > 0))
@@ -624,54 +649,54 @@ void NumiAnalysis::FillHadmmNtuple(const G4Track& track, Int_t hmm_num, Int_t ce
             g4hmmdata->mmypos[hmm_num] = track.GetPosition()[1];
             //g4hmmdata->mmzpos[hmm_num] = track.GetPosition()[2];
          }
-         
+
          g4hmmdata->mmpx[hmm_num]   = track.GetMomentum()[0];
          g4hmmdata->mmpy[hmm_num]   = track.GetMomentum()[1];
-         g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2]; 
+         g4hmmdata->mmpz[hmm_num]   = track.GetMomentum()[2];
          g4hmmdata->cell[hmm_num]   = cellNum;
 
          /*if(hmm_num == 0)
            G4cout << GetEntry() << ": mmpz = " << g4hmmdata->mmpz[hmm_num]
            << " mmxpos = " << g4hmmdata->mmxpos[hmm_num]
-           << " mmcell = " << g4hmmdata->cell[hmm_num] << G4endl; 
+           << " mmcell = " << g4hmmdata->cell[hmm_num] << G4endl;
          */
-         
+
          fMuInAlc[hmm_num] = true;
-      }     
+      }
    }
    else if(g4draydataMIB)
    {
       if(hmm_num != 4)
-      {  
+      {
          if(fMuInAlc[hmm_num] == true) return;
-         
+
          g4draydataMIB->mmxpos[hmm_num] = track.GetPosition()[0];
          g4draydataMIB->mmpx[hmm_num]   = track.GetMomentum()[0];
          g4draydataMIB->mmypos[hmm_num] = track.GetPosition()[1];
          g4draydataMIB->mmpy[hmm_num]   = track.GetMomentum()[1];
          //g4draydataMIB->mmzpos[hmm_num] = track.GetPosition()[2];
-         g4draydataMIB->mmpz[hmm_num]   = track.GetMomentum()[2]; 
+         g4draydataMIB->mmpz[hmm_num]   = track.GetMomentum()[2];
          g4draydataMIB->cell[hmm_num]   = cellNum;
-         
+
          fMuInAlc[hmm_num] = true;
-      }     
+      }
    }
    else if(g4draydataSPB)
    {
       if(hmm_num != 4)
-      {  
+      {
          if(fMuInAlc[hmm_num] == true) return;
-         
+
          g4draydataSPB->mmxpos[hmm_num] = track.GetPosition()[0];
          g4draydataSPB->mmpx[hmm_num]   = track.GetMomentum()[0];
          g4draydataSPB->mmypos[hmm_num] = track.GetPosition()[1];
          g4draydataSPB->mmpy[hmm_num]   = track.GetMomentum()[1];
          //g4draydataSPB->mmzpos[hmm_num] = track.GetPosition()[2];
-         g4draydataSPB->mmpz[hmm_num]   = track.GetMomentum()[2]; 
+         g4draydataSPB->mmpz[hmm_num]   = track.GetMomentum()[2];
          g4draydataSPB->cell[hmm_num]   = cellNum;
-         
+
          fMuInAlc[hmm_num] = true;
-      }     
+      }
    }
 
 }
@@ -683,7 +708,7 @@ void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleD
 {
 
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillEdep() called." << G4endl;}
-   
+
    edep = edep/CLHEP::eV;
 
    if(g4draydataMIB)
@@ -736,7 +761,7 @@ void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleD
       else
          G4cerr << "NumiAnalysis::FillEdep - Problem: Invalid particle type " << particleDefinition -> GetParticleName() << G4endl;
    }
-   
+
 }
 
 
@@ -751,20 +776,20 @@ void NumiAnalysis::FillEdep(G4double edep, const G4ParticleDefinition* particleD
 void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
 {
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillAlcEdepInfo() called." << G4endl;}
-   
+
   if(fAlcEdep_called[alc] == true) return;
 
   //G4cout << "fentry = " << fentry
   //<< " Calling NumiAnalysis::FillAlcEdepInfo() for alc "
-  //<< alc << " zpos = " << track.GetPosition()[2] << G4endl; 
-  
+  //<< alc << " zpos = " << track.GetPosition()[2] << G4endl;
+
   //g4hmmdata->mmxpos_Edep[alc] = track.GetPosition()[0];
   g4hmmdata->mmpx_Edep[alc]   = track.GetMomentum()[0];
   //g4hmmdata->mmypos_Edep[alc] = track.GetPosition()[1];
   g4hmmdata->mmpy_Edep[alc]   = track.GetMomentum()[1];
   //g4hmmdata->mmzpos_Edep[alc] = track.GetPosition()[2];
   g4hmmdata->mmpz_Edep[alc]   = track.GetMomentum()[2];
-      
+
   fAlcEdep_called[alc] = true;
 
 }
@@ -774,11 +799,11 @@ void NumiAnalysis::FillAlcEdepInfo(const G4Track& track, G4int alc)
 //this function only gets called if useMuonInput = true
 //
 //------------------------------------------------------------------------------------
-void NumiAnalysis::FillHadmmNtuple() 
+void NumiAnalysis::FillHadmmNtuple()
 {
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillHadmmNtuple() (with no args) called." << G4endl;}
 
-  if (!NumiData->createHadmmNtuple) return;  
+  if (!NumiData->createHadmmNtuple) return;
 
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
   NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
@@ -797,53 +822,53 @@ void NumiAnalysis::FillHadmmNtuple()
         g4hmmdata->tvx = tparentPosition[0];
         g4hmmdata->tvy = tparentPosition[1];
         g4hmmdata->tvz = tparentPosition[2];
-        
+
         G4ThreeVector parentMomentum = NPGA->GetMuParentMomentum();
         g4hmmdata->pdpx = parentMomentum[0];
         g4hmmdata->pdpy = parentMomentum[1];
         g4hmmdata->pdpz = parentMomentum[2];
-        
+
         G4ThreeVector parentPosition = NPGA->GetMuParentPosition();
         g4hmmdata->pdvx = parentPosition[0];
         g4hmmdata->pdvy = parentPosition[1];
         g4hmmdata->pdvz = parentPosition[2];
-        
+
         G4ThreeVector parentProdPosition = NPGA->GetMuParentProdPosition();
         g4hmmdata->ppvx = parentProdPosition[0];
         g4hmmdata->ppvy = parentProdPosition[1];
         g4hmmdata->ppvz = parentProdPosition[2];
 
-        g4hmmdata->pptype = NPGA->GetMuParentType(); 
+        g4hmmdata->pptype = NPGA->GetMuParentType();
         g4hmmdata->ppmedium = NPGA->GetMuParentProdMedium();
-        g4hmmdata->pgen = NPGA->GetMuParentGen(); 
+        g4hmmdata->pgen = NPGA->GetMuParentGen();
         g4hmmdata->ptype = NPGA->GetMuType();
-        
+
         g4hmmdata->evtno = NPGA->GetEvtno();
      }
-     
+
      G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
      g4hmmdata->mupx = particleMomentum[0];
      g4hmmdata->mupy = particleMomentum[1];
      g4hmmdata->mupz = particleMomentum[2];
-     
+
      G4ThreeVector tparentMomentum = NPGA->GetMuTParentMomentum();
      g4hmmdata->tpx = tparentMomentum[0];
      g4hmmdata->tpy = tparentMomentum[1];
      g4hmmdata->tpz = tparentMomentum[2];
 
-     g4hmmdata->muweight = NPGA->GetMuWeight(); 
-     g4hmmdata->tpptype = NPGA->GetTParentType(); 
+     g4hmmdata->muweight = NPGA->GetMuWeight();
+     g4hmmdata->tpptype = NPGA->GetTParentType();
      g4hmmdata->nimpwt = NPGA->GetImpWeight();
-     
+
      //g4hmmdata->run = pRunManager->GetCurrentRun()->GetRunID();
      //g4hmmdata->mtgthsig = NumiData->beamSigmaX/CLHEP::cm;
      //g4hmmdata->mtgtvsig = NumiData->beamSigmaY/CLHEP::cm;
      //g4hmmdata->mtgthpos = NumiData->beamPosition[0]/CLHEP::cm;
      //g4hmmdata->mtgtvpos = NumiData->beamPosition[1]/CLHEP::cm;
      //g4hmmdata->evtno = pRunManager->GetCurrentEvent()->GetEventID();
-     
-     
-     
+
+
+
      //g4hmmdata->hmmenergy = -81000;
      //g4hmmdata->hmmxpos = -81000;
      //g4hmmdata->hmmypos = -81000;
@@ -851,20 +876,20 @@ void NumiAnalysis::FillHadmmNtuple()
      //g4hmmdata->hmmpx = -81000;
      //g4hmmdata->hmmpy = -81000;
      //g4hmmdata->hmmpz = -81000;
-     
+
      for(Int_t i=0;i<3;++i)
      {
         if( !(NumiData->GetMaterialSigma() < 0) && !(NumiData->GetMaterialSigma() > 0))
-        {  
-           g4hmmdata->mmxpos[i] = -99999.;        
+        {
+           g4hmmdata->mmxpos[i] = -99999.;
            g4hmmdata->mmypos[i] = -99999.;
            //g4hmmdata->mmzpos[i] = -99999.;
         }
-        
+
         g4hmmdata->mmpx[i]   = -99999.;
         g4hmmdata->mmpy[i]   = -99999.;
         g4hmmdata->mmpz[i]   = -99999.;
-        g4hmmdata->cell[i]   = -999;   
+        g4hmmdata->cell[i]   = -999;
      }
   }
   else if(g4draydataMIB)
@@ -873,16 +898,16 @@ void NumiAnalysis::FillHadmmNtuple()
      g4draydataMIB->muvx = particlePosition[0];
      g4draydataMIB->muvy = particlePosition[1];
      //g4draydataMIB->muvz = particlePosition[2];
-     
+
      G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
      g4draydataMIB->mupx = particleMomentum[0];
      g4draydataMIB->mupy = particleMomentum[1];
      g4draydataMIB->mupz = particleMomentum[2];
-     
-     g4draydataMIB->muweight = NPGA->GetMuWeight(); 
-     g4draydataMIB->nimpwt = NPGA->GetImpWeight(); 
-     g4draydataMIB->ptype = NPGA->GetMuType(); 
-               
+
+     g4draydataMIB->muweight = NPGA->GetMuWeight();
+     g4draydataMIB->nimpwt = NPGA->GetImpWeight();
+     g4draydataMIB->ptype = NPGA->GetMuType();
+
   }
   else if(g4draydataSPB)
   {
@@ -890,24 +915,24 @@ void NumiAnalysis::FillHadmmNtuple()
      g4draydataSPB->muvx = particlePosition[0];
      g4draydataSPB->muvy = particlePosition[1];
      g4draydataSPB->muvz = particlePosition[2];
-     
+
      G4ThreeVector particleMomentum = NPGA->GetParticleMomentum();
      g4draydataSPB->mupx = particleMomentum[0];
      g4draydataSPB->mupy = particleMomentum[1];
      g4draydataSPB->mupz = particleMomentum[2];
-     
-     g4draydataSPB->ptype = NPGA->GetMuType(); 
-               
+
+     g4draydataSPB->ptype = NPGA->GetMuType();
+
   }
 
-  
+
 }
 
 //------------------------------------------------------------------------------------
 void NumiAnalysis::FillAbsorberBkgrdNtuple(const G4Track& track)
 {
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillAbsorberBkgrdNtuple() called." << G4endl;}
-   
+
    G4ParticleDefinition * particleType = track.GetDefinition();
    G4String partType = particleType->GetParticleType();
    g4absbkgdata -> ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(particleType->GetParticleName()));
@@ -917,14 +942,14 @@ void NumiAnalysis::FillAbsorberBkgrdNtuple(const G4Track& track)
    g4absbkgdata->y    = track.GetPosition()[1]/CLHEP::cm;
    g4absbkgdata->py   = track.GetMomentum()[1]/CLHEP::GeV;
    g4absbkgdata->z    = track.GetPosition()[2]/CLHEP::cm;
-   g4absbkgdata->pz   = track.GetMomentum()[2]/CLHEP::GeV; 
+   g4absbkgdata->pz   = track.GetMomentum()[2]/CLHEP::GeV;
 
    g4absbkgdata->KE = track.GetKineticEnergy()/CLHEP::GeV;
 
    NumiTrackInformation* info = (NumiTrackInformation*)(track.GetUserInformation());
    g4absbkgdata->impwt = info->GetNImpWt();  // Importance weight
    g4absbkgdata->tgen = info->GetTgen()-1;
-   
+
    int tgtz = -999;
    if(NumiData->TargetZ0/CLHEP::cm == -35.)
       tgtz = 0;
@@ -940,7 +965,7 @@ void NumiAnalysis::FillAbsorberBkgrdNtuple(const G4Track& track)
    g4absbkgdata->tgtz = tgtz;
    g4absbkgdata->ihorn = NumiData->HornCurrent/CLHEP::ampere/1000.;
 
-   absbkgtree->Fill(); 
+   absbkgtree->Fill();
    g4absbkgdata->Clear();
 }
 
@@ -988,18 +1013,18 @@ G4int NumiAnalysis::GetEntry()
 void NumiAnalysis::WriteHadmmNtuple()
 {
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::WriteHadmmNtuple() called." << G4endl;}
-      
+
    if (!(NumiData->createHadmmNtuple)) return;
 
    if(g4draydataMIB) g4draydataMIB->ClearTrackIDVectors();
 
    hadmmtree->Fill();
-   
+
    if(g4hmmdata) g4hmmdata->Clear();
    if(g4draydataMIB) g4draydataMIB->Clear();
    if(g4draydataSPB) g4draydataSPB->Clear();
-      
-   
+
+
 }
 
 //------------------------------------------------------------------------------------
@@ -1007,22 +1032,22 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 {
 
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::FillNeutrinoNtuple() called." << G4endl;}
- 
+
   if (!NumiData->createNuNtuple) return;
-    
+
   G4String myHorn1Config =  NumiData->GetHornConfig();
   const NumiRunManager* theRunManager = reinterpret_cast<const NumiRunManager*>(NumiRunManager::GetRunManager());
   const NumiSteppingAction* theSteppingAction =
      reinterpret_cast<const NumiSteppingAction*>(theRunManager->GetUserSteppingAction());
-  
+
   //Neutrino vertex position and momentum
-  G4ThreeVector pos = track.GetPosition()/CLHEP::mm; 
+  G4ThreeVector pos = track.GetPosition()/CLHEP::mm;
   x = pos.x();
   y = pos.y();
   z = pos.z();
   G4ThreeVector NuMomentum = track.GetMomentum();
   G4int parentID = track.GetParentID();
-  
+
   if (parentID == 0) return; //I have to make some changes so that neutrinos in fluka/mars ntuples don't crash
 
   NumiTrajectory* NuParentTrack = GetParentTrajectory(parentID);
@@ -1031,24 +1056,24 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4ThreeVector vertex_r = (NuParentTrack->GetPoint(point_no-1)->GetPosition()/CLHEP::m)*CLHEP::m; //Should be the same as Neutrino vertex
   G4String parent_name = NuParentTrack->GetParticleName();
   G4double Parent_mass = NuParentTrack->GetMass();
-  G4double gamma = sqrt(ParentMomentumFinal*ParentMomentumFinal+Parent_mass*Parent_mass)/Parent_mass; 
+  G4double gamma = sqrt(ParentMomentumFinal*ParentMomentumFinal+Parent_mass*Parent_mass)/Parent_mass;
   G4double Parent_energy = gamma*Parent_mass;
   G4ThreeVector beta_vec = ParentMomentumFinal/Parent_energy;
   G4double partial = gamma*(beta_vec*NuMomentum);
- 
+
   G4double enuzr = gamma*(track.GetTotalEnergy())-partial; //neutrino energy in parent rest frame
 
   //fill histograms, ntuples,...
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
   NumiPrimaryGeneratorAction *NPGA = (NumiPrimaryGeneratorAction*)(pRunManager)->GetUserPrimaryGeneratorAction();
- 
+
   g4data->run = pRunManager->GetCurrentRun()->GetRunID();
   g4data->evtno = pRunManager->GetCurrentEvent()->GetEventID();
   g4data->beamHWidth = NumiData->beamSigmaX/CLHEP::cm;
   g4data->beamVWidth = NumiData->beamSigmaY/CLHEP::cm;
   g4data->beamX = NumiData->beamPosition[0]/CLHEP::cm;
   g4data->beamY = NumiData->beamPosition[1]/CLHEP::cm;
- 
+
   G4int particleID = track.GetParentID();
   G4ThreeVector protonOrigin = NPGA->GetProtonOrigin();
   g4data->protonX = protonOrigin[0];
@@ -1096,7 +1121,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4ThreeVector ParentMomentumProduction = NuParentTrack->GetMomentum(0);
   g4data->ppdxdz = ParentMomentumProduction[0]/ParentMomentumProduction[2];
   g4data->ppdydz = ParentMomentumProduction[1]/ParentMomentumProduction[2];
-  g4data->pppz = ParentMomentumProduction[2]/CLHEP::GeV; 
+  g4data->pppz = ParentMomentumProduction[2]/CLHEP::GeV;
 
   G4double parentp = sqrt(ParentMomentumProduction*ParentMomentumProduction);
 
@@ -1105,12 +1130,12 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   g4data->ppmedium = 0.; //this is still empty
 
   g4data->ptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(parent_name));
- 
-  G4ThreeVector production_vertex = (NuParentTrack->GetPoint(0)->GetPosition()/CLHEP::m)*CLHEP::m; 
+
+  G4ThreeVector production_vertex = (NuParentTrack->GetPoint(0)->GetPosition()/CLHEP::m)*CLHEP::m;
   g4data->ppvx = production_vertex[0]/CLHEP::cm;
   g4data->ppvy = production_vertex[1]/CLHEP::cm;
   g4data->ppvz = production_vertex[2]/CLHEP::cm;
-  
+
   //if nu parent is a muon then find muon parent info
   if ((parent_name=="mu+" || parent_name=="mu-") && NuParentTrack->GetParentID()!=0)
     {
@@ -1120,13 +1145,13 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       G4ThreeVector muparp = MuParentTrack->GetMomentum(nopoint_mupar-1);
       G4double muparm = MuParentTrack->GetMass();
       g4data->muparpx = muparp[0]/CLHEP::GeV; // vector of hadron parent of muon
-      g4data->muparpy = muparp[1]/CLHEP::GeV; // 
+      g4data->muparpy = muparp[1]/CLHEP::GeV; //
       g4data->muparpz = muparp[2]/CLHEP::GeV;
       g4data->mupare = (sqrt(muparp*muparp+muparm*muparm))/CLHEP::GeV;
     }
   else
     {
-      g4data->muparpx = -999999.;  
+      g4data->muparpx = -999999.;
       g4data->muparpy = -999999.;
       g4data->muparpz = -999999.;
       g4data->mupare = -999999.;
@@ -1141,19 +1166,19 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   g4data->xpoint = 0.;
   g4data->xpoint = 0.;
 
-  /*    
-	tgen is is the "generation" number
-	of the particle that makes it out of the target. Beam protons have
-	tgen=1, any particle produced by a p-C interaction would have tgen=2,
-	particles produced from interactions of those products have tgen=3 etc.
-	etc. until the cascade exiting the target core.
+  /*
+        tgen is is the "generation" number
+        of the particle that makes it out of the target. Beam protons have
+        tgen=1, any particle produced by a p-C interaction would have tgen=2,
+        particles produced from interactions of those products have tgen=3 etc.
+        etc. until the cascade exiting the target core.
   */
-  
+
   //if not using external ntuple then need to find the particle that exited the target
-  
+
   G4int tar_pdg = 0; //auxiliar variable to convert to PDG code
   G4int tar_trackId = -1;
-  if(!NumiData->useFlukaInput && !NumiData->useMarsInput) 
+  if(!NumiData->useFlukaInput && !NumiData->useMarsInput)
     {
         G4bool findTarget = false;
         G4ThreeVector ParticleMomentum = G4ThreeVector(-999999,-999999,-999999);
@@ -1161,23 +1186,23 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
         NumiTrajectory* PParentTrack = GetParentTrajectory(track.GetParentID());
         G4int tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
         particleID = PParentTrack->GetTrackID();
-        
+
         while (!findTarget && particleID!=1){
             G4int numberOfPoints = PParentTrack->GetPointEntries();
             for (G4int ii=0;ii<numberOfPoints-1; ++ii){
                 G4String lastVolName = PParentTrack->GetPreStepVolumeName(ii);
                 G4String nextVolName = PParentTrack->GetPreStepVolumeName(ii+1);
-		if (theSteppingAction->EscapingTarget(lastVolName, nextVolName)) {
+                if (theSteppingAction->EscapingTarget(lastVolName, nextVolName)) {
                     // tv_ and tp_ are equal to position and
                     // momentum of the particle exiting the target (actually shell around target)
-                    ParticleMomentum = PParentTrack->GetMomentum(ii);              
-                    ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();  
+                    ParticleMomentum = PParentTrack->GetMomentum(ii);
+                    ParticlePosition = PParentTrack->GetPoint(ii)->GetPosition();
                     tptype = NumiParticleCode::AsInt(NumiParticleCode::StringToEnum(PParentTrack->GetParticleName()));
-		    tar_pdg = PParentTrack->GetPDGEncoding();
-		    tar_trackId = PParentTrack->GetTrackID();
+                    tar_pdg = PParentTrack->GetPDGEncoding();
+                    tar_trackId = PParentTrack->GetTrackID();
                     findTarget = true;
-//	            std::cerr << " NumiAnalysis::FillNeutrinoNtuple Find Target is true Position " 
-//		              << ParticlePosition << " momentum " << ParticleMomentum << std::endl;
+//                  std::cerr << " NumiAnalysis::FillNeutrinoNtuple Find Target is true Position "
+//                            << ParticlePosition << " momentum " << ParticleMomentum << std::endl;
                   }
             }
             PParentTrack = GetParentTrajectory(PParentTrack->GetParentID());
@@ -1202,9 +1227,9 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       g4data->tpy = ParticleMomentum[1]/CLHEP::GeV;
       g4data->tpz = ParticleMomentum[2]/CLHEP::GeV;
       g4data->tptype = NPGA->GetParticleType();
-  }   
-  
-      //set all trk_ & trkp_ to -999999  
+  }
+
+      //set all trk_ & trkp_ to -999999
   for (G4int ii=0; ii<10; ++ii){
       g4data->trkx[ii] = -999999.;
       g4data->trky[ii] = -999999.;
@@ -1216,10 +1241,10 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       // Neutrino data at different points
       // need neutrino parent info to be filled in g4data by this point
 
-  for (G4int ii=0; ii<NumiData->nNear; ++ii){          // near detector 
+  for (G4int ii=0; ii<NumiData->nNear; ++ii){          // near detector
       g4data->NdxdzNear[ii] = (x-NumiData->xdet_near[ii])/(z-NumiData->zdet_near[ii]);
       g4data->NdydzNear[ii] = (y-NumiData->ydet_near[ii])/(z-NumiData->zdet_near[ii]);
-      
+
       NumiNuWeight nuwgh;
       G4double nu_wght;
       G4double nu_energy;
@@ -1231,11 +1256,11 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       g4data->NenergyN[ii] = nu_energy; //in GeV
       g4data->NWtNear[ii]  = nu_wght;
   }
-  
+
   for (G4int ii=0; ii<NumiData->nFar; ++ii){         // far detector
       g4data->NdxdzFar[ii] = (x-NumiData->xdet_far[ii])/(z-NumiData->zdet_far[ii]);
       g4data->NdydzFar[ii] = (y-NumiData->ydet_far[ii])/(z-NumiData->zdet_far[ii]);
-      
+
       NumiNuWeight nuwgh;
       G4double nu_wght;
       G4double nu_energy;
@@ -1246,25 +1271,25 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
       g4data->NenergyF[ii] = nu_energy; //in GeV
       g4data->NWtFar[ii]   = nu_wght;
-      
+
   }
-  
+
       //if(parentID!=0){
   G4ThreeVector ParentMomentum;
   G4ThreeVector ParentPosition;
-  
+
   G4String sconf = NumiData->GetBeamConfig();
   G4bool is_me   = sconf.contains("me") || sconf.contains("ME");
   //std::cout<<"=> (check) Beam Configuration: "<< (NumiData->GetBeamConfig()) <<" "<< is_me <<std::endl;
-  
-  for (G4int ii=0; ii<point_no-1; ++ii){ 
+
+  for (G4int ii=0; ii<point_no-1; ++ii){
       ParentMomentum = NuParentTrack->GetMomentum(ii);
       ParentPosition = (NuParentTrack->GetPoint(ii)->GetPosition()/CLHEP::m)*CLHEP::m;
-      
+
       G4String postvolname = "";
       G4String prevolname = NuParentTrack->GetPreStepVolumeName(ii);
       if (ii<point_no-2) postvolname = NuParentTrack->GetPreStepVolumeName(ii+1);
-      
+
           // parent created inside target
       if ((prevolname.contains("TGT")||prevolname.contains("Budal")) && ii==0){
           g4data->trkx[0] = ParentPosition[0]/CLHEP::cm;
@@ -1281,9 +1306,9 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
             g4data->trkpx[1] = ParentMomentum[0]/CLHEP::GeV;
             g4data->trkpy[1] = ParentMomentum[1]/CLHEP::GeV;
             g4data->trkpz[1] = ParentMomentum[2]/CLHEP::GeV;
-//	    std::cerr << " NumiAnalysis::FillNeutrinoNtuple filling point 1 ... " << ParentPosition << std::endl;
-	 }
-	    
+//          std::cerr << " NumiAnalysis::FillNeutrinoNtuple filling point 1 ... " << ParentPosition << std::endl;
+         }
+
           //enter horn1
       if (prevolname.contains("TGAR") && postvolname.contains("Horn1")){
           g4data->trkx[2] = ParentPosition[0]/CLHEP::cm;
@@ -1328,45 +1353,45 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
         g4data->trkpx[6] = ParentMomentum[0]/CLHEP::GeV;
         g4data->trkpy[6] = ParentMomentum[1]/CLHEP::GeV;
         g4data->trkpz[6] = ParentMomentum[2]/CLHEP::GeV;}
-    
-    
-    
+
+
+
     // check if the particle passes through the neck of the horn
     // if yes then set the trk_ to +999999
     // need to make this work for arbitrary horn position!!
     //LE:
     if ((ParentPosition[2]>0.&&ParentPosition[2]<3.*CLHEP::m)&&  // horn 1 position 0-3m
-	(sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
-	(g4data->trkx[2]==-999999. || g4data->trkx[2]==999999.))
+        (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
+        (g4data->trkx[2]==-999999. || g4data->trkx[2]==999999.))
     {
-	g4data->trkx[2] = 999999.;
-	g4data->trky[2] = 999999.;
-	g4data->trkz[2] = 999999.;  
+        g4data->trkx[2] = 999999.;
+        g4data->trky[2] = 999999.;
+        g4data->trkz[2] = 999999.;
     }
     //Different Horn2 positions between LE and ME (Leo, Sept 13, 2020)
     if(!is_me){
       if ((ParentPosition[2]>10.*CLHEP::m&&ParentPosition[2]<13.*CLHEP::m)&&  //horn 2 position 10-13m
-	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
-	  (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
-	{
-	  g4data->trkx[4] = 999999.;
-	  g4data->trky[4] = 999999.;
-	  g4data->trkz[4] = 999999.;  
-	}
+          (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
+          (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
+        {
+          g4data->trkx[4] = 999999.;
+          g4data->trky[4] = 999999.;
+          g4data->trkz[4] = 999999.;
+        }
     }
     //ME
     else if(is_me){
       if ((ParentPosition[2]>19.*CLHEP::m&&ParentPosition[2]<22.*CLHEP::m)&&  //horn 2 position 19-22m
-	  (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
-	  (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
-	{
-	  g4data->trkx[4] = 999999.;
-	  g4data->trky[4] = 999999.;
-	  g4data->trkz[4] = 999999.;  
-	}
-    } 
+          (sqrt(ParentPosition[0]*ParentPosition[0]+ParentPosition[1]*ParentPosition[1])<5.*CLHEP::cm)&&
+          (g4data->trkx[4]==-999999. || g4data->trkx[4]==999999.))
+        {
+          g4data->trkx[4] = 999999.;
+          g4data->trky[4] = 999999.;
+          g4data->trkz[4] = 999999.;
+        }
+    }
   }
-  
+
   ParentMomentum = NuParentTrack->GetMomentum(point_no-1);
   ParentPosition = (NuParentTrack->GetPoint(point_no-1)->GetPosition()/CLHEP::m)*CLHEP::m;
   g4data->trkx[7] = ParentPosition[0]/CLHEP::cm;
@@ -1407,7 +1432,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       g4data->fvol[index] = "NotDefined";
   }
 
-  
+
       // Save neutrino history to the ntuple. If the depth of the history is more than the
       // allocated memory in the arrays, then the variable 'overflow' will be set to 'TRUE'.
       // Entries with overflow set to true should be excluded from analysis. Currently at
@@ -1451,13 +1476,13 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       //Searching for the index of the hadron that the target:
       //This is saved later in dk2nu:
       if(g4data->trackId[index] == tar_trackId){
-	idx_tar_in_chain = int(index); 
+        idx_tar_in_chain = int(index);
       }
 
   }
 
-  //For now, I write it by hand but I need to figure out how to do it automatically 
-  //this values were extracted from NumiMaterials and checking the volumes definition 
+  //For now, I write it by hand but I need to figure out how to do it automatically
+  //this values were extracted from NumiMaterials and checking the volumes definition
   //of IC, DPIP and DVOL. the fact_X is mass number over density ( gr/mole / g /cm3 )
   //and looking at parent(0), grand-parent(1), great-gran-parent(2)
   // (Leo Aliaga. Feb18, 2015)
@@ -1465,19 +1490,19 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   const int Nanc = NumiData->nGenAbs;
 //  std::cerr << " NumiAnalysis fill ntuple,  Nanc " << Nanc << std::endl;
 
-  G4double fact_Al = (26.98) / (2.7); 
-  G4double fact_Fe = (55.85) / (7.869990); 
-  G4double fact_He = (4.003) / (0.000145); 
+  G4double fact_Al = (26.98) / (2.7);
+  G4double fact_Fe = (55.85) / (7.869990);
+  G4double fact_He = (4.003) / (0.000145);
   G4double dist_IC1[3];
   G4double dist_IC2[3];
   G4double dist_DPIP[3];
   G4double dist_DVOL[3];
-  
+
   if (Nanc > 3) {
     std::cerr << " NumiAnalysis::FillNeutrinoNtuple, Nanc greter than 3, Overwrite!... Quit here " << std::endl;
     exit(2);
   }
-  
+
   //initializing:
   for(int ii=0; ii<Nanc;ii++){
     dist_IC1[ii]  = -1.0*fact_Al;
@@ -1486,42 +1511,42 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     dist_DVOL[ii] = -1.0*fact_He;
   }
   //Getting values:
-  NumiTrajectory* tmp_traj; 
+  NumiTrajectory* tmp_traj;
   for(int ii=0;ii<Nanc;ii++){
     if(history.size()<=3 && ii==2)continue;
     tmp_traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(history.size()-(ii+2)));
-    //If the Horn1 is alternate (See doc 10573), the name convention of the Horn1 IC volumes changes. 
-    //Ths part of the code checks if the horn1 is alternate. If not, it assumes it is the nominal (Horn 1 
-    //model we used in g4numi v5). 
+    //If the Horn1 is alternate (See doc 10573), the name convention of the Horn1 IC volumes changes.
+    //Ths part of the code checks if the horn1 is alternate. If not, it assumes it is the nominal (Horn 1
+    //model we used in g4numi v5).
     double tmp_dist_h1 = 0;
     if( NumiData->GetHorn1IsAlternate() ){
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont0_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont1_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont2_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1IOTransCont3_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect0WeldUpstr_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect0_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect1_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect2_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1UpstrSubSect1Weld0_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect0_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect1_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect2_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1ToNeckPartM0SubSect3_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1Neck_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect0_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect1_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect2_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect3_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect4_P");
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1SubSect5_P");
-      
+
       tmp_dist_h1 += GetDistanceInVolume(tmp_traj,"Horn1DownstrPart1Weld1_P");
     }
     else{
@@ -1531,14 +1556,14 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     dist_IC2[ii]  = GetDistanceInVolume(tmp_traj,"PHorn2IC");
     dist_DPIP[ii] = GetDistanceInVolume(tmp_traj,"DPIP");
     dist_DVOL[ii] = GetDistanceInVolume(tmp_traj,"DVOL");
-    
+
  }
 
-  
+
   /////////////////////////////////////////////////////////////////////////
   //In this approach, I am not deleting any g4data variables.
   //Just copying or accomodating values for dk2nu:
-  
+
   //For conversions:
   G4double mm2cm   = 0.1;
   G4double MeV2GeV = 0.001;
@@ -1552,14 +1577,14 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   //1) Ancestries:
 
-#ifdef USEMODGEANT4 
+#ifdef USEMODGEANT4
 
   MinervaElementInter*  ei =  MinervaElementInter::getInstance();
   std::map<G4int,G4String> ei_map =  ei->GetInfo();
   std::map<G4int,G4String>::iterator ei_it;
   std::map<G4int,G4ThreeVector> pi_map =  ei->GetP();
   std::map<G4int,G4ThreeVector>::iterator pi_it;
-  
+
 #endif
 
   std::size_t ntrajectory = history.size();
@@ -1567,22 +1592,22 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       NumiTrajectory* traj = dynamic_cast<NumiTrajectory*>(tmpHistory.at(index));
 
       bsim::Ancestor tmp_ancestor;
-      
+
       G4double startx = mm2cm*(traj->GetPoint(0)->GetPosition().x());
       G4double starty = mm2cm*(traj->GetPoint(0)->GetPosition().y());
-      G4double startz = mm2cm*(traj->GetPoint(0)->GetPosition().z());  
-      G4double localt = traj->GetTime();
+      G4double startz = mm2cm*(traj->GetPoint(0)->GetPosition().z());
+      G4double localt = traj->GetTimeStart();
       tmp_ancestor.SetStartXYZT(startx,starty,startz,localt);
-      
+
       G4double startpx = MeV2GeV*(traj->GetMomentum(0).x());
       G4double startpy = MeV2GeV*(traj->GetMomentum(0).y());
       G4double startpz = MeV2GeV*(traj->GetMomentum(0).z());
       tmp_ancestor.SetStartP(startpx,startpy,startpz);
-      
+
       tmp_ancestor.pdg = traj->GetPDGEncoding();
 
       const int lastPoint = traj->GetPointEntries()-1;
-      
+
       G4double stoppx  = MeV2GeV*(traj->GetMomentum(lastPoint).x());
       G4double stoppy  = MeV2GeV*(traj->GetMomentum(lastPoint).y());
       G4double stoppz  = MeV2GeV*(traj->GetMomentum(lastPoint).z());
@@ -1591,38 +1616,70 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       G4double pprodpx = MeV2GeV*(traj->GetParentMomentumAtThisProduction().x());
       G4double pprodpy = MeV2GeV*(traj->GetParentMomentumAtThisProduction().y());
       G4double pprodpz = MeV2GeV*(traj->GetParentMomentumAtThisProduction().z());
-      
+
       tmp_ancestor.proc    = traj->GetProcessName();
       tmp_ancestor.ivol    = traj->GetPreStepVolumeName(0);
-      tmp_ancestor.imat    = "NotFillYet";      
-      G4int elemID = 0;     
+      tmp_ancestor.imat    = "NotFillYet";
+      G4int elemID = 0;
 
-      tmp_ancestor.polx = 0.0;
-      tmp_ancestor.poly = 0.0;
-      tmp_ancestor.polz = 0.0;
+      const G4ThreeVector pol = traj->GetPolarization();
+      tmp_ancestor.polx = pol.x();
+      tmp_ancestor.poly = pol.y();
+      tmp_ancestor.polz = pol.z();
 
-#ifdef USEMODGEANT4 
-      
+
+#ifdef USEMODGEANT4
+
       //filling inter. elem. and momuntum info:
       ei_it = ei_map.find(traj->GetTrackID());
-      pi_it = pi_map.find(traj->GetTrackID());     
-      
+      pi_it = pi_map.find(traj->GetTrackID());
+
       if(ei_it != ei_map.end()){
-	elemID = GetNucleus(ei_it->second);
-	// if(elemID == 0) G4cout<< "NO FOUND IN THE TABLE "<< ei_it->second << G4endl;
+        elemID = GetNucleus(ei_it->second);
+        // if(elemID == 0) G4cout<< "NO FOUND IN THE TABLE "<< ei_it->second << G4endl;
       }
       else{
-	//the final neutrino does not interact:
-	elemID = 0;
+        //the final neutrino does not interact:
+        elemID = 0;
       }
-      
+
       if(pi_it != pi_map.end()){
-	G4ThreeVector mom_inter = pi_it->second;
-	pprodpx  = mom_inter.x()CLHEP::*meV2GeV;
-	pprodpy  = mom_inter.y()CLHEP::*meV2GeV;
-	pprodpz  = mom_inter.z()CLHEP::*meV2GeV;
-      } 
-      
+        G4ThreeVector mom_inter = pi_it->second;
+        pprodpx  = mom_inter.x()CLHEP::*meV2GeV;
+        pprodpy  = mom_inter.y()CLHEP::*meV2GeV;
+        pprodpz  = mom_inter.z()CLHEP::*meV2GeV;
+      }
+
+#else
+      elemID = traj->GetPDGNucleus();
+
+      G4ThreeVector pprodp = traj->GetParentMomentumAtThisProduction();
+      if ( pprodp.z() == 0 ) {
+
+        //// amit bashyal 2021-11-17 "fix"????
+        //G4int np = traj->GetPointEntries();
+        //if (traj->GetMomentum(np-2)[2] > 1e-100 ) pprodp = traj->GetMomentum(np-2);
+        //else {
+        //  G4ThreeVector pLast = traj->GetMomentum(np-1);
+        //  pprodp = pLast;
+        //}
+
+        // alternative to amit's "fix"
+        // ParentMomentumAtThisProductions z was exactly zero
+        // ... look for a non-zero case of GetMomentum
+        // starting at the end, and moving backwards
+        G4int np = traj->GetPointEntries();
+        G4int ip;
+        for (ip=np-1; ip>=0; --ip) {
+          pprodp = traj->GetMomentum(ip);
+          if ( pprodp.z() > 1e-100 ) break;
+        }
+
+      }
+      pprodpx = MeV2GeV*pprodp.x();
+      pprodpy = MeV2GeV*pprodp.y();
+      pprodpz = MeV2GeV*pprodp.z();
+
 #endif
 
       tmp_ancestor.nucleus = elemID;
@@ -1633,7 +1690,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   /////
 
   //2) TGT Exit:
-  
+
   this_tgtexit.tvx = g4data->tvx;
   this_tgtexit.tvy = g4data->tvy;
   this_tgtexit.tvz = g4data->tvz;
@@ -1648,8 +1705,8 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   //-) Storing the index of tar
   vec_int.push_back(idx_tar_in_chain);
 
-  //-) We need to see how to do it better. We already store the playlsit in the meta tree 
-  // but GENIE is not propagating dkmeta (just dk2nu) and then this playlist ID is going 
+  //-) We need to see how to do it better. We already store the playlsit in the meta tree
+  // but GENIE is not propagating dkmeta (just dk2nu) and then this playlist ID is going
   // to know the playlist used.
   G4String playlist  = NumiData->GetPlaylist();
   int plID = -1;
@@ -1668,7 +1725,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   if(playlist=="minerva12") plID = 12;
   if(playlist=="minerva13") plID = 13;
   vec_int.push_back(plID);
-  
+
   //2.2)Storing the distance by density of the particle in IC:
   for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_IC1[ii]/fact_Al);
   for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_IC2[ii]/fact_Al);
@@ -1676,7 +1733,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   for(int ii=0;ii<Nanc;ii++)vec_dbl.push_back(dist_DVOL[ii]/fact_He);
 
   /////
-  
+
 
   //3) Trajectories (ray tracing):
   for (G4int ii=0; ii<10; ++ii){
@@ -1707,7 +1764,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   this_decay.ppenergy = g4data->ppenergy;
   this_decay.ppmedium = int(g4data->ppmedium);
   this_decay.ptype    = NuParentTrack->GetPDGEncoding();
-  this_decay.muparpx  = g4data->muparpx;  
+  this_decay.muparpx  = g4data->muparpx;
   this_decay.muparpy  = g4data->muparpy;
   this_decay.muparpz  = g4data->muparpz;
   this_decay.mupare   = g4data->mupare;
@@ -1724,11 +1781,11 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   G4double RdecE  = track.GetTotalEnergy()/CLHEP::GeV;
   bsim::NuRay tmp_nuray_random(RdecPx,RdecPy,RdecPz,RdecE,1.0);
   vec_nuray.push_back(tmp_nuray_random);
-  
+
   //calculating again...
   //I will optimize this.
 
-  //for near detectors: 
+  //for near detectors:
   for(G4int ii=0; ii<NumiData->nNear; ++ii){
     NumiNuWeight nuwgh;
     G4double nu_wght;
@@ -1740,32 +1797,32 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
     nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
     G4double mom_nu[3];
     double rad = sqrt((r_det[0]- g4data->Vx)*(r_det[0]- g4data->Vx) +
-		      (r_det[1]- g4data->Vy)*(r_det[1]- g4data->Vy) +
-		      (r_det[2]- g4data->Vz)*(r_det[2]- g4data->Vz));
+                      (r_det[1]- g4data->Vy)*(r_det[1]- g4data->Vy) +
+                      (r_det[2]- g4data->Vz)*(r_det[2]- g4data->Vz));
     mom_nu[0] = (r_det[0]- g4data->Vx) * nu_energy / rad;
     mom_nu[1] = (r_det[1]- g4data->Vy) * nu_energy / rad;
     mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
     bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
     vec_nuray.push_back(tmp_nuray);
-    if ((energyBinSimpleHistoMinerva > 0.) && 
+    if ((energyBinSimpleHistoMinerva > 0.) &&
         (ii == 1) && (nu_energy > 0.)) { // 2nd detector is centered on axis. We
       size_t iBin = nu_energy/energyBinSimpleHistoMinerva;
       if ((iBin < MinervaNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
         MinervaNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
       if ((iBin < MinervaNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
         MinervaNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
-    }	 	      
-    if ((energyBinSimpleHistoMinerva > 0.) && 
-        (ii == 2) && (nu_energy > 0.)) { // Nova Near Detector off axis.. 
+    }
+    if ((energyBinSimpleHistoMinerva > 0.) &&
+        (ii == 2) && (nu_energy > 0.)) { // Nova Near Detector off axis..
       size_t iBin = nu_energy/energyBinSimpleHistoMinerva;
       if ((iBin < NovaNearNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
         NovaNearNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
       if ((iBin < NovaNearNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
         NovaNearNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
-    }	 	      
+    }
   }
-  //for far detectors: 
-  for(G4int ii=0; ii<NumiData->nFar; ++ii){      
+  //for far detectors:
+  for(G4int ii=0; ii<NumiData->nFar; ++ii){
       NumiNuWeight nuwgh;
       G4double nu_wght;
       G4double nu_energy;
@@ -1775,22 +1832,22 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       r_det.push_back(NumiData->zdet_far[ii]/CLHEP::cm);
       nuwgh.GetWeight(g4data, r_det,nu_wght,nu_energy);
       double rad = sqrt((r_det[0]- g4data->Vx)*(r_det[0]- g4data->Vx) +
-			(r_det[1]- g4data->Vy)*(r_det[1]- g4data->Vy) +
-			(r_det[2]- g4data->Vz)*(r_det[2]- g4data->Vz));
+                        (r_det[1]- g4data->Vy)*(r_det[1]- g4data->Vy) +
+                        (r_det[2]- g4data->Vz)*(r_det[2]- g4data->Vz));
       G4double mom_nu[3];
       mom_nu[0] = (r_det[0]- g4data->Vx) * nu_energy / rad;
       mom_nu[1] = (r_det[1]- g4data->Vy) * nu_energy / rad;
       mom_nu[2] = (r_det[2]- g4data->Vz) * nu_energy / rad;
       bsim::NuRay tmp_nuray(mom_nu[0],mom_nu[1],mom_nu[2],nu_energy,nu_wght);
-      vec_nuray.push_back(tmp_nuray);      
-      if ((energyBinSimpleHistoMinerva > 0.) && 
-          (ii == 1) && (nu_energy > 0.)) { // Nova Near Detector off axis.. 
+      vec_nuray.push_back(tmp_nuray);
+      if ((energyBinSimpleHistoMinerva > 0.) &&
+          (ii == 1) && (nu_energy > 0.)) { // Nova Near Detector off axis..
         size_t iBin = nu_energy/0.1;
         if ((iBin < NovaFarNuMuHisto.size()) &&  (particleType->GetPDGEncoding() == 14))
           NovaFarNuMuHisto[iBin] += nu_wght*g4data->Nimpwt;
         if ((iBin < NovaFarNuMuBarHisto.size()) &&  (particleType->GetPDGEncoding() == -14))
           NovaFarNuMuBarHisto[iBin] += nu_wght*g4data->Nimpwt;
-      }	 	      
+      }
   }
   ////
   //6) Others:
@@ -1803,7 +1860,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
   int valjob;
   buffer >> valjob;
   this_dk2nu->job = valjob;
-  
+
   this_dk2nu->potnum = g4data->evtno;
   this_dk2nu->ppvx = g4data->ppvx;
   this_dk2nu->ppvy = g4data->ppvy;
@@ -1820,10 +1877,10 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 
   /////////////////////////////////////////////////////////////////////////
 
-  
-  tree->Fill();  
-  
-  
+
+  tree->Fill();
+
+
       // Write to file
   if (NumiData->createASCII)
   {
@@ -1831,11 +1888,11 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
       if(asciiFile.is_open())
       {
           asciiFile << g4data->Ntype<< " " << g4data->Nenergy << " " << g4data->NenergyN[0] << " " << g4data->NWtNear[0];
-          asciiFile << " " << g4data->NenergyF[0] << " " << g4data->NWtFar[0] <<" "<<g4data->Nimpwt<< G4endl; 
+          asciiFile << " " << g4data->NenergyF[0] << " " << g4data->NWtFar[0] <<" "<<g4data->Nimpwt<< G4endl;
           asciiFile.close();
       }
   }
-  
+
 
 }
 
@@ -1843,7 +1900,7 @@ void NumiAnalysis::FillNeutrinoNtuple(const G4Track& track, const std::vector<G4
 void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
 
   if (!NumiData->createBXDRAW) return;
-  // Based on Fortran code in mgdraw.f in *_fluka/for/ 
+  // Based on Fortran code in mgdraw.f in *_fluka/for/
   G4int JTRACK, LTRACK;
   G4int TMREG, TNEWREG;
   G4int NCASE;
@@ -1855,13 +1912,13 @@ void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
   G4Track * theTrack = aStep->GetTrack();
   G4StepPoint* startPoint = aStep->GetPreStepPoint();
   G4StepPoint* endPoint = aStep->GetPostStepPoint();
-  
-  
+
+
   G4VPhysicalVolume *Start = startPoint->GetPhysicalVolume();
   G4VPhysicalVolume *End   = endPoint->GetPhysicalVolume();
 
   if (!End || !Start) // Left simulated region
-	return;
+        return;
 
   G4String StartName = Start->GetName();
   G4String EndName   = End->GetName();
@@ -1869,67 +1926,67 @@ void NumiAnalysis::FillBXDRAW(const G4Step* aStep) {
   TMREG = 0;
   TNEWREG = 0;
   WTRACK = theTrack->GetWeight();
-  
+
   if (StartName.contains("Horn1Box"))
-	TMREG = 1;             // Horn 1
+        TMREG = 1;             // Horn 1
   else if (StartName.contains("Horn2Box"))
-	TMREG = 2;             // Horn 2
-  else if (StartName.contains("DVOL") ) 
-	TMREG = 3;             // Decay Pipe - DVOL only
-  
+        TMREG = 2;             // Horn 2
+  else if (StartName.contains("DVOL") )
+        TMREG = 3;             // Decay Pipe - DVOL only
+
   if (EndName.contains("Horn1Box"))
-	TNEWREG = 1;             // Horn 1
+        TNEWREG = 1;             // Horn 1
   else if (EndName.contains("Horn2Box"))
-	TNEWREG = 2;             // Horn 2
-  else if (EndName.contains("DVOL") ) 
+        TNEWREG = 2;             // Horn 2
+  else if (EndName.contains("DVOL") )
         TNEWREG = 3;             // Decay Pipe - DVOL only
 
   ZSCO = theTrack->GetPosition().z()/CLHEP::cm;
 
-  if ( TMREG != TNEWREG )  {                 // Change Regions 
-	if ( TMREG == 1 || TMREG == 2 ||       // Exit horns
-		 (ZSCO > 4569  && ZSCO < 4571) || // Enter Decay Pipe
-		 (ZSCO > 72237 && ZSCO < 72238)   // Exit Decay Pipe
+  if ( TMREG != TNEWREG )  {                 // Change Regions
+        if ( TMREG == 1 || TMREG == 2 ||       // Exit horns
+                 (ZSCO > 4569  && ZSCO < 4571) || // Enter Decay Pipe
+                 (ZSCO > 72237 && ZSCO < 72238)   // Exit Decay Pipe
          ) {
-	  
-	  ETRACK = theTrack->GetTotalEnergy()/CLHEP::GeV;
-	  G4ParticleDefinition * particleType = theTrack->GetDefinition();
-	  JTRACK = code[particleType->GetPDGEncoding()];
-	  if (JTRACK == 8 || JTRACK == 9)
-		return;
-	  if (ETRACK > 0.5 ) { // 0.5 GeV Cut off
-		NumiTrackInformation* info=(NumiTrackInformation*)(theTrack->GetUserInformation());
-		if (info) {
-		  LTRACK = info->GetTgen();
-		}
-		else { 
-		  LTRACK = 0; 
-		}
-		
-		NCASE = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-		
-		AM = particleType->GetPDGMass()/CLHEP::GeV;
-		
-		XSCO = theTrack->GetPosition().x()/CLHEP::cm;
-		YSCO = theTrack->GetPosition().y()/CLHEP::cm;
-		
-		RSCO = sqrt(XSCO*XSCO + YSCO*YSCO);
-		
-		CXTRCK = theTrack->GetMomentumDirection().x();
-		CYTRCK = theTrack->GetMomentumDirection().y();
-		CZTRCK = theTrack->GetMomentumDirection().z();
+
+          ETRACK = theTrack->GetTotalEnergy()/CLHEP::GeV;
+          G4ParticleDefinition * particleType = theTrack->GetDefinition();
+          JTRACK = code[particleType->GetPDGEncoding()];
+          if (JTRACK == 8 || JTRACK == 9)
+                return;
+          if (ETRACK > 0.5 ) { // 0.5 GeV Cut off
+                NumiTrackInformation* info=(NumiTrackInformation*)(theTrack->GetUserInformation());
+                if (info) {
+                  LTRACK = info->GetTgen();
+                }
+                else {
+                  LTRACK = 0;
+                }
+
+                NCASE = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+
+                AM = particleType->GetPDGMass()/CLHEP::GeV;
+
+                XSCO = theTrack->GetPosition().x()/CLHEP::cm;
+                YSCO = theTrack->GetPosition().y()/CLHEP::cm;
+
+                RSCO = sqrt(XSCO*XSCO + YSCO*YSCO);
+
+                CXTRCK = theTrack->GetMomentumDirection().x();
+                CYTRCK = theTrack->GetMomentumDirection().y();
+                CZTRCK = theTrack->GetMomentumDirection().z();
 
 
-		std::ofstream bxdrawFile(bxdrawFileName, std::ios::app);
-		bxdrawFile << JTRACK << "  " << TMREG  << "  " << TNEWREG<< "  "  // Code, regions
-				   << NCASE  << "  " << WTRACK << "  "                    // Event, Track Weight
-				   << LTRACK << "  " << ETRACK << "  " << AM     << "  "  // Gen, E, M
-				   << XSCO   << "  " << YSCO   << "  " << RSCO   << "  " << ZSCO << "  "  // crossing point
-				   << CXTRCK << "  " << CYTRCK << "  " << CZTRCK << "  "  // direction cosines
-				   << G4endl;
-		bxdrawFile.close();
-	  }
-	}
+                std::ofstream bxdrawFile(bxdrawFileName, std::ios::app);
+                bxdrawFile << JTRACK << "  " << TMREG  << "  " << TNEWREG<< "  "  // Code, regions
+                                   << NCASE  << "  " << WTRACK << "  "                    // Event, Track Weight
+                                   << LTRACK << "  " << ETRACK << "  " << AM     << "  "  // Gen, E, M
+                                   << XSCO   << "  " << YSCO   << "  " << RSCO   << "  " << ZSCO << "  "  // crossing point
+                                   << CXTRCK << "  " << CYTRCK << "  " << CZTRCK << "  "  // direction cosines
+                                   << G4endl;
+                bxdrawFile.close();
+          }
+        }
   }
 }
 
@@ -1938,19 +1995,19 @@ NumiTrajectory* NumiAnalysis::GetParentTrajectory(G4int parentID)
 {
 
    if(NumiData->GetDebugLevel() == 10) { G4cout << "NumiAnalysis::GetParentTrajectory() called." << G4endl;}
-      
-  G4TrajectoryContainer* container = 
+
+  G4TrajectoryContainer* container =
     G4RunManager::GetRunManager()->GetCurrentEvent()->GetTrajectoryContainer();
   if(container==0) return 0;
 
   TrajectoryVector* vect = container->GetVector();
   G4VTrajectory* tr;
-  G4int ii = 0; 
-  while (ii<G4int(vect->size())){  
-    tr = (*vect)[ii]; 
-    NumiTrajectory* tr1 = (NumiTrajectory*)(tr);  
-    if(tr1->GetTrackID() == parentID) return tr1; 
-    ++ii; 
+  G4int ii = 0;
+  while (ii<G4int(vect->size())){
+    tr = (*vect)[ii];
+    NumiTrajectory* tr1 = (NumiTrajectory*)(tr);
+    if(tr1->GetTrackID() == parentID) return tr1;
+    ++ii;
   }
 
   return 0;
@@ -2009,7 +2066,7 @@ void NumiAnalysis::WriteZpNtuple(){//Jasmine added
     g4zpdata->ptypeatz=-10;
     g4zpdata->pidtype=-10;
     g4zpdata->run=-100;
-    g4zpdata->evtno=-100;  
+    g4zpdata->evtno=-100;
 }
 
 //------------------------------------------------------------------------------------
@@ -2018,7 +2075,7 @@ void NumiAnalysis::FillTarNtuple(const G4Track& track)
   if(!NumiData->createTarNtuple) return ;
 
   G4RunManager* pRunManager = G4RunManager::GetRunManager();
- 
+
     G4ParticleDefinition* particleDefinition = track.GetDefinition();
 
     NumiTrackInformation* info = (NumiTrackInformation*)(track.GetUserInformation());
@@ -2051,17 +2108,17 @@ void NumiAnalysis::WriteTarNtuple(){//Melissa added
     g4tardata->tpz=-10000;
     g4tardata->tptype=-10;
     g4tardata->run=-100;
-    g4tardata->evtno=-100;  
+    g4tardata->evtno=-100;
 }
 
 //----------------------------
 G4int NumiAnalysis::GetNucleus(G4String nucl_name){
-  
+
   //The new dk2nu store the nucleus element as integer.
-  //We have the element name from our custumized geant4. 
+  //We have the element name from our custumized geant4.
   //Form now, I created this map will all elements in g4numi:
   //I am contructing the pdg code based on the convention:
-  //+-10LZZZAAAI, where L is the number of s quarks, 
+  //+-10LZZZAAAI, where L is the number of s quarks,
   //I is the isomer id (both set to zero).
   G4int id = 0;
 
@@ -2086,7 +2143,7 @@ G4int NumiAnalysis::GetNucleus(G4String nucl_name){
   if(nucl_name == "Nickel")          return  1000280590;
   if(nucl_name == "Copper")          return  1000290640;
   if(nucl_name == "Gallium")         return  1000310700;
-  if(nucl_name == "Mercury")         return  1000802010; 
+  if(nucl_name == "Mercury")         return  1000802010;
   if(nucl_name == "Sodium")          return  1000110230;
   if(nucl_name == "Phospho")         return  1000150310;
   if(nucl_name == "Berylliu")        return  1000040090;
@@ -2105,17 +2162,17 @@ G4int NumiAnalysis::GetNucleus(G4String nucl_name){
 G4double NumiAnalysis::GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String wanted_vol){
   double dist_vol = 0;
   if(wanted_traj==0)return -1.;
-  
+
   G4ThreeVector ParticlePos;
   G4int npoints = GetParentTrajectory(wanted_traj->GetTrackID())->GetPointEntries();
-  
+
   G4ThreeVector tmp_ipos,tmp_fpos;
   G4ThreeVector tmp_disp;
-  
+
   G4double tmp_dist = 0.0;
   G4bool enter_vol = false;
   G4bool exit_vol  = false;
-  for(G4int ii=0; ii<npoints; ++ii){ 
+  for(G4int ii=0; ii<npoints; ++ii){
     ParticlePos = (wanted_traj->GetPoint(ii)->GetPosition()/CLHEP::m)*CLHEP::m;
     G4String postvol = "";
     G4String prevol  = wanted_traj->GetPreStepVolumeName(ii);
@@ -2123,7 +2180,7 @@ G4double NumiAnalysis::GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String
 
     G4bool vol_in  = ( (prevol != wanted_vol) && (postvol == wanted_vol) ) || ( ii==0 && prevol== wanted_vol);
     G4bool vol_out = (prevol == wanted_vol) && (postvol != wanted_vol);
-    if(vol_in){	
+    if(vol_in){
       enter_vol = true;
       exit_vol  = false;
       tmp_ipos = G4ThreeVector(ParticlePos[0]/CLHEP::cm,ParticlePos[1]/CLHEP::cm,ParticlePos[2]/CLHEP::cm);
@@ -2147,5 +2204,5 @@ G4double NumiAnalysis::GetDistanceInVolume(NumiTrajectory* wanted_traj, G4String
   }
 
   return dist_vol;
-  
+
 }
