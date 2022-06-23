@@ -647,7 +647,7 @@ void NumiDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
    
    if ( command == UpdateCmd ) {
 #ifndef FLUGG
-      std::cerr << " Updating the geometry, i.e., calling NimuDetector construction again.. " << std::endl;
+      std::cerr << " Updating the geometry, i.e., calling NumiDetector construction again.. " << std::endl;
       NumiDetector->UpdateGeometry();
 #endif
    }
