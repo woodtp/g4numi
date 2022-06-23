@@ -1,4 +1,3 @@
-
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 #include "G4UIterminal.hh"
@@ -17,8 +16,10 @@
 #include "NumiDetectorConstruction.hh"
 
 // Interaction Physics Lists
-
-#include "FTFP_BERT.hh"
+//#include "FTFP_BERT.hh"
+#include "G4PhysListFactoryAlt.hh"
+#include "G4PhysListRegistry.hh"
+#include "G4PhysicsConstructorFactory.hh"
 
 #include "NumiPrimaryGeneratorAction.hh"
 #include "NumiEventAction.hh"
@@ -35,17 +36,100 @@
 #endif
 
 
+//---------------------------------------------------------------------------
+namespace {
+
+  void PrintAvailablePhysicsListsDetails(G4int verbosity) {
+    G4cout << G4endl;
+    G4cout << "extensibleFactory: here are the available physics lists:"
+           << G4endl;
+    g4alt::G4PhysListFactory factory;
+    factory.PrintAvailablePhysLists();
+
+    // if user asked for extra verbosity then print physics ctors as well
+    if ( verbosity > 1 ) {
+      G4cout << G4endl;
+      G4cout << "extensibleFactory: "
+             << "here are the available physics ctors that can be added:"
+             << G4endl;
+      G4PhysicsConstructorRegistry* g4pctorFactory =
+        G4PhysicsConstructorRegistry::Instance();
+      g4pctorFactory->PrintAvailablePhysicsConstructors();
+    }
+  }
+}
+//---------------------------------------------------------------------------
+
 
 int main(int argc,char** argv)
 {
+
   // Construct the default run manager
   G4RunManager* runManager = new NumiRunManager();
 
   // set mandatory initialization classes
   runManager->SetUserInitialization(new NumiDetectorConstruction);
 
+  NumiDataInput* numiData = NumiDataInput::GetNumiDataInput();
+
   // Initialize Physics Lists
-  FTFP_BERT* physicsList = new FTFP_BERT;
+  //FTFP_BERT* physicsList = new FTFP_BERT;
+  g4alt::G4PhysListFactory plFactory;
+
+  G4String defaultPhysListName = "FTFP_BERT";
+  plFactory.SetDefaultReferencePhysList(defaultPhysListName);
+
+  // set a short name for G4RadioactiveDecayPhysics
+  G4PhysListRegistry* plreg = G4PhysListRegistry::Instance();
+  plreg->AddPhysicsExtension("RADIO","G4RadioactiveDecayPhysics");
+
+  G4String physListName = ""; // numiData->GetPhysicsListName();
+  if ( argv[2] ) physListName = G4String(argv[2]);
+  char*    physListNameEnv = 0;
+  G4VModularPhysicsList* physicsList = nullptr;
+
+  // Get Reference PhysicsList via its name, or if none given
+  //    from environment variable $PHYSLIST, with fall back to a default
+  if ( physListName.size() ) {
+    G4cout << "g4numi: explicitly using '"
+             << physListName << "'" << G4endl;
+    physicsList = plFactory.GetReferencePhysList(physListName);
+  } else {
+    G4cout << "g4numi: no explicit setting;"
+           << " using ReferencePhysList() ($PHYSLIST or default)" << G4endl;
+    physicsList = plFactory.ReferencePhysList();
+
+    if ( ! physicsList ) {
+      // failed?  get what the user set, but we couldn't find
+      physListNameEnv = getenv("PHYSLIST");
+      if ( physListNameEnv ) {
+        G4cout << "g4numi: $PHYSLIST="
+               << physListNameEnv << G4endl;
+      }
+    }
+
+  }
+
+  // deal with failure to get what the user wanted
+  // print what they _could_ use
+  if ( ! physicsList ) {
+    G4cerr << "g4numi: PhysicsList '"
+           << ( physListNameEnv ? physListNameEnv : physListName )
+           << "' was not available in g4alt::PhysListFactory." << G4endl;
+    PrintAvailablePhysicsListsDetails(2);
+
+    // if we can't get what the user asked for...
+    //    don't go on to use something else, that's confusing
+    G4ExceptionDescription ED;
+    ED << "The factory for the physicslist ["
+       << ( physListNameEnv ? physListNameEnv : physListName )
+       << "] does not exist!"
+       << G4endl;
+    G4Exception("g4numi",
+                "g4numi001", FatalException, ED);
+    exit(42);
+  }
+
   runManager->SetUserInitialization(physicsList);
 
 #ifdef G4VIS_USE
@@ -67,43 +151,41 @@ int main(int argc,char** argv)
   // Initialize G4 kernel
   runManager->Initialize();
 
-  
   {
-     G4ProcessManager * pManager = 0; 
+     G4ProcessManager * pManager = 0;
      pManager = G4Electron::Electron()->GetProcessManager();
      if(!pManager) G4cout << "g4numi::main() - Can't get a valid Electron process manager" << G4endl;
-     
+
      //pManager->AddProcess(new NumieIonisation,        -1, 4, -1);
-     
+
   }
   {
      G4ProcessManager * pManager = 0;
      pManager = G4Positron::Positron()->GetProcessManager();
      if(!pManager) G4cout << "g4numi::main() - Can't get a valid Positron process manager" << G4endl;
-     
+
      //pManager->AddProcess(new NumieIonisation,        -1, 4, -1);
   }
   {
      G4ProcessManager * pManager = 0;
      pManager  = G4MuonPlus::MuonPlus()->GetProcessManager();
      if(!pManager) G4cout << "g4numi::main() - Can't get a valid MuPlus process manager" << G4endl;
-     
+
      //pManager->AddProcess(new NumiMuIonisation,       -1, 5, -1);
-     
+
   }
   {
      G4ProcessManager * pManager = 0;
      pManager  = G4MuonMinus::MuonMinus()->GetProcessManager();
      if(!pManager) G4cout << "g4numi::main() - Can't get a valid MuMinus process manager" << G4endl;
-     
+
      //pManager->AddProcess(new NumiMuIonisation,       -1, 5, -1);
-    
-               
+
+
   }
 
   // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
-
 
  // ---> April 2006. D.Jaffe modifications to set K0L,K+,K- branching fractions
 
@@ -114,7 +196,7 @@ int main(int argc,char** argv)
   // KTeV PRL 93, 181802. PR D70 092006
   // KLOE hep-ex/0408027, PL B632 (2006) 43
   // NA48 PL B602 (2004) 41
-  
+
   // K+ branching fractions from PDG2005 update and section 3.2.1 of  hep-ex/0512039
   // for average Ke3 from BNL E865 (PRL 91, 261802) and NA48.
   // B(Ke3) = 5.14+-0.06 %  hep-ex/0512039
@@ -123,7 +205,7 @@ int main(int argc,char** argv)
   G4cout<<G4endl;
   G4cout << "Setting correct branching fractions and form factors for "
          << "K0L, K+ and K- decays (MINOS-doc-1786)"<<G4endl;
-  
+
   UI->ApplyCommand("/particle/select kaon0L");           // ----------- K0L
   UI->ApplyCommand("/particle/property/decay/select 0"); //3pi0
   UI->ApplyCommand("/particle/property/decay/br 19.72e-2");
@@ -165,9 +247,9 @@ int main(int argc,char** argv)
   UI->ApplyCommand("/particle/property/decay/br 3.30e-2");
   UI->ApplyCommand("/particle/property/decay/select 5"); //pi0,pi0,pi
   UI->ApplyCommand("/particle/property/decay/br 1.757e-2");
-  // <--- end of djaffe april06 additions						   
+  // <--- end of djaffe april06 additions
 
-  // ---> April 2006. Adding Davids modifications here instead of changing 
+  // ---> April 2006. Adding Davids modifications here instead of changing
   // G4KL3DecayChannel.cc
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleTable::G4PTblDicIterator *ptiter=particleTable->GetIterator();
@@ -185,106 +267,106 @@ int main(int argc,char** argv)
   while ((*ptiter)()){
     G4ParticleDefinition *particle = ptiter->value();
     if (particle==G4KaonPlus::KaonPlusDefinition()||
-	particle==G4KaonMinus::KaonMinusDefinition()){
+        particle==G4KaonMinus::KaonMinusDefinition()){
       G4DecayTable *decayTable=particle->GetDecayTable();
       for (G4int ii=0; ii<decayTable->entries(); ++ii){
-	if (decayTable->GetDecayChannel(ii)->GetKinematicsName()=="KL3 Decay"){
-	  G4KL3DecayChannel *decayChannel=(G4KL3DecayChannel *)decayTable->GetDecayChannel(ii);
+        if (decayTable->GetDecayChannel(ii)->GetKinematicsName()=="KL3 Decay"){
+          G4KL3DecayChannel *decayChannel=(G4KL3DecayChannel *)decayTable->GetDecayChannel(ii);
 
-	  //G4cout<<particle->GetParticleName();
-	  for (G4int jj=0; jj<decayChannel->GetNumberOfDaughters();++jj){
-	    //   if (jj==0) G4cout << " -> ";
-	    //   else G4cout << " + ";
-	    //   G4cout<<decayChannel->GetDaughter(jj)->GetParticleName();
-	    if (decayChannel->GetDaughter(jj)==G4Positron::PositronDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_kp;
-	    }
-	    if (decayChannel->GetDaughter(jj)==G4Electron::ElectronDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_kp;
-	    }
-	    if (decayChannel->GetDaughter(jj)==G4MuonPlus::MuonPlusDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_kp;
-	    }
-	    if (decayChannel->GetDaughter(jj)==G4MuonMinus::MuonMinusDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_kp;
-	    }
-	  }//loop over daughters
-	  // G4cout<<"\t \t" << decayChannel->GetDalitzParameterLambda() << " -> " << pLambda<< "  "
-	  //	<<"\t"<< decayChannel->GetDalitzParameterXi() << " -> " << pXi0 <<G4endl ;
-	  decayChannel->SetDalitzParameter(pLambda,pXi0);
-	}//check if its KL3 Decay
+          //G4cout<<particle->GetParticleName();
+          for (G4int jj=0; jj<decayChannel->GetNumberOfDaughters();++jj){
+            //   if (jj==0) G4cout << " -> ";
+            //   else G4cout << " + ";
+            //   G4cout<<decayChannel->GetDaughter(jj)->GetParticleName();
+            if (decayChannel->GetDaughter(jj)==G4Positron::PositronDefinition()){
+              pLambda=lamp;
+              pXi0=xi_kp;
+            }
+            if (decayChannel->GetDaughter(jj)==G4Electron::ElectronDefinition()){
+              pLambda=lamp;
+              pXi0=xi_kp;
+            }
+            if (decayChannel->GetDaughter(jj)==G4MuonPlus::MuonPlusDefinition()){
+              pLambda=lamp;
+              pXi0=xi_kp;
+            }
+            if (decayChannel->GetDaughter(jj)==G4MuonMinus::MuonMinusDefinition()){
+              pLambda=lamp;
+              pXi0=xi_kp;
+            }
+          }//loop over daughters
+          // G4cout<<"\t \t" << decayChannel->GetDalitzParameterLambda() << " -> " << pLambda<< "  "
+          //	<<"\t"<< decayChannel->GetDalitzParameterXi() << " -> " << pXi0 <<G4endl ;
+          decayChannel->SetDalitzParameter(pLambda,pXi0);
+        }//check if its KL3 Decay
       }//loop over decay channels
     }
     if (particle==G4KaonZeroLong::KaonZeroLongDefinition()){
       G4DecayTable *decayTable=particle->GetDecayTable();
       for (G4int ii=0; ii<decayTable->entries(); ++ii){
-	if (decayTable->GetDecayChannel(ii)->GetKinematicsName()=="KL3 Decay"){
-	  G4KL3DecayChannel *decayChannel=(G4KL3DecayChannel *)decayTable->GetDecayChannel(ii);
-	  //	  G4cout<<particle->GetParticleName();
-	  for (G4int jj=0; jj<decayChannel->GetNumberOfDaughters();++jj){
-	    // if (jj==0) G4cout << " -> ";
-	    // else G4cout << " + ";
-	    // G4cout<<decayChannel->GetDaughter(jj)->GetParticleName();
-	    if (decayChannel->GetDaughter(jj)==G4Positron::PositronDefinition()||
-		decayChannel->GetDaughter(jj)==G4Electron::ElectronDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_k0;
-	    }
-	    if (decayChannel->GetDaughter(jj)==G4MuonPlus::MuonPlusDefinition()||
-		decayChannel->GetDaughter(jj)==G4MuonMinus::MuonMinusDefinition()){
-	      pLambda=lamp;
-	      pXi0=xi_k0;
-	    }
-	  }//loop over daughters
-	  //	  G4cout<<"\t \t" << decayChannel->GetDalitzParameterLambda() << " -> " << pLambda<< "  "
-	  //	<<"\t"<< decayChannel->GetDalitzParameterXi() << " -> " << pXi0 <<G4endl ;
+        if (decayTable->GetDecayChannel(ii)->GetKinematicsName()=="KL3 Decay"){
+          G4KL3DecayChannel *decayChannel=(G4KL3DecayChannel *)decayTable->GetDecayChannel(ii);
+          //      G4cout<<particle->GetParticleName();
+          for (G4int jj=0; jj<decayChannel->GetNumberOfDaughters();++jj){
+            // if (jj==0) G4cout << " -> ";
+            // else G4cout << " + ";
+            // G4cout<<decayChannel->GetDaughter(jj)->GetParticleName();
+            if (decayChannel->GetDaughter(jj)==G4Positron::PositronDefinition()||
+                decayChannel->GetDaughter(jj)==G4Electron::ElectronDefinition()){
+              pLambda=lamp;
+              pXi0=xi_k0;
+            }
+            if (decayChannel->GetDaughter(jj)==G4MuonPlus::MuonPlusDefinition()||
+                decayChannel->GetDaughter(jj)==G4MuonMinus::MuonMinusDefinition()){
+              pLambda=lamp;
+              pXi0=xi_k0;
+            }
+          }//loop over daughters
+          //      G4cout<<"\t \t" << decayChannel->GetDalitzParameterLambda() << " -> " << pLambda<< "  "
+          //	<<"\t"<< decayChannel->GetDalitzParameterXi() << " -> " << pXi0 <<G4endl ;
 
-	  decayChannel->SetDalitzParameter(pLambda,pXi0);
+          decayChannel->SetDalitzParameter(pLambda,pXi0);
 
-	}//check if its KL3 Decay
+        }//check if its KL3 Decay
       }
-    } 
+    }
   }//loop over particles
   // done with kaon form factors
 
- 
+
   // Setting the maximum step size to 1 cm
   G4ParticleTable* ptbl = G4ParticleTable::GetParticleTable();
   G4ParticleTable::G4PTblDicIterator* piter = ptbl->GetIterator();
-  G4StepLimiter* slim = new G4StepLimiter("StepLimiter");    
-  
+  G4StepLimiter* slim = new G4StepLimiter("StepLimiter");
+
   piter->reset();
   while ( (*piter)() ) {
     G4ParticleDefinition* pdef = piter->value();
     G4ProcessManager* pmgr = pdef->GetProcessManager();
-    
+
     // add user limit processes for steps and special cuts
-    if ( pmgr ) {      
+    if ( pmgr ) {
       pmgr->AddProcess( slim, -1, -1, 3);
     }
-  }		
-  
+  }
+
   if(argc==1)
-  // Define (G)UI terminal for interactive mode  
-  { 
+  // Define (G)UI terminal for interactive mode
+  {
     G4UIsession * session = 0;
 
     // G4UIterminal is a (dumb) terminal.
 #ifdef G4UI_USE_TCSH
-      session = new G4UIterminal(new G4UItcsh);      
+      session = new G4UIterminal(new G4UItcsh);
 #else
       session = new G4UIterminal();
-#endif    
+#endif
 
     session->SessionStart();
     delete session;
   }
   else  // Batch mode
-  { 
+  {
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     G4cout << "Executing " << command+fileName << G4endl;
@@ -300,5 +382,4 @@ int main(int argc,char** argv)
   delete runManager;
   return 0;
 }
-
 
