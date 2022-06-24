@@ -99,30 +99,31 @@ def main():
   print "\nOutput logfile(s):",logfile
 
   submit_command = ("jobsub_submit {GRID} {MEMORY} {DURATION} -N {NJOBS} " # -dG4NUMI {OUTDIR} "
-      "-G {EXPERIMENT} "
+      "-G {JOBSUB_GROUP} "
       "-e OUTDIR={OUTDIR} "
-      "-e BEAMCONFIG={BEAMCONFIG} " 
+      "-e BEAMCONFIG={BEAMCONFIG} "
       "-e PLAYLIST={PLAYLIST} "
       "-e RUN={RUN} "
       "-f {TARFILE} "
       "-f {MACFILE} "
       "-L {LOGFILE} "
       "file://{CACHE}/g4numi_job_localprod.sh".format(
-      GRID       = ("--OS=SL7 -g "
-                    "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
-                    "--role=Analysis "),
-      MEMORY     = "--memory 2000MB ", # was 200MB
-      DURATION   = "--expected-lifetime 24h ",  # didn't exist
-      NJOBS      = options.n_jobs,
-      OUTDIR     = options.outdir,
-      EXPERIMENT = os.getenv("EXPERIMENT"),
-      BEAMCONFIG = options.beamconfig,
-      PLAYLIST   = options.playlist,
-      RUN        = options.run_number,
-      TARFILE    = cache_folder + TARFILE_NAME,
-      MACFILE    = cache_folder + "g4numi.mac",
-      LOGFILE    = logfile,
-      CACHE      = cache_folder)
+      GRID         = ("--OS=SL7 -g "
+                      "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
+                      "--role=Analysis "),
+      MEMORY       = "--memory 2000MB ", # was 200MB
+      DURATION     = "--expected-lifetime 4h ",  # 500K pots takes ~ 2.5 hr
+      NJOBS        = options.n_jobs,
+      OUTDIR       = options.outdir,
+      JOBSUB_GROUP = os.getenv("JOBSUB_GROUP"),
+      EXPERIMENT   = os.getenv("EXPERIMENT"),
+      BEAMCONFIG   = options.beamconfig,
+      PLAYLIST     = options.playlist,
+      RUN          = options.run_number,
+      TARFILE      = cache_folder + TARFILE_NAME,
+      MACFILE      = cache_folder + "g4numi.mac",
+      LOGFILE      = logfile,
+      CACHE        = cache_folder)
   )
 
   #Ship it
