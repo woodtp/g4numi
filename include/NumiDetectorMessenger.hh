@@ -19,12 +19,12 @@ class NumiDetectorMessenger: public G4UImessenger {
 public:
    NumiDetectorMessenger(NumiDetectorConstruction* );
    ~NumiDetectorMessenger();
-   
+
    void SetNewValue(G4UIcommand*, G4String);
-   
+
 private:
    NumiDetectorConstruction* NumiDetector;
-   
+
    G4UIdirectory*              NumiDir;
    G4UIdirectory*              detDir;
    G4UIcmdWithAString*         TargetGasCmd;
@@ -35,7 +35,7 @@ private:
    G4UIcmdWithAnInteger*       RunPeriod;
    G4UIcmdWithAString*         BeamConfig;
    G4UIcmdWithABool*           UseCorrHornCurrent;
-   G4UIcmdWithABool*	       UseHornMisalign;
+   G4UIcmdWithABool*           UseHornMisalign;
    G4UIcmdWithABool*           UseTgtDensity;
    G4UIcmdWithAString*         AbsorberConfig;
    G4UIcmdWithAString*         Mon0AbsMatCmd;
@@ -50,7 +50,7 @@ private:
    G4UIcmdWithADoubleAndUnit*  LengthOfWaterInTgt;
    G4UIcmdWithABool*           HeInDecayPipe;
    G4UIcmdWithABool*           applyDecayPipeMagneticField;
-   //G4UIcmdWithAnInteger*     NbLayersCmd;    
+   //G4UIcmdWithAnInteger*     NbLayersCmd;
    G4UIcmdWithoutParameter*    UpdateCmd;
 
     G4UIdirectory* fBeamConfigDirectory;
@@ -58,7 +58,7 @@ private:
     G4UIcmdWithADoubleAndUnit* fTHBlockShiftCmd;
     G4UIcmdWithADoubleAndUnit* fDeltaOuterThicknessCmd;
 
-    
+
     G4UIcmdWith3VectorAndUnit* fBafflePositionCmd;
     G4UIcmdWith3VectorAndUnit* fTargetPositionCmd;
     G4UIcmdWith3VectorAndUnit* fHorn1PositionCmd;
@@ -72,7 +72,7 @@ private:
     G4UIcmdWithADoubleAndUnit* fBaffleOuterRadiusCmd;
     G4UIcmdWithADoubleAndUnit* fBaffleInnerRadiusCmd;
     G4UIcmdWithADoubleAndUnit* fBaffleLengthCmd;
-    
+
     G4UIcmdWithABool* fForcedOldTargetCmd;
 
     G4UIcmdWithADoubleAndUnit* fHornWaterLayerThick;
@@ -82,8 +82,8 @@ private:
     G4UIcmdWithADoubleAndUnit* fHorn1ExtraLayerAlum;
     G4UIcmdWithABool* fDumpBFieldPlease;
     //
-    // New Data card to study sensitivity of the ME wiggle to the 
-    // field map and target geometry 
+    // New Data card to study sensitivity of the ME wiggle to the
+    // field map and target geometry
     //
     G4UIcmdWithABool* fIgnoreCEQBr;
     G4UIcmdWithADoubleAndUnit* fHorn1FieldZCutUpstream;
@@ -94,7 +94,7 @@ private:
     G4UIcmdWithADoubleAndUnit* fHorn2CurrentEqualizerLongAbsLength;
     G4UIcmdWithADouble* fHorn2CurrentEqualizerQuadAmpl;
     G4UIcmdWithADouble* fHorn2CurrentEqualizerOctAmpl;
-    
+
     G4UIcmdWithADouble* fNovaTargetHTilt;
     G4UIcmdWithADouble* fNovaTargetVTilt;
     G4UIcmdWithADoubleAndUnit* fNovaTargetXOffset;
@@ -104,11 +104,9 @@ private:
     G4UIcmdWithABool* fUsePosLocalCoordInMagField;
     G4UIcmdWithABool* fUseRotLocalCoordInMagField;
 
-#ifdef MODERN_G4
     G4UIcmdWithAString* fGDMLOutputCmd;
     G4UIcmdWithABool*   fGDMLStoreRefCmd;
     G4bool              fGDMLStoreReferences;
-#endif
 
 };
 
