@@ -48,6 +48,9 @@ find_ups_product( geant4         v4_10_4  )
 find_ups_product( canvas_root_io v1_01_00 )
 find_ups_product( dk2nudata      v01_08_00a )
 
+# GDMLParser in G4Percistency requires access to XERCES_C headers
+find_ups_product( xerces_c )
+
 find_ups_root( root v6_00_00 )
 
 include(ArtDictionary)
@@ -86,52 +89,55 @@ cet_find_library( G4VIS_MANAGEMENT     NAMES G4vis_management    PATHS ENV GEANT
 cet_find_library( G4VISXXX             NAMES G4visXXX            PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
 cet_find_library( G4VRML               NAMES G4VRML              PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
 cet_find_library( G4ZLIM               NAMES G4zlib              PATHS ENV GEANT4_LIB NO_DEFAULT_PATH )
+# PERSISTENCY needs XERCES_C library
+cet_find_library( XERCES_C             NAMES xerces-c            PATHS ENV XERCES_C_LIB NO_DEFAULT_PATH )
 
-set( G4_LIB_LIST ${G4ANALYSIS}          
-		 ${G4DIGITS_HITS}       
-		 ${G4ERROR_PROPAGATION} 
-		 ${G4EVENT}             
-		 ${G4FR}                
-		 ${G4GEOMETRY}          
-		 ${G4GL2PS}             
-		 ${G4GLOBAL}            
-		 ${G4GMOCREN}           
-		 ${G4GRAPHICS_REPS}     
-		 ${G4INTERCOMS}         
-		 ${G4INTERFACES}        
-		 ${G4MATERIALS}         
-		 ${G4MODELING}          
-		 ${G4OPENGL}            
-		 ${G4PARMODELS}         
-		 ${G4PARTICLES}         
-		 ${G4PERSISTENCY}       
-		 ${G4PHYSICSLISTS}      
-		 ${G4PROCESSES}         
-		 ${G4RAYTRACER}         
-		 ${G4READOUT}           
-		 ${G4RUN}               
-		 ${G4TRACKING}          
-		 ${G4TRACK}             
-		 ${G4TREE}              
-		 ${G4VISHEPREP}         
-		 ${G4VIS_MANAGEMENT}    
-		 ${G4VISXXX}            
-		 ${G4VRML}              
-		 ${G4ZLIM}              
+set( G4_LIB_LIST ${G4ANALYSIS}
+                 ${G4DIGITS_HITS}
+                 ${G4ERROR_PROPAGATION}
+                 ${G4EVENT}
+                 ${G4FR}
+                 ${G4GEOMETRY}
+                 ${G4GL2PS}
+                 ${G4GLOBAL}
+                 ${G4GMOCREN}
+                 ${G4GRAPHICS_REPS}
+                 ${G4INTERCOMS}
+                 ${G4INTERFACES}
+                 ${G4MATERIALS}
+                 ${G4MODELING}
+                 ${G4OPENGL}
+                 ${G4PARMODELS}
+                 ${G4PARTICLES}
+                 ${G4PERSISTENCY}
+                 ${XERCES_C}
+                 ${G4PHYSICSLISTS}
+                 ${G4PROCESSES}
+                 ${G4RAYTRACER}
+                 ${G4READOUT}
+                 ${G4RUN}
+                 ${G4TRACKING}
+                 ${G4TRACK}
+                 ${G4TREE}
+                 ${G4VISHEPREP}
+                 ${G4VIS_MANAGEMENT}
+                 ${G4VISXXX}
+                 ${G4VRML}
+                 ${G4ZLIM}
    )
 
-#MESSAGE("Geant4 library list is ${G4_LIB_LIST}" )	       
+#MESSAGE("Geant4 library list is ${G4_LIB_LIST}" )
 
 cet_find_library( CLHEPLIB NAMES CLHEP PATHS ENV CLHEP_LIB_DIR NO_DEFAULT_PATH )
 
 # ROOT libraries
 set( ENV{ROOTLIB} $ENV{ROOTSYS}/lib )
 cet_find_library( ROOTCORE       NAMES  Core       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
-cet_find_library( ROOTCINT       NAMES  Cling      PATHS ENV ROOTLIB NO_DEFAULT_PATH ) 
+cet_find_library( ROOTCINT       NAMES  Cling      PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTRIO        NAMES  RIO        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTNET        NAMES  Net        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTIMT        NAMES  Imt        PATHS ENV ROOTLIB NO_DEFAULT_PATH )
-cet_find_library( ROOTHIST       NAMES  Hist       PATHS ENV ROOTLIB NO_DEFAULT_PATH ) 
+cet_find_library( ROOTHIST       NAMES  Hist       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTGRAF       NAMES  Graf       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTGRAF3D     NAMES  Graf3d     PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTGPAD       NAMES  Gpad       PATHS ENV ROOTLIB NO_DEFAULT_PATH )
@@ -143,11 +149,11 @@ cet_find_library( ROOTPHYSICS    NAMES  Physics    PATHS ENV ROOTLIB NO_DEFAULT_
 cet_find_library( ROOTMATHCORE   NAMES  MathCore   PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 cet_find_library( ROOTTHREAD     NAMES  Thread     PATHS ENV ROOTLIB NO_DEFAULT_PATH )
 set(ROOT_BASIC_LIB_LIST ${ROOTCORE}
-                        ${ROOTCINT} 
+                        ${ROOTCINT}
                         ${ROOTRIO}
                         ${ROOTNET}
                         ${ROOTIMT}
-                        ${ROOTHIST} 
+                        ${ROOTHIST}
                         ${ROOTGRAF}
                         ${ROOTGRAF3D}
                         ${ROOTGPAD}
@@ -181,4 +187,3 @@ install_scripts()
 # install root macros into the ups product
 file(GLOB root_macros *.C)
 install( FILES ${root_macros} DESTINATION ${product}/${version}/macros/root )
-
