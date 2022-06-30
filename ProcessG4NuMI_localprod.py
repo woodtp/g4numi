@@ -112,7 +112,8 @@ def main():
                       "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
                       "--role=Analysis "),
       MEMORY       = "--memory 2000MB ", # was 200MB
-      DURATION     = "--expected-lifetime 4h ",  # 500K pots takes ~ 2.5 hr
+      DURATION     = "--expected-lifetime 12h ",  # 500K pots takes ~2h to 7h,
+                     # avg ~3h; estimate long for tail
       NJOBS        = options.n_jobs,
       OUTDIR       = options.outdir,
       JOBSUB_GROUP = os.getenv("JOBSUB_GROUP"),
