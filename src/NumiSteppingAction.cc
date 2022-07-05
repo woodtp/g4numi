@@ -367,14 +367,14 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
         G4cout << "particle = " << particleDefinition -> GetParticleName() << G4endl;
         G4ProcessVector* pv = pm -> GetProcessList();
         G4cout << " process list: " ;
-        for(int i = 0; i< pv->size(); ++i)
+        for(size_t i = 0; i< pv->size(); ++i)
         {
            G4VProcess* proc = (*pv)[i];
            //proc -> SetVerboseLevel(2);
            G4cout <<  proc->GetProcessName() << ", ";
         }
         G4cout << G4endl;
-        for(int i = 0; i< pv->size(); ++i)
+        for(size_t i = 0; i< pv->size(); ++i)
         {
            G4VProcess* proc = (*pv)[i];
            G4cout <<  proc->GetProcessTypeName(proc->GetProcessType()) << ", ";
@@ -382,7 +382,7 @@ void NumiSteppingAction::UserSteppingAction(const G4Step * theStep)
         G4cout << G4endl;
         G4ProcessVector* pv_along = pm -> GetAlongStepProcessVector();
         G4cout << " along step process list: " ;
-        for(int i = 0; i< pv_along->size(); ++i)
+        for(size_t i = 0; i< pv_along->size(); ++i)
         {
            G4VProcess* proc = (*pv_along)[i];
            G4cout <<  proc->GetProcessName() << ", ";
