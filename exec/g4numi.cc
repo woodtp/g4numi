@@ -29,8 +29,6 @@
 #include "NumiRunAction.hh"
 #include "NumiRunManager.hh"
 
-
-
 #ifdef G4VIS_USE
 #include "NumiVisManager.hh"
 #endif
@@ -72,49 +70,41 @@ int main(int argc,char** argv)
 
   NumiDataInput* numiData = NumiDataInput::GetNumiDataInput();
 
-  // Initialize Physics Lists
-  //FTFP_BERT* physicsList = new FTFP_BERT;
+  // Initialize Physics List
   g4alt::G4PhysListFactory plFactory;
-
-  G4String defaultPhysListName = "FTFP_BERT";
-  plFactory.SetDefaultReferencePhysList(defaultPhysListName);
 
   // set a short name for G4RadioactiveDecayPhysics
   G4PhysListRegistry* plreg = G4PhysListRegistry::Instance();
   plreg->AddPhysicsExtension("RADIO","G4RadioactiveDecayPhysics");
 
-  G4String physListName = ""; // numiData->GetPhysicsListName();
-  if ( argv[2] ) physListName = G4String(argv[2]);
+  G4String physListName = "FTFP_BERT";  // default physics list
+
+  // is $PHYLIST shell environment variable set?
   char*    physListNameEnv = 0;
+  physListNameEnv = getenv("PHYSLIST");
+  if ( physListNameEnv ) {
+    G4cout << "g4numi: $PHYSLIST="
+           << physListNameEnv << G4endl;
+    physListName = physListNameEnv;
+  }
+
+  // is argv[2] set?  use that as physic list name
+  if ( argv[2] ) {
+    G4cout << "g4numi: argv[2]="
+           << argv[2] << G4endl;
+    physListName = G4String(argv[2]);
+  }
+
   G4VModularPhysicsList* physicsList = nullptr;
 
-  // Get Reference PhysicsList via its name, or if none given
-  //    from environment variable $PHYSLIST, with fall back to a default
-  if ( physListName.size() ) {
-    G4cout << "g4numi: explicitly using '"
-             << physListName << "'" << G4endl;
-    physicsList = plFactory.GetReferencePhysList(physListName);
-  } else {
-    G4cout << "g4numi: no explicit setting;"
-           << " using ReferencePhysList() ($PHYSLIST or default)" << G4endl;
-    physicsList = plFactory.ReferencePhysList();
-
-    if ( ! physicsList ) {
-      // failed?  get what the user set, but we couldn't find
-      physListNameEnv = getenv("PHYSLIST");
-      if ( physListNameEnv ) {
-        G4cout << "g4numi: $PHYSLIST="
-               << physListNameEnv << G4endl;
-      }
-    }
-
-  }
+  G4cout << "g4numi: explicitly using '"
+             << physListName << "' for physics list" << G4endl;
+  physicsList = plFactory.GetReferencePhysList(physListName);
 
   // deal with failure to get what the user wanted
   // print what they _could_ use
   if ( ! physicsList ) {
-    G4cerr << "g4numi: PhysicsList '"
-           << ( physListNameEnv ? physListNameEnv : physListName )
+    G4cerr << "g4numi: PhysicsList '" << physListName
            << "' was not available in g4alt::PhysListFactory." << G4endl;
     PrintAvailablePhysicsListsDetails(2);
 
@@ -130,6 +120,7 @@ int main(int argc,char** argv)
     exit(42);
   }
 
+  numiData->SetPhysicsListName(physListName);
   runManager->SetUserInitialization(physicsList);
 
 #ifdef G4VIS_USE

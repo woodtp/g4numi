@@ -534,19 +534,25 @@ void NumiAnalysis::FillMeta(){
   /// static const G4String G4Version = "$Name: geant4-10-04-patch-02b $";
   G4String version = G4Version.substr(7,string::npos);
   // get the physics list as used
-  const G4VUserPhysicsList* pl = pRunManager->GetUserPhysicsList();
-  const std::type_info& ti = typeid(*pl);
-  G4String mangled = ti.name();
-#if defined(HAVE_CXA_DEMANGLE) || defined(__clang__) || defined(__GNUC__)
-  int status;
-  char *realname = abi::__cxa_demangle(ti.name(),0,0,&status);
-  G4String demangled = realname;
-  free(realname);
-#else
-  G4String demangled = mangled;  // will have to do
-#endif
+  G4String physListName = NumiData->GetPhysicsListName();
+
+//#ifdef THE_HARD_WAY
+//  const G4VUserPhysicsList* pl = pRunManager->GetUserPhysicsList();
+//  const std::type_info& ti = typeid(*pl);
+//  G4String mangled = ti.name();
+//#if defined(HAVE_CXA_DEMANGLE) || defined(__clang__) || defined(__GNUC__)
+//  int status;
+//  char *realname = abi::__cxa_demangle(ti.name(),0,0,&status);
+//  G4String demangled = realname;
+//  free(realname);
+//#else
+//  G4String demangled = mangled;  // will have to do
+//#endif
+//  G4String physListName = demanangled;
+//#endif
+
   //this_meta->physics = "geant4_9_2_p03_FTFP_BERT1.0";
-  this_meta->physics = version + demangled;
+  this_meta->physics = version + " " + physListName;
   this_meta->physcuts = "nofillyet";
 
   G4String hornC = NumiData->GetBeamConfig();
