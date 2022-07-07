@@ -24,11 +24,6 @@ void NA49RunAction::BeginOfRunAction(const G4Run* aRun)
   G4int id = aRun->GetRunID();
   G4cout << "### Run " << id << " start" << G4endl;
 
-  const G4long* table_entry;
-  table_entry = CLHEP::HepRandom::getTheSeeds();
-  G4long id0 = table_entry[0];
-  G4long id1 = table_entry[1];
-
 #ifdef G4VIS_USE
   G4UImanager* UI = G4UImanager::GetUIpointer();
 

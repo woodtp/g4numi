@@ -96,7 +96,7 @@ void NA49Analysis::finish()
 
 void NA49Analysis::FillNtuple(std::vector<TrackInfo_t> trackInfoVec)
 {
-  G4RunManager* pRunManager = G4RunManager::GetRunManager();
+
   g4Proddata.NPart= trackInfoVec.size();
 
   Int_t partNum   = 0;
