@@ -45,8 +45,8 @@ cet_report_compiler_flags()
 # put products in this list that you want to have set up with
 # their environment by ups
 find_ups_product( geant4         v4_10_4  )
-find_ups_product( canvas_root_io v1_01_00 )
-find_ups_product( dk2nudata      v01_08_00a )
+find_ups_product( canvas_root_io v1_05_02 )
+find_ups_product( dk2nudata      v01_08_00g )
 
 # GDMLParser in G4Percistency requires access to XERCES_C headers
 find_ups_product( xerces_c )
