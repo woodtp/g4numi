@@ -63,6 +63,7 @@ NumiDataInput::NumiDataInput()
     fHornConfig(""),
     fSimulation(""),
     fSubSimulation(""),
+    fPhysicsListName("<unset>"),
 
     fRunPeriod(-999),
     fDebugLevel(0),
@@ -77,7 +78,6 @@ NumiDataInput::NumiDataInput()
     fLengthOfWaterInTgt(4.0*CLHEP::cm),
 
     fPrintInfo(1)
-    
 
 {
 

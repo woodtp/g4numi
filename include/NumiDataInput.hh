@@ -27,8 +27,8 @@ public:
    ~NumiDataInput();
 
    void Print();
-   
-   
+
+
    static NumiDataInput* GetNumiDataInput();
 private:
    static NumiDataInput* fNumiDataInput;
@@ -46,24 +46,27 @@ private:
    void SetBeamZ0(G4double val)         { beamPosition[2] = val;}
    void SetHornCurrent(G4double val)    { HornCurrent = val;}
 
-   void SetHorn1X0(G4double val)	  {Horn1X0=val;}
-   void SetHorn2X0(G4double val)	  {Horn2X0=val;}
+   void SetHorn1X0(G4double val)          {Horn1X0=val;}
+   void SetHorn2X0(G4double val)          {Horn2X0=val;}
    void SetTargetDensityVal(G4double val) {TargetDensity=val;}
-   
+
 public:
-  
+
    G4bool SetBeamConfig(G4String config);
 
    G4bool SetPlaylist(G4String pl);
-   
+
+   inline void     SetPhysicsListName(G4String plname) {fPhysicsListName = plname; }
+   inline G4String GetPhysicsListName() { return fPhysicsListName; }
+
    void SetBeamX0(G4double val) { beamPosition[0] = val;}
-  
+
    void SetBeamY0(G4double val) { beamPosition[1] = val;}
 
    void SetDetailedProtonBeam(G4bool val);
 
    void SetLengthOfWaterInTgt(G4double val);
-   
+
    void ApplyStepLimits(G4LogicalVolume *);
    void ApplyTimeLimits(G4LogicalVolume *);
 
@@ -80,7 +83,7 @@ public:
    void SetDebugLevel(G4int val)                {fDebugLevel = val;}
    void SetRunPeriod(G4int val)                 {fRunPeriod = val;}
    void SetOkToRun(G4bool val)                  {fOkToRun = val;}
-   void SetUseCorrHornCurrent(G4bool val)       {fUseCorrHornCurrent = val;}   
+   void SetUseCorrHornCurrent(G4bool val)       {fUseCorrHornCurrent = val;}
    void SetDebugOn(G4bool val)                  { debugOn = val; }
    void SetNImpWeight(G4bool val)               { NImpWeightOn = val;}
    void SetTestTheta(G4float t)                 { testTheta = t*M_PI/180.;}
@@ -122,7 +125,7 @@ public:
    G4bool   GetNuBeam()                       { return fUseNuBeam;}
    G4bool   GetWaterInTgt()                   { return fUseWaterInTgt;}
    G4bool   GetDetailedProtonBeam()           { return fUseDetailedProtonBeam;}
-   
+
    G4String GetBeamConfig()                   { return fBeamConfig;}
    G4String GetPlaylist()                     { return fPlaylist;}
    G4String GetSimulation()                   { return fSimulation;}
@@ -133,19 +136,19 @@ public:
    G4double GetKillTrackingThreshold()        { return KillTrackingThreshold;}
    G4double GetProtonMomentum()               { return protonMomentum;}
    G4double GetProton_outR()                  { return fProton_outR;}
-   G4double GetProton_inR()                   { return fProton_inR;}  
+   G4double GetProton_inR()                   { return fProton_inR;}
    G4double GetProtonDivergence()             { return fProtonDiv;}
-   G4double GetProtonSpread()                 { return fProtonSpread;} 
-   G4double GetProton_cosx()                  { return fProton_cosx;} 
+   G4double GetProtonSpread()                 { return fProtonSpread;}
+   G4double GetProton_cosx()                  { return fProton_cosx;}
    G4double GetProton_cosy()                  { return fProton_cosy;}
-   G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;} 
+   G4double GetLengthOfWaterInTgt()           { return fLengthOfWaterInTgt;}
 
    G4double GetHornWaterLayerThick() const    { return fHornWaterLayerThick; }
    G4bool GetHorn1IsAlternate()  const        { return fHorn1IsAlternate; }
    G4bool GetHorn1IsRefined()  const        { return fHorn1IsRefined; }
    G4double GetHorn1ExtraLayerAlum() const    { return fHorn1ExtraLayerAlum; }
    G4bool GetDumpBFieldPlease() const    { return fDumpBFieldPlease; }
-   
+
   void SetBeamSigmaX(G4double val);
   void SetBeamSigmaY(G4double val);
 
@@ -182,7 +185,7 @@ public:
    void SetHorn1IsRefined(G4bool t)          {fHorn1IsRefined = t;}
    void SetHorn1ExtraLayerAlum(G4double d)     {fHorn1ExtraLayerAlum = d;}
    void SetDumpBFieldPlease(G4bool t)          {fDumpBFieldPlease = t; }
- 
+
    G4bool   GetMuonBeam()            {return useMuonBeam;}
    G4int    GetNInputParts()         {return NInputParts;}
    G4int    GetNInputPart()          {return NInputPart;}
@@ -220,7 +223,7 @@ public:
    //-------------------------------------------------------
 
  private:
-   
+
    G4bool debugOn;
    G4bool fPrintGeometry;
    G4bool fOkToRun;
@@ -239,15 +242,16 @@ public:
    G4String fHornConfig;
    G4String fSimulation;
    G4String fSubSimulation;
+   G4String fPhysicsListName;
 
    G4int fRunPeriod;
    G4int fDebugLevel;
 
    G4double fProton_outR;
-   G4double fProton_inR;  
+   G4double fProton_inR;
    G4double fProtonDiv;
-   G4double fProtonSpread; 
-   G4double fProton_cosx; 
+   G4double fProtonSpread;
+   G4double fProton_cosx;
    G4double fProton_cosy;
 
    G4double fLengthOfWaterInTgt;
@@ -257,14 +261,14 @@ public:
    G4int fPrintInfo;
 
    //////////////////////////////
-   
+
    G4bool NImpWeightOn, createNuNtuple, createTarNtuple, createHadmmNtuple, createASCII;
    G4bool useFlukaInput, useMarsInput;
 
    G4bool useMuonBeam, useMuonInput, solidMuMons, simAbsBkg, reWeightDeltas;
    G4String absorberConfig;
-   G4bool fHorn1IsAlternate; // An different way of coding up Horn1 (P.L., Sept 2014) 
-   G4bool fHorn1IsRefined; // An improved version of Horn1, using Numi existing code (P.L., November 2014) 
+   G4bool fHorn1IsAlternate; // An different way of coding up Horn1 (P.L., Sept 2014)
+   G4bool fHorn1IsRefined; // An improved version of Horn1, using Numi existing code (P.L., November 2014)
    G4int    NInputPart, NInputParts, nSplitDeltas;
    G4bool simDRays, useZPosCut, createAbsBkgNtuple;
    G4double muonBeamMomentum, muonBeamGaussXsig, muonBeamGaussYsig, muonBeamZPos;
@@ -279,15 +283,15 @@ public:
    G4Material* Mon3AbsorberMaterial;
    G4double Mon1AbsorberThickness, Mon2AbsorberThickness, Mon3AbsorberThickness;
    G4double Mon1AbsorberDist,  Mon2AbsorberDist,  Mon3AbsorberDist;
-   
-   G4double StepLimit;   
+
+   G4double StepLimit;
    G4double TimeLimit;
 
    G4bool createBXDRAW;
    G4bool useTestBeam, useDecayPipeSelect;
    G4String bxdrawName;
    G4float testTheta;   // TestBeam Angle
-   
+
   //=================================
   //  for Raytracing=================
   //----------------------------------
@@ -298,7 +302,7 @@ public:
    G4bool createZpNtuple;// name of the zp tuple and the bool of zpntuple
    G4bool raytracing;//
    //==================================
-   
+
    //==================================
    //-- For making the horns the same
    //----------------------------------
@@ -314,14 +318,14 @@ public:
    G4double protonMomentum, beamSigmaX, beamSigmaY, beamShiftX, beamShiftY, protonKineticEnergy, materialSigma;
    G4double KillTrackingThreshold;
    G4ThreeVector beamPosition, beamDirection;
-   
+
    // World Volume
    G4double RockRadius, RockHalfLen, RockDensity, RockRadLen;
-   
+
    // Target Area
    G4double TargetAreaZ0, TargetAreaLength, TargetAreaHeight,TargetAreaWidth;
    G4int TargetAreaGEANTmat;
-   
+
    // added by Zachary Barnett - Target Area ConcretePit
    G4int NTHConcreteSectionsN;
    vdouble_t THConcreteX0, THConcreteY0, THConcreteZ0;
@@ -330,7 +334,7 @@ public:
    vint_t THConcreteGeantMaterial;
    vstring_t THConcreteName;
    //-------------------------------------
-   
+
    // Target
    G4bool constructTarget;
    G4double TargetX0, TargetY0, TargetZ0, TargetDxdz, TargetDydz;
@@ -340,21 +344,21 @@ public:
    G4double TargetSegmentPitch,TargetCPGRadius,TargetCPGPosition;
    G4bool TargetEndRounded;
    //
-   // Added virtual (assembly) volume such that one can simulate the ME configuration, while 
-   // having a virtual LE/MIPP target, for MIPP correction.. 
+   // Added virtual (assembly) volume such that one can simulate the ME configuration, while
+   // having a virtual LE/MIPP target, for MIPP correction..
    G4double TargetVirtualCanisterHeight;
    G4double TargetVirtualCanisterWidth;
-   
+
    //Rings holding target and cooling pipes
    G4int NTgtRingN;
    vdouble_t TgtRingZ0, TgtRingLength, TgtRingRin,TgtRingRout;
    vint_t TgtRingGeantMaterial;
    vstring_t TgtRingVolName;
-   
+
    //Budal
    G4double BudalX0,BudalY0,BudalZ0,BudalDxdz,BudalDydz;
-   
-  //HPBaffle 
+
+  //HPBaffle
   G4int HPBaffle, HPBaffleGEANTMat;
   G4double HPBaffleX0,HPBaffleY0,HPBaffleZ0,HPBaffleDXDZ,HPBaffleDYDZ;
   G4double HPBaffleLength,HPBaffleRin,HPBaffleRout;
@@ -367,7 +371,7 @@ public:
   vint_t CPGeantMat;
   vdouble_t CPipeCurvRad,CPipeOpenAng,CPipeCloseAng;
   vstring_t CPipeVolName;
-  
+
   //Container
   G4int NContainerN;
   vdouble_t CTubeZ0,CTubeLength,CTubeRin,CTubeRout;
@@ -402,35 +406,35 @@ public:
   G4double HadrBox_width, HadrBox_height, HadrBox_length;
 
   // Horn 1 & 2
-  
+
    //////////////////////////////
    // July 2014: Adding the layer of water, Paul Lebrun. Declared public.. Why placing access functon them
-   // But other variables are declared this way. 
+   // But other variables are declared this way.
    //
-   
+
    G4double fHornWaterLayerThick;
    G4double fHorn1ExtraLayerAlum;
-   
+
    //
-   // A logical flag to indicate the request to dump the magnetic field map 
+   // A logical flag to indicate the request to dump the magnetic field map
    //
-   G4bool fDumpBFieldPlease; 
+   G4bool fDumpBFieldPlease;
 
    //-----------------
    //do these variables get used?!
    //
    G4int PhornNphorn;
-   
-   vdouble_t PhornZ1, PhornZ2;  
-   vint_t  PhornNpoint;  
+
+   vdouble_t PhornZ1, PhornZ2;
+   vint_t  PhornNpoint;
    vdouble_t PhornAin, PhornBin, PhornCin, PhornAout, PhornBout, PhornCout;
    vdouble_t  PhornROCin, PhornROCout;
-   vdouble_t PhornThickFront, PhornThickEnd;  
+   vdouble_t PhornThickFront, PhornThickEnd;
    vdouble_t PhornX0, PhornY0, PhornZ0, PhornDXDZ, PhornDYDZ, PhornCurrent;
-   vint_t PhornGEANTmat; 
+   vint_t PhornGEANTmat;
    vstring_t PhornName;
    //-----------------
-  
+
   // Flux Area
    G4int nNear,nFar;
    vdouble_t xdet_near,ydet_near,zdet_near;
@@ -438,7 +442,7 @@ public:
    vstring_t det_near_name, det_far_name;
 
    G4double HornCurrent; //old
-	
+
    // Horn 1
 
    //----------------
@@ -448,17 +452,17 @@ public:
    //----------------
   //Horn1 rotation:
   G4double Horn1Phi, Horn1Theta, Horn1Psi;
-   
+
   //
-  // Paul Lebrun, October 2017: supplement two boolean to quantify the effect of 
-  // the bug in coordinate transform, global to local, in computing the magnetic field 
+  // Paul Lebrun, October 2017: supplement two boolean to quantify the effect of
+  // the bug in coordinate transform, global to local, in computing the magnetic field
   //
   bool usePosLocalCoordInMagField;
   bool useRotLocalCoordInMagField;
-   
-   
+
+
    G4int NPHorn1OCN,NPHorn1ICN,NPHorn1EndN;
-  
+
   vdouble_t PHorn1OCRout,PHorn1OCRin,PHorn1OCZ0;
   vdouble_t PHorn1ICZ0;
   vint_t PHorn1ICNpoint;
@@ -470,7 +474,7 @@ public:
   G4int NHorn1SpiderSupportPlanesN,NHorn1SpidersPerPlaneN;
   vdouble_t Horn1SpiderSupportZ0;
   vNumiHornSpiderSupport_t Horn1SS;
-  
+
    // Horn 2
 
    //----------------
@@ -481,7 +485,7 @@ public:
   //Horn2 rotation
   G4double Horn2Phi, Horn2Theta, Horn2Psi;
   G4int NPHorn2OCN,NPHorn2ICN,NPHorn2EndN;
-  
+
   vdouble_t PHorn2OCRout,PHorn2OCRin,PHorn2OCZ0;
   vdouble_t PHorn2ICZ0;
   vint_t PHorn2ICNpoint;
@@ -500,7 +504,7 @@ public:
    G4double TargetSegWidth;
    G4double TargetSegHeight;
    G4double TargetSegPitch;
-   G4double TargetGraphiteHeight;	
+   G4double TargetGraphiteHeight;
 
    G4double BudalVFHSLength;
    G4double BudalVFHSWidth;
@@ -583,22 +587,22 @@ public:
    G4double CoolingPlateCutoutWidth;
    G4double CoolingPlateCutoutHeight;
 //
-// To be use to fill the Ntuple, info about the particle 6D phase space exiting the target. 
+// To be use to fill the Ntuple, info about the particle 6D phase space exiting the target.
 //
-   inline G4String GetHornConfig() const { return fHornConfig; } 
+   inline G4String GetHornConfig() const { return fHornConfig; }
 
     //Variables needed for custumized dk2nu storing (Leo Aliaga, Feb17, 2015)
   //Absorption:
-  G4int nGenAbs;  //generations under absorption study 
-  G4int nVolAbs;  //volumes under absorption study 
-  G4int nVdblTot;  //number of values to be store in vdbl 
-  vstring_t GenAbsName;  
+  G4int nGenAbs;  //generations under absorption study
+  G4int nVolAbs;  //volumes under absorption study
+  G4int nVdblTot;  //number of values to be store in vdbl
+  vstring_t GenAbsName;
   vstring_t VolAbsName;
   vstring_t VolVdblName;
-  
+
   G4int nVintTot;  //number of values to be store in vint
   vstring_t VolVintName;
 
-   
+
 };
 #endif
