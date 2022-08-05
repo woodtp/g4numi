@@ -492,7 +492,7 @@ G4double NumiDetectorConstruction::PHorn2ICRout(G4double z)
   { // Neck
     r = 4.2*CLHEP::cm;
   }
-  else if((z/CLHEP::cm)>=104.803 && (z/CLHEP::cm)<118.156*in)
+  else if((z/CLHEP::cm)>=104.803 && (z)<118.156*in) //RJN 04/08/2022 removed erroneous cm conversion
   {
     r= (sqrt(((z/CLHEP::cm)-100)/0.2723))*CLHEP::cm ;
   }
@@ -608,7 +608,7 @@ G4double NumiDetectorConstruction::PHorn2ICRin(G4double z)
   { // Neck
     r = 4*CLHEP::cm;
   }
-  else if((z/CLHEP::cm)>=104.803 && (z/CLHEP::cm)<118.156*in)
+  else if((z/CLHEP::cm)>=104.803 && (z)<118.156*in)  //RJN removed erroneous cm conversion
   {
     r= (sqrt(((z/CLHEP::cm)-100)/0.2723)-0.2)*CLHEP::cm ;
   }
