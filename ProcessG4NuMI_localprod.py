@@ -108,7 +108,7 @@ def main():
       "-f {MACFILE} "
       "-L {LOGFILE} "
       "file://{CACHE}/g4numi_job_localprod.sh".format(
-      GRID         = ("--OS=SL7 -g "
+      GRID         = ("--OS=SL7 "
                       "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
                       "--role=Analysis "),
       MEMORY       = "--memory 2000MB ", # was 200MB
