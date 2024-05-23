@@ -827,8 +827,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
   //
   // Now the outer...
   // 
-   const double rOut = 16.25*in + 7.50*in + 2.5*CLHEP::cm; // 7.5 inches is an overestimate of the max. outer dimension of exhaust piping, downstream. 
-    // 2.5 in is a guess the thickness of the outer tube. 
+   const double rOut = 23.5/2.*in+epsilR; // largest radial extensions seems to be coming from Horn1OuterTubeDowsntreamFlanges
    aMotherHorn1AllRads.push_back(rOut);
    aMotherHorn1AllLengths.push_back(zCurrent);
    aMotherHorn1AllRads.push_back(rOut);
@@ -1457,7 +1456,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
      for (int iSub = 0; iSub != numSubSect; iSub++) {					      
        const double zzBegin = zStartDrawing + iSub*deltaZ;
        const double zzEnd = zzBegin + deltaZ;
-       std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart1SubSect" << iSub;
+       std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart2SubSect" << iSub;
        G4String nameStr(nameStrStr.str());
        const double rMin1 = fHorn1Equations[4].GetVal(zzBegin); // Equation 1
        const double rMin2 = fHorn1Equations[4].GetVal(zzEnd);
@@ -1480,7 +1479,7 @@ void NumiDetectorConstruction::ConstructHorn1Alternate(G4ThreeVector hornpos, G4
        std::cerr << " fEffectiveRadiiForFieldMap Dwnstr.., indices " << izzBegin << " / " << izzEnd 
                << " radii " << fEffectiveRadiiForFieldMap[izzBegin] << " / " << fEffectiveRadiiForFieldMap[izzEnd] << std::endl;
       if (hornWaterLayerThick > 0.002*CLHEP::mm) {
-       std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart1SubSect" << iSub << "Water";
+       std::ostringstream nameStrStr; nameStrStr << "Horn1DownstrPart2SubSect" << iSub << "Water";
        G4String nameStr(nameStrStr.str());
        G4Cons *aCons = new G4Cons(nameStr, rMax1 - hornWaterLayerThick, rMax1-0.001*CLHEP::mm,
                                          rMax2 - hornWaterLayerThick, rMax2-0.001*CLHEP::mm,
