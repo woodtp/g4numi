@@ -36,9 +36,9 @@ setup g4numi $version -q $qualifier
 
 echo
 echo "======== UPDATE MACRO WITH RUN NUMBER ========"
-SEED=$((RUN*10000+PROCESS))
+SEED=$(date +%Y%m%d%H%M%S)
 sed -i 's/\${seed}/'$SEED'/g' g4numi.mac
-OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}"
+OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}_${SEED}"
 sed -i 's/\${outfile}/'$OUTFILE'/g' g4numi.mac
 
 echo "BEAMCONFIG=${BEAMCONFIG}"
