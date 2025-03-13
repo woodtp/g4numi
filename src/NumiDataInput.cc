@@ -217,7 +217,8 @@ NumiDataInput::NumiDataInput()
   airhrn =false; // airhrn must be changed before compilation
   vacuumworld=false;
   jCompare = false; // make horns have the same B field;
-  g3Chase = true;
+  g3Chase = true; //make this true by default and construct the top layer of shielding
+  
 
 if(!vacuumworld && !airhrn){
   hrnmat = 9;   // Al
@@ -664,7 +665,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
                                -0.0377, //Block 20 (side 2 gnumi block)
                                0.657075,//Block 21 (top gnumi block)
 			       0.657075, // Block 22 (top gnumi block after h2)
-                               0.672075 //Block 23 above Horn2
+                               0.672075+0.05 //Block 23 above Horn2 (ZP: add 5cm and make it 5cm thinner for overall 10cm shift to clear horn 2 volume)
   };
 
 

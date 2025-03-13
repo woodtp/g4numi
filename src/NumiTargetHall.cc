@@ -128,7 +128,8 @@ void NumiDetectorConstruction::ConstructTargetHall()
       // Mike Martens (Need to move Horn 2 by 9 meters downstream)
     tempgnumiD = new G4Box("sDuratekgnumiD", 0.5842*CLHEP::m,0.301475*CLHEP::m, 7.85*CLHEP::m + fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD = new G4LogicalVolume(tempgnumiD, Fe, "lvDuratekBlockgnumiD", 0, 0,0);
-    tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*CLHEP::m, 0.286475*CLHEP::m, (6/2)*CLHEP::m);
+    //shrink and shift the block above horn 2 to clear the flanges
+    tempgnumiD3 = new G4Box("sDuratekgnumiD3", 0.5842*CLHEP::m, 0.286475*CLHEP::m-5*CLHEP::cm, (6/2)*CLHEP::m);
     G4LogicalVolume *lvDuratekBlockgnumiD3 = new G4LogicalVolume(tempgnumiD3, Fe, "lvDuratekBlockgnumiD3",0,0,0);
     tempgnumiD2 = new G4Box("sDuratekgnumiD2", 0.5842*CLHEP::m, 0.301475*CLHEP::m,15.349*CLHEP::m - fDuratekShift);
     G4LogicalVolume *lvDuratekBlockgnumiD2 = new G4LogicalVolume(tempgnumiD2, Fe, "lvDuratekBlockgnumiD2",0,0,0);
