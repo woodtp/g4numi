@@ -129,10 +129,17 @@ NumiTrajectory::NumiTrajectory(const G4Track* aTrack)
        dynamic_cast<const G4HadronicProcess*>( aTrack->GetCreatorProcess() );
 
      if ( hadronicProcess ) {
+       /* getting nucleus at this point is not necessarily getting the one associated with this track
+	  this gets the nucleus associate with the last time this hadronicProcess was used.
+	  So instead will store this info in NumiTrackInfo within NumiStackingAction and then retrieve here 
+      
        G4Nucleus nucleus = *(hadronicProcess->GetTargetNucleus());
        fPDGNucleus = 1000000000 +
          nucleus.GetZ_asInt()*10000 + nucleus.GetA_asInt()*10;
-
+       */
+       NumiTrackInformation* trackInfo=(NumiTrackInformation*)(aTrack->GetUserInformation());  
+       if (trackInfo) fPDGNucleus = trackInfo->GetPDGNucleus();
+       
        // flag it as EM process with negative isotope code
        if ( fProcessName == "muonNuclear"     ||
             fProcessName == "electronNuclear" ||
