@@ -60,7 +60,7 @@ TARGET_WATER_CM            = 3 #cm
 ##################################################
 LEbeamconfig_dict = { "le010z185i"  : {"minerva1"   : "-44.50",    #tgt2H1 = 9.50
                                      "minerva7"   : "-44.18",    #tgt2H1 = 9.18
-                                     "minerva9"   : "-45.40",    #tgt2H1 = 10.40 
+                                     "minerva9"   : "-45.40",    #tgt2H1 = 10.40
                                      "minerva13"  : "-44.17"},   #tgt2H1 = 9.17
                     "le010z-185i" : {"downstream" : "-44.50",    #tgt2H1 = 9.5
                                      "minerva5"   : "-43.85",    #tgt2H1 = 8.85
@@ -81,7 +81,7 @@ def main():
   g4_macro = make_macro(options)
 
   # scratch /pnfs area from which to send tarfile to grid
-  cache_folder = CACHE_PNFS_AREA + str(random.randint(10000,99999)) + "/"
+  cache_folder = CACHE_PNFS_AREA + str(random.randint(10000,99999))
   os.mkdir(cache_folder)
 
   print("\nTarring up local area...")
@@ -91,7 +91,7 @@ def main():
   shutil.move(g4_macro,        cache_folder) # temp file -> remove it form pwd
   shutil.copy("g4numi_job_localprod.sh", cache_folder)
 
-  print("\nTarball of local area:" + cache_folder + TARFILE_NAME)
+  print("\nTarball of local area:" + cache_folder + "/" + TARFILE_NAME)
 
   logfile = options.outdir + "/g4numi_{BEAMCONFIG}_{RUN}_\$PROCESS.log".format(BEAMCONFIG = options.beamconfig,
                                                                                RUN        = options.run_number)
@@ -104,11 +104,11 @@ def main():
       "-e BEAMCONFIG={BEAMCONFIG} "
       "-e PLAYLIST={PLAYLIST} "
       "-e RUN={RUN} "
-      "-f {TARFILE} "
       "-f {MACFILE} "
       "-L {LOGFILE} "
+      "--tar_file_name dropbox://{TARFILE} "
       "file://{CACHE}/g4numi_job_localprod.sh".format(
-      GRID         = ("--OS=SL7 "
+      GRID         = ("--singularity-image=/cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest "
                       "--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC "
                       "--role=Analysis "),
       MEMORY       = "--memory 2000MB ", # was 200MB
@@ -117,13 +117,13 @@ def main():
       NJOBS        = options.n_jobs,
       OUTDIR       = options.outdir,
       JOBSUB_GROUP = os.getenv("JOBSUB_GROUP"),
-      EXPERIMENT   = os.getenv("EXPERIMENT"),
+      # EXPERIMENT   = os.getenv("EXPERIMENT"),
       BEAMCONFIG   = options.beamconfig,
       PLAYLIST     = options.playlist,
       RUN          = options.run_number,
-      TARFILE      = cache_folder + TARFILE_NAME,
-      MACFILE      = cache_folder + "g4numi.mac",
+      MACFILE      = cache_folder + "/g4numi.mac",
       LOGFILE      = logfile,
+      TARFILE      = cache_folder + "/" + TARFILE_NAME,
       CACHE        = cache_folder)
   )
 
@@ -156,12 +156,12 @@ def get_options():
 
   horn_group   = optparse.OptionGroup(parser, "Horn Options")
 
-  horn_group.add_option('--do_horn1_old_geometry',   action="store_true", 
+  horn_group.add_option('--do_horn1_old_geometry',   action="store_true",
         default = False,
-        help="The new horn 1 geom (formerly known as 'alternate') is now default. " 
+        help="The new horn 1 geom (formerly known as 'alternate') is now default. "
              "Use this option to use the old geometry. Default = %default.")
 
-  horn_group.add_option('--do_horn1_fine_segmentation', action="store_true", 
+  horn_group.add_option('--do_horn1_fine_segmentation', action="store_true",
         default = False,
         help="Works for old and new horn1. Default = %default.")
 
@@ -204,7 +204,7 @@ def get_options():
 
   old_group.add_option('--template', default = TEMPLATE,
         help='Specify template macro. Default = %default.')
-  old_group.add_option('--no_importance_weighting', action="store_true", 
+  old_group.add_option('--no_importance_weighting', action="store_true",
         default = NO_IMPORTANCE_WEIGHTING,
         help="Turn off importance weighting. Default: importance weighting is on, "
              "i.e. this option is %default." )
@@ -213,7 +213,7 @@ def get_options():
   old_group.add_option('--do_target_water', default = False)
   old_group.add_option('--playlist', default = PLAYLIST,
         help="correct the Z target posision per playlist (LE). Default = %default.")
-  old_group.add_option('--beamconfig', default = BEAMCONFIG, 
+  old_group.add_option('--beamconfig', default = BEAMCONFIG,
         help="Configure the neutrino beam. "
               "This sets the TargetZ0 and Baffle Z0 and HornCurrent. "
               "Must be in the form 'LE#z#i' or 'le#z#i', where # is any number. "
@@ -299,7 +299,7 @@ def make_macro(options):
     )
 
   macro_name = "g4numi.mac"
-  macro = open(macro_name, "w") 
+  macro = open(macro_name, "w")
   macro.write(macro_string)
   macro.close()
 

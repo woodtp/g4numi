@@ -11,7 +11,8 @@ G4Allocator<NumiTrackInformation> aTrackInformationAllocator;
 NumiTrackInformation::NumiTrackInformation()
   :decay_code(0),
    tgen(0),
-   Nimpwt(1.0)
+   Nimpwt(1.0),
+   fPDGNucleus(0)
 {
 
 }
@@ -22,6 +23,7 @@ NumiTrackInformation::NumiTrackInformation(const NumiTrackInformation* aTrackInf
   decay_code = aTrackInfo->decay_code;
   tgen = aTrackInfo->tgen;
   Nimpwt = aTrackInfo->Nimpwt;
+  fPDGNucleus = aTrackInfo->fPDGNucleus;
 }
 
 NumiTrackInformation::~NumiTrackInformation(){}
@@ -34,6 +36,8 @@ void NumiTrackInformation::Print() const
      << "tgen = " << tgen << G4endl;
     G4cout 
      << "nimpwt = " << Nimpwt << G4endl;
+    G4cout 
+     << "nucleus = " << fPDGNucleus << G4endl;
 }
 
 void NumiTrackInformation::Print(const G4Track *aTrack) const

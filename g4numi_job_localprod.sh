@@ -15,15 +15,15 @@ source ${GPRDCVMFS}/bootstrap_genie_ups.sh
 
 echo
 echo "======== UNTARRING... ========"
-tar xvfz local_products.tar.gz -C ./ > /dev/null
+# tar xvfz local_products.tar.gz -C ./ > /dev/null
 
 echo
 echo "======== Done untarring. ls ========"
-ls
+ls -l ${INPUT_TAR_DIR_LOCAL}/local_products
 
 echo
 echo "======== setup our version of g4num as a UPS product  ========"
-export PRODUCTS=${PRODUCTS}:`pwd`/local_products
+export PRODUCTS=${PRODUCTS}:${INPUT_TAR_DIR_LOCAL}/local_products
 ups list -aK+ g4numi
 xyzzy=`ups list -aK+ g4numi | tr -d '"' `
 version=`echo $xyzzy | cut -d' ' -f2`
@@ -36,9 +36,9 @@ setup g4numi $version -q $qualifier
 
 echo
 echo "======== UPDATE MACRO WITH RUN NUMBER ========"
-SEED=$((RUN*10000+PROCESS))
+SEED=$(date +%Y%m%d%H%M%S)
 sed -i 's/\${seed}/'$SEED'/g' g4numi.mac
-OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}"
+OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}_${SEED}"
 sed -i 's/\${outfile}/'$OUTFILE'/g' g4numi.mac
 
 echo "BEAMCONFIG=${BEAMCONFIG}"
@@ -54,7 +54,7 @@ cat g4numi.mac
 
 echo
 echo "======== EXECUTING g4numi ========"
-echo "g4numi_g4numi.mac"
+echo "g4numi g4numi.mac"
 g4numi g4numi.mac
 
 echo

@@ -39,7 +39,7 @@ NumiDataInput* NumiDataInput::GetNumiDataInput()
 {
   //G4cout << "Requesting NumiDataInput " << G4endl;
     if (!fNumiDataInput) {
-        fNumiDataInput = new NumiDataInput();    
+        fNumiDataInput = new NumiDataInput();
     }
     return fNumiDataInput;
 }
@@ -55,7 +55,7 @@ NumiDataInput::NumiDataInput()
     fUseWaterInTgt(false),
     fUseHornMisalign(false),
     fUseTgtDensity(false),
-    
+
     fBeamConfig(""),
     fPlaylist(""),
     fTargetConfig(""),
@@ -69,7 +69,7 @@ NumiDataInput::NumiDataInput()
     fDebugLevel(0),
 
     fProton_outR(-999.0),
-    fProton_inR(-999.0), 
+    fProton_inR(-999.0),
     fProtonDiv(-999.0),
     fProtonSpread(-999.0),
     fProton_cosx(-999.0),
@@ -108,16 +108,16 @@ NumiDataInput::NumiDataInput()
   int runPeriodFile = -999;
   double targetZFile = -999.;
   double hornCurrentFile = -999.;
-  
+
   std::ifstream datafile("../runConfig.inp");
   if (datafile.is_open()) {
     useFile = true;
     datafile  >> runPeriodFile >> targetZFile >> hornCurrentFile;
     datafile.close();
     G4cout << G4endl << G4endl << G4endl << G4endl
-    << G4endl << G4endl << G4endl << G4endl 
-    << G4endl << G4endl << G4endl << G4endl 
-    << G4endl << G4endl << G4endl << G4endl 
+    << G4endl << G4endl << G4endl << G4endl
+    << G4endl << G4endl << G4endl << G4endl
+    << G4endl << G4endl << G4endl << G4endl
         << "Using parameters from runConfig.inp: " << G4endl
            << "  Run Period = " << runPeriodFile << G4endl
            << "  Target Z = " << targetZFile << G4endl
@@ -133,10 +133,10 @@ NumiDataInput::NumiDataInput()
   }
   //
   */
-  
-      
-  
-  NImpWeightOn = true; 
+
+
+
+  NImpWeightOn = true;
   createNuNtuple=false;  createHadmmNtuple=false;
   createASCII=false;     createBXDRAW = false;
   useFlukaInput = false; useMarsInput=false;
@@ -170,17 +170,17 @@ NumiDataInput::NumiDataInput()
   muonBeamGaussXsig = 0.0*CLHEP::mm;
   muonBeamGaussYsig = 0.0*CLHEP::mm;
 
-  useTestBeam = false;   
+  useTestBeam = false;
   useDecayPipeSelect = false;
   KillTracking = true; // false for ahimmel
   testTheta = M_PI/6.;
-  
-   StepLimit = 0.0; 
+
+   StepLimit = 0.0;
    TimeLimit = 60.0*CLHEP::s;
 
   extNtupleFileName=""; //fluka or mars or muon ntuple with particles coming of the target
   //Set the energy threshold for 'killing' particles
-   KillTrackingThreshold = 0.05*CLHEP::GeV; //for defaut neutrino MC g4numi 
+   KillTrackingThreshold = 0.05*CLHEP::GeV; //for defaut neutrino MC g4numi
    //KillTrackingThreshold = 0.001*CLHEP::GeV; //for muon beam MC
 
 
@@ -202,13 +202,13 @@ NumiDataInput::NumiDataInput()
    // rock density and muon alcove wall location
    //
    materialSigma   = 0;
-   
+
 
    //===================================
    //------ Use Macro---------------
    // useMacro = true if you actually want to change beam parameters
-   // from the macro 
-   
+   // from the macro
+
    useMacro = false;
 
   //====================================
@@ -219,6 +219,7 @@ NumiDataInput::NumiDataInput()
   jCompare = false; // make horns have the same B field;
   g3Chase = true; //make this true by default and construct the top layer of shielding
   
+
 if(!vacuumworld && !airhrn){
   hrnmat = 9;   // Al
   hrnmatcr =31; // CT852
@@ -236,16 +237,16 @@ if(!vacuumworld && !airhrn){
      hallmat=16;
    }
  }
- 
+
 //======================================
- 
+
 //======================================
 //--Ray Tracing parameter-------------
 //--------------------------------------
  raytracing =false;
  //==============================
  //------------------------------
- 
+
  //initialize zpoints
  NZpoint=48;
  Zpoint.push_back(0*CLHEP::m); //1
@@ -308,7 +309,7 @@ if(!vacuumworld && !airhrn){
   //=======================================================================
   double TargetConfigZ = -10.0*CLHEP::cm;
   int runPeriod = 0;
-   
+
   if (useFile) {
       runPeriod = runPeriodFile;
       TargetConfigZ = -1*targetZFile*CLHEP::cm;
@@ -318,7 +319,7 @@ if(!vacuumworld && !airhrn){
   G4float beam_x_dir = 0;
   G4float beam_y_dir = 0;
   G4float beam_z_dir = 1;//cos(.01*pi/180);
-  //actual dm is 5/13e-4 radians 
+  //actual dm is 5/13e-4 radians
   G4float beam_x_pos = 0;
   G4float beam_y_pos = 0;
   G4float beam_z_pos = fBeamZ0_ref;
@@ -328,14 +329,14 @@ if(!vacuumworld && !airhrn){
   This is wrong somehow. If running G4NuMI with a proton beam
   need the beam to start before the baffle to get the effect of protons
   interacting with the baffle. - Laura
-  
+
 //G4float beam_z_pos = -4.0*CLHEP::m+ TargetConfigZ;
   // the reason for the beam_z_pos change was to move the beam to start
   // immediately before the target so that the beam spot interaction point
   // would remain constant, but the angle would change.
   */
 
-  protonMomentum = 120.*CLHEP::GeV;  
+  protonMomentum = 120.*CLHEP::GeV;
   //  beamSigmaY     = 1.1*CLHEP::mm;//1.25*CLHEP::mm;
   //  beamSigmaX     = 1.1*CLHEP::mm;//1.1*CLHEP::mm;
   // MAK 10/14/16 - hack in a wider ME beam
@@ -356,21 +357,21 @@ if(!vacuumworld && !airhrn){
 
 
 
-  
+
   constructTarget = true;
   //TargetArea          1
   //=======================================================================
   TargetAreaZ0       = -6.7*CLHEP::m;  //was -4.0*m (08/09/05);
   TargetAreaLength   = 52.398*CLHEP::m;//was 49.28*m (08/09/05);
 
-  // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version, 
-  // but I had to extend them by 1 m to fit the concrete chase in TGAR 
+  // TargetAreaHeight and TargetAreaWidth were 6.0 meters in Zarko's older version,
+  // but I had to extend them by 1 m to fit the concrete chase in TGAR
   // (working from dimensions and placement given in the Numi Technical Design Handbook)
   // I (Zarko) had to add 1.5m more to fit all blocks
   TargetAreaHeight   = 8.5*CLHEP::m;
   TargetAreaWidth    = 8.5*CLHEP::m;
   TargetAreaGEANTmat = 15;
-  
+
   // Target   1
   //=======================================================================
   TargetX0           = 0.0;
@@ -413,9 +414,9 @@ if(!vacuumworld && !airhrn){
   else {
     // Align Target and Budal
     TargetY0 = 0.0;
-    BudalY0 = 0.0;	
+    BudalY0 = 0.0;
   }
-	
+
   if (runPeriod == 2 || runPeriod == 3) {
     // Change LE010 to LE009
     if (TargetConfigZ == -10.0*CLHEP::cm) {
@@ -423,7 +424,7 @@ if(!vacuumworld && !airhrn){
     }
   }
   */
-  
+
   //HPBaffle           1 // Only the length and position can be changed currently
   //=======================================================================
   HPBaffleGEANTMat   =  18;
@@ -440,7 +441,7 @@ if(!vacuumworld && !airhrn){
   HPBaffleLength     =  1.50*CLHEP::m; //Why was this 1.2m?!
   HPBaffleRin        =  5.5*CLHEP::mm;
   HPBaffleRout       =  3.*CLHEP::cm;
- 
+
   //Cooling pipes
   NCPipeN = 19;
   //=======================================================================
@@ -451,18 +452,18 @@ if(!vacuumworld && !airhrn){
   G4double CPipeX0_[]        = {0.     ,0.      ,0.     , 0.     ,   0.  ,0.     , 0.    , 0.    ,  0.    , 0.           ,0.            , 0      , 0       ,0         ,0         , 0       , 0       , 0       , 0};
   G4double CPipeY0_[]        = {1.05e-2,-1.05e-2,1.05e-2,-1.05e-2,3.5e-2 ,-3.5e-2, 0.    , 0.    ,  0.    , 1.05e-2      ,-1.05e-2      , 5.95e-2, -5.95e-2,5.95e-2   ,-5.95e-2  , 5.95e-2 , -5.95e-2,5.95e-2  ,-5.95e-2};
   G4double CPipeZ0_[]        = {-0.275 , -0.275 ,-0.30  ,-0.30   , -.3001,-.3001 ,.969   , .9695 , .9735  , 0.955        ,0.955         , -0.215 , -0.215  ,-.071     ,-.071     ,-0.287   ,-0.287   , -.30    , -.30};
-  G4double CPipeDXDZ_[]      = {    0  ,  0     , 0     ,  0     ,-99999 ,-99999 , 0     ,  0    , 0      , 0            ,0             , 0.     , 0.      ,0.        ,0         , 0.      , 0.      , 0.      , 0.}; 
+  G4double CPipeDXDZ_[]      = {    0  ,  0     , 0     ,  0     ,-99999 ,-99999 , 0     ,  0    , 0      , 0            ,0             , 0.     , 0.      ,0.        ,0         , 0.      , 0.      , 0.      , 0.};
   G4double CPipeDYDZ_[]      = {    0  ,  0     , 0     ,  0     , 0     ,0      , 0     ,  0    , 0      , 0            ,0             , 0.     , 0.      ,0.        ,0         , 0.      , 0.      , 0.      , 0.};
   G4double CPipeLength_[]    = {1.230  , 1.230  , .025  , .025   , 0     ,0      , 5e-4  ,  4e-3 , 3e-3   , 14.e-3      ,14.e-3         , 14.4e-2, 14.4e-2 ,2e-2      ,2e-2      , 7.2e-2      ,7.2e-2  , 13e-3   ,13e-3};
   G4double CPipeRadiusOut_[] = {3e-3   , 3e-3   ,3e-3   ,3e-3    , 3e-3  ,3e-3   ,13.52e-3,14.1e-3,14.1e-3, 3.4e-3       , 3.4e-3       , 5e-3   , 5e-3    ,4e-3      ,4e-3      , 7.5e-3      , 7.5e-3 , 3e-3    ,3e-3};
-  G4double CPipeRadiusIn_[]  = {   0.  ,    0.  ,   0.  ,   0.   , 0.    ,   0.  ,7.52e-3,7.3e-3,7.3e-3   , 0.           , 0.           , 0      , 0       ,0         ,0         , 0           , 0        , 0.      ,0.}; 
+  G4double CPipeRadiusIn_[]  = {   0.  ,    0.  ,   0.  ,   0.   , 0.    ,   0.  ,7.52e-3,7.3e-3,7.3e-3   , 0.           , 0.           , 0      , 0       ,0         ,0         , 0           , 0        , 0.      ,0.};
   //CPipeRadiusIn is not the inner pipe radius - use radiusOut and wallthickness for that
-  G4double CPipeWallThick_[] = {4e-4   ,4e-4    ,4e-4   ,4e-4    ,4e-4   ,4e-4   , 0     ,1.6e-3 , 0      , 0.8e-3       , 0.8e-3       , 1.e-3  , 1.e-3   ,1e-3      ,1e-3      , 1.1e-3      , 1.1e-3  , 4e-4    , 4e-4}; 
+  G4double CPipeWallThick_[] = {4e-4   ,4e-4    ,4e-4   ,4e-4    ,4e-4   ,4e-4   , 0     ,1.6e-3 , 0      , 0.8e-3       , 0.8e-3       , 1.e-3  , 1.e-3   ,1e-3      ,1e-3      , 1.1e-3      , 1.1e-3  , 4e-4    , 4e-4};
   G4double CPipeCurvRad_[]   = {0      , 0      , 0     , 0      ,2.45e-2,2.45e-2, 0     ,   0   , 0      , 0            , 0            , 0      , 0       ,0         ,0         , 0           , 0        , 0       , 0}; // straight tube if this is 0;
   G4double CPipeOpenAng_[]   = {0      , 0      , 0     , 0      ,90.    ,90.    , 0     ,   0   , 0      , 0            , 0            , 0      , 0       ,0         ,0         , 0           , 0        , 0       , 0   };
   G4double CPipeCloseAng_[]  = {0      , 0      , 0     , 0      ,270.   ,270.   , 0     ,   0   , 0      , 0            , 0            , 0      , 0       ,0         ,0         , 0           , 0        , 0       , 0  };
   G4String CPipeVolName_[]   = {"Pipe1","Pipe2" ,"Pipe3","Pipe4" ,"Pipe5","Pipe6","Pipe7","Pipe8","Pipe9" ,"PipeAdapter1","PipeAdapter2","PipeC1","PipeC2" ,"PipeEndT","PipeEndB","PipeBellowT","PipeBellowB"  ,"Pipe1tp","Pipe2btm" };
-  
+
   for (G4int ii=0;ii<NCPipeN;ii++){
     if(airhrn){
       CPGeantMat.push_back(15);
@@ -472,7 +473,7 @@ if(!vacuumworld && !airhrn){
     }
     CPipeFilledWater.push_back(CPipeFilledWater_[ii]);
     CPipeX0.push_back(CPipeX0_[ii]*CLHEP::m);
-    CPipeY0.push_back(CPipeY0_[ii]*CLHEP::m);    
+    CPipeY0.push_back(CPipeY0_[ii]*CLHEP::m);
     CPipeZ0.push_back(CPipeZ0_[ii]*CLHEP::m);
     CPipeDXDZ.push_back(CPipeDXDZ_[ii]);
     CPipeDYDZ.push_back(CPipeDYDZ_[ii]);
@@ -485,12 +486,12 @@ if(!vacuumworld && !airhrn){
     CPipeCloseAng.push_back(CPipeCloseAng_[ii]*CLHEP::deg);
     CPipeVolName.push_back(CPipeVolName_[ii]);
   }
-  
+
   //Container
   //=======================================================================
   // Z0 with respect to the first target fin
   NContainerN=21;
-  
+
   G4double CTubeZ0_[]     ={-.42181, -.421556, -.41555, -.35855 , -0.3522 ,-.3332 ,-0.0802, -0.123  ,-0.109  ,-0.0572 ,-0.0492 , -0.04  ,-0.042 ,-.022 , -0.013   , -0.0035  ,0.011     , 0.011       ,  0.011      , 0.9785 , 0.9896  };
   G4double CTubeLength_[] ={.254e-3, 6.006e-3, 5.7e-2 , 6.35e-3 , 19e-3   , 253e-3, 23e-3 , 11e-2   , 66e-3  ,8e-3   , 17e-3  , 6e-3   ,0.02   ,15e-3  , 24e-3    , 14.5e-3  , 0.9785   ,1e-6         , 0.9786      ,5e-4    , 1e-6};
   G4double CTubeRin_[]    ={  0.   , 1.27e-2 , 1.7e-2 , 22.22e-3, 17.5e-3 , 77e-3 , 77e-3 , 14.6e-3 , 16.e-3 , 74e-3 , 24e-3  , 18.5e-3,16e-3  ,16e-3  , 14.6e-3  , 16e-3    , 14.6e-3  ,15.101e-3    , 15.1e-3     , 0.0    , 0.};
@@ -498,8 +499,8 @@ if(!vacuumworld && !airhrn){
   G4int CTubeGeantMat_[]  ={   5   ,  10     ,   10   , 10      , 10      , 10    , 10    ,  31     , 10     , 10    , 10     ,  10    , 10    ,10     , 10       , 9        , 9        ,15           ,  15         ,  5     ,  15};
   G4String CTubeVolName_[]={"BeUp1", "BeUp2" , "Added", "BeUp3" , "BFront", "Body", "BEnd","CerTube", "Conn1","CLid1", "CLid2", "Conn2","Conn3","Tube1a" ,"Tube1b", "AlTube1", "AlTube2","TGTExitCyl1","TGTExitCyl2", "BeDW" ,"TGTExitTop"};
 
- TargetVirtualCanisterHeight = 63.0*CLHEP::mm + 0.075*CLHEP::mm; // Sett Mova Target Heigth... 
- TargetVirtualCanisterWidth = 13.75*CLHEP::mm; // a bit bigger than LE as well, 
+ TargetVirtualCanisterHeight = 63.0*CLHEP::mm + 0.075*CLHEP::mm; // Sett Mova Target Heigth...
+ TargetVirtualCanisterWidth = 13.75*CLHEP::mm; // a bit bigger than LE as well,
 
  for (G4int ii=0;ii<NContainerN;ii++){
     CTubeZ0.push_back(CTubeZ0_[ii]*CLHEP::m);
@@ -537,19 +538,19 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   TunnelGEANTmat = 15;
   BeamAngle      = 0.05835; // .05835 in radians.
 
-  //ShieldNshield  5 
-  //======================================================================= 
-  ShieldX0       = 0.0; 
-  ShieldY0       = 0.0; 
-  ShieldZ0       = 45.699*CLHEP::m; //was 45.28*m (08/09/05);   
-  ShieldDxdz     = 0.0; // not 
+  //ShieldNshield  5
+  //=======================================================================
+  ShieldX0       = 0.0;
+  ShieldY0       = 0.0;
+  ShieldZ0       = 45.699*CLHEP::m; //was 45.28*m (08/09/05);
+  ShieldDxdz     = 0.0; // not
   ShieldDydz     = 0.0; // used
-  ShieldLength   = 676.681*CLHEP::m; //was 677.1*m (08/09/05);  
-  ShieldRout     = 2.23*CLHEP::m; 
-  ShieldRin      = 1.0097*CLHEP::m; 
+  ShieldLength   = 676.681*CLHEP::m; //was 677.1*m (08/09/05);
+  ShieldRout     = 2.23*CLHEP::m;
+  ShieldRin      = 1.0097*CLHEP::m;
   ShieldGEANTmat = 17;
-  
-  //DecayPipe          1    
+
+  //DecayPipe          1
   //=======================================================================
   DecayPipeZ0        = 45.699*CLHEP::m; //was 45.28*CLHEP::m (08/09/05);
   //DecayPipeRadius    = 0.9716*CLHEP::m; // was 0.9906 but doesnt correlate w gnumi
@@ -565,17 +566,17 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   DecayPipeEWinmat   = 10;
   HeInDecayPipe      = true;
   applyDecayPipeMagneticField = false;
-  // New Target Hall by Zach Barnett 
-  
+  // New Target Hall by Zach Barnett
+
   //==========================================================================
   // TargetHallChase       1
-  
+
   NTHConcreteSectionsN = 6;
-  
+
   // units in meters, dimensions based on Numi note.
   G4double THConcreteX0_[]= {3.36073, 2.60670, 0.0, -2.60670, -3.36073, 0.0};
   G4double THConcreteY0_[]= {2.801, 0.0, -2.801, 0, 2.801, 3.45665};
-  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume 
+  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume
   G4double THConcreteZ0_[]= {19.499, 19.499, 19.499, 19.499, 19.499, 19.499};
   G4double THConcreteLength_[]= {52.397, 52.397, 52.397, 52.397, 52.397, 52.397};
   G4double THConcreteHdx_[]={.754025,.46675,3.07345,.46675,.754025, 2.921};
@@ -597,10 +598,10 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 	  THConcreteGeantMaterial.push_back(THConcreteGeantMaterial_[ii]);
 	  THConcreteName.push_back(THConcreteName_[ii]);
   }
-  
+
   //==========================================================================
 
-  //======================================================================= 
+  //=======================================================================
   // Target Hall shielding (18 blocks, numbered 0-17)
 
   if(g3Chase){
@@ -622,7 +623,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   .6904,     //Block 4
 							   -.6904,    //Block 5
 							   -1.7158,   //Block 6
-							   1.0254,      //Block 7 
+							   1.0254,      //Block 7
 							   -1.0254,     //Block 8
 							   1.7158,    //Block 9
 							   -1.7158,   //Block 10
@@ -667,16 +668,16 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
                                0.672075+0.05 //Block 23 above Horn2 (ZP: add 5cm and make it 5cm thinner for overall 10cm shift to clear horn 2 volume)
   };
 
-  
-  
+
+
   // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume
 
   G4double THBlockZ0_[]= {19.499};
   G4double THBlockDxdz_[] = {0.0};
   G4double THBlockDydz_[] = {0.0};
-	  
-  /*	  
-  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume 
+
+  /*
+  // these Z0 values are set with respect to the ROCK volume, but NumiTargetHall.cc adjusts them to the TGAR volume
   G4double THBlockZ0_[]    = { 20.64,        //Block 0
   20.64,        //Block 1
 							   20.64,        //Block 2
@@ -697,14 +698,14 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 							   20.64,        //Block17 (top block3)
 							   19.499,//Block 18 bottom
 							   19.499,//Block 19 side
-							   19.499,//Block 20 side	
+							   19.499,//Block 20 side
 							   19.499,//Block 21 top
 							   19.499,//Block 22 top
 							   19.499,//Block 23 top
 
   };
 
-	  
+
   G4double THBlockDxdz_[]  = { 0.0,        //Block 0
 							   0.0,        //Block 1
 							   0.0,        //Block 2
@@ -745,7 +746,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 			       0.0,        //Block17 (top block3)
                              };
   */
-	  
+
   // all normal blocks have the same Length, Hdx, and Hdy values.  These values for the slightly larger blocks are set
   // in NumiTargetHall.cc, line 103
   G4double THBlockLength_[]= {52.397};
@@ -803,7 +804,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     THBlockName.push_back(THBlockName_[ii]);
   }
 
-  //======================================================================= 
+  //=======================================================================
   // Hadron Box Dimensions
   // 55.75' is the surveyed distance between the
   // downstream wall of Muon Alcove 1 and the
@@ -818,18 +819,18 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     //
     //it is horrible!
     //
-  
-  HornCurrent=182100.*CLHEP::ampere; 
+
+  HornCurrent=182100.*CLHEP::ampere;
   if (useFile) {
     HornCurrent = hornCurrentFile*CLHEP::ampere;
     if (HornCurrent < 250*CLHEP::ampere) HornCurrent *= 1000.; // Convert to kA
   }
-  
+
   if (runPeriod == 4) {
       HornCurrent *= -1;
   }
 
-  
+
   G4cout << "Running with: " << G4endl
        << "  Run Period = " << runPeriod << G4endl
        << "  Target Z = " << TargetConfigZ/CLHEP::cm << " cm" << G4endl
@@ -847,7 +848,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   Horn2X0 = 0.0*CLHEP::cm;
   Horn2Y0 = 0.0*CLHEP::cm;
   Horn2Z0 = 10.0*CLHEP::m;
-  
+
   Horn1Phi   = 0.0*CLHEP::rad;
   Horn1Theta = 0.0*CLHEP::rad;
   Horn1Psi   = 0.0*CLHEP::rad;
@@ -859,23 +860,23 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 //  fHornWaterLayerThick = 0.0*CLHEP::mm; // July 14 2014, P.L.  Default is zero, should be 0.5 mm
   fHornWaterLayerThick = 1.0*CLHEP::mm; // Oct 18 2014, Based on studies done
 //  mid-October, after fixing bug in the Magnetic field pointer assignments,
-//  default is now what it should be 
+//  default is now what it should be
   fHorn1ExtraLayerAlum = 0.0*CLHEP::mm;
   fDumpBFieldPlease = false;
-//  fDumpBFieldPlease = true;// To get enhanced field.. Dirty back door... 
+//  fDumpBFieldPlease = true;// To get enhanced field.. Dirty back door...
 
   NPHorn2EndN=3;
-  
+
   G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
   if (jCompare) {
 	PHorn2EndZ0_[0] = 118.11;
 	PHorn2EndZ0_[1] = 119.86;
-	PHorn2EndZ0_[2] = 122.048;	
+	PHorn2EndZ0_[2] = 122.048;
   }
   G4double PHorn2EndLength_[] ={1.75           ,2.188       ,.625};
   G4double PHorn2EndRin_[]    ={12.719         ,12.532      ,11.};
   G4double PHorn2EndRout_[]   ={14.405         ,14.469      ,12.532};
-  G4int PHorn2EndGeantMat_[]  ={31             ,  9         ,  9 };  
+  G4int PHorn2EndGeantMat_[]  ={31             ,  9         ,  9 };
   G4String PHorn2EndVolName_[]={"PHorn2InsRing","PHorn2CPB1","PHorn2CPB2"};
 
   for (G4int ii=0;ii<NPHorn2EndN;ii++){
@@ -897,7 +898,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   if (jCompare) {
 	PHorn1EndZ0_[0] = 118.11;
 	PHorn1EndZ0_[1] = 119.86;
-	PHorn1EndZ0_[2] = 122.048;	
+	PHorn1EndZ0_[2] = 122.048;
   }
   G4double PHorn1EndLength_[] ={1.75           ,2.188       ,.624};
   G4double PHorn1EndRin_[]    ={6.00           ,5.815       ,4.25};
@@ -910,7 +911,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
     PHorn1EndLength.push_back(PHorn1EndLength_[ii]*in);
     PHorn1EndRin.push_back(PHorn1EndRin_[ii]*in);
     PHorn1EndRout.push_back(PHorn1EndRout_[ii]*in);
-    if(airhrn){ 
+    if(airhrn){
       PHorn1EndGeantMat.push_back(15);
     }
     else{
@@ -939,9 +940,9 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   dummy.bottomThickMid=.3*in;  //Thickness of bottom part in the middle
   dummy.bottomR=1.188*in;
   dummy.ceramicRodR=.491*in;
-  
+
   Horn1SS.push_back(dummy);
-  
+
   dummy.stripW=.5*in;
   dummy.stripH=3.123*in;
   dummy.stripL=.063*in;
@@ -954,9 +955,9 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   dummy.bottomThickMid=.3*in;  //Thickness of bottom part in the middle
   dummy.bottomR=1.75*in;
   dummy.ceramicRodR=.491*in;
-  
+
   Horn1SS.push_back(dummy);
- 
+
   dummy.stripW=.5*in;
   dummy.stripH=1.56*in;
   dummy.stripL=.031*in;
@@ -969,7 +970,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   dummy.bottomThickMid=.3*in;  //Thickness of bottom part in the middle
   dummy.bottomR=3.313*in;
   dummy.ceramicRodR=.491*in;
-  
+
   Horn1SS.push_back(dummy);
 
   //Spider supports for Horn2
@@ -989,7 +990,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   dummy.bottomThickMid=.3*in;  //Thickness of bottom part in the middle
   dummy.bottomR=5.812*in;
   dummy.ceramicRodR=.491*in;
- 
+
   Horn2SS.push_back(dummy);
   //---------------------------------------------------------
 
@@ -997,19 +998,19 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   //Near & Far Detector locations:
 
   //Miniboone, Microboone and Sciboone (Zarko Pavlovic private e-mail 2014-09-12)
-  
+
   //Minos Near and Far: positions from R. Hatcher using GENIE GNuMIFlux R-2_8_4 transformation.
-  
-  //Nova Near and Far: positions from R. Hatcher (using GENIE GNuMIFlux R-2_8_4 transformation) and updated by 
+
+  //Nova Near and Far: positions from R. Hatcher (using GENIE GNuMIFlux R-2_8_4 transformation) and updated by
   //Alex Radovic and Ryan Nichol.
-  
-  //Minerva values are in the center of the tracker: (0,0,716.95cm) in the Minerva coordinate system. 
+
+  //Minerva values are in the center of the tracker: (0,0,716.95cm) in the Minerva coordinate system.
   //We provide these numbers to Robert Hatcher and he calculated the numbers below using GENIE GNuMIFlux R-2_8_4 transformation.
   //See also M. Kordosky Minerva docdb 10414.
-  
+
   nNear=7;
   nFar=2;
-  //We are checking now Minerva positions. 
+  //We are checking now Minerva positions.
   G4double xdetNear[]    = {-0.5628   ,     0         ,   11.7174545 ,  -0.29,    26.04      ,    53.    ,    197.6};
   G4double ydetNear[]    = {-0.5329317,     0         ,   -3.3151325 ,  92.21,    78.64      ,    76.    ,     53.4};
   G4double zdetNear[]    = {1032.319  ,  1036.488     ,  992.9347347 , 841.76,   744.87      ,   679.    ,    339.4};
@@ -1034,8 +1035,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   }
 
   //Variables needed fr custumized dk2nu storing (Leo Aliaga, Feb17, 2015)
-  
-  // vdbl: 
+
+  // vdbl:
   //For now, just storing values for absorption studies
   nGenAbs = 3;
   nVolAbs = 4;
@@ -1056,7 +1057,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   }
   nVdblTot = int(VolVdblName.size());
 
-  // vint: 
+  // vint:
   //For now, storing two values
   nVintTot = 2;
   G4String name_vint[] = {"Index_Tar_In_Ancestry","playlistID"};
@@ -1070,7 +1071,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   // Nova Medium Energy Target
   // =================================================
 
-  //  48 Target segments 
+  //  48 Target segments
   // + 1 Budal VFHS (Vertical Fin for Horizontal Scan)
   // + 1 Budal HFVS (Horizontal Fin for Vertical Scan)
 
@@ -1106,7 +1107,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   // TargetDensity        = 1.78*CLHEP::g/CLHEP::cm3;
 
   //  Z=4.,A=9.01*CLHEP::g/mole, density=1.848*CLHEP::g/CLHEP::cm3
-  //Be Target 
+  //Be Target
   //TargetA              = 9.01*CLHEP::g/mole;
   //TargetZ              = 4.0;
   //TargetDensity        = 1.848*CLHEP::g/CLHEP::cm3;
@@ -1115,10 +1116,10 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   // Downstream end of target is fixed at -20 cm with respect to MCZERO
   // MCZERO is at location (0,0,0) in the ROCK volume.
   // Work upstream from there to find the upstream end of the Target
-  TotalTargetLength =   
-    TargetSegmentNo*TargetSegLength 
-    + (TargetSegmentNo-1)*TargetSegPitch 
-    + BudalVFHSLength + BudalVFHSPitch 
+  TotalTargetLength =
+    TargetSegmentNo*TargetSegLength
+    + (TargetSegmentNo-1)*TargetSegPitch
+    + BudalVFHSLength + BudalVFHSPitch
     + BudalHFVSLength + BudalHFVSPitch;
   // TargetX0           = 0.0;
   // TargetY0           = 0.0;
@@ -1130,12 +1131,12 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
 
   // The distance between the downstream end of the target and the
   // downstream canister flange is 8 cm.
-  // The centerline of the target canister is 4.15 cm below the beamline 
+  // The centerline of the target canister is 4.15 cm below the beamline
   TargetEndtoDnFlange = 8.0*CLHEP::cm;
   TargetCanisterCenterOffset = -4.15*CLHEP::cm;
 
   // The X0, YO, and Z0 for the flanges and cansiter are with respect to the
-  // the canister center for X0 and Y0 and the start of the target material for Z0 
+  // the canister center for X0 and Y0 and the start of the target material for Z0
   // X0 and Y0 are the locations of the center of the volume, and Z0 is the location of the upstream end.
   TargetDnFlangeLength = 2.5*CLHEP::cm;
   TargetDnFlangeOutRad = 15.0*CLHEP::cm;
@@ -1150,7 +1151,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   TargetDnBeWindowLength     = 1*CLHEP::mm;
 
 
-  // The body of the target canister is modeled with three layers 
+  // The body of the target canister is modeled with three layers
   // to approximate the actual geometry given in nova-doc 3681-v3 :
   //   The outer shell is 3mm thick aluminum
   TargetOutsideCasingOutRad = 15.0*CLHEP::cm;
@@ -1178,7 +1179,7 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   TargetUpBeFlangeLength = 0.5*(CLHEP::cm * 2.54) ;
   TargetUpBeFlangeOutRad = 2.73*(CLHEP::cm * 2.54) / 2.0;
   TargetUpBeFlangeX0 = 0.0;
-  TargetUpBeFlangeY0 = 0.0; 
+  TargetUpBeFlangeY0 = 0.0;
   TargetUpBeFlangeZ0 =  TargetUpFlangeZ0 - TargetUpBeFlangeLength;
 
   TargetUpBeFlangeCutoutLength = 0.25*(CLHEP::cm * 2.54);
@@ -1187,8 +1188,8 @@ for (G4int ii=0;ii<NTgtRingN;ii++){
   TargetUpBeWindowRadius = 0.5*(CLHEP::cm * 2.54);
   TargetUpBeWindowLength = 0.01*(CLHEP::cm * 2.54);
 
-  // The target graphite material is clamped between the pressing plate and cooling plate 
-  // Pressing plate 
+  // The target graphite material is clamped between the pressing plate and cooling plate
+  // Pressing plate
   PressingPlateLength = TotalTargetLength;
   PressingPlateHeight = TargetGraphiteHeight - TargetSegHeight;
   PressingPlateWidth  = 20.0*CLHEP::mm;
@@ -1274,7 +1275,7 @@ void NumiDataInput::Print()
              << " Proton Beam Y-Sigma                         = " << beamSigmaY/CLHEP::mm << " mm" << G4endl
 	     << " Decay Pipe Helium                           = " << std::boolalpha << HeInDecayPipe<<G4endl
 	     << " Decay Pipe Magnetic Field                   = " << std::boolalpha << applyDecayPipeMagneticField << G4endl;
-      
+
       if(fUseDetailedProtonBeam)
       {
          G4cout << " Using Detailed Proton Beam with parameters..." << G4endl
@@ -1286,7 +1287,7 @@ void NumiDataInput::Print()
                 << "    Proton cosx               = " << fProton_cosx  << G4endl
                 << "    Proton cosy               = " << fProton_cosy  << G4endl;
       }
-      
+
 
 
    }
@@ -1307,7 +1308,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
       G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM: Run Period not set. MUST SET RUN PERIOD BEFORE SETTING BEAM CONFIGURATION. " << G4endl;
       return false;
    }
-   
+
    std::string::size_type beg_loc_tgt = std::string::npos;
    std::string::size_type size_horn;
 
@@ -1325,7 +1326,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    {
       G4cout << "NumiDataInput::SetBeamConfig() - PROBLEM. Can't get beam configuration. "
              << "Beam configuration must be in the form \"LE#z#i\" or \"le#z#i\", where # is any number. "
-             << "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc." 
+             << "Examples are le010z185i, LE025.3z-200i, LE250z185.6i....etc."
              << "Note that I don't know how to simulate \"ME\" beam configurations right now." << G4endl;
       return false;
    }
@@ -1339,7 +1340,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
    //
    //get the target config
    //
-   
+
    std::string::size_type end_loc_tgt = config.find("z", 0);
 
    if(end_loc_tgt == std::string::npos)
@@ -1350,7 +1351,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
       return false;
    }
 
-   
+
    std::string::size_type size_tgt = end_loc_tgt-(beg_loc_tgt+size_horn) +1;
    std::string tgtzstr = config.substr(beg_loc_tgt+size_horn, size_tgt);
 
@@ -1377,7 +1378,7 @@ bool NumiDataInput::SetBeamConfig(G4String config)
 
    std::string ihornstr = config.substr(end_loc_tgt+1, end_loc_ihorn-end_loc_tgt);
 
-   
+
    if(!NumiDataInput::SetHornCurrentConfig(ihornstr)) return false;
 //These lines are to change the horizontal transverse position of the position of the horns and the target density --Bruce Howard, Jr.
    if(fUseHornMisalign){
@@ -1400,15 +1401,15 @@ bool NumiDataInput::SetBeamConfig(G4String config)
       //get horn 2 X0
       //
       std::string::size_type end_loc_h2 = config.find("htt",0);
-      
+
       if(end_loc_h2 == std::string::npos)
       {
          G4cout << "\n\n\n\n\n HORN 2 POSITION NOT PROPERLY ENTERED!! MUST ENTER AS ###htt. PROGRAM ABORTED." << G4endl;
          std::exit (EXIT_FAILURE);
       }
-   
+
       std::string ih2str = config.substr(end_loc_h2-3,3);
-   
+
       if(!NumiDataInput::SetHornTwoPos(ih2str)) return false;
    }
    else
@@ -1436,21 +1437,21 @@ bool NumiDataInput::SetBeamConfig(G4String config)
 
 
    if(!NumiDataInput::ConfigureRunPeriod(config)) return false;
-   
-   
+
+
    fBeamConfig = config;
-   
-   
-   
+
+
+
    return true;
-      
+
 }
 
 //---------------------------------------------------------------------------------
 G4bool NumiDataInput::SetPlaylist(G4String pl)
 {
    fPlaylist = pl;
-   
+
    return true;
 }
 
@@ -1469,7 +1470,7 @@ G4bool NumiDataInput::SetTargetConfig(G4String config)
    }
 
    const std::string tgtzstr = config.substr(0,size_config-1);
-   
+
    const std::string number = "0123456789.";
 
    for(unsigned int i = 0; i < tgtzstr.size(); ++i)
@@ -1489,7 +1490,7 @@ G4bool NumiDataInput::SetTargetConfig(G4String config)
                 << " Can't get target configuration. "
                 << "Target configuration must be in the form \"#z\", where # is any number. "
                 << "Examples are 010z, 100z, 025.3z, 250.5z....etc." << G4endl;
-         return false;  
+         return false;
       }
    }
 
@@ -1504,7 +1505,7 @@ G4bool NumiDataInput::SetTargetConfig(G4String config)
 
    fTargetConfig = config;
 
-   
+
    return true;
 }
 
@@ -1543,10 +1544,10 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
                 << "Can't get horn current configuration. "
                 << "Horn current configuration must be in the form \"#i\", where # is any number. "
                 << "Examples are 185i, -059i, -200i, 20.6i....etc." << G4endl;
-         return false;  
+         return false;
       }
    }
-  
+
    if(fUseCorrHornCurrent && fHornConfig == "le")
    {
       //
@@ -1568,7 +1569,7 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
       else if (ihornstr == "174")   ihornstr = "174.816";
       else if (ihornstr == "176")   ihornstr = "176.637";
       else if (ihornstr == "178")   ihornstr = "178.458";
-      else if (ihornstr == "180")   ihornstr = "180.279";                                        
+      else if (ihornstr == "180")   ihornstr = "180.279";
       else if (ihornstr == "183")   ihornstr = "183.921";
       else if (ihornstr == "186")   ihornstr = "185.742";
       else if (ihornstr == "187")   ihornstr = "187.563";
@@ -1603,16 +1604,16 @@ G4bool NumiDataInput::SetHornCurrentConfig(G4String config)
 
    NumiDataInput::SetHornCurrent(ihorn*1000.*CLHEP::ampere);
    //
-   // Do something naughty: Multiply by 1000 for BFieldMu geantino analysis. 
+   // Do something naughty: Multiply by 1000 for BFieldMu geantino analysis.
    //
    if (fDumpBFieldPlease) {
        NumiDataInput::SetHornCurrent(ihorn*1.e6*CLHEP::ampere);
-       std::cerr << " Horn Current has been multiplied by 1 e3 for Muon Geantino use, Hor Current is now  " 
+       std::cerr << " Horn Current has been multiplied by 1 e3 for Muon Geantino use, Hor Current is now  "
                  << this->HornCurrent << std::endl;
 //       exit(2);
    }
    fIHornConfig = ihornstr + "i";
-   
+
    return true;
 }
 
@@ -1634,11 +1635,11 @@ G4bool NumiDataInput::SetHornTwoPos(G4String config)
    std::istringstream posstream(config);
    posstream >> hornpos;
 
-   std::cerr << " Setting Horn2 position at " << hornpos << std::endl; 
+   std::cerr << " Setting Horn2 position at " << hornpos << std::endl;
 
    NumiDataInput::SetHorn2X0((hornpos/10.)*CLHEP::cm); //Input as mm, but we want cm
 
-   return true;   
+   return true;
 }
 //------------------------------------------------------------------------------------
 G4bool NumiDataInput::SetTargetDensity(G4String config)
@@ -1657,12 +1658,12 @@ G4bool NumiDataInput::SetHornConfig(G4String config)
    if(config != "le" && config != "me")
    {
       G4cout << "NumiDataInput::SetHornConfig() - PROBLEM. Can't set horn configuration. "
-             << "Valid horn configs are \"LE\" or \"le\"." 
+             << "Valid horn configs are \"LE\" or \"le\"."
              << "Note that I don't know how to simulate \"ME\" beam configurations right now." << G4endl;
-      
+
       return false;
    }
-   
+
    fHornConfig = config;
 
    return true;
@@ -1688,7 +1689,7 @@ G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
                 << " during run period " << fRunPeriod << G4endl;
          return false;
       }
-      
+
       TargetY0 = -1.1*CLHEP::mm;
       BudalY0  = 2.26*CLHEP::mm;
 
@@ -1705,7 +1706,7 @@ G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
                 << " during run period " << fRunPeriod << G4endl;
          return false;
       }
-         
+
       // Change LE010 to LE008.9
       if (beamconfig.find("LE010") != std::string::npos ||
           beamconfig.find("le010") != std::string::npos )
@@ -1724,7 +1725,7 @@ G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
                 << " during run period " << fRunPeriod << G4endl;
          return false;
       }
-         
+
       // Change LE010 to LE008.9
       if (beamconfig.find("LE010") != std::string::npos ||
           beamconfig.find("le010") != std::string::npos )
@@ -1747,13 +1748,13 @@ G4bool NumiDataInput::ConfigureRunPeriod(G4String &beamconfig)
    }
    else
    {
-      
+
       G4cout << "NumiDataInput::ConfigureRunPeriod() - PROBLEM: Don't know about Run Period " << fRunPeriod << G4endl;
       return false;
    }
 
 
-   
+
 }
 
 //---------------------------------------------------------------------------------
@@ -1763,7 +1764,7 @@ void NumiDataInput::SetDetailedProtonBeam(G4bool val)
    {
       //
       //These values are in g4numi_flugg/scripts/g4numi_fluka.sh
-      //      
+      //
       //protonMomentum = 120.0*CLHEP::GeV;
       fProton_outR  = -0.26350;  //this is probably mm
       fProton_inR   = -0.26139; //this is probably mm
@@ -1771,9 +1772,9 @@ void NumiDataInput::SetDetailedProtonBeam(G4bool val)
       fProtonSpread = -0.000001; //this is probably GeV?
 
       //
-      //these values are in NumiPrimaryMessenger.cc 
+      //these values are in NumiPrimaryMessenger.cc
       //
-      fProton_cosx = 0.0; 
+      fProton_cosx = 0.0;
       fProton_cosy = 0.0;
    }
 
@@ -1826,7 +1827,7 @@ void NumiDataInput::SetAbsorberMaterial(G4Material* mat, G4int mon)
       Mon2AbsorberMaterial = DefaultMaterial;
       Mon3AbsorberMaterial = DefaultMaterial;
    }
-      
+
 }
 
 //---------------------------------------------------------------------------------
@@ -1846,7 +1847,7 @@ void NumiDataInput::SetAbsorberThickness(G4double val, G4int mon)
       Mon2AbsorberThickness = 0.0;
       Mon3AbsorberThickness = 0.0;
    }
-      
+
 }
 
 //----------------------------------------------------------------------------------------
@@ -1882,7 +1883,7 @@ G4Material* NumiDataInput::GetAbsorberMaterial(G4int mon)
              << " returing " << DefaultMaterial->GetName() << G4endl;
       return DefaultMaterial;
    }
-      
+
 }
 
 //----------------------------------------------------------------------
@@ -1897,7 +1898,7 @@ G4double NumiDataInput::GetAbsorberThickness(G4int mon)
              << " returning 1e-6 mm" << G4endl;
       return 0.0;
    }
-      
+
 }
 
 //----------------------------------------------------------------------------------------
@@ -1921,19 +1922,19 @@ void NumiDataInput::SetjCompare(G4bool _jc) {
     if (jCompare) {
         PHorn1EndZ0_[0] = 118.11;
         PHorn1EndZ0_[1] = 119.86;
-        PHorn1EndZ0_[2] = 122.048;	
+        PHorn1EndZ0_[2] = 122.048;
     }
     PHorn1EndZ0.clear();
     for (G4int ii=0;ii<NPHorn1EndN;ii++){
         PHorn1EndZ0.push_back(PHorn1EndZ0_[ii]*in);
     }
-    
-    
+
+
     G4double PHorn2EndZ0_[]     ={135.861        ,137.611     ,139.486};
     if (jCompare) {
         PHorn2EndZ0_[0] = 118.11;
         PHorn2EndZ0_[1] = 119.86;
-        PHorn2EndZ0_[2] = 122.048;	
+        PHorn2EndZ0_[2] = 122.048;
     }
     PHorn2EndZ0.clear();
     for (G4int ii=0;ii<NPHorn2EndN;ii++){
@@ -1945,14 +1946,14 @@ void NumiDataInput::SetjCompare(G4bool _jc) {
 void NumiDataInput::Setg3Chase(G4bool _gc)
 {
     g3Chase = _gc;
-    
+
     if(g3Chase){
         THBlockNblock = 24;
     }
     else{
         THBlockNblock=18;
-    }       
-    
+    }
+
 }
 
 //---------------------------------------------------------------------------------
