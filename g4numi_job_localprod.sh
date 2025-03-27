@@ -36,9 +36,11 @@ setup g4numi $version -q $qualifier
 
 echo
 echo "======== UPDATE MACRO WITH RUN NUMBER ========"
-SEED=$(date +%Y%m%d%H%M%S)
+DATE=$(date +%Y%m%d%H%M%S)
+MAX_LONG=2147483647  # Random number generator accepts a long.
+SEED=$(( PROCESS + $(date +%s%3N) % MAX_LONG ))
 sed -i 's/\${seed}/'$SEED'/g' g4numi.mac
-OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}_${SEED}"
+OUTFILE="g4numi${G4NUMIVER}_${PLAYLIST}_${BEAMCONFIG}_${PROCESS}_${SEED}_${DATE}"
 sed -i 's/\${outfile}/'$OUTFILE'/g' g4numi.mac
 
 echo "BEAMCONFIG=${BEAMCONFIG}"
